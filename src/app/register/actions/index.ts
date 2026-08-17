@@ -10,7 +10,7 @@ export async function signup(formData: FormData) {
   const role = formData.get("role") as string;
 
   const supabase = createServerClient();
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -25,9 +25,5 @@ export async function signup(formData: FormData) {
     throw new Error(error.message);
   }
 
-  if (role === "producer") {
-    redirect("/dashboard/producer");
-  } else {
-    redirect("/dashboard/seller");
-  }
+  redirect("/onboarding"); 
 }
