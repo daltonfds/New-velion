@@ -8,9 +8,7 @@ export async function signup(formData: FormData) {
   const password = formData.get("password") as string;
   const fullName = formData.get("fullName") as string;
 
-  const supabase = createClient();
-
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await createClient().auth.signUp({
     email,
     password,
     options: {
@@ -22,7 +20,7 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    throw new Error(error.message);
   }
 
   redirect("/dashboard/seller");

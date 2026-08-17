@@ -13,7 +13,7 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    throw new Error(error.message);
   }
 
   redirect("/dashboard/seller");
