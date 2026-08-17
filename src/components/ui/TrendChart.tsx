@@ -2,17 +2,20 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-const data = [
-  { name: "Day 1", sales: 0, profit: 0 },
-  { name: "Day 5", sales: 120, profit: 10 },
-  { name: "Day 10", sales: 210, profit: 45 },
-  { name: "Day 15", sales: 340, profit: 80 },
-  { name: "Day 20", sales: 280, profit: 65 },
-  { name: "Day 25", sales: 410, profit: 90 },
-  { name: "Day 30", sales: 550, profit: 120 },
-];
+interface TrendChartProps {
+  data: { name: string; sales: number; profit: number }[];
+}
 
-export default function TrendChart() {
+export default function TrendChart({ data }: TrendChartProps) {
+  // Se não houver dados, mostra um placeholder
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-64 w-full flex items-center justify-center text-muted text-sm">
+        No sales data available for the last 30 days.
+      </div>
+    );
+  }
+
   return (
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
