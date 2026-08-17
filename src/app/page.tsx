@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
+import Particles from "@tsparticles/react";
 
 export default function LandingPage() {
   const [init, setInit] = useState(false);
 
   useEffect(() => {
     const initParticles = async () => {
+      // Importação dinâmica para evitar o conflito de tipos do TypeScript com o default export
+      const { initParticlesEngine } = await import("@tsparticles/react");
       const { loadSlim } = await import("@tsparticles/slim");
       await initParticlesEngine(async (engine) => {
         await loadSlim(engine);
