@@ -1,30 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
 import Particles from "@tsparticles/react";
 
 export default function LandingPage() {
-  const [init, setInit] = useState(false);
-
-  useEffect(() => {
-    const initParticles = async () => {
-      // Importação dinâmica para evitar o conflito de tipos do TypeScript com o default export
-      const { initParticlesEngine } = await import("@tsparticles/react");
-      const { loadSlim } = await import("@tsparticles/slim");
-      await initParticlesEngine(async (engine) => {
-        await loadSlim(engine);
-      });
-      setInit(true);
-    };
-    initParticles();
-  }, []);
-
   return (
     <div className="min-h-screen bg-secondary relative overflow-hidden flex flex-col items-center justify-center p-6">
-      {init && (
-        <Particles
+      <Particles
           id="tsparticles"
           options={{
             background: { color: { value: "#F4F4F7" } },
@@ -45,7 +29,6 @@ export default function LandingPage() {
             detectRetina: true,
           }}
         />
-      )}
       
       <div className="relative z-10 w-full max-w-md bg-white/80 backdrop-blur-lg border border-white/40 shadow-2xl rounded-2xl p-8 flex flex-col items-center text-center">
         <div className="mb-6">
