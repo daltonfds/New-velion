@@ -1,67 +1,73 @@
+"use client";
+
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Button from "@/components/ui/Button";
-import { createServerClient } from "@/lib/supabase/server";
+import { createIntegration } from "./actions";
+import { useToast } from "@/components/ui/Toast";
 
-// Buscar integrações do banco de dados
-async function getIntegrations() {
-  const supabase = createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+export default function IntegrationsPage() {
+  const { showToast } = useToast();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const { data, error } = await supabase
-    .from("integrations")
-    .select("*")
-    .eq("seller_id", user.id);
-
-  if (error) return [];
-  return data || [];
-}
-
-export default async function IntegrationsPage() {
-  const integrations = await getIntegrations();
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const formData = new FormData(e.currentTarget);
+      await createIntegration(formData);
+      showToast("Integration added successfully!", "success");
+      setIsModalOpen(false);
+    } catch (err: any) {
+      showToast(err.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <DashboardLayout>
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-dark">Integrations</h1>
-          <p className="text-muted text-sm">Connect your store to Velion for automatic order processing.</p>
+          <p className="text-muted text-sm">Connect your store to Velion.</p>
         </div>
-        <Button>+ Connect New Store</Button>
+        <Button onClick={() => setIsModalOpen(true)}>+ Connect New Store</Button>
       </div>
 
-      <div className="space-y-4">
-        {integrations.length === 0 ? (
-          <div className="bg-white p-12 rounded-xl border border-border shadow-sm text-center">
-            <div className="text-4xl mb-4">🔌</div>
-            <h3 className="text-lg font-medium text-dark">No integrations yet</h3>
-            <p className="text-muted text-sm mb-6">Connect your Shopify, WooCommerce, or custom store to start processing orders via Velion.</p>
-            <Button variant="outline">+ Add Integration</Button>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-muted hover:text-dark text-xl">×</button>
+            <h2 className="text-xl font-bold text-dark mb-4">Connect Your Store</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-xs text-muted block mb-1">Platform</label>
+                <select name="platform" className="w-full px-4 py-2.5 border border-border rounded-lg bg-secondary/50" required>
+                  <option value="">Select platform</option>
+                  <option value="shopify">Shopify</option>
+                  <option value="woocommerce">WooCommerce</option>
+                  <option value="custom_api">Custom API</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-muted block mb-1">Store URL</label>
+                <input type="url" name="store_url" placeholder="https://..." className="w-full px-4 py-2.5 border border-border rounded-lg bg-secondary/50" />
+              </div>
+              <div>
+                <label className="text-xs text-muted block mb-1">API Key</label>
+                <input type="text" name="api_key" placeholder="sk_..." className="w-full px-4 py-2.5 border border-border rounded-lg bg-secondary/50" required />
+              </div>
+              <div>
+                <label className="text-xs text-muted block mb-1">API Secret</label>
+                <input type="password" name="api_secret" placeholder="••••••••" className="w-full px-4 py-2.5 border border-border rounded-lg bg-secondary/50" required />
+              </div>
+              <Button type="submit" disabled={loading} className="w-full justify-center mt-4">Save Integration</Button>
+            </form>
           </div>
-        ) : (
-          integrations.map((integration: any) => (
-            <div key={integration.id} className="bg-white p-6 rounded-xl border border-border shadow-sm flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center text-xl">
-                  {integration.platform === 'shopify' ? '🛒' : integration.platform === 'woocommerce' ? '🛍️' : '⚙️'}
-                </div>
-                <div>
-                  <h4 className="font-semibold text-dark capitalize">{integration.platform.replace('_', ' ')}</h4>
-                  <p className="text-sm text-muted">{integration.store_url || 'Connected via API'}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`w-2 h-2 rounded-full ${integration.is_active ? 'bg-success' : 'bg-error'}`} />
-                    <span className="text-xs text-muted">{integration.is_active ? 'Active' : 'Inactive'}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" className="text-xs px-4 py-2">View Webhooks</Button>
-                <Button className="bg-error/10 text-error hover:bg-error/20 text-xs px-4 py-2">Disconnect</Button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

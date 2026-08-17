@@ -2,12 +2,13 @@ import { createServerClient } from "@/lib/supabase/server";
 import VelionLogo from "@/components/ui/VelionLogo";
 import { notFound } from "next/navigation";
 
-export default async function TrackingPage({ params }: { params: { id: string } }) {
+export default async function TrackingPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = createServerClient();
   const { data: order, error } = await supabase
     .from("orders")
     .select("*, products(*)")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !order) return notFound();
@@ -25,7 +26,7 @@ export default async function TrackingPage({ params }: { params: { id: string } 
       <div className="w-full max-w-md bg-white rounded-2xl border border-border shadow-sm p-8 text-center">
         <div className="flex justify-center mb-6"><VelionLogo className="w-16 h-16" /></div>
         <h1 className="text-xl font-bold text-dark mb-1">Order Tracking</h1>
-        <p className="text-sm text-muted mb-6">ID: #{params.id.slice(0, 8)}</p>
+        <p className="text-sm text-muted mb-6">ID: #{id.slice(0, 8)}</p>
 
         <div className="mb-6 space-y-2 text-left">
           <div className="flex justify-between border-b border-border pb-2">

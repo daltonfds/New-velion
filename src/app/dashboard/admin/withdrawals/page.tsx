@@ -1,6 +1,5 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { createServerClient } from "@/lib/supabase/server";
-import AdminActionModal from "@/components/ui/AdminActionModal";
 
 export default async function AdminWithdrawalsPage() {
   const supabase = createServerClient();

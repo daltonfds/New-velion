@@ -2,7 +2,8 @@ import { createServerClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 // PUT/PATCH: Atualizar um produto existente (somente o produtor dono pode)
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -13,7 +14,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const { data: existing, error: checkError } = await supabase
       .from("products")
       .select("supplier_id")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (checkError || !existing) throw new Error("Product not found");
@@ -23,7 +24,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const { data, error } = await supabase
       .from("products")
       .update(body)
-      .eq("id", params.id)
+      .eq("id", id)
       .select();
 
     if (error) throw error;
@@ -34,7 +35,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 // DELETE: Deletar um produto (ou desativar logicamente)
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -43,7 +45,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     const { data: existing, error: checkError } = await supabase
       .from("products")
       .select("supplier_id")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (checkError || !existing) throw new Error("Product not found");
@@ -53,7 +55,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     const { error } = await supabase
       .from("products")
       .update({ is_active: false })
-      .eq("id", params.id);
+      .eq("id", id);
 
     if (error) throw error;
     return new Response(null, { status: 204 }); // No Content
