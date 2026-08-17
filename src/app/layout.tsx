@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/Toast";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Velion",
-  description: "Performance Affiliate Platform",
+  title: "Velion - The climb starts here",
+  description: "Marketplace, warehousing, and fulfillment for your business.",
 };
 
 export default function RootLayout({
@@ -15,9 +16,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light">
-      <body className={`${inter.variable} antialiased bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors duration-300`}>
-        {children}
+    <html lang="en">
+      <body className={`${inter.className} antialiased bg-secondary text-dark`}>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );
