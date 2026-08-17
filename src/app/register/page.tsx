@@ -8,6 +8,7 @@ import { signup } from "./actions";
 
 export default function RegisterPage() {
   const [error, setError] = useState("");
+  const [role, setRole] = useState<"seller" | "producer">("seller");
 
   async function handleSubmit(formData: FormData) {
     try {
@@ -24,6 +25,33 @@ export default function RegisterPage() {
         <h2 className="text-xl font-semibold text-dark text-center mb-1">Create your account</h2>
         <p className="text-center text-muted text-sm mb-6">Start your climb with Velion.</p>
         <form action={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-muted mb-1">I am a:</label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 text-sm text-dark">
+                <input 
+                  type="radio" 
+                  name="role" 
+                  value="seller" 
+                  checked={role === "seller"}
+                  onChange={() => setRole("seller")}
+                  className="accent-primary"
+                />
+                Seller
+              </label>
+              <label className="flex items-center gap-2 text-sm text-dark">
+                <input 
+                  type="radio" 
+                  name="role" 
+                  value="producer" 
+                  checked={role === "producer"}
+                  onChange={() => setRole("producer")}
+                  className="accent-primary"
+                />
+                Producer / Supplier
+              </label>
+            </div>
+          </div>
           <div>
             <label className="block text-xs font-medium text-muted mb-1">Full Name</label>
             <input type="text" name="fullName" placeholder="John Doe" className="w-full px-4 py-2.5 bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-dark" required />
