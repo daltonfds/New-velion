@@ -17,6 +17,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-tsparticles": "^2.12.2",
+    "recharts": "^3.10.1",
     "tsparticles": "^4.3.2"
   },
   "devDependencies": {
