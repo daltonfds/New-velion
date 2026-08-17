@@ -1,29 +1,63 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-// PATCH: Atualizar o status de um produto (Aprovar/Rejeitar)
+// PUT/PATCH: Atualizar um produto existente (somente o produtor dono pode)
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const supabase = createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  
-  // Apenas Admin pode aprovar/rejeitar produtos
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const body = await req.json();
-    const { is_active } = body; // true (aprovado) ou false (rejeitado)
+    // Verificar se o usuário é o dono do produto
+    const { data: existing, error: checkError } = await supabase
+      .from("products")
+      .select("supplier_id")
+      .eq("id", params.id)
+      .single();
 
+    if (checkError || !existing) throw new Error("Product not found");
+    if (existing.supplier_id !== user.id) throw new Error("Forbidden: You do not own this product");
+
+    // Atualizar o produto
     const { data, error } = await supabase
       .from("products")
-      .update({ is_active })
+      .update(body)
       .eq("id", params.id)
       .select();
 
     if (error) throw error;
     return NextResponse.json(data[0]);
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
+}
+
+// DELETE: Deletar um produto (ou desativar logicamente)
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  const supabase = createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  try {
+    const { data: existing, error: checkError } = await supabase
+      .from("products")
+      .select("supplier_id")
+      .eq("id", params.id)
+      .single();
+
+    if (checkError || !existing) throw new Error("Product not found");
+    if (existing.supplier_id !== user.id) throw new Error("Forbidden: You do not own this product");
+
+    // Desativar logicamente (em vez de deletar, deixamos como inativo)
+    const { error } = await supabase
+      .from("products")
+      .update({ is_active: false })
+      .eq("id", params.id);
+
+    if (error) throw error;
+    return new Response(null, { status: 204 }); // No Content
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
   }
 }
