@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
-import Particles from "@tsparticles/react";
-import initParticlesEngine from "@tsparticles/react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
 
 export default function LandingPage() {
   const [init, setInit] = useState(false);
