@@ -9,12 +9,31 @@ export default function SupportChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [showHuman, setShowHuman] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  const handleSend = () => {
-    if (message.trim()) {
-      alert("Support ticket sent! We'll get back to you.");
-      setMessage("");
-      setShowHuman(true);
+  const handleSend = async () => {
+    if (!message.trim()) return;
+    setSending(true);
+    try {
+      // Envia para o backend (cria uma notificação para o Admin)
+      const res = await fetch("/api/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "support_ticket",
+          message: `Support Ticket: ${message}`,
+        }),
+      });
+      if (res.ok) {
+        setMessage("");
+        setShowHuman(true);
+      } else {
+        alert("Failed to send message.");
+      }
+    } catch (err) {
+      alert("Network error.");
+    } finally {
+      setSending(false);
     }
   };
 
@@ -32,12 +51,14 @@ export default function SupportChat() {
               <div>
                 <p className="text-sm text-muted mb-4">Describe your issue below. We respond instantly to common questions.</p>
                 <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Type your message..." className="w-full px-3 py-2 border border-border rounded-lg text-sm h-20 resize-none focus:outline-none" />
-                <Button className="w-full justify-center mt-3" onClick={handleSend}><Send size={16} className="mr-2" /> Send Message</Button>
+                <Button className="w-full justify-center mt-3" onClick={handleSend} disabled={sending}>
+                  {sending ? "Sending..." : <><Send size={16} className="mr-2" /> Send Message</>}
+                </Button>
                 <button onClick={() => setShowHuman(true)} className="w-full text-center text-xs text-primary underline mt-2">Need human support? Contact us</button>
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-sm text-muted mb-2">Our AI couldn't resolve this. Contact our human support team:</p>
+                <p className="text-sm text-muted mb-2">Support ticket sent. Contact our human support team:</p>
                 <div className="space-y-2">
                   <a href="mailto:daltonfelizarda66@gmail.com" className="flex items-center gap-3 p-2 bg-secondary/50 rounded-lg text-sm text-dark hover:bg-secondary transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5946E6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>

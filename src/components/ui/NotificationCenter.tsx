@@ -1,22 +1,48 @@
 "use client";
 
-import { useState } from "react";
-import { Bell, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const mockNotifications = [
-  { id: 1, message: "New order #VL-1004 received", time: "2 min ago", read: false },
-  { id: 2, message: "Your withdrawal request was approved", time: "1 hour ago", read: false },
-  { id: 3, message: "Product 'T-Shirt' is low in stock", time: "3 hours ago", read: true },
-];
+import { supabase } from "@/lib/supabase/client";
+import { subscribeToNotifications } from "@/lib/supabase/realtime";
 
 export default function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(mockNotifications);
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  const fetchNotifications = async () => {
+    const res = await fetch("/api/notifications");
+    if (res.ok) {
+      const data = await res.json();
+      setNotifications(data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+        await fetchNotifications();
+        // Subscribe to real-time updates
+        const subscription = subscribeToNotifications(user.id, (payload) => {
+          setNotifications((prev) => [payload.new, ...prev]);
+        });
+        return () => subscription?.unsubscribe();
+      }
+    };
+    getUser();
+  }, []);
+
+  const unreadCount = notifications.filter((n: any) => !n.read).length;
+
+  const markAllAsRead = async () => {
+    if (!userId) return;
+    await supabase.from("notifications").update({ read: true }).eq("user_id", userId);
+    setNotifications(notifications.map((n: any) => ({ ...n, read: true })));
   };
 
   return (
@@ -34,10 +60,11 @@ export default function NotificationCenter() {
               <button onClick={markAllAsRead} className="text-xs text-primary hover:underline">Mark all read</button>
             </div>
             <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
-              {notifications.length > 0 ? notifications.map(n => (
+              {loading ? <p className="text-center text-muted text-sm py-2">Loading...</p> : 
+               notifications.length > 0 ? notifications.map((n: any) => (
                 <div key={n.id} className={`flex gap-2 text-sm ${n.read ? "text-muted" : "text-dark"}`}>
                   <span className={`w-1.5 h-1.5 rounded-full mt-1.5 ${n.read ? "bg-gray-300" : "bg-primary"}`} />
-                  <div><p>{n.message}</p><p className="text-xs text-muted">{n.time}</p></div>
+                  <div><p>{n.message}</p><p className="text-xs text-muted">{new Date(n.created_at).toLocaleString()}</p></div>
                 </div>
               )) : <p className="text-center text-muted text-sm py-2">No notifications yet</p>}
             </div>
