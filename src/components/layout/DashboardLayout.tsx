@@ -9,6 +9,7 @@ const menuItems = [
   { name: "Dashboard", path: "/dashboard/seller" },
   { name: "Orders", path: "/dashboard/seller/orders" },
   { name: "Products", path: "/dashboard/seller/products" },
+  { name: "Integrations", path: "/dashboard/seller/integrations" },
   { name: "Wallet", path: "/dashboard/seller/wallet" },
   { name: "Settings", path: "/dashboard/seller/settings" },
 ];
