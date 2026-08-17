@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { MessageCircle, X, Send, Phone, Mail, Instagram } from "lucide-react";
+import { MessageCircle, X, Send, Phone, Mail } from "lucide-react";
+// Import do Instagram com alias para garantir que o Vercel reconheça
+import { Instagram as InstagramIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "./Button";
 
@@ -41,7 +43,7 @@ export default function SupportChat() {
                 <div className="space-y-2">
                   <a href="mailto:daltonfelizarda66@gmail.com" className="flex items-center gap-3 p-2 bg-secondary/50 rounded-lg text-sm text-dark hover:bg-secondary transition-colors"><Mail size={16} className="text-primary" /> daltonfelizarda66@gmail.com</a>
                   <a href="tel:+27722958915" className="flex items-center gap-3 p-2 bg-secondary/50 rounded-lg text-sm text-dark hover:bg-secondary transition-colors"><Phone size={16} className="text-primary" /> +27722958915</a>
-                  <a href="https://instagram.com/dalton_fds" target="_blank" className="flex items-center gap-3 p-2 bg-secondary/50 rounded-lg text-sm text-dark hover:bg-secondary transition-colors"><Instagram size={16} className="text-primary" /> @dalton_fds</a>
+                  <a href="https://instagram.com/dalton_fds" target="_blank" className="flex items-center gap-3 p-2 bg-secondary/50 rounded-lg text-sm text-dark hover:bg-secondary transition-colors"><InstagramIcon size={16} className="text-primary" /> @dalton_fds</a>
                 </div>
                 <Button variant="outline" className="w-full justify-center mt-2" onClick={() => setShowHuman(false)}>Back to AI Chat</Button>
               </div>
