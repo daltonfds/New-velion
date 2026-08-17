@@ -3,18 +3,21 @@
 import { useEffect, useState } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
+import Particles from "@tsparticles/react";
+import initParticlesEngine from "@tsparticles/react";
 
 export default function LandingPage() {
   const [init, setInit] = useState(false);
 
   useEffect(() => {
-    initParticlesEngine(async (engine) => {
+    const initParticles = async () => {
       const { loadSlim } = await import("@tsparticles/slim");
-      await loadSlim(engine);
-    }).then(() => {
+      await initParticlesEngine(async (engine) => {
+        await loadSlim(engine);
+      });
       setInit(true);
-    });
+    };
+    initParticles();
   }, []);
 
   return (
