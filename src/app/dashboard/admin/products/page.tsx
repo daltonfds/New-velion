@@ -1,27 +1,47 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Button from "@/components/ui/Button";
-import { createServerClient } from "@/lib/supabase/server";
-import AdminActionModal from "@/components/ui/AdminActionModal";
-import { updateProductStatus } from "./actions";
 
-// Buscar produtos do banco de dados no servidor
-async function getPendingProducts() {
-  const supabase = createServerClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("is_active", false)
-    .order("created_at", { ascending: false });
+export default function AdminProductsPage() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (error) {
-    console.error("Error fetching products:", error);
-    return [];
-  }
-  return data || [];
-}
+  // Buscar produtos da API
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/products");
+      const data = await res.json();
+      setProducts(data.filter((p: any) => !p.is_active)); // Mostrar apenas os pendentes
+    } catch (err) {
+      console.error("Erro ao buscar produtos", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-export default async function AdminProductsPage() {
-  const pendingProducts = await getPendingProducts();
+  // Aprovar ou rejeitar
+  const handleAction = async (id: string, is_active: boolean) => {
+    if (!confirm(`Are you sure you want to ${is_active ? 'approve' : 'reject'} this product?`)) return;
+    
+    try {
+      await fetch(`/api/products/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active }),
+      });
+      // Recarregar a lista após a ação
+      fetchProducts();
+    } catch (err) {
+      alert("Error updating product");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   return (
     <DashboardLayout>
@@ -38,13 +58,13 @@ export default async function AdminProductsPage() {
         </div>
         
         <div className="p-6">
-          {pendingProducts.length === 0 ? (
-            <div className="text-center py-12 text-muted text-sm">
-              No products awaiting approval.
-            </div>
+          {loading ? (
+            <div className="text-center py-12 text-muted text-sm">Loading products...</div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-12 text-muted text-sm">No products awaiting approval.</div>
           ) : (
             <div className="space-y-4">
-              {pendingProducts.map((product: any) => (
+              {products.map((product: any) => (
                 <div key={product.id} className="flex items-center justify-between border-b border-border pb-4 last:border-0">
                   <div className="flex items-center gap-4">
                     {product.images && product.images.length > 0 && (
@@ -58,47 +78,18 @@ export default async function AdminProductsPage() {
                   </div>
                   
                   <div className="flex gap-2">
-                    <form action={async () => {
-                      "use server";
-                      await updateProductStatus(product.id, true);
-                    }}>
-                      <Button type="submit" className="bg-success hover:bg-success/90 text-xs px-4 py-2">Approve</Button>
-                    </form>
-
-                    {/* Formulário para Rejeitar com Modal */}
-                    <form action={async (formData: FormData) => {
-                      "use server";
-                      const reason = formData.get("reason") as string;
-                      await updateProductStatus(product.id, false, reason);
-                    }}>
-                      <AdminActionModal 
-                        isOpen={false} // Controlado via cliente, mas aqui temos o botão
-                        onClose={() => {}}
-                        onConfirm={(reason) => {
-                          // A lógica de envio é feita pelo form acima
-                          // Isso aqui é apenas para o botão abrir
-                        }}
-                        title={`Reject "${product.name}"`}
-                        actionType="reject"
-                      />
-                      {/* Botão visual para abrir o modal */}
-                      <Button type="button" className="bg-error hover:bg-error/90 text-xs px-4 py-2" onClick={() => {
-                        // No frontend real, isso abriria o modal com JS
-                        // Para demonstração, apenas alerta
-                        if(confirm("Are you sure you want to reject this product?")) {
-                          // Aqui o usuário teria que ter preenchido o motivo
-                          const reason = prompt("Reason for rejection:");
-                          if(reason) {
-                            // Simula o envio
-                            const formData = new FormData();
-                            formData.append("reason", reason);
-                            // Em uma app real, isso chamaria a server action via JS
-                            // Estamos deixando o backend pronto
-                            alert("Product rejected (Backend ready)");
-                          }
-                        }
-                      }}>Reject</Button>
-                    </form>
+                    <Button 
+                      className="bg-success hover:bg-success/90 text-xs px-4 py-2"
+                      onClick={() => handleAction(product.id, true)}
+                    >
+                      Approve
+                    </Button>
+                    <Button 
+                      className="bg-error hover:bg-error/90 text-xs px-4 py-2"
+                      onClick={() => handleAction(product.id, false)}
+                    >
+                      Reject
+                    </Button>
                   </div>
                 </div>
               ))}
