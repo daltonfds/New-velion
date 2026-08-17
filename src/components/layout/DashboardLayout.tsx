@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import VelionLogo from "@/components/ui/VelionLogo";
+import { signOut } from "@/app/logout/actions";
 
 const menuItems = [
   { name: "Dashboard", path: "/dashboard/seller" },
@@ -19,7 +20,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-secondary">
-      {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-border hidden md:flex flex-col p-6">
         <div className="flex items-center gap-3 mb-10">
           <VelionLogo className="w-10 h-10" showText={false} />
@@ -41,11 +41,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="mt-auto pt-6 border-t border-border">
-          <Link href="/login" className="text-sm text-muted hover:text-error block px-4 py-2">Sign Out</Link>
+          <form action={signOut}>
+            <button type="submit" className="w-full text-left text-sm text-muted hover:text-error block px-4 py-2">Sign Out</button>
+          </form>
         </div>
       </aside>
-
-      {/* Main Content */}
       <main className="flex-1 p-6 md:p-8 overflow-y-auto">{children}</main>
     </div>
   );

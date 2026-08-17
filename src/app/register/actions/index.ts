@@ -18,6 +18,8 @@ export async function signup(formData: FormData) {
         full_name: fullName,
         role: role || "seller",
       },
+      // Isso ativa o fluxo de confirmação de e-mail
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`,
     },
   });
 
@@ -25,5 +27,6 @@ export async function signup(formData: FormData) {
     throw new Error(error.message);
   }
 
-  redirect("/onboarding"); 
+  // Redireciona para uma página dizendo "Verifique seu e-mail"
+  redirect("/verify-email");
 }
