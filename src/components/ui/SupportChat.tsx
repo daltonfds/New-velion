@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MessageCircle, X, Send, Phone, Mail, Instagram } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Button from "./Button";
 
 export default function SupportChat() {
   const [isOpen, setIsOpen] = useState(false);

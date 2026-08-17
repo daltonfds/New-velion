@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
-import { loadSlim } from "@tsparticles/slim";
+import Particles from "@tsparticles/react";
+import { initParticlesEngine } from "@tsparticles/react";
 
 export default function LandingPage() {
   const [init, setInit] = useState(false);
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
+      const { loadSlim } = await import("@tsparticles/slim");
       await loadSlim(engine);
     }).then(() => {
       setInit(true);
@@ -33,7 +34,7 @@ export default function LandingPage() {
               color: { value: "#5946E6" },
               links: { color: "#5946E6", distance: 150, enable: true, opacity: 0.2, width: 1 },
               move: { enable: true, speed: 1, direction: "none", random: false, straight: false },
-              number: { density: { enable: true, area: 800 }, value: 80 },
+              number: { density: { enable: true }, value: 80 },
               opacity: { value: 0.3 },
               shape: { type: "circle" },
               size: { value: { min: 1, max: 5 } },
