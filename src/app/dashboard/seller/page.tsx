@@ -7,9 +7,12 @@ import TrendChart from "@/components/ui/TrendChart";
 import NotificationCenter from "@/components/ui/NotificationCenter";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import { EmptyState } from "@/components/ui/Skeleton";
+import { formatDualCurrency } from "@/lib/currency";
+import { supabase } from "@/lib/supabase/client";
 
 export default function SellerDashboard() {
   const [loading, setLoading] = useState(true);
+  const [countryCode, setCountryCode] = useState("ZA");
   const [metrics, setMetrics] = useState({
     totalSales: 0,
     netProfit: 0,
@@ -18,34 +21,44 @@ export default function SellerDashboard() {
     chartData: [] as { name: string; sales: number; profit: number }[],
     recentOrders: [] as any[],
   });
+  const [formatted, setFormatted] = useState({
+    totalSales: { zar: "R 0.00", local: "R 0.00" },
+    netProfit: { zar: "R 0.00", local: "R 0.00" },
+    pendingCOD: { zar: "R 0.00", local: "R 0.00" },
+    balance: { zar: "R 0.00", local: "R 0.00" },
+  });
 
-  // Buscar pedidos da API e calcular as métricas
+  // Carregar país do utilizador
+  useEffect(() => {
+    const getUserCountry = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("country")
+          .eq("id", user.id)
+          .single();
+        if (profile?.country) setCountryCode(profile.country);
+      }
+    };
+    getUserCountry();
+  }, []);
+
+  // Buscar pedidos e calcular métricas
   const fetchOrders = async () => {
     try {
       const res = await fetch("/api/orders");
       const orders = await res.json();
 
-      // Calcular totais
-      let totalSales = 0;
-      let netProfit = 0;
-      let pendingCOD = 0;
-      let balance = 0;
-
-      // Processar os pedidos
+      let totalSales = 0, netProfit = 0, pendingCOD = 0, balance = 0;
       const last30Days: { [key: string]: { sales: number; profit: number } } = {};
       
       orders.forEach((order: any) => {
-        // Para simular o lucro, vamos supor que o preço de custo é 60% do preço (mock até o ledger ficar pronto)
-        const profitPerOrder = order.total_price * 0.40; 
-
+        const profitPerOrder = order.total_price * 0.40;
         totalSales += order.total_price || 0;
         netProfit += profitPerOrder;
+        if (order.status === "pending") pendingCOD += order.total_price || 0;
 
-        if (order.status === "pending") {
-          pendingCOD += order.total_price || 0;
-        }
-
-        // Últimos 30 dias (para o gráfico)
         const date = new Date(order.created_at);
         const dayKey = `${date.getDate()}/${date.getMonth() + 1}`;
         if (!last30Days[dayKey]) last30Days[dayKey] = { sales: 0, profit: 0 };
@@ -53,10 +66,8 @@ export default function SellerDashboard() {
         last30Days[dayKey].profit += profitPerOrder;
       });
 
-      // Saldo disponível = lucro líquido (mockado)
-      balance = netProfit * 0.8; // 80% disponível, 20% reservado
+      balance = netProfit * 0.8;
 
-      // Transformar dados do gráfico em array
       const chartData = Object.keys(last30Days).map((key) => ({
         name: key,
         sales: last30Days[key].sales,
@@ -69,8 +80,19 @@ export default function SellerDashboard() {
         pendingCOD,
         balance,
         chartData,
-        recentOrders: orders.slice(0, 5), // Últimos 5 pedidos
+        recentOrders: orders.slice(0, 5),
       });
+
+      // Formatar moedas
+      const [
+        ts, np, pc, bal
+      ] = await Promise.all([
+        formatDualCurrency(totalSales, countryCode),
+        formatDualCurrency(netProfit, countryCode),
+        formatDualCurrency(pendingCOD, countryCode),
+        formatDualCurrency(balance, countryCode),
+      ]);
+      setFormatted({ totalSales: ts, netProfit: np, pendingCOD: pc, balance: bal });
     } catch (err) {
       console.error("Error fetching dashboard data", err);
     } finally {
@@ -79,8 +101,8 @@ export default function SellerDashboard() {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    if (countryCode) fetchOrders();
+  }, [countryCode]);
 
   return (
     <DashboardLayout>
@@ -95,35 +117,29 @@ export default function SellerDashboard() {
         </div>
       </div>
       
-      {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white p-4 rounded-xl border border-border shadow-sm">
           <p className="text-xs text-muted font-medium">Total Sales</p>
-          <p className="text-xl font-bold text-dark mt-1">
-            {loading ? "..." : `R ${metrics.totalSales.toFixed(2)}`}
-          </p>
+          <p className="text-xl font-bold text-dark mt-1">{loading ? "..." : formatted.totalSales.zar}</p>
+          <p className="text-xs text-muted">{loading ? "" : formatted.totalSales.local}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-border shadow-sm">
           <p className="text-xs text-muted font-medium">Net Profit</p>
-          <p className="text-xl font-bold text-success mt-1">
-            {loading ? "..." : `R ${metrics.netProfit.toFixed(2)}`}
-          </p>
+          <p className="text-xl font-bold text-success mt-1">{loading ? "..." : formatted.netProfit.zar}</p>
+          <p className="text-xs text-muted">{loading ? "" : formatted.netProfit.local}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-border shadow-sm">
           <p className="text-xs text-muted font-medium">Pending COD</p>
-          <p className="text-xl font-bold text-warning mt-1">
-            {loading ? "..." : `R ${metrics.pendingCOD.toFixed(2)}`}
-          </p>
+          <p className="text-xl font-bold text-warning mt-1">{loading ? "..." : formatted.pendingCOD.zar}</p>
+          <p className="text-xs text-muted">{loading ? "" : formatted.pendingCOD.local}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-border shadow-sm">
           <p className="text-xs text-muted font-medium">Available Balance</p>
-          <p className="text-xl font-bold text-primary mt-1">
-            {loading ? "..." : `R ${metrics.balance.toFixed(2)}`}
-          </p>
+          <p className="text-xl font-bold text-primary mt-1">{loading ? "..." : formatted.balance.zar}</p>
+          <p className="text-xs text-muted">{loading ? "" : formatted.balance.local}</p>
         </div>
       </div>
 
-      {/* Trend Chart */}
       <div className="bg-white p-6 rounded-xl border border-border shadow-sm mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-dark">Sales & Profit — Last 30 Days</h3>
