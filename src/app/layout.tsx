@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "@/context/LanguageContext";
+import { ToastProvider } from "@/components/ui/Toast";
+import SupportChat from "@/components/ui/SupportChat";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -27,7 +30,12 @@ export default function RootLayout({
         />
       </head>
       <body className={`${jetbrainsMono.variable} antialiased bg-midnight`}>
-        {children}
+        <LanguageProvider>
+          <ToastProvider>
+            {children}
+            <SupportChat />
+          </ToastProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
