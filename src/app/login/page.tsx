@@ -27,28 +27,24 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-border shadow-sm p-8">
-        <div className="flex justify-center mb-6"><VelionLogo className="w-20 h-20" /></div>
-        <h2 className="text-xl font-semibold text-dark text-center mb-1">Sign In</h2>
-        <p className="text-center text-muted text-sm mb-6">Enter your Velion account.</p>
+      <div className="w-full max-w-md bg-white rounded-2xl border border-light-border shadow-sm p-8">
+        <div className="flex justify-center mb-6">
+          <VelionLogo className="w-28 h-28" />
+        </div>
+        <h2 className="text-xl font-semibold text-light-text text-center mb-1">Sign In</h2>
+        <p className="text-center text-light-muted text-sm mb-6">Enter your Velion account.</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-muted mb-1">Email</label>
-            <input type="email" name="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-4 py-2.5 bg-secondary/50 border border-border rounded-lg text-dark" required />
+            <label className="block text-xs font-medium text-light-muted mb-1">Email</label>
+            <input type="email" name="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
           </div>
           <div>
-            <label className="block text-xs font-medium text-muted mb-1">Password</label>
-            <input type="password" name="password" placeholder="••••••••" className="w-full px-4 py-2.5 bg-secondary/50 border border-border rounded-lg text-dark" required />
+            <label className="block text-xs font-medium text-light-muted mb-1">Password</label>
+            <input type="password" name="password" placeholder="••••••••" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
           </div>
-          {email === "daltonfelizarda66@gmail.com" && (
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">Admin Security Password</label>
-              <input type="password" name="extra_password" placeholder="Admin pass" className="w-full px-4 py-2.5 bg-secondary/50 border border-border rounded-lg text-dark" required />
-            </div>
-          )}
-          <Button type="submit" disabled={loading} className="w-full justify-center mt-2">Sign In</Button>
+          <Button type="submit" disabled={loading} className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full">Sign In</Button>
         </form>
-        <div className="mt-6 text-center text-xs text-muted">Don't have an account? <Link href="/register" className="text-primary font-medium hover:underline">Sign up</Link></div>
+        <div className="mt-6 text-center text-xs text-light-muted">Don't have an account? <Link href="/register" className="text-primary font-medium hover:underline">Sign up</Link></div>
       </div>
     </div>
   );

@@ -44,7 +44,7 @@ export function Landing() {
   return (
     <div className="min-h-screen bg-secondary text-light-text font-sans selection:bg-primary/20">
       
-      {/* ---------- Sidebar (Menu lateral esquerdo - Igual ao seu print) ---------- */}
+      {/* ---------- Sidebar (Exact layout, but fully translated to English) ---------- */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -73,8 +73,10 @@ export function Landing() {
               </div>
               
               <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
+                
+                {/* ACCOUNT SECTION */}
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium mb-3">CONTA</p>
+                  <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium mb-3">ACCOUNT</p>
                   <div className="space-y-1">
                     <Link href="/login" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
                       <div className="flex items-center gap-3">
@@ -86,42 +88,44 @@ export function Landing() {
                     <Link href="/register" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
                       <div className="flex items-center gap-3">
                         <User size={18} className="text-primary" />
-                        <span className="text-sm font-medium">Cadastro</span>
+                        <span className="text-sm font-medium">Sign Up</span>
                       </div>
                       <ChevronRight size={16} className="text-light-muted" />
                     </Link>
                     <a href="mailto:daltonfelizarda66@gmail.com" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
                       <div className="flex items-center gap-3">
                         <MessageCircle size={18} className="text-primary" />
-                        <span className="text-sm font-medium">Suporte</span>
+                        <span className="text-sm font-medium">Support</span>
                       </div>
                       <ChevronRight size={16} className="text-light-muted" />
                     </a>
                   </div>
                 </div>
 
+                {/* NAVIGATION SECTION */}
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium mb-3">NAVEGAÇÃO</p>
+                  <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium mb-3">NAVIGATION</p>
                   <div className="space-y-1">
                     <a href="#how" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium">Como funciona</span>
+                        <span className="text-sm font-medium">How it works</span>
                       </div>
                       <ChevronRight size={16} className="text-light-muted" />
                     </a>
                   </div>
                 </div>
+
               </div>
 
               <div className="px-6 py-6 border-t border-light-border">
-                <p className="text-[11px] text-light-muted">A subida começa aqui.</p>
+                <p className="text-[11px] text-light-muted">The climb starts here.</p>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
-      {/* ---------- Header (Sem duplicação de texto) ---------- */}
+      {/* ---------- Header ---------- */}
       <header className="fixed inset-x-0 top-0 z-30 flex items-center px-6 py-4 sm:px-10 bg-secondary/80 backdrop-blur-sm border-b border-light-border/50">
         <div className="flex items-center gap-4 w-full">
           <button onClick={toggleMenu} className="text-light-muted hover:text-light-text transition-colors p-1">
@@ -131,7 +135,7 @@ export function Landing() {
         </div>
       </header>
 
-      {/* ---------- Hero (Tamanhos reduzidos) ---------- */}
+      {/* ---------- Hero ---------- */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center pt-24 pb-12">
         <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
           <motion.div
