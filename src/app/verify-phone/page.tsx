@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Button from "@/components/ui/Button";
@@ -58,7 +58,6 @@ function VerifyPhoneForm() {
   );
 }
 
-// Página principal que envolve o formulário com Suspense
 export default function VerifyPhonePage() {
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center p-6">
