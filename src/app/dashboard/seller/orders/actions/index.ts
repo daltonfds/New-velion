@@ -21,7 +21,7 @@ export async function createOrder(formData: FormData) {
   // 2. Buscar dados do produto (preço de custo do fornecedor)
   const { data: product, error: prodError } = await supabase
     .from("products")
-    .select("price, supplier_id")
+    .select("name, price, supplier_id")
     .eq("id", product_id)
     .single();
   if (prodError || !product) throw new Error("Product not found");
