@@ -4,19 +4,23 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export async function signupWithPhone(formData: FormData) {
-  const phone = formData.get("phone") as string;
   const fullName = formData.get("fullName") as string;
+  const country = formData.get("country") as string;
+  const phone = formData.get("phone") as string;
+  const password = formData.get("password") as string;
   const role = formData.get("role") as string;
 
   const supabase = createServerClient();
 
-  // 1. Tentar criar o utilizador com o número de telefone
+  // 1. Criar o utilizador com email, password e metadata
   const { data, error } = await supabase.auth.signUp({
-    phone,
-    password: phone, // Gera uma password baseada no número (o utilizador pode alterar depois)
+    email: `${phone}@phone.velion`, // Truque para criar conta com telefone
+    password: password,
     options: {
       data: {
         full_name: fullName,
+        country: country,
+        phone: phone,
         role: role || "seller",
       },
     },
@@ -48,4 +52,17 @@ export async function verifyPhoneCode(formData: FormData) {
 
   if (error) throw new Error(error.message);
   redirect("/dashboard/seller");
+}
+
+export async function loginWithPhone(formData: FormData) {
+  const phone = formData.get("phone") as string;
+
+  const supabase = createServerClient();
+  const { error } = await supabase.auth.signInWithOtp({
+    phone,
+    options: { shouldCreateUser: false }
+  });
+
+  if (error) throw new Error(error.message);
+  return { success: true, phone };
 }

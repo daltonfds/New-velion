@@ -4,21 +4,34 @@ import { useState } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
-import { signup } from "./actions";
-import { useToast } from "@/components/ui/Toast";
+import CountrySelector from "@/components/ui/CountrySelector";
+import { signupWithPhone } from "./actions";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
-  const { showToast } = useToast();
   const [role, setRole] = useState<"seller" | "producer">("seller");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<any>(null);
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSubmit(formData: FormData) {
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
+    setError(null);
     try {
-      await signup(formData);
+      await signupWithPhone(formData);
     } catch (e: any) {
-      showToast(e.message, "error");
-    } finally {
+      setError(e.message || "Failed to create account");
       setLoading(false);
     }
   }
@@ -30,6 +43,76 @@ export default function RegisterPage() {
         <h2 className="text-xl font-semibold text-light-text text-center mb-1">Create your account</h2>
         <p className="text-center text-light-muted text-sm mb-6">Start your climb with Velion.</p>
         <form action={handleSubmit} className="space-y-4">
+          
+          <div>
+            <label className="block text-xs font-medium text-light-muted mb-1">Full Name</label>
+            <input type="text" name="fullName" placeholder="John Doe" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-light-muted mb-1">Select Country (Auto-sync DDD)</label>
+            <CountrySelector 
+              selectedCountry={selectedCountry?.code} 
+              onSelect={setSelectedCountry} 
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-light-muted mb-1">Phone Number</label>
+            <div className="flex gap-2">
+              <div className="px-3 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text font-medium whitespace-nowrap">
+                {selectedCountry ? selectedCountry.dial_code : "+00"}
+              </div>
+              <input 
+                type="tel" 
+                name="phone" 
+                placeholder="84 000 0000" 
+                className="flex-1 w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" 
+                required 
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-xs font-medium text-light-muted mb-1">Password</label>
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                name="password" 
+                placeholder="••••••••" 
+                className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text pr-10" 
+                required 
+              />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-light-muted hover:text-light-text"
+              >
+                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-light-muted mb-1">Confirm Password</label>
+            <div className="relative">
+              <input 
+                type={showConfirmPassword ? "text" : "password"} 
+                name="confirmPassword" 
+                placeholder="••••••••" 
+                className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text pr-10" 
+                required 
+              />
+              <button 
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-light-muted hover:text-light-text"
+              >
+                {showConfirmPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+              </button>
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-medium text-light-muted mb-1">I am a:</label>
             <div className="flex gap-4">
@@ -43,19 +126,9 @@ export default function RegisterPage() {
               </label>
             </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-light-muted mb-1">Full Name</label>
-            <input type="text" name="fullName" placeholder="John Doe" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-light-muted mb-1">Email</label>
-            <input type="email" name="email" placeholder="you@example.com" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-light-muted mb-1">Password</label>
-            <input type="password" name="password" placeholder="••••••••" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
-          </div>
-          {loading && <p className="text-center text-sm text-light-muted">Creating account...</p>}
+
+          {error && <p className="text-sm text-rose-600 text-center bg-rose-50 p-2 rounded-lg">{error}</p>}
+          
           <Button type="submit" disabled={loading} className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full">Create Account</Button>
         </form>
         <div className="mt-6 text-center text-xs text-light-muted">Already have an account? <Link href="/login" className="text-primary font-medium hover:underline">Sign In</Link></div>
