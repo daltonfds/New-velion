@@ -9,6 +9,7 @@ import { signupWithPhone } from "./actions";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
+  const [registerType, setRegisterType] = useState<"email" | "phone">("phone");
   const [role, setRole] = useState<"seller" | "producer">("seller");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,13 +18,12 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Referência para saber se o componente ainda está montado
   const isMounted = useRef(true);
 
   useEffect(() => {
     isMounted.current = true;
     return () => {
-      isMounted.current = false; // Quando o componente sair da tela, isto fica falso
+      isMounted.current = false;
     };
   }, []);
 
@@ -40,9 +40,7 @@ export default function RegisterPage() {
     setError(null);
     try {
       await signupWithPhone(formData);
-      // Nota: Se chegar aqui, o redirecionamento já aconteceu.
     } catch (e: any) {
-      // Só atualiza o estado se o componente ainda estiver na tela
       if (isMounted.current) {
         setError(e.message || "Failed to create account");
         setLoading(false);
@@ -56,6 +54,13 @@ export default function RegisterPage() {
         <div className="flex justify-center mb-6"><VelionLogo className="w-28 h-28" /></div>
         <h2 className="text-xl font-semibold text-light-text text-center mb-1">Create your account</h2>
         <p className="text-center text-light-muted text-sm mb-6">Start your climb with Velion.</p>
+
+        {/* Abas de escolha */}
+        <div className="flex gap-2 mb-6 bg-secondary/50 p-1 rounded-lg">
+          <button onClick={() => setRegisterType("email")} className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${registerType === "email" ? "bg-white shadow-sm text-light-text" : "text-light-muted hover:text-light-text"}`}>Email</button>
+          <button onClick={() => setRegisterType("phone")} className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${registerType === "phone" ? "bg-white shadow-sm text-light-text" : "text-light-muted hover:text-light-text"}`}>Phone</button>
+        </div>
+
         <form action={handleSubmit} className="space-y-4">
           
           <div>
@@ -63,29 +68,39 @@ export default function RegisterPage() {
             <input type="text" name="fullName" placeholder="John Doe" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-light-muted mb-1">Select Country (Auto-sync DDD)</label>
-            <CountrySelector 
-              selectedCountry={selectedCountry?.code} 
-              onSelect={setSelectedCountry} 
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-light-muted mb-1">Phone Number</label>
-            <div className="flex gap-2">
-              <div className="px-3 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text font-medium whitespace-nowrap">
-                {selectedCountry ? selectedCountry.dial_code : "+00"}
-              </div>
-              <input 
-                type="tel" 
-                name="phone" 
-                placeholder="84 000 0000" 
-                className="flex-1 w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" 
-                required 
-              />
+          {registerType === "email" && (
+            <div>
+              <label className="block text-xs font-medium text-light-muted mb-1">Email</label>
+              <input type="email" name="email" placeholder="you@example.com" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
             </div>
-          </div>
+          )}
+
+          {registerType === "phone" && (
+            <>
+              <div>
+                <label className="block text-xs font-medium text-light-muted mb-1">Select Country (Auto-sync DDD)</label>
+                <CountrySelector 
+                  selectedCountry={selectedCountry?.code} 
+                  onSelect={setSelectedCountry} 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-light-muted mb-1">Phone Number</label>
+                <div className="flex gap-2">
+                  <div className="px-3 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text font-medium whitespace-nowrap">
+                    {selectedCountry ? selectedCountry.dial_code : "+00"}
+                  </div>
+                  <input 
+                    type="tel" 
+                    name="phone" 
+                    placeholder="84 000 0000" 
+                    className="flex-1 w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" 
+                    required 
+                  />
+                </div>
+              </div>
+            </>
+          )}
           
           <div>
             <label className="block text-xs font-medium text-light-muted mb-1">Password</label>

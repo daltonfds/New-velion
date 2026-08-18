@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/Toast";
 
 export default function LoginPage() {
   const { showToast } = useToast();
+  const [loginType, setLoginType] = useState<"email" | "phone">("phone");
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,44 +39,67 @@ export default function LoginPage() {
         <h2 className="text-xl font-semibold text-light-text text-center mb-1">Sign In</h2>
         <p className="text-center text-light-muted text-sm mb-6">Enter your Velion account.</p>
 
-        <div>
-          {!otpSent ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-light-muted mb-1">Select Country (Auto-sync DDD)</label>
-                <CountrySelector 
-                  selectedCountry={selectedCountry?.code} 
-                  onSelect={setSelectedCountry} 
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-light-muted mb-1">Phone Number</label>
-                <div className="flex gap-2">
-                  <div className="px-3 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text font-medium whitespace-nowrap">
-                    {selectedCountry ? selectedCountry.dial_code : "+00"}
-                  </div>
-                  <input 
-                    type="tel" 
-                    name="phone" 
-                    placeholder="84 000 0000" 
-                    className="flex-1 w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" 
-                    required 
+        {/* Abas de escolha */}
+        <div className="flex gap-2 mb-6 bg-secondary/50 p-1 rounded-lg">
+          <button onClick={() => setLoginType("email")} className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${loginType === "email" ? "bg-white shadow-sm text-light-text" : "text-light-muted hover:text-light-text"}`}>Email</button>
+          <button onClick={() => setLoginType("phone")} className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${loginType === "phone" ? "bg-white shadow-sm text-light-text" : "text-light-muted hover:text-light-text"}`}>Phone</button>
+        </div>
+
+        {loginType === "email" && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-light-muted mb-1">Email</label>
+              <input type="email" name="email" placeholder="you@example.com" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-light-muted mb-1">Password</label>
+              <input type="password" name="password" placeholder="••••••••" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
+            </div>
+            {error && <p className="text-sm text-rose-600 text-center bg-rose-50 p-2 rounded-lg">{error}</p>}
+            <Button type="submit" disabled={loading} className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full">Sign In</Button>
+          </form>
+        )}
+
+        {loginType === "phone" && (
+          <div>
+            {!otpSent ? (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-light-muted mb-1">Select Country (Auto-sync DDD)</label>
+                  <CountrySelector 
+                    selectedCountry={selectedCountry?.code} 
+                    onSelect={setSelectedCountry} 
                   />
                 </div>
+                <div>
+                  <label className="block text-xs font-medium text-light-muted mb-1">Phone Number</label>
+                  <div className="flex gap-2">
+                    <div className="px-3 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text font-medium whitespace-nowrap">
+                      {selectedCountry ? selectedCountry.dial_code : "+00"}
+                    </div>
+                    <input 
+                      type="tel" 
+                      name="phone" 
+                      placeholder="84 000 0000" 
+                      className="flex-1 w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" 
+                      required 
+                    />
+                  </div>
+                </div>
+                {error && <p className="text-sm text-rose-600 text-center bg-rose-50 p-2 rounded-lg">{error}</p>}
+                <Button type="submit" disabled={loading} className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full">Send Code via SMS</Button>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-center text-light-muted text-sm">We sent a code to <span className="font-medium text-light-text">{selectedCountry?.dial_code} ...</span></p>
+                <Link href="/verify-phone">
+                  <Button className="w-full justify-center bg-primary text-white hover:bg-primary/90 rounded-full">Enter Code</Button>
+                </Link>
+                <button type="button" onClick={() => setOtpSent(false)} className="w-full text-center text-xs text-primary mt-3 hover:underline">Resend code</button>
               </div>
-              {error && <p className="text-sm text-rose-600 text-center bg-rose-50 p-2 rounded-lg">{error}</p>}
-              <Button type="submit" disabled={loading} className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full">Send Code via SMS</Button>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-center text-light-muted text-sm">We sent a code to <span className="font-medium text-light-text">{selectedCountry?.dial_code} {otpSent}</span></p>
-              <Link href="/verify-phone">
-                <Button className="w-full justify-center bg-primary text-white hover:bg-primary/90 rounded-full">Enter Code</Button>
-              </Link>
-              <button type="button" onClick={() => setOtpSent(false)} className="w-full text-center text-xs text-primary mt-3 hover:underline">Resend code</button>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         <div className="mt-6 text-center text-xs text-light-muted">
           Don't have an account? <Link href="/register" className="text-primary font-medium hover:underline">Sign up</Link>
