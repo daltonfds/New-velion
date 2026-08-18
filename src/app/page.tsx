@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle, Box, Truck, Shield, Users, Globe } from "lucide-react";
+import { ArrowRight, CheckCircle, Box, Truck, Shield, Users } from "lucide-react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
 
@@ -40,7 +40,7 @@ export default function LandingPage() {
             The climb starts here.
           </h1>
           <p className="text-lg md:text-xl text-light-muted max-w-2xl mx-auto leading-relaxed">
-            Connect producers with sellers. Velion gives you everything you need to scale your business across Mozambique, South Africa, and Angola.
+            Connect producers with sellers. Velion gives you everything you need to scale your business.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link href="/register">
