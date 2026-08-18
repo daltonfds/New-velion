@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ToastProvider } from "@/components/ui/Toast";
 import SupportChat from "@/components/ui/SupportChat";
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Velion - Performance Affiliate Platform",
@@ -22,14 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=general-sans@400,500,600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className={`${jetbrainsMono.variable} antialiased bg-midnight`}>
+      <body className={`${inter.className} antialiased bg-secondary text-light-text`}>
         <LanguageProvider>
           <ToastProvider>
             {children}

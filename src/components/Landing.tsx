@@ -8,7 +8,7 @@ import VelionLogo from '@/components/ui/VelionLogo'
 import { WelcomeFigure } from '@/components/ui/WelcomeFigure'
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 14 },
   show: { opacity: 1, y: 0 },
 }
 
@@ -42,9 +42,9 @@ export function Landing() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
   return (
-    <div className="min-h-screen bg-secondary text-light-text font-sans selection:bg-primary/30">
+    <div className="min-h-screen bg-secondary text-light-text font-sans selection:bg-primary/20">
       
-      {/* ---------- Sidebar (Menu lateral esquerdo - Igual à sua imagem) ---------- */}
+      {/* ---------- Sidebar (Menu lateral esquerdo - Igual ao seu print) ---------- */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -62,7 +62,6 @@ export function Landing() {
               transition={{ type: "spring", damping: 25 }}
               className="fixed left-0 top-0 h-full w-[300px] bg-white shadow-2xl z-50 flex flex-col"
             >
-              {/* Header do Menu */}
               <div className="flex items-center justify-between px-6 py-5 border-b border-light-border">
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium">VELION</p>
@@ -73,10 +72,7 @@ export function Landing() {
                 </button>
               </div>
               
-              {/* Corpo do Menu */}
               <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
-                
-                {/* CONTA */}
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium mb-3">CONTA</p>
                   <div className="space-y-1">
@@ -104,7 +100,6 @@ export function Landing() {
                   </div>
                 </div>
 
-                {/* NAVEGAÇÃO */}
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium mb-3">NAVEGAÇÃO</p>
                   <div className="space-y-1">
@@ -116,10 +111,8 @@ export function Landing() {
                     </a>
                   </div>
                 </div>
-
               </div>
 
-              {/* Footer do Menu */}
               <div className="px-6 py-6 border-t border-light-border">
                 <p className="text-[11px] text-light-muted">A subida começa aqui.</p>
               </div>
@@ -128,34 +121,28 @@ export function Landing() {
         )}
       </AnimatePresence>
 
-      {/* ---------- Header ---------- */}
-      <header className="fixed inset-x-0 top-0 z-30 flex items-center px-6 py-5 sm:px-10 bg-secondary/80 backdrop-blur-sm border-b border-light-border/50">
+      {/* ---------- Header (Sem duplicação de texto) ---------- */}
+      <header className="fixed inset-x-0 top-0 z-30 flex items-center px-6 py-4 sm:px-10 bg-secondary/80 backdrop-blur-sm border-b border-light-border/50">
         <div className="flex items-center gap-4 w-full">
-          {/* Menu Hambúrguer */}
           <button onClick={toggleMenu} className="text-light-muted hover:text-light-text transition-colors p-1">
             <Menu size={24} />
           </button>
-          
-          {/* Logo + Texto Velion */}
-          <div className="flex items-center gap-3">
-            <VelionLogo size={28} />
-            <span className="font-display text-lg font-semibold text-light-text">Velion</span>
-          </div>
+          <VelionLogo size={28} />
         </div>
       </header>
 
-      {/* ---------- Hero ---------- */}
+      {/* ---------- Hero (Tamanhos reduzidos) ---------- */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center pt-24 pb-12">
-        <div className="relative z-10 flex flex-col items-center max-w-4xl mx-auto">
+        <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
           <motion.div
             initial="hidden"
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6 }}
-            className="mb-3 flex flex-col items-center"
+            className="mb-4 flex flex-col items-center"
           >
             <VelionLogo size={72} withWordmark={false} />
-            <span className="mt-3 font-mono text-xs uppercase tracking-[0.2em] text-primary/70">
+            <span className="mt-3 text-[10px] uppercase tracking-[0.2em] text-primary/80 font-medium">
               Performance Affiliate Platform
             </span>
           </motion.div>
@@ -165,7 +152,7 @@ export function Landing() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="text-balance mt-4 max-w-2xl text-4xl font-bold font-display text-light-text sm:text-6xl tracking-tight"
+            className="text-balance mt-3 max-w-2xl text-3xl sm:text-5xl font-bold text-light-text tracking-tight"
           >
             The climb starts here.
           </motion.h1>
@@ -175,7 +162,7 @@ export function Landing() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-balance mt-5 max-w-lg text-base text-light-muted sm:text-lg leading-relaxed"
+            className="text-balance mt-4 max-w-lg text-sm sm:text-base text-light-muted leading-relaxed"
           >
             Sell health and wellness products across Mozambique, South Africa and Angola.
             Commission calculated automatically, fast payouts, no fine print.
@@ -186,17 +173,17 @@ export function Landing() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6, delay: 0.45 }}
-            className="mt-8 flex flex-col items-center gap-4 sm:flex-row w-full justify-center"
+            className="mt-8 flex flex-col items-center gap-4 sm:flex-row w-full max-w-sm"
           >
             <Link
               href="/register"
-              className="w-full sm:w-auto inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-base font-medium text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105"
+              className="w-full inline-flex h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105"
             >
               Create account
             </Link>
             <Link
               href="/login"
-              className="w-full sm:w-auto inline-flex h-14 items-center justify-center rounded-full border border-light-border px-8 text-base font-medium text-light-text bg-white transition-all hover:bg-secondary hover:scale-105"
+              className="w-full inline-flex h-12 items-center justify-center rounded-full border border-light-border px-6 text-sm font-medium text-light-text bg-white transition-all hover:bg-secondary hover:scale-105"
             >
               Sign in
             </Link>
@@ -206,10 +193,10 @@ export function Landing() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="relative mt-12"
+            className="relative mt-12 scale-90"
           >
             <WelcomeFigure />
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[11px] text-light-muted">
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] text-light-muted">
               Welcome to Velion
             </span>
           </motion.div>
@@ -217,14 +204,14 @@ export function Landing() {
       </section>
 
       {/* ---------- How it works ---------- */}
-      <section id="how" className="relative px-6 py-24 sm:px-10 bg-white">
+      <section id="how" className="relative px-6 py-20 sm:px-10 bg-white">
         <div className="mx-auto max-w-5xl">
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary/70">Process</span>
-          <h2 className="text-balance mt-3 max-w-xl text-3xl font-bold font-display text-light-text sm:text-4xl">
+          <span className="text-[10px] uppercase tracking-[0.15em] text-primary/80 font-medium">Process</span>
+          <h2 className="text-balance mt-3 max-w-xl text-2xl sm:text-3xl font-bold text-light-text">
             Three steps to your commission.
           </h2>
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-3">
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
             {HOW_IT_WORKS.map((step, i) => (
               <motion.div
                 key={step.n}
@@ -232,50 +219,48 @@ export function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-light-card border border-light-border rounded-2xl p-6 hover:shadow-md transition-shadow"
+                className="bg-light-card border border-light-border rounded-xl p-6 hover:shadow-sm transition-shadow"
               >
-                <span className="font-mono text-sm text-primary">{step.n}</span>
-                <h3 className="mt-3 text-lg font-semibold text-light-text">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-light-muted">{step.body}</p>
+                <span className="text-sm font-mono text-primary">{step.n}</span>
+                <h3 className="mt-2 text-base font-semibold text-light-text">{step.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-light-muted">{step.body}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ---------- Corridor / coverage ---------- */}
-      <section className="relative px-6 py-24 sm:px-10 bg-secondary">
+      {/* ---------- Corridor ---------- */}
+      <section className="relative px-6 py-20 sm:px-10 bg-secondary">
         <div className="mx-auto max-w-5xl">
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary/70">Coverage</span>
-          <h2 className="text-balance mt-3 max-w-xl text-3xl font-bold font-display text-light-text sm:text-4xl">
+          <span className="text-[10px] uppercase tracking-[0.15em] text-primary/80 font-medium">Coverage</span>
+          <h2 className="text-balance mt-3 max-w-xl text-2xl sm:text-3xl font-bold text-light-text">
             Built for the Mozambique — South Africa corridor.
           </h2>
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {CORRIDOR.map((c) => (
-              <div key={c.name} className="bg-light-card border border-light-border rounded-2xl p-6">
+              <div key={c.name} className="bg-light-card border border-light-border rounded-xl p-6">
                 <span className="text-3xl">{c.flag}</span>
-                <h3 className="mt-3 font-semibold text-light-text">{c.name}</h3>
+                <h3 className="mt-2 font-medium text-light-text">{c.name}</h3>
                 <p className="mt-1 text-sm text-light-muted">{c.detail}</p>
               </div>
             ))}
           </div>
-
-          <p className="mt-8 font-mono text-sm text-primary/80">Withdrawals processed within 60 minutes</p>
         </div>
       </section>
 
       {/* ---------- Final CTA ---------- */}
-      <section className="relative overflow-hidden px-6 py-28 text-center sm:px-10 bg-white">
+      <section className="relative overflow-hidden px-6 py-20 text-center sm:px-10 bg-white">
         <div className="relative z-10 mx-auto max-w-xl">
-          <h2 className="text-balance text-3xl font-bold font-display text-light-text sm:text-4xl">
+          <h2 className="text-balance text-2xl sm:text-3xl font-bold text-light-text">
             Ready to start climbing?
           </h2>
-          <p className="mt-3 text-light-muted">Create your account in under a minute.</p>
-          <div className="mt-8 flex justify-center">
+          <p className="mt-3 text-sm text-light-muted">Create your account in under a minute.</p>
+          <div className="mt-6 flex justify-center">
             <Link
               href="/register"
-              className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-base font-medium text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105"
             >
               Create account
             </Link>
@@ -284,14 +269,14 @@ export function Landing() {
       </section>
 
       {/* ---------- Footer ---------- */}
-      <footer className="border-t border-light-border px-6 py-10 sm:px-10 bg-secondary">
+      <footer className="border-t border-light-border px-6 py-8 sm:px-10 bg-secondary">
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex flex-col items-center gap-2 sm:items-start">
-            <VelionLogo size={24} />
-            <p className="text-xs text-light-muted">Performance affiliate marketing for health and wellness.</p>
+            <VelionLogo size={20} />
+            <p className="text-[11px] text-light-muted">Performance marketplace for health and wellness.</p>
           </div>
 
-          <div className="flex flex-col items-center gap-1 text-xs text-light-muted sm:items-end">
+          <div className="flex flex-col items-center gap-1 text-[11px] text-light-muted sm:items-end">
             <span className="font-medium text-light-text">Contact</span>
             <a href="mailto:daltonfelizarda66@gmail.com" className="hover:text-primary transition-colors">
               daltonfelizarda66@gmail.com
@@ -304,7 +289,7 @@ export function Landing() {
             </a>
           </div>
         </div>
-        <p className="mt-8 text-center font-mono text-[11px] text-light-muted/60">
+        <p className="mt-6 text-center text-[10px] text-light-muted/60">
           © {new Date().getFullYear()} Velion. All rights reserved.
         </p>
       </footer>
