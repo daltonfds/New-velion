@@ -1,0 +1,15 @@
+[33mf4e7f5e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix button disabled state to prevent React Error #441
+[33m285bd0e[m Fix React Error #441 by removing Toast during redirects and handling errors locally
+[33m9b83181[m Removed Google Login entirely. Only Email/Password remains.
+[33m3f406cc[m Adicionado log detalhado do Resend para diagnóstico
+[33m23eb162[m Fix: Toast text inverted - success text is green, error text is red
+[33m5a7a78b[m Fix: Toast notifications contrast - Green for success, Red for errors
+[33m56409bf[m Add: Password confirm, show/hide, and resend limit (max 3 per 30min)
+[33m1cf98f5[m Fix: Use admin API to create user and send custom OTP via Resend
+[33m4ea64bf[m Fix: Import useState and useRef in verify-email page
+[33m04ff754[m Fix: Add Suspense boundary around useSearchParams in verify-email
+[33m958c140[m Fix: Export login actions and fix ref type in verify-email
+[33mf7232bb[m Garantindo código final do Login/Google e Verificação OTP
+[33m4047880[m Changed verification flow: Resend OTP email code instead of confirmation link
+[33m86744ac[m Support menu now expands to show Email, WhatsApp, Call and Instagram options
+[33mfe5d22c[m Fix: Ring visibility, Welcome Figure contrast, Menu translated to EN, Larger logo on Login
