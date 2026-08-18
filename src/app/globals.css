@@ -1,8 +1,6 @@
-@import "tailwindcss";
-
-body {
-  @apply bg-light-bg text-light-text;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Animações do Logo Dourado */
 @keyframes drawStroke {
@@ -12,7 +10,6 @@ body {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-
 .draw-mountain {
   stroke-dasharray: 300;
   stroke-dashoffset: 300;
