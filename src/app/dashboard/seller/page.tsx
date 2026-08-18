@@ -7,7 +7,7 @@ import TrendChart from "@/components/ui/TrendChart";
 import NotificationCenter from "@/components/ui/NotificationCenter";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import { EmptyState } from "@/components/ui/Skeleton";
-import { formatDualCurrency } from "@/lib/currency";
+import { formatMultiCurrency } from "@/lib/currency";
 import { supabase } from "@/lib/supabase/client";
 
 export default function SellerDashboard() {
@@ -22,13 +22,12 @@ export default function SellerDashboard() {
     recentOrders: [] as any[],
   });
   const [formatted, setFormatted] = useState({
-    totalSales: { zar: "R 0.00", local: "R 0.00" },
-    netProfit: { zar: "R 0.00", local: "R 0.00" },
-    pendingCOD: { zar: "R 0.00", local: "R 0.00" },
-    balance: { zar: "R 0.00", local: "R 0.00" },
+    totalSales: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
+    netProfit: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
+    pendingCOD: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
+    balance: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
   });
 
-  // Carregar país do utilizador
   useEffect(() => {
     const getUserCountry = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -44,7 +43,6 @@ export default function SellerDashboard() {
     getUserCountry();
   }, []);
 
-  // Buscar pedidos e calcular métricas
   const fetchOrders = async () => {
     try {
       const res = await fetch("/api/orders");
@@ -74,23 +72,14 @@ export default function SellerDashboard() {
         profit: last30Days[key].profit,
       }));
 
-      setMetrics({
-        totalSales,
-        netProfit,
-        pendingCOD,
-        balance,
-        chartData,
-        recentOrders: orders.slice(0, 5),
-      });
+      setMetrics({ totalSales, netProfit, pendingCOD, balance, chartData, recentOrders: orders.slice(0, 5) });
 
-      // Formatar moedas
-      const [
-        ts, np, pc, bal
-      ] = await Promise.all([
-        formatDualCurrency(totalSales, countryCode),
-        formatDualCurrency(netProfit, countryCode),
-        formatDualCurrency(pendingCOD, countryCode),
-        formatDualCurrency(balance, countryCode),
+      // Formatar as 3 moedas
+      const [ts, np, pc, bal] = await Promise.all([
+        formatMultiCurrency(totalSales, countryCode),
+        formatMultiCurrency(netProfit, countryCode),
+        formatMultiCurrency(pendingCOD, countryCode),
+        formatMultiCurrency(balance, countryCode),
       ]);
       setFormatted({ totalSales: ts, netProfit: np, pendingCOD: pc, balance: bal });
     } catch (err) {
@@ -118,29 +107,33 @@ export default function SellerDashboard() {
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-xl border border-border shadow-sm">
+        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
           <p className="text-xs text-muted font-medium">Total Sales</p>
           <p className="text-xl font-bold text-dark mt-1">{loading ? "..." : formatted.totalSales.zar}</p>
+          <p className="text-xs text-muted">{loading ? "" : formatted.totalSales.usd}</p>
           <p className="text-xs text-muted">{loading ? "" : formatted.totalSales.local}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-border shadow-sm">
+        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
           <p className="text-xs text-muted font-medium">Net Profit</p>
           <p className="text-xl font-bold text-success mt-1">{loading ? "..." : formatted.netProfit.zar}</p>
+          <p className="text-xs text-muted">{loading ? "" : formatted.netProfit.usd}</p>
           <p className="text-xs text-muted">{loading ? "" : formatted.netProfit.local}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-border shadow-sm">
+        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
           <p className="text-xs text-muted font-medium">Pending COD</p>
           <p className="text-xl font-bold text-warning mt-1">{loading ? "..." : formatted.pendingCOD.zar}</p>
+          <p className="text-xs text-muted">{loading ? "" : formatted.pendingCOD.usd}</p>
           <p className="text-xs text-muted">{loading ? "" : formatted.pendingCOD.local}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-border shadow-sm">
+        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
           <p className="text-xs text-muted font-medium">Available Balance</p>
           <p className="text-xl font-bold text-primary mt-1">{loading ? "..." : formatted.balance.zar}</p>
+          <p className="text-xs text-muted">{loading ? "" : formatted.balance.usd}</p>
           <p className="text-xs text-muted">{loading ? "" : formatted.balance.local}</p>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl border border-border shadow-sm mb-8">
+      <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-dark">Sales & Profit — Last 30 Days</h3>
         </div>
@@ -152,7 +145,7 @@ export default function SellerDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+        <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm">
           <h3 className="font-semibold text-dark mb-4">Recent Orders</h3>
           {loading ? (
             <div className="text-center py-8 text-muted text-sm">Loading...</div>
@@ -172,7 +165,7 @@ export default function SellerDashboard() {
             </div>
           )}
         </div>
-        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+        <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm">
           <h3 className="font-semibold text-dark mb-4">Inventory Alerts</h3>
           <EmptyState title="All stocked up" description="You have enough inventory for now." />
         </div>
