@@ -2,10 +2,9 @@
 
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LogIn, User, MessageCircle, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import VelionLogo from '@/components/ui/VelionLogo'
-import { AscentParticles } from '@/components/ui/AscentParticles'
 import { WelcomeFigure } from '@/components/ui/WelcomeFigure'
 
 const fadeUp = {
@@ -43,9 +42,9 @@ export function Landing() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
   return (
-    <div className="min-h-screen bg-ascent">
+    <div className="min-h-screen bg-secondary text-light-text font-sans selection:bg-primary/30">
       
-      {/* ---------- Sidebar (Menu lateral esquerdo) ---------- */}
+      {/* ---------- Sidebar (Menu lateral esquerdo - Igual à sua imagem) ---------- */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -54,35 +53,75 @@ export function Landing() {
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }}
               onClick={toggleMenu}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/30 z-40"
             />
             <motion.div 
-              initial={{ x: -300 }} 
+              initial={{ x: -320 }} 
               animate={{ x: 0 }} 
-              exit={{ x: -300 }}
-              transition={{ type: "spring", damping: 20 }}
-              className="fixed left-0 top-0 h-full w-72 bg-midnight/95 border-r border-white/10 p-6 z-50 flex flex-col gap-6 shadow-2xl"
+              exit={{ x: -320 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="fixed left-0 top-0 h-full w-[300px] bg-white shadow-2xl z-50 flex flex-col"
             >
-              <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                  <VelionLogo size={32} />
-                  <span className="font-display text-xl font-semibold text-pearl">Velion</span>
+              {/* Header do Menu */}
+              <div className="flex items-center justify-between px-6 py-5 border-b border-light-border">
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium">VELION</p>
+                  <p className="text-lg font-bold text-light-text">Menu</p>
                 </div>
-                <button onClick={toggleMenu} className="text-mist hover:text-pearl p-1">
-                  <X size={24} />
+                <button onClick={toggleMenu} className="text-light-muted hover:text-light-text p-2 rounded-full hover:bg-secondary transition-colors">
+                  <X size={20} />
                 </button>
               </div>
               
-              <nav className="flex flex-col gap-4 text-sm text-mist">
-                <Link href="#how" onClick={toggleMenu} className="hover:text-pearl transition-colors py-2">How it works</Link>
-                <Link href="/login" onClick={toggleMenu} className="hover:text-pearl transition-colors py-2">Login</Link>
-                <Link href="/register" onClick={toggleMenu} className="hover:text-pearl transition-colors py-2">Sign Up</Link>
-              </nav>
+              {/* Corpo do Menu */}
+              <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
+                
+                {/* CONTA */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium mb-3">CONTA</p>
+                  <div className="space-y-1">
+                    <Link href="/login" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
+                      <div className="flex items-center gap-3">
+                        <LogIn size={18} className="text-primary" />
+                        <span className="text-sm font-medium">Login</span>
+                      </div>
+                      <ChevronRight size={16} className="text-light-muted" />
+                    </Link>
+                    <Link href="/register" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
+                      <div className="flex items-center gap-3">
+                        <User size={18} className="text-primary" />
+                        <span className="text-sm font-medium">Cadastro</span>
+                      </div>
+                      <ChevronRight size={16} className="text-light-muted" />
+                    </Link>
+                    <a href="mailto:daltonfelizarda66@gmail.com" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
+                      <div className="flex items-center gap-3">
+                        <MessageCircle size={18} className="text-primary" />
+                        <span className="text-sm font-medium">Suporte</span>
+                      </div>
+                      <ChevronRight size={16} className="text-light-muted" />
+                    </a>
+                  </div>
+                </div>
 
-              <div className="mt-auto border-t border-white/10 pt-4 text-xs text-mist/60">
-                <p>Support</p>
-                <a href="mailto:daltonfelizarda66@gmail.com" className="block hover:text-gold mt-1">daltonfelizarda66@gmail.com</a>
-                <a href="https://wa.me/27722958915" target="_blank" className="block hover:text-gold">+27 72 295 8915</a>
+                {/* NAVEGAÇÃO */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-light-muted font-medium mb-3">NAVEGAÇÃO</p>
+                  <div className="space-y-1">
+                    <a href="#how" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium">Como funciona</span>
+                      </div>
+                      <ChevronRight size={16} className="text-light-muted" />
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Footer do Menu */}
+              <div className="px-6 py-6 border-t border-light-border">
+                <p className="text-[11px] text-light-muted">A subida começa aqui.</p>
               </div>
             </motion.div>
           </>
@@ -90,45 +129,33 @@ export function Landing() {
       </AnimatePresence>
 
       {/* ---------- Header ---------- */}
-      <header className="fixed inset-x-0 top-0 z-30 flex items-center px-6 py-4 sm:px-10">
-        <div className="flex items-center gap-4">
+      <header className="fixed inset-x-0 top-0 z-30 flex items-center px-6 py-5 sm:px-10 bg-secondary/80 backdrop-blur-sm border-b border-light-border/50">
+        <div className="flex items-center gap-4 w-full">
           {/* Menu Hambúrguer */}
-          <button onClick={toggleMenu} className="text-mist hover:text-pearl transition-colors">
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button onClick={toggleMenu} className="text-light-muted hover:text-light-text transition-colors p-1">
+            <Menu size={24} />
           </button>
           
           {/* Logo + Texto Velion */}
           <div className="flex items-center gap-3">
-            <VelionLogo size={32} />
-            <span className="font-display text-xl font-semibold text-pearl hidden sm:block">Velion</span>
+            <VelionLogo size={28} />
+            <span className="font-display text-lg font-semibold text-light-text">Velion</span>
           </div>
-        </div>
-
-        <div className="ml-auto flex items-center gap-4 sm:gap-6 text-sm text-mist">
-          <a href="#how" className="hidden sm:block hover:text-pearl transition-colors">How it works</a>
-          <Link href="/login" className="hidden sm:block hover:text-pearl transition-colors">Login</Link>
-          <Link href="/register">
-            <button className="bg-gold text-midnight px-5 py-2 rounded-full font-medium hover:bg-gold-400 transition-transform hover:scale-105 shadow-[0_0_0_1px_rgba(212,175,55,0.4)]">
-              Sign Up
-            </button>
-          </Link>
         </div>
       </header>
 
       {/* ---------- Hero ---------- */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center pt-20">
-        <AscentParticles className="pointer-events-none absolute inset-0 opacity-70" />
-
-        <div className="relative z-10 flex flex-col items-center">
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center pt-24 pb-12">
+        <div className="relative z-10 flex flex-col items-center max-w-4xl mx-auto">
           <motion.div
             initial="hidden"
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6 }}
-            className="mb-2 flex flex-col items-center"
+            className="mb-3 flex flex-col items-center"
           >
             <VelionLogo size={72} withWordmark={false} />
-            <span className="mt-3 font-mono text-xs uppercase tracking-[0.2em] text-gold/80">
+            <span className="mt-3 font-mono text-xs uppercase tracking-[0.2em] text-primary/70">
               Performance Affiliate Platform
             </span>
           </motion.div>
@@ -138,7 +165,7 @@ export function Landing() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="text-balance mt-4 max-w-2xl text-4xl font-semibold text-pearl sm:text-6xl"
+            className="text-balance mt-4 max-w-2xl text-4xl font-bold font-display text-light-text sm:text-6xl tracking-tight"
           >
             The climb starts here.
           </motion.h1>
@@ -148,7 +175,7 @@ export function Landing() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-balance mt-5 max-w-lg text-base text-mist sm:text-lg"
+            className="text-balance mt-5 max-w-lg text-base text-light-muted sm:text-lg leading-relaxed"
           >
             Sell health and wellness products across Mozambique, South Africa and Angola.
             Commission calculated automatically, fast payouts, no fine print.
@@ -159,17 +186,17 @@ export function Landing() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.6, delay: 0.45 }}
-            className="mt-8 flex flex-col items-center gap-4 sm:flex-row"
+            className="mt-8 flex flex-col items-center gap-4 sm:flex-row w-full justify-center"
           >
             <Link
               href="/register"
-              className="inline-flex h-14 items-center justify-center rounded-full bg-gold px-8 text-base font-medium text-midnight shadow-[0_0_0_1px_rgba(212,175,55,0.4)] transition-all hover:bg-gold-400 hover:shadow-[0_0_24px_rgba(212,175,55,0.45)]"
+              className="w-full sm:w-auto inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-base font-medium text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105"
             >
               Create account
             </Link>
             <Link
               href="/login"
-              className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 px-8 text-base font-medium text-pearl transition-colors hover:border-gold/60 hover:text-gold"
+              className="w-full sm:w-auto inline-flex h-14 items-center justify-center rounded-full border border-light-border px-8 text-base font-medium text-light-text bg-white transition-all hover:bg-secondary hover:scale-105"
             >
               Sign in
             </Link>
@@ -179,10 +206,10 @@ export function Landing() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="relative mt-10"
+            className="relative mt-12"
           >
             <WelcomeFigure />
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[11px] text-mist">
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[11px] text-light-muted">
               Welcome to Velion
             </span>
           </motion.div>
@@ -190,10 +217,10 @@ export function Landing() {
       </section>
 
       {/* ---------- How it works ---------- */}
-      <section id="how" className="relative px-6 py-24 sm:px-10">
+      <section id="how" className="relative px-6 py-24 sm:px-10 bg-white">
         <div className="mx-auto max-w-5xl">
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-gold/80">Process</span>
-          <h2 className="text-balance mt-3 max-w-xl text-3xl font-semibold text-pearl sm:text-4xl">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary/70">Process</span>
+          <h2 className="text-balance mt-3 max-w-xl text-3xl font-bold font-display text-light-text sm:text-4xl">
             Three steps to your commission.
           </h2>
 
@@ -205,11 +232,11 @@ export function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="glass rounded-2xl p-6"
+                className="bg-light-card border border-light-border rounded-2xl p-6 hover:shadow-md transition-shadow"
               >
-                <span className="font-mono text-sm text-gold">{step.n}</span>
-                <h3 className="mt-3 text-lg font-semibold text-pearl">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-mist">{step.body}</p>
+                <span className="font-mono text-sm text-primary">{step.n}</span>
+                <h3 className="mt-3 text-lg font-semibold text-light-text">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-light-muted">{step.body}</p>
               </motion.div>
             ))}
           </div>
@@ -217,39 +244,38 @@ export function Landing() {
       </section>
 
       {/* ---------- Corridor / coverage ---------- */}
-      <section className="relative px-6 py-24 sm:px-10">
+      <section className="relative px-6 py-24 sm:px-10 bg-secondary">
         <div className="mx-auto max-w-5xl">
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-gold/80">Coverage</span>
-          <h2 className="text-balance mt-3 max-w-xl text-3xl font-semibold text-pearl sm:text-4xl">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary/70">Coverage</span>
+          <h2 className="text-balance mt-3 max-w-xl text-3xl font-bold font-display text-light-text sm:text-4xl">
             Built for the Mozambique — South Africa corridor.
           </h2>
 
           <div className="mt-12 grid gap-4 sm:grid-cols-3">
             {CORRIDOR.map((c) => (
-              <div key={c.name} className="glass rounded-2xl p-6">
+              <div key={c.name} className="bg-light-card border border-light-border rounded-2xl p-6">
                 <span className="text-3xl">{c.flag}</span>
-                <h3 className="mt-3 font-semibold text-pearl">{c.name}</h3>
-                <p className="mt-1 text-sm text-mist">{c.detail}</p>
+                <h3 className="mt-3 font-semibold text-light-text">{c.name}</h3>
+                <p className="mt-1 text-sm text-light-muted">{c.detail}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-8 font-mono text-sm text-gold/90">Withdrawals processed within 60 minutes</p>
+          <p className="mt-8 font-mono text-sm text-primary/80">Withdrawals processed within 60 minutes</p>
         </div>
       </section>
 
       {/* ---------- Final CTA ---------- */}
-      <section className="relative overflow-hidden px-6 py-28 text-center sm:px-10">
-        <div className="pointer-events-none absolute inset-0 bg-gold-glow" />
+      <section className="relative overflow-hidden px-6 py-28 text-center sm:px-10 bg-white">
         <div className="relative z-10 mx-auto max-w-xl">
-          <h2 className="text-balance text-3xl font-semibold text-pearl sm:text-4xl">
+          <h2 className="text-balance text-3xl font-bold font-display text-light-text sm:text-4xl">
             Ready to start climbing?
           </h2>
-          <p className="mt-3 text-mist">Create your account in under a minute.</p>
+          <p className="mt-3 text-light-muted">Create your account in under a minute.</p>
           <div className="mt-8 flex justify-center">
             <Link
               href="/register"
-              className="inline-flex h-14 items-center justify-center rounded-full bg-gold px-8 text-base font-medium text-midnight shadow-[0_0_0_1px_rgba(212,175,55,0.4)] transition-all hover:bg-gold-400 hover:shadow-[0_0_24px_rgba(212,175,55,0.45)]"
+              className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-base font-medium text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105"
             >
               Create account
             </Link>
@@ -258,27 +284,27 @@ export function Landing() {
       </section>
 
       {/* ---------- Footer ---------- */}
-      <footer className="border-t border-white/10 px-6 py-10 sm:px-10">
+      <footer className="border-t border-light-border px-6 py-10 sm:px-10 bg-secondary">
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex flex-col items-center gap-2 sm:items-start">
             <VelionLogo size={24} />
-            <p className="text-xs text-mist">Performance affiliate marketing for health and wellness.</p>
+            <p className="text-xs text-light-muted">Performance affiliate marketing for health and wellness.</p>
           </div>
 
-          <div className="flex flex-col items-center gap-1 text-xs text-mist sm:items-end">
-            <span className="font-medium text-pearl">Contact</span>
-            <a href="mailto:daltonfelizarda66@gmail.com" className="hover:text-gold">
+          <div className="flex flex-col items-center gap-1 text-xs text-light-muted sm:items-end">
+            <span className="font-medium text-light-text">Contact</span>
+            <a href="mailto:daltonfelizarda66@gmail.com" className="hover:text-primary transition-colors">
               daltonfelizarda66@gmail.com
             </a>
-            <a href="https://wa.me/27722958915" target="_blank" rel="noreferrer" className="hover:text-gold">
+            <a href="https://wa.me/27722958915" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">
               WhatsApp +27 72 295 8915
             </a>
-            <a href="https://instagram.com/dalton_fds" target="_blank" rel="noreferrer" className="hover:text-gold">
+            <a href="https://instagram.com/dalton_fds" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">
               @dalton_fds
             </a>
           </div>
         </div>
-        <p className="mt-8 text-center font-mono text-[11px] text-mist/70">
+        <p className="mt-8 text-center font-mono text-[11px] text-light-muted/60">
           © {new Date().getFullYear()} Velion. All rights reserved.
         </p>
       </footer>
