@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle, Box, Truck, Shield, Users, Menu, X, Mail, Phone, Instagram } from "lucide-react";
+import { ArrowRight, CheckCircle, Box, Truck, Shield, Users, Menu, X, Mail, Phone, InstagramIcon } from "lucide-react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
 import { useState } from "react";
@@ -48,7 +48,7 @@ export default function LandingPage() {
                     <Phone size={16} /> +27722958915
                   </a>
                   <a href="https://instagram.com/dalton_fds" target="_blank" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
-                    <Instagram size={16} /> @dalton_fds
+                    <InstagramIcon size={16} /> @dalton_fds
                   </a>
                 </motion.div>
               )}
@@ -90,7 +90,7 @@ export default function LandingPage() {
                       <Phone size={16} /> +27722958915
                     </a>
                     <a href="https://instagram.com/dalton_fds" target="_blank" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
-                      <Instagram size={16} /> @dalton_fds
+                      <InstagramIcon size={16} /> @dalton_fds
                     </a>
                   </div>
                 </div>
