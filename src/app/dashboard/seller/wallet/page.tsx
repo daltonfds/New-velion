@@ -3,26 +3,24 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Button from "@/components/ui/Button";
-import { formatDualCurrency } from "@/lib/currency";
+import { formatMultiCurrency } from "@/lib/currency";
 import { supabase } from "@/lib/supabase/client";
 
 export default function WalletPage() {
   const [loading, setLoading] = useState(true);
   const [countryCode, setCountryCode] = useState("ZA");
   const [balance, setBalance] = useState(0);
-  const [pending, setPending] = useState(0);
-  const [formatted, setFormatted] = useState({
-    balance: { zar: "R 0.00", local: "R 0.00" },
-    pending: { zar: "R 0.00", local: "R 0.00" },
-  });
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [formatted, setFormatted] = useState({
+    balance: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Buscar país
+      // Buscar país do utilizador
       const { data: profile } = await supabase
         .from("profiles")
         .select("country, balance")
@@ -36,15 +34,13 @@ export default function WalletPage() {
       // Buscar transações do ledger
       const res = await fetch("/api/orders");
       const orders = await res.json();
-      // Simular transações (na realidade viriam do ledger)
       setTransactions(orders.slice(0, 5));
 
-      // Formatar moedas
-      const [bal, pend] = await Promise.all([
-        formatDualCurrency(profile?.balance || 0, profile?.country || "ZA"),
-        formatDualCurrency(0, profile?.country || "ZA"), // pending não temos
+      // Formatar as 3 moedas
+      const [bal] = await Promise.all([
+        formatMultiCurrency(profile?.balance || 0, profile?.country || "ZA"),
       ]);
-      setFormatted({ balance: bal, pending: pend });
+      setFormatted({ balance: bal });
       setLoading(false);
     };
     fetchData();
@@ -58,18 +54,19 @@ export default function WalletPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+        <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm">
           <p className="text-xs text-muted font-medium">Available Balance</p>
           <p className="text-3xl font-bold text-primary mt-2">{loading ? "..." : formatted.balance.zar}</p>
+          <p className="text-sm text-muted">{loading ? "" : formatted.balance.usd}</p>
           <p className="text-sm text-muted">{loading ? "" : formatted.balance.local}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+        <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm">
           <p className="text-xs text-muted font-medium">Pending Settlements</p>
           <p className="text-3xl font-bold text-warning mt-2">R 0.00</p>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl border border-border shadow-sm mb-6">
+      <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-dark">Transaction History</h3>
           <Button variant="outline" className="text-xs px-4 py-2">Withdraw Funds</Button>
