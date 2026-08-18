@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle, Box, Truck, Shield, Users, Menu, X, Mail, Phone, InstagramIcon } from "lucide-react";
+import { ArrowRight, CheckCircle, Box, Truck, Shield, Users, Menu, X, Mail, Phone } from "lucide-react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
 import { useState } from "react";
@@ -48,7 +48,13 @@ export default function LandingPage() {
                     <Phone size={16} /> +27722958915
                   </a>
                   <a href="https://instagram.com/dalton_fds" target="_blank" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
-                    <InstagramIcon size={16} /> @dalton_fds
+                    {/* SVG puro para o Instagram, garante 100% de compatibilidade */}
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
+                    @dalton_fds
                   </a>
                 </motion.div>
               )}
@@ -90,7 +96,12 @@ export default function LandingPage() {
                       <Phone size={16} /> +27722958915
                     </a>
                     <a href="https://instagram.com/dalton_fds" target="_blank" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
-                      <InstagramIcon size={16} /> @dalton_fds
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                      </svg>
+                      @dalton_fds
                     </a>
                   </div>
                 </div>
