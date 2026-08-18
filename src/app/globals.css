@@ -1,12 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  body {
-    @apply bg-secondary text-dark antialiased;
-  }
-}
+@import "tailwindcss";
 
 /* Animações da Logo dourada */
 @keyframes drawStroke {
