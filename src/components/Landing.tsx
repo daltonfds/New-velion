@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Menu, X } from 'lucide-react'
+import { useState } from 'react'
 import VelionLogo from '@/components/ui/VelionLogo'
 import { AscentParticles } from '@/components/ui/AscentParticles'
 import { WelcomeFigure } from '@/components/ui/WelcomeFigure'
@@ -36,20 +38,85 @@ const CORRIDOR = [
 ]
 
 export function Landing() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+
   return (
     <div className="min-h-screen bg-ascent">
+      
+      {/* ---------- Sidebar (Menu lateral esquerdo) ---------- */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              onClick={toggleMenu}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+            />
+            <motion.div 
+              initial={{ x: -300 }} 
+              animate={{ x: 0 }} 
+              exit={{ x: -300 }}
+              transition={{ type: "spring", damping: 20 }}
+              className="fixed left-0 top-0 h-full w-72 bg-midnight/95 border-r border-white/10 p-6 z-50 flex flex-col gap-6 shadow-2xl"
+            >
+              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <VelionLogo size={32} />
+                  <span className="font-display text-xl font-semibold text-pearl">Velion</span>
+                </div>
+                <button onClick={toggleMenu} className="text-mist hover:text-pearl p-1">
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <nav className="flex flex-col gap-4 text-sm text-mist">
+                <Link href="#how" onClick={toggleMenu} className="hover:text-pearl transition-colors py-2">How it works</Link>
+                <Link href="/login" onClick={toggleMenu} className="hover:text-pearl transition-colors py-2">Login</Link>
+                <Link href="/register" onClick={toggleMenu} className="hover:text-pearl transition-colors py-2">Sign Up</Link>
+              </nav>
+
+              <div className="mt-auto border-t border-white/10 pt-4 text-xs text-mist/60">
+                <p>Support</p>
+                <a href="mailto:daltonfelizarda66@gmail.com" className="block hover:text-gold mt-1">daltonfelizarda66@gmail.com</a>
+                <a href="https://wa.me/27722958915" target="_blank" className="block hover:text-gold">+27 72 295 8915</a>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* ---------- Header ---------- */}
-      <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-4 sm:px-10">
-        <VelionLogo size={32} />
-        <div className="flex items-center gap-3">
-          <a href="#how" className="hidden text-sm text-mist transition-colors hover:text-pearl sm:block">
-            How it works
-          </a>
+      <header className="fixed inset-x-0 top-0 z-30 flex items-center px-6 py-4 sm:px-10">
+        <div className="flex items-center gap-4">
+          {/* Menu Hambúrguer */}
+          <button onClick={toggleMenu} className="text-mist hover:text-pearl transition-colors">
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+          
+          {/* Logo + Texto Velion */}
+          <div className="flex items-center gap-3">
+            <VelionLogo size={32} />
+            <span className="font-display text-xl font-semibold text-pearl hidden sm:block">Velion</span>
+          </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-4 sm:gap-6 text-sm text-mist">
+          <a href="#how" className="hidden sm:block hover:text-pearl transition-colors">How it works</a>
+          <Link href="/login" className="hidden sm:block hover:text-pearl transition-colors">Login</Link>
+          <Link href="/register">
+            <button className="bg-gold text-midnight px-5 py-2 rounded-full font-medium hover:bg-gold-400 transition-transform hover:scale-105 shadow-[0_0_0_1px_rgba(212,175,55,0.4)]">
+              Sign Up
+            </button>
+          </Link>
         </div>
       </header>
 
       {/* ---------- Hero ---------- */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center">
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center pt-20">
         <AscentParticles className="pointer-events-none absolute inset-0 opacity-70" />
 
         <div className="relative z-10 flex flex-col items-center">
@@ -216,5 +283,5 @@ export function Landing() {
         </p>
       </footer>
     </div>
-  )
+  );
 }
