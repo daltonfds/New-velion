@@ -1,43 +1,51 @@
-"use client";
+'use client'
 
-export default function VelionLogo({ className = "w-24 h-24" }: { className?: string }) {
+import { motion, useReducedMotion } from 'framer-motion'
+
+interface VelionLogoProps {
+  size?: number
+  withWordmark?: boolean
+  className?: string
+}
+
+export function VelionLogo({ size = 40, withWordmark = true, className = '' }: VelionLogoProps) {
+  const reduceMotion = useReducedMotion()
+
   return (
-    <div className={`relative flex items-center justify-center ${className}`}>
-      {/* Anel tracejado em SVG para melhor controle */}
-      <svg viewBox="0 0 100 100" className="absolute w-[130%] h-[130%] animate-spin-slow">
-        <circle 
-          cx="50" 
-          cy="50" 
-          r="40" 
-          fill="none" 
-          stroke="#D4AF37" 
-          strokeWidth="1.5" 
-          strokeDasharray="4 6" 
-          opacity="0.3" 
+    <div className={`flex items-center gap-3 ${className}`}>
+      <svg width={size} height={size} viewBox="0 0 64 64" fill="none" role="img" aria-label="Velion">
+        <motion.path
+          d="M32 12 L52 48 H38 L32 34 L26 48 H12 Z"
+          stroke="#D4AF37"
+          strokeWidth={3.2}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          fill="none"
+          initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1.4, ease: 'easeInOut' }}
+        />
+        <motion.circle
+          cx={32}
+          cy={32}
+          r={27}
+          stroke="#D4AF37"
+          strokeOpacity={0.35}
+          strokeWidth={1}
+          strokeDasharray="3 5"
+          fill="none"
+          initial={reduceMotion ? false : { rotate: 0, opacity: 0 }}
+          animate={{ rotate: 360, opacity: 1 }}
+          transition={{
+            opacity: { duration: 1, delay: 0.4 },
+            rotate: { duration: 40, repeat: Infinity, ease: 'linear' },
+          }}
+          style={{ transformOrigin: '32px 32px' }}
         />
       </svg>
-      
-      {/* Montanha com V invertido, pontas arredondadas */}
-      <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_6px_rgba(212,175,55,0.3)]">
-        <path 
-          d="M50 20 L85 85 M15 85 L50 20" 
-          fill="none" 
-          stroke="#D4AF37" 
-          strokeWidth="4" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-          className="draw-mountain"
-        />
-        <path 
-          d="M45 85 L50 55 L55 85" 
-          fill="none" 
-          stroke="#D4AF37" 
-          strokeWidth="4" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-          className="draw-valley"
-        />
-      </svg>
+      {withWordmark && (
+        <span className="font-display text-xl font-semibold tracking-tight text-pearl">Velion</span>
+      )}
     </div>
-  );
+  )
 }

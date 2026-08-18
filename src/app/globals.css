@@ -1,26 +1,30 @@
-@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-secondary text-light-text antialiased;
+@layer utilities {
+  .glass {
+    @apply bg-white/[0.04] backdrop-blur-xl border border-white/10;
+  }
+  .bg-ascent {
+    background-image: theme('backgroundImage.ascent');
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
 }
 
-/* Animações do Logo Dourado */
-@keyframes drawStroke {
-  to { stroke-dashoffset: 0; }
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #061229, 0 0 0 4px #D4AF37;
+  border-radius: 2px;
 }
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.draw-mountain {
-  stroke-dasharray: 300;
-  stroke-dashoffset: 300;
-  animation: drawStroke 1.4s ease-in-out forwards;
-}
-.animate-spin-slow {
-  animation: spin-slow 40s linear infinite;
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
