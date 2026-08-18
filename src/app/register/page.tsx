@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
@@ -17,6 +17,16 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Referência para saber se o componente ainda está montado
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false; // Quando o componente sair da tela, isto fica falso
+    };
+  }, []);
+
   async function handleSubmit(formData: FormData) {
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
@@ -30,9 +40,13 @@ export default function RegisterPage() {
     setError(null);
     try {
       await signupWithPhone(formData);
+      // Nota: Se chegar aqui, o redirecionamento já aconteceu.
     } catch (e: any) {
-      setError(e.message || "Failed to create account");
-      setLoading(false);
+      // Só atualiza o estado se o componente ainda estiver na tela
+      if (isMounted.current) {
+        setError(e.message || "Failed to create account");
+        setLoading(false);
+      }
     }
   }
 
