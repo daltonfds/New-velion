@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, LogIn, User, MessageCircle, ChevronRight } from 'lucide-react'
+import { Menu, X, LogIn, User, MessageCircle, ChevronRight, Mail, Phone } from 'lucide-react'
 import { useState } from 'react'
 import VelionLogo from '@/components/ui/VelionLogo'
 import { WelcomeFigure } from '@/components/ui/WelcomeFigure'
@@ -38,13 +38,14 @@ const CORRIDOR = [
 
 export function Landing() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [supportOpen, setSupportOpen] = useState(false)
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
   return (
     <div className="min-h-screen bg-secondary text-light-text font-sans selection:bg-primary/20">
       
-      {/* ---------- Sidebar (Exact layout, but fully translated to English) ---------- */}
+      {/* ---------- Sidebar (Menu lateral esquerdo com suporte expansível) ---------- */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -92,13 +93,47 @@ export function Landing() {
                       </div>
                       <ChevronRight size={16} className="text-light-muted" />
                     </Link>
-                    <a href="mailto:daltonfelizarda66@gmail.com" onClick={toggleMenu} className="flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text">
-                      <div className="flex items-center gap-3">
-                        <MessageCircle size={18} className="text-primary" />
-                        <span className="text-sm font-medium">Support</span>
-                      </div>
-                      <ChevronRight size={16} className="text-light-muted" />
-                    </a>
+
+                    {/* Support Dropdown */}
+                    <div className="relative">
+                      <button 
+                        onClick={() => setSupportOpen(!supportOpen)} 
+                        className="w-full flex items-center justify-between py-3 px-3 -ml-3 hover:bg-secondary rounded-lg transition-colors text-light-text"
+                      >
+                        <div className="flex items-center gap-3">
+                          <MessageCircle size={18} className="text-primary" />
+                          <span className="text-sm font-medium">Support</span>
+                        </div>
+                        <motion.div animate={{ rotate: supportOpen ? 90 : 0 }}>
+                          <ChevronRight size={16} className="text-light-muted" />
+                        </motion.div>
+                      </button>
+
+                      <AnimatePresence>
+                        {supportOpen && (
+                          <motion.div 
+                            initial={{ height: 0, opacity: 0 }} 
+                            animate={{ height: "auto", opacity: 1 }} 
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden pl-4 border-l-2 border-light-border ml-1 mt-1 space-y-2"
+                          >
+                            <a href="mailto:daltonfelizarda66@gmail.com" className="flex items-center gap-3 py-2 px-3 text-sm text-light-muted hover:text-primary transition-colors rounded-lg">
+                              <Mail size={16} /> Email
+                            </a>
+                            <a href="https://wa.me/27722958915" target="_blank" rel="noreferrer" className="flex items-center gap-3 py-2 px-3 text-sm text-light-muted hover:text-primary transition-colors rounded-lg">
+                              <MessageCircle size={16} /> WhatsApp
+                            </a>
+                            <a href="tel:+27722958915" className="flex items-center gap-3 py-2 px-3 text-sm text-light-muted hover:text-primary transition-colors rounded-lg">
+                              <Phone size={16} /> Call
+                            </a>
+                            <a href="https://instagram.com/dalton_fds" target="_blank" rel="noreferrer" className="flex items-center gap-3 py-2 px-3 text-sm text-light-muted hover:text-primary transition-colors rounded-lg">
+                              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                              Instagram
+                            </a>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </div>
 
