@@ -1,29 +1,109 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle, Box, Truck, Shield, Users } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, CheckCircle, Box, Truck, Shield, Users, Menu, X, Mail, Phone, Instagram } from "lucide-react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
+
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const toggleSupport = () => setSupportOpen(!supportOpen);
+
   return (
     <div className="min-h-screen bg-secondary text-light-text font-sans selection:bg-primary/30">
       
       {/* Navbar */}
-      <header className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between border-b border-light-border">
+      <header className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-light-border relative z-50">
         <div className="flex items-center gap-3">
           <VelionLogo className="w-8 h-8" />
           <span className="font-display text-xl font-semibold text-light-text">Velion</span>
         </div>
-        <div className="flex items-center gap-6 text-sm hidden md:flex">
-          <Link href="#" className="text-light-muted hover:text-light-text transition-colors">How it works</Link>
-          <Link href="/login" className="text-light-muted hover:text-light-text transition-colors">Sign in</Link>
+        
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-6 text-sm">
+          <a href="#how-it-works" className="text-light-muted hover:text-light-text transition-colors">How it works</a>
+          <Link href="/login" className="text-light-muted hover:text-light-text transition-colors">Login</Link>
+          
+          <div className="relative">
+            <button onClick={toggleSupport} className="text-light-muted hover:text-light-text transition-colors flex items-center gap-1">
+              Support
+            </button>
+            <AnimatePresence>
+              {supportOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-full right-0 mt-2 w-56 bg-light-card border border-light-border rounded-xl shadow-lg p-4 space-y-3 text-sm z-50"
+                >
+                  <p className="font-medium text-light-text mb-1">Contact Support</p>
+                  <a href="mailto:daltonfelizarda66@gmail.com" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
+                    <Mail size={16} /> daltonfelizarda66@gmail.com
+                  </a>
+                  <a href="https://wa.me/27722958915" target="_blank" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
+                    <Phone size={16} /> +27722958915
+                  </a>
+                  <a href="https://instagram.com/dalton_fds" target="_blank" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
+                    <Instagram size={16} /> @dalton_fds
+                  </a>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <Link href="/register">
             <button className="bg-primary text-white px-5 py-2 rounded-full font-medium hover:bg-primary/90 transition-transform hover:scale-105 shadow-lg shadow-primary/20">
-              Start Selling
+              Sign Up
             </button>
           </Link>
         </div>
+
+        {/* Mobile Navigation Toggle */}
+        <button onClick={toggleMobileMenu} className="md:hidden p-2 text-light-text hover:bg-light-border rounded-lg transition-colors">
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Mobile Navigation Menu (Slide down) */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }} 
+              animate={{ opacity: 1, height: "auto" }} 
+              exit={{ opacity: 0, height: 0 }}
+              className="absolute top-full left-0 w-full bg-light-card border-b border-light-border shadow-lg overflow-hidden md:hidden z-50"
+            >
+              <div className="flex flex-col p-6 space-y-4 text-sm">
+                <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-light-muted hover:text-light-text transition-colors">How it works</a>
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-light-muted hover:text-light-text transition-colors">Login</Link>
+                
+                <div className="border-t border-light-border pt-4">
+                  <p className="font-medium text-light-text mb-3">Support</p>
+                  <div className="space-y-2">
+                    <a href="mailto:daltonfelizarda66@gmail.com" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
+                      <Mail size={16} /> daltonfelizarda66@gmail.com
+                    </a>
+                    <a href="https://wa.me/27722958915" target="_blank" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
+                      <Phone size={16} /> +27722958915
+                    </a>
+                    <a href="https://instagram.com/dalton_fds" target="_blank" className="flex items-center gap-3 text-light-muted hover:text-primary transition-colors">
+                      <Instagram size={16} /> @dalton_fds
+                    </a>
+                  </div>
+                </div>
+
+                <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                  <button className="w-full bg-primary text-white py-3 rounded-full font-medium hover:bg-primary/90 transition-transform hover:scale-105 shadow-lg shadow-primary/20">
+                    Sign Up
+                  </button>
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-16 md:py-24 space-y-32">
@@ -76,8 +156,8 @@ export default function LandingPage() {
           </div>
         </motion.section>
 
-        {/* 3. How it Works */}
-        <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }} className="text-center space-y-12">
+        {/* 3. How it Works (Anchor linked from menu) */}
+        <motion.section id="how-it-works" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }} className="text-center space-y-12">
           <h2 className="text-3xl font-display font-bold text-light-text">How it works</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
             <div className="bg-light-card border border-light-border rounded-xl p-6 hover:border-primary/30 transition-colors"><h4 className="font-bold text-primary text-sm mb-1">01. Producers</h4><p className="text-light-muted text-sm">List products and set your wholesale price.</p></div>
@@ -136,7 +216,7 @@ export default function LandingPage() {
             <ul className="space-y-2 text-sm text-light-muted">
               <li className="flex items-center gap-2"><CheckCircle size={16} className="text-primary" /> Real time tracking for every order</li>
               <li className="flex items-center gap-2"><CheckCircle size={16} className="text-primary" /> Dedicated support system</li>
-              <li className="flex items-center gap-2"><CheckCircle size={16} className="text-primary" /> Multi currency support (ZAR, MZN, AOA)</li>
+              <li className="flex items-center gap-2"><CheckCircle size={16} className="text-primary" /> Multi currency support</li>
             </ul>
           </div>
         </motion.section>
