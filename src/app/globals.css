@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  @apply bg-secondary text-dark antialiased;
+}
+
 /* Animações do Logo Dourado */
 @keyframes drawStroke {
   to { stroke-dashoffset: 0; }

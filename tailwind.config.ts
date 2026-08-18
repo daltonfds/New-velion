@@ -9,23 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#5946E6",
-        secondary: "#F4F4F7",
-        dark: "#1A1A1A",
-        muted: "#6B7280",
-        border: "#E5E7EB",
-        success: "#10B981",
-        warning: "#F59E0B",
-        error: "#EF4444",
-        // Nomes usados no seu design:
-        'light-bg': "#F4F4F7",
-        'light-text': "#1A1A1A",
-        'light-textMuted': "#6B7280",
-        'light-border': "#E5E7EB",
-        'dark-bg': "#0D0D0D",
-        'dark-text': "#FFFFFF",
-        'dark-textMuted': "#9CA3AF",
-        'dark-border': "#333333",
+        primary: "#4F46E5", // Índigo/Roxo dos botões
+        secondary: "#F8F9FA", // Fundo claro
+        dark: "#1A202C", // Texto escuro
+        muted: "#64748B", // Texto secundário
+        border: "#E2E8F0", // Bordas leves
       },
       fontFamily: {
         display: ['"Clash Display"', 'sans-serif'],
