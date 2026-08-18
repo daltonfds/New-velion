@@ -8,7 +8,7 @@ interface VelionLogoProps {
   className?: string
 }
 
-export function VelionLogo({ size = 40, withWordmark = true, className = '' }: VelionLogoProps) {
+export default function VelionLogo({ size = 40, withWordmark = true, className = '' }: VelionLogoProps) {
   const reduceMotion = useReducedMotion()
 
   return (
