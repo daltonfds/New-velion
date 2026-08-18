@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { VelionLogo } from '@/components/ui/VelionLogo'
+import VelionLogo from '@/components/ui/VelionLogo'
 import { AscentParticles } from '@/components/ui/AscentParticles'
 import { WelcomeFigure } from '@/components/ui/WelcomeFigure'
 
