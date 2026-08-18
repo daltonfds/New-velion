@@ -26,7 +26,7 @@ export default function MobileMenu() {
       {isOpen && (
         <div className="absolute top-16 left-0 w-full bg-white border-b border-border shadow-lg p-4 flex flex-col gap-2 z-40">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <VelionLogo className="w-8 h-8" showText={false} />
+            <VelionLogo className="w-8 h-8" />
             <span className="font-display font-semibold text-dark">Velion</span>
           </div>
           {menuItems.map((item) => (

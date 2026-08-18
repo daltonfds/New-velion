@@ -9,7 +9,7 @@ export default function Header({ userType = "seller" }: HeaderProps) {
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-border">
       <div className="flex items-center gap-3">
-        <VelionLogo className="w-10 h-10" showText={false} />
+        <VelionLogo className="w-10 h-10" />
         <div>
           <span className="font-display text-lg font-semibold text-dark">Velion</span>
           <span className="block text-[10px] uppercase tracking-wider text-muted">{userType === "admin" ? "Admin" : "Seller"}</span>

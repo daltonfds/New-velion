@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen bg-secondary">
       <aside className="w-64 bg-white border-r border-border hidden md:flex flex-col p-6">
         <div className="flex items-center gap-3 mb-10">
-          <VelionLogo className="w-10 h-10" showText={false} />
+          <VelionLogo className="w-10 h-10" />
           <span className="font-display text-lg font-semibold text-dark">Velion</span>
         </div>
         <nav className="flex flex-col gap-2">
