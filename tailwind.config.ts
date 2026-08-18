@@ -9,12 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#4F46E5",
-        background: "#0A0A0A",
-        card: "#121212",
-        border: "#262626",
-        text: "#FFFFFF",
-        muted: "#9CA3AF",
+        primary: "#4F46E5", // Roxo principal dos botões
+        secondary: "#F4F4F7", // Fundo cinza clarinho (como nas fotos)
+        "light-card": "#FFFFFF", // Cartões brancos
+        "light-border": "#E5E7EB", // Bordas sutis
+        "light-text": "#1A1A1A", // Texto preto (quase cinza escuro)
+        "light-muted": "#6B7280", // Texto secundário cinza
       },
       fontFamily: {
         display: ['"Clash Display"', 'sans-serif'],

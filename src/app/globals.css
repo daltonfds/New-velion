@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-background text-text antialiased;
+  @apply bg-secondary text-light-text antialiased;
 }
 
 /* Animações do Logo Dourado */
@@ -20,11 +20,6 @@ body {
   stroke-dasharray: 300;
   stroke-dashoffset: 300;
   animation: drawStroke 1.4s ease-in-out forwards;
-}
-.draw-valley {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: drawStroke 1.2s ease-in-out 0.3s forwards;
 }
 .animate-spin-slow {
   animation: spin-slow 40s linear infinite;
