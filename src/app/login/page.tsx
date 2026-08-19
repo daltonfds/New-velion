@@ -1,32 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import CountrySelector from "@/components/ui/CountrySelector";
-import { loginWithPhone } from "@/app/register/actions";
+import { loginWithEmail, loginWithPhone } from "@/app/register/actions";
 import { useToast } from "@/components/ui/Toast";
 
 export default function LoginPage() {
   const { showToast } = useToast();
-  const [loginType, setLoginType] = useState<"email" | "phone">("phone");
+  const [loginType, setLoginType] = useState<"email" | "phone">("email");
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => { isMounted.current = false; };
+  }, []);
+
+  async function handleEmailSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData(e.currentTarget);
+      await loginWithEmail(formData);
+    } catch (err: any) {
+      if (isMounted.current) {
+        setError(err.message || "Invalid email or password");
+        setLoading(false);
+      }
+    }
+  }
+
+  async function handlePhoneSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
       const formData = new FormData(e.currentTarget);
       await loginWithPhone(formData);
-      setOtpSent(true);
+      if (isMounted.current) setOtpSent(true);
     } catch (err: any) {
-      setError(err.message || "Failed to send code.");
-      setLoading(false);
+      if (isMounted.current) {
+        setError(err.message || "Failed to send code.");
+        setLoading(false);
+      }
     }
   }
 
@@ -39,14 +62,13 @@ export default function LoginPage() {
         <h2 className="text-xl font-semibold text-light-text text-center mb-1">Sign In</h2>
         <p className="text-center text-light-muted text-sm mb-6">Enter your Velion account.</p>
 
-        {/* Abas de escolha */}
         <div className="flex gap-2 mb-6 bg-secondary/50 p-1 rounded-lg">
           <button onClick={() => setLoginType("email")} className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${loginType === "email" ? "bg-white shadow-sm text-light-text" : "text-light-muted hover:text-light-text"}`}>Email</button>
           <button onClick={() => setLoginType("phone")} className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${loginType === "phone" ? "bg-white shadow-sm text-light-text" : "text-light-muted hover:text-light-text"}`}>Phone</button>
         </div>
 
         {loginType === "email" && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-light-muted mb-1">Email</label>
               <input type="email" name="email" placeholder="you@example.com" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
@@ -63,7 +85,7 @@ export default function LoginPage() {
         {loginType === "phone" && (
           <div>
             {!otpSent ? (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handlePhoneSubmit} className="space-y-4">
                 <div>
                   <label className="block text-xs font-medium text-light-muted mb-1">Select Country (Auto-sync DDD)</label>
                   <CountrySelector 
