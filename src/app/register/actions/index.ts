@@ -3,6 +3,7 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { sendVerificationEmail } from "@/lib/email/sendVerification";
 
 // 1. Registo via Email
@@ -12,7 +13,6 @@ export async function signupWithEmail(formData: FormData) {
   const fullName = formData.get("fullName") as string;
   const role = formData.get("role") as string;
 
-  // Cria utilizador via Admin API (sem necessidade de confirmação extra)
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
@@ -25,7 +25,6 @@ export async function signupWithEmail(formData: FormData) {
 
   if (error) throw new Error(error.message);
 
-  // Gera código OTP e envia via Resend
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
   const supabase = createServerClient();
   await supabase.from("email_verification_codes").insert({ email, code: otpCode });
@@ -127,4 +126,18 @@ export async function loginWithEmail(formData: FormData) {
 
   if (error) throw new Error(error.message);
   redirect("/dashboard/seller");
+}
+
+// 7. Login com Google
+export async function loginWithGoogle() {
+  const supabase = createServerClient();
+  const origin = (await headers()).get("origin");
+  
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${origin}/auth/callback` },
+  });
+
+  if (error) throw new Error(error.message);
+  redirect(data.url);
 }
