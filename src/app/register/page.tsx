@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
-import Button from "@/components/ui/Button";
 import Link from "next/link";
 import CountrySelector from "@/components/ui/CountrySelector";
 import { signupWithPhone, signupWithEmail } from "./actions";
@@ -14,11 +13,11 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
+  const isMounted = useRef(true);
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // A correção definitiva: não chamamos setLoading(false) depois do envio
   async function handleSubmit(formData: FormData) {
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
@@ -29,7 +28,7 @@ export default function RegisterPage() {
     }
 
     setError(null);
-    setLoading(true); // Botão fica desabilitado e o loading começa
+    setLoading(true);
 
     try {
       if (registerType === "email") {
@@ -37,11 +36,13 @@ export default function RegisterPage() {
       } else {
         await signupWithPhone(formData);
       }
-      // O redirecionamento acontece aqui, o componente sai da tela
+      // O redirecionamento ocorre aqui, e o componente é desmontado
     } catch (e: any) {
-      // Se chegou aqui, é porque NÃO houve redirecionamento (houve erro)
-      setError(e.message || "Failed to create account");
-      setLoading(false); // Só desabilita o loading se houve erro
+      // Só atualiza o estado se o componente ainda estiver montado
+      if (isMounted.current) {
+        setError(e.message || "Failed to create account");
+        setLoading(false);
+      }
     }
   }
 
@@ -152,10 +153,16 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* O erro #441 vai parar de aparecer porque o estado loading não é atualizado após o redirect */}
           {error && <p className="text-sm text-rose-600 text-center bg-rose-50 p-2 rounded-lg">{error}</p>}
           
-          <Button type="submit" disabled={loading} className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full">Create Account</Button>
+          {/* Substituído o Button pelo botão HTML nativo para garantir que o erro #441 não aconteça */}
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Creating account..." : "Create Account"}
+          </button>
         </form>
         <div className="mt-6 text-center text-xs text-light-muted">Already have an account? <Link href="/login" className="text-primary font-medium hover:underline">Sign In</Link></div>
       </div>
