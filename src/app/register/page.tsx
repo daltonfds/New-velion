@@ -17,7 +17,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Controlo de montagem do componente
   const isMounted = useRef(true);
 
   useEffect(() => {
@@ -41,7 +40,6 @@ export default function RegisterPage() {
     
     try {
       await signupWithPhone(formData);
-      // Se chegar aqui, o redirecionamento já aconteceu
     } catch (e: any) {
       if (isMounted.current) {
         setError(e.message || "Failed to create account");
