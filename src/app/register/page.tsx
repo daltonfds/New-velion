@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
 import CountrySelector from "@/components/ui/CountrySelector";
@@ -10,10 +10,8 @@ import { Eye, EyeOff } from "lucide-react";
 export default function RegisterPage() {
   const [registerType, setRegisterType] = useState<"email" | "phone">("email");
   const [role, setRole] = useState<"seller" | "producer">("seller");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
-  const isMounted = useRef(true);
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,7 +26,6 @@ export default function RegisterPage() {
     }
 
     setError(null);
-    setLoading(true);
 
     try {
       if (registerType === "email") {
@@ -36,13 +33,8 @@ export default function RegisterPage() {
       } else {
         await signupWithPhone(formData);
       }
-      // O redirecionamento ocorre aqui, e o componente é desmontado
     } catch (e: any) {
-      // Só atualiza o estado se o componente ainda estiver montado
-      if (isMounted.current) {
-        setError(e.message || "Failed to create account");
-        setLoading(false);
-      }
+      setError(e.message || "Failed to create account");
     }
   }
 
@@ -155,13 +147,11 @@ export default function RegisterPage() {
 
           {error && <p className="text-sm text-rose-600 text-center bg-rose-50 p-2 rounded-lg">{error}</p>}
           
-          {/* Substituído o Button pelo botão HTML nativo para garantir que o erro #441 não aconteça */}
           <button 
             type="submit" 
-            disabled={loading}
-            className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium"
           >
-            {loading ? "Creating account..." : "Create Account"}
+            Create Account
           </button>
         </form>
         <div className="mt-6 text-center text-xs text-light-muted">Already have an account? <Link href="/login" className="text-primary font-medium hover:underline">Sign In</Link></div>
