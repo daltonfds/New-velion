@@ -3,6 +3,7 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
+import { sendApprovalEmail } from "@/lib/email/sendApproval";
 
 export async function approveRequest(requestId: string, tempPassword: string) {
   const supabase = createServerClient();
@@ -16,7 +17,7 @@ export async function approveRequest(requestId: string, tempPassword: string) {
 
   if (fetchError || !request) throw new Error("Request not found");
 
-  // 2. Criar o utilizador no Supabase Auth com senha temporária
+  // 2. Criar o utilizador no Supabase Auth
   const { data: user, error: createError } = await supabaseAdmin.auth.admin.createUser({
     email: request.email,
     password: tempPassword,
@@ -31,7 +32,7 @@ export async function approveRequest(requestId: string, tempPassword: string) {
 
   if (createError) throw new Error(createError.message);
 
-  // 3. Atualizar o status do pedido para 'approved'
+  // 3. Atualizar o status do pedido
   const { error: updateError } = await supabase
     .from("registration_requests")
     .update({ status: "approved" })
@@ -39,7 +40,18 @@ export async function approveRequest(requestId: string, tempPassword: string) {
 
   if (updateError) throw new Error(updateError.message);
 
-  // 4. Recarregar a página do Admin para mostrar o pedido como aprovado
+  // 4. Enviar e-mail de boas-vindas com a senha temporária
+  try {
+    await sendApprovalEmail(
+      request.email,
+      request.full_name,
+      tempPassword
+    );
+  } catch (emailError) {
+    console.error("Failed to send approval email:", emailError);
+    // Não paramos o fluxo, mas alertamos o admin
+  }
+
   revalidatePath("/dashboard/admin/requests");
   return { success: true, userId: user.user.id };
 }
