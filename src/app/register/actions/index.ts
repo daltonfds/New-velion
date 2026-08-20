@@ -2,39 +2,35 @@
 
 import { createServerClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { sendVerificationEmail } from "@/lib/email/sendVerification";
 
-// 1. Registo via Email (retorna URL para redirecionamento manual)
 export async function signupWithEmail(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const fullName = formData.get("fullName") as string;
   const role = formData.get("role") as string;
 
-  const { data, error } = await supabaseAdmin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: {
-      full_name: fullName,
-      role: role || "seller",
-    },
-  });
+  try {
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { full_name: fullName, role: role || "seller" },
+    });
 
-  if (error) throw new Error(error.message);
+    if (error) throw new Error(error.message);
 
-  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const supabase = createServerClient();
-  await supabase.from("email_verification_codes").insert({ email, code: otpCode });
-  await sendVerificationEmail(email, otpCode);
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const supabase = createServerClient();
+    await supabase.from("email_verification_codes").insert({ email, code: otpCode });
+    await sendVerificationEmail(email, otpCode);
 
-  // Retorna a URL para o cliente fazer o redirect
-  return `/verify-email?email=${encodeURIComponent(email)}`;
+    return { success: true, redirect: `/verify-email?email=${encodeURIComponent(email)}` };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 }
 
-// 2. Registo via Telefone
 export async function signupWithPhone(formData: FormData) {
   const fullName = formData.get("fullName") as string;
   const country = formData.get("country") as string;
@@ -42,103 +38,50 @@ export async function signupWithPhone(formData: FormData) {
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
 
-  const supabase = createServerClient();
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase.auth.signUp({
+      email: `${phone}@phone.velion`,
+      password,
+      options: { data: { full_name: fullName, country, phone, role: role || "seller" } },
+    });
 
-  const { data, error } = await supabase.auth.signUp({
-    email: `${phone}@phone.velion`,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-        country: country,
-        phone: phone,
-        role: role || "seller",
-      },
-    },
-  });
+    if (error) throw new Error(error.message);
 
-  if (error) throw new Error(error.message);
+    const { error: otpError } = await supabase.auth.signInWithOtp({ phone });
+    if (otpError) throw new Error(otpError.message);
 
-  const { error: otpError } = await supabase.auth.signInWithOtp({ phone });
-  if (otpError) throw new Error(otpError.message);
-
-  return `/verify-phone?phone=${encodeURIComponent(phone)}`;
-}
-
-// 3. Verificação de código (Email)
-export async function verifyEmailCode(formData: FormData) {
-  const email = formData.get("email") as string;
-  const code = formData.get("code") as string;
-
-  const supabase = createServerClient();
-  const { data, error } = await supabase
-    .from("email_verification_codes")
-    .select("*")
-    .eq("email", email)
-    .eq("code", code)
-    .gte("expires_at", new Date().toISOString())
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  if (error || !data || data.length === 0) {
-    throw new Error("Invalid or expired verification code.");
+    return { success: true, redirect: `/verify-phone?phone=${encodeURIComponent(phone)}` };
+  } catch (error: any) {
+    return { success: false, error: error.message };
   }
-
-  return "/dashboard/seller";
 }
 
-// 4. Verificação de código (Telefone)
-export async function verifyPhoneCode(formData: FormData) {
-  const phone = formData.get("phone") as string;
-  const token = formData.get("token") as string;
-
-  const supabase = createServerClient();
-  const { error } = await supabase.auth.verifyOtp({
-    phone,
-    token,
-    type: "sms"
-  });
-
-  if (error) throw new Error(error.message);
-  return "/dashboard/seller";
-}
-
-// 5. Login via Telefone
-export async function loginWithPhone(formData: FormData) {
-  const phone = formData.get("phone") as string;
-
-  const supabase = createServerClient();
-  const { error } = await supabase.auth.signInWithOtp({
-    phone,
-    options: { shouldCreateUser: false }
-  });
-
-  if (error) throw new Error(error.message);
-  return "/verify-phone";
-}
-
-// 6. Login via Email
 export async function loginWithEmail(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const supabase = createServerClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) throw new Error(error.message);
-  return "/dashboard/seller";
+  try {
+    const supabase = createServerClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw new Error(error.message);
+    return { success: true, redirect: "/dashboard/seller" };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 }
 
-// 7. Login com Google
-export async function loginWithGoogle() {
-  const supabase = createServerClient();
-  const origin = (await headers()).get("origin");
-  
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: `${origin}/auth/callback` },
-  });
-
-  if (error) throw new Error(error.message);
-  return data.url;
+export async function loginWithPhone(formData: FormData) {
+  const phone = formData.get("phone") as string;
+  try {
+    const supabase = createServerClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+      options: { shouldCreateUser: false }
+    });
+    if (error) throw new Error(error.message);
+    return { success: true, redirect: "/verify-phone" };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 }
