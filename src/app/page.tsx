@@ -5,11 +5,11 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-light-bg text-light-text font-sans selection:bg-primary/20">
       
-      {/* ---------- Navbar ---------- */}
+      {/* ---------- Header ---------- */}
       <header className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-light-border/50">
+        {/* Removido o texto "Velion" duplicado. Ficou apenas o logotipo no topo */}
         <div className="flex items-center gap-3">
-          <VelionLogo className="w-8 h-8" />
-          <span className="font-display text-xl font-semibold tracking-tight">Velion</span>
+          <VelionLogo className="w-10 h-10" />
         </div>
         <div className="flex items-center gap-6 text-sm hidden md:flex">
           <Link href="#for-sellers" className="text-light-muted hover:text-light-text transition-colors">Sellers</Link>
@@ -24,13 +24,17 @@ export default function LandingPage() {
         {/* ---------- Hero Section ---------- */}
         <section className="py-24 md:py-32 text-center max-w-4xl mx-auto space-y-8">
           <div className="flex justify-center mb-2">
-            <VelionLogo className="w-24 h-24" />
+            {/* Logotipo maior e animado */}
+            <VelionLogo className="w-32 h-32" />
           </div>
-          <p className="text-xs font-semibold tracking-[0.2em] text-primary uppercase font-display">Commerce Infrastructure Platform</p>
-          <h1 className="text-4xl md:text-6xl font-bold font-display tracking-tight leading-tight text-light-text">
+          {/* Texto menor, mais elegante, com tracking mais espaçado */}
+          <p className="text-xs font-medium tracking-[0.3em] text-primary uppercase font-display">
+            Commerce Infrastructure Platform
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold font-display tracking-tight leading-tight text-light-text">
             The climb starts here.
           </h1>
-          <p className="text-lg md:text-xl text-light-muted max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-light-muted max-w-2xl mx-auto leading-relaxed">
             The infrastructure behind your next business. Velion connects producers and suppliers with sellers around the world, giving businesses access to products, fulfillment, warehousing, logistics, payments and Cash on Delivery through one platform.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -59,10 +63,28 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <h2 className="text-3xl md:text-4xl font-bold font-display text-light-text">One platform. The entire commerce chain.</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8 text-left text-sm">
-              <div className="bg-light-card border border-light-border p-6 rounded-xl shadow-sm"><span className="block font-bold text-primary mb-1">PRODUCER / SUPPLIER</span><p className="text-light-muted text-xs">Products &amp; Inventory</p><div className="mt-2 w-8 h-0.5 bg-primary/50"></div></div>
-              <div className="bg-light-card border border-light-border p-6 rounded-xl shadow-sm border-primary/30 relative"><span className="block font-bold text-primary mb-1">VELION</span><p className="text-light-muted text-xs">Marketplace · Warehousing · Fulfillment · Payments · Logistics</p></div>
-              <div className="bg-light-card border border-light-border p-6 rounded-xl shadow-sm"><span className="block font-bold text-primary mb-1">SELLER</span><p className="text-light-muted text-xs">Store · Pricing · Sales</p><div className="mt-2 w-8 h-0.5 bg-primary/50"></div></div>
-              <div className="bg-light-card border border-light-border p-6 rounded-xl shadow-sm"><span className="block font-bold text-primary mb-1">CUSTOMER</span><p className="text-light-muted text-xs">Delivery · Tracking · COD</p></div>
+              {/* Cartão 1 */}
+              <div className="bg-light-card border-2 border-primary p-6 rounded-xl shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer">
+                <span className="block font-bold text-primary mb-1">PRODUCER / SUPPLIER</span>
+                <p className="text-light-muted text-xs">Products &amp; Inventory</p>
+                <div className="mt-2 w-8 h-0.5 bg-primary/50"></div>
+              </div>
+              {/* Cartão 2 (Velion) */}
+              <div className="bg-light-card border-2 border-primary p-6 rounded-xl shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer relative">
+                <span className="block font-bold text-primary mb-1">VELION</span>
+                <p className="text-light-muted text-xs">Marketplace · Warehousing · Fulfillment · Payments · Logistics</p>
+              </div>
+              {/* Cartão 3 */}
+              <div className="bg-light-card border-2 border-primary p-6 rounded-xl shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer">
+                <span className="block font-bold text-primary mb-1">SELLER</span>
+                <p className="text-light-muted text-xs">Store · Pricing · Sales</p>
+                <div className="mt-2 w-8 h-0.5 bg-primary/50"></div>
+              </div>
+              {/* Cartão 4 */}
+              <div className="bg-light-card border-2 border-primary p-6 rounded-xl shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer">
+                <span className="block font-bold text-primary mb-1">CUSTOMER</span>
+                <p className="text-light-muted text-xs">Delivery · Tracking · COD</p>
+              </div>
             </div>
             <p className="text-light-muted text-sm max-w-lg mx-auto mt-4">Producer / Supplier → Velion / 3PL → Seller → Customer → Carrier → Velion → Settlements.</p>
           </div>
@@ -152,17 +174,17 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
           <div className="space-y-3">
             <span className="font-display font-semibold text-base text-light-text">Velion</span>
-            <p className="text-light-muted">About</p>
-            <p className="text-light-muted">Producers</p>
-            <p className="text-light-muted">Sellers</p>
-            <p className="text-light-muted">Suppliers</p>
+            <p className="text-light-muted hover:no-underline">About</p>
+            <p className="text-light-muted hover:no-underline">Producers</p>
+            <p className="text-light-muted hover:no-underline">Sellers</p>
+            <p className="text-light-muted hover:no-underline">Suppliers</p>
           </div>
           <div className="space-y-3">
             <span className="font-display font-semibold text-base text-light-text">Support</span>
-            <p className="text-light-muted">Help Center</p>
-            <p className="text-light-muted">Terms of Service</p>
-            <p className="text-light-muted">Privacy Policy</p>
-            <p className="text-light-muted">Contact</p>
+            <p className="text-light-muted hover:no-underline">Help Center</p>
+            <p className="text-light-muted hover:no-underline">Terms of Service</p>
+            <p className="text-light-muted hover:no-underline">Privacy Policy</p>
+            <p className="text-light-muted hover:no-underline">Contact</p>
           </div>
           <div className="space-y-3 col-span-2 md:col-span-2 md:text-right">
             <p className="text-light-muted text-xs leading-relaxed">Commerce infrastructure for producers, suppliers, and sellers.</p>
