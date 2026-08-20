@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { sendVerificationEmail } from "@/lib/email/sendVerification";
 
-// 1. Registo via Email
+// 1. Registo via Email (retorna URL para redirecionamento manual)
 export async function signupWithEmail(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -30,7 +30,8 @@ export async function signupWithEmail(formData: FormData) {
   await supabase.from("email_verification_codes").insert({ email, code: otpCode });
   await sendVerificationEmail(email, otpCode);
 
-  redirect(`/verify-email?email=${encodeURIComponent(email)}`);
+  // Retorna a URL para o cliente fazer o redirect
+  return `/verify-email?email=${encodeURIComponent(email)}`;
 }
 
 // 2. Registo via Telefone
@@ -61,7 +62,7 @@ export async function signupWithPhone(formData: FormData) {
   const { error: otpError } = await supabase.auth.signInWithOtp({ phone });
   if (otpError) throw new Error(otpError.message);
 
-  redirect(`/verify-phone?phone=${encodeURIComponent(phone)}`);
+  return `/verify-phone?phone=${encodeURIComponent(phone)}`;
 }
 
 // 3. Verificação de código (Email)
@@ -83,7 +84,7 @@ export async function verifyEmailCode(formData: FormData) {
     throw new Error("Invalid or expired verification code.");
   }
 
-  redirect("/dashboard/seller");
+  return "/dashboard/seller";
 }
 
 // 4. Verificação de código (Telefone)
@@ -99,7 +100,7 @@ export async function verifyPhoneCode(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-  redirect("/dashboard/seller");
+  return "/dashboard/seller";
 }
 
 // 5. Login via Telefone
@@ -113,7 +114,7 @@ export async function loginWithPhone(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-  return { success: true, phone };
+  return "/verify-phone";
 }
 
 // 6. Login via Email
@@ -125,7 +126,7 @@ export async function loginWithEmail(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) throw new Error(error.message);
-  redirect("/dashboard/seller");
+  return "/dashboard/seller";
 }
 
 // 7. Login com Google
@@ -139,5 +140,5 @@ export async function loginWithGoogle() {
   });
 
   if (error) throw new Error(error.message);
-  redirect(data.url);
+  return data.url;
 }

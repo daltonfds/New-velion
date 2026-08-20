@@ -11,26 +11,35 @@ export default function LoginPage() {
   const [loginType, setLoginType] = useState<"email" | "phone">("email");
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleEmailSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsLoading(true);
     setError(null);
+    
     try {
       const formData = new FormData(e.currentTarget);
+      // Não usamos redirect do Next.js. Usamos navegação manual do navegador.
       await loginWithEmail(formData);
+      // A função loginWithEmail agora NÃO faz redirect; ela retorna uma URL.
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
+      setIsLoading(false);
     }
   }
 
   async function handlePhoneSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsLoading(true);
     setError(null);
+
     try {
       const formData = new FormData(e.currentTarget);
       await loginWithPhone(formData);
     } catch (err: any) {
       setError(err.message || "Failed to send code.");
+      setIsLoading(false);
     }
   }
 
@@ -59,7 +68,13 @@ export default function LoginPage() {
               <input type="password" name="password" placeholder="••••••••" className="w-full px-4 py-2.5 bg-secondary/50 border border-light-border rounded-lg text-light-text" required />
             </div>
             {error && <p className="text-sm text-rose-600 text-center bg-rose-50 p-2 rounded-lg">{error}</p>}
-            <button type="submit" className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium">Sign In</button>
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium disabled:opacity-50"
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </button>
           </form>
         )}
 
@@ -88,7 +103,13 @@ export default function LoginPage() {
               </div>
             </div>
             {error && <p className="text-sm text-rose-600 text-center bg-rose-50 p-2 rounded-lg">{error}</p>}
-            <button type="submit" className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium">Send Code</button>
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium disabled:opacity-50"
+            >
+              {isLoading ? "Sending..." : "Send Code"}
+            </button>
           </form>
         )}
 

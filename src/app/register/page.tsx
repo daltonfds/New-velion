@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [registerType, setRegisterType] = useState<"email" | "phone">("email");
   const [role, setRole] = useState<"seller" | "producer">("seller");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   
   const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +27,7 @@ export default function RegisterPage() {
     }
 
     setError(null);
+    setIsLoading(true);
 
     try {
       if (registerType === "email") {
@@ -35,6 +37,7 @@ export default function RegisterPage() {
       }
     } catch (e: any) {
       setError(e.message || "Failed to create account");
+      setIsLoading(false);
     }
   }
 
@@ -149,9 +152,10 @@ export default function RegisterPage() {
           
           <button 
             type="submit" 
-            className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium"
+            disabled={isLoading}
+            className="w-full justify-center mt-2 bg-primary text-white hover:bg-primary/90 rounded-full py-3 font-medium disabled:opacity-50"
           >
-            Create Account
+            {isLoading ? "Creating..." : "Create Account"}
           </button>
         </form>
         <div className="mt-6 text-center text-xs text-light-muted">Already have an account? <Link href="/login" className="text-primary font-medium hover:underline">Sign In</Link></div>
