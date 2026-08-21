@@ -17,7 +17,7 @@ export default function LoginPage() {
     setError(null);
 
     // Tentar fazer o login
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -28,8 +28,19 @@ export default function LoginPage() {
       return;
     }
 
-    // Login bem-sucedido. O Middleware vai decidir para onde redirecionar.
-    window.location.reload();
+    // Obter o role do utilizador diretamente dos metadados da sessão
+    const role = data.user?.user_metadata?.role || "seller";
+
+    // Redirecionar baseado no role (sem esperar, sem travar)
+    setTimeout(() => {
+      if (role === "admin") {
+        window.location.href = "/dashboard/admin";
+      } else if (role === "producer") {
+        window.location.href = "/dashboard/producer";
+      } else {
+        window.location.href = "/dashboard/seller";
+      }
+    }, 100);
   }
 
   return (
