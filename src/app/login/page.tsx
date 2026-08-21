@@ -29,7 +29,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Redirecionar após login bem-sucedido
     router.push("/dashboard/seller");
   }
 

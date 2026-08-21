@@ -8,16 +8,24 @@ export default function LandingPage() {
       {/* ============ HEADER / MENU ============ */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-light-bg/80 backdrop-blur-md border-b border-light-border/50 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          {/* Logo (Apenas o ícone, sem duplicação) */}
+          {/* Logo (Apenas o ícone, maior) */}
           <div className="flex items-center gap-3">
-            <VelionLogo className="w-8 h-8" />
+            <VelionLogo className="w-10 h-10" />
+            <span className="font-display text-lg font-semibold tracking-tight text-light-text hidden sm:block">Velion</span>
           </div>
 
-          {/* Menu (Versão Desktop) */}
+          {/* Menu Desktop */}
           <div className="hidden md:flex items-center gap-6 text-xs font-medium text-light-muted tracking-wide">
             <a href="#how-it-works" className="hover:text-light-text transition-colors">How it works</a>
             <Link href="/login" className="hover:text-light-text transition-colors">Login</Link>
-            <a href="mailto:daltonfelizarda66@gmail.com" className="hover:text-light-text transition-colors flex items-center gap-1">Support</a>
+            <div className="relative group">
+              <button className="hover:text-light-text transition-colors cursor-pointer">Support</button>
+              <div className="absolute right-0 top-full mt-2 w-48 bg-light-card border border-light-border rounded-xl shadow-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 text-xs">
+                <a href="mailto:daltonfelizarda66@gmail.com" className="block py-1 hover:text-primary">Email</a>
+                <a href="https://wa.me/27722958915" target="_blank" className="block py-1 hover:text-primary">WhatsApp</a>
+                <a href="https://instagram.com/dalton_fds" target="_blank" className="block py-1 hover:text-primary">Instagram</a>
+              </div>
+            </div>
           </div>
 
           {/* Botão de Ação */}
@@ -37,7 +45,8 @@ export default function LandingPage() {
         {/* --- HERO SECTION --- */}
         <section className="text-center max-w-3xl mx-auto space-y-5">
           <div className="flex justify-center">
-            <VelionLogo className="w-20 h-20" />
+            {/* Logotipo maior no centro */}
+            <VelionLogo className="w-32 h-32" />
           </div>
           <div className="space-y-2">
             <p className="text-[10px] font-medium tracking-[0.2em] text-primary uppercase">Commerce Infrastructure</p>
@@ -161,7 +170,7 @@ export default function LandingPage() {
       <footer className="border-t border-light-border py-8 px-4 bg-light-card">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-light-muted">
           <div className="flex items-center gap-3">
-            <VelionLogo className="w-5 h-5" />
+            <VelionLogo className="w-6 h-6" />
             <span className="font-display font-semibold text-sm text-light-text">Velion</span>
           </div>
           <div className="flex gap-4">
