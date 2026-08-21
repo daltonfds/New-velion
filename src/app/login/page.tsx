@@ -16,7 +16,8 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    // 1. Tentar fazer o login
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -27,8 +28,33 @@ export default function LoginPage() {
       return;
     }
 
-    // Redirecionamento forçado do navegador
-    window.location.href = "/dashboard/seller";
+    // 2. Obter o role do utilizador (a partir da tabela profiles)
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
+
+    if (profileError || !profile) {
+      setError("User profile not found. Please contact support.");
+      setLoading(false);
+      return;
+    }
+
+    // 3. Redirecionar com base no role
+    switch (profile.role) {
+      case "admin":
+        window.location.href = "/dashboard/admin";
+        break;
+      case "seller":
+        window.location.href = "/dashboard/seller";
+        break;
+      case "producer":
+        window.location.href = "/dashboard/producer";
+        break;
+      default:
+        window.location.href = "/dashboard/seller"; // Fallback seguro
+    }
   }
 
   return (
