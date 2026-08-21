@@ -28,33 +28,35 @@ export default function LoginPage() {
       return;
     }
 
-    // 2. Obter o role do utilizador (a partir da tabela profiles)
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", data.user.id)
-      .single();
+    // 2. Atraso curto para garantir que a sessão foi estabelecida
+    setTimeout(async () => {
+      // 3. Obter o role do utilizador
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
 
-    if (profileError || !profile) {
-      setError("User profile not found. Please contact support.");
-      setLoading(false);
-      return;
-    }
+      if (profileError || !profile) {
+        window.location.replace("/dashboard/seller");
+        return;
+      }
 
-    // 3. Redirecionar com base no role
-    switch (profile.role) {
-      case "admin":
-        window.location.href = "/dashboard/admin";
-        break;
-      case "seller":
-        window.location.href = "/dashboard/seller";
-        break;
-      case "producer":
-        window.location.href = "/dashboard/producer";
-        break;
-      default:
-        window.location.href = "/dashboard/seller"; // Fallback seguro
-    }
+      // 4. Redirecionar com replace (substitui o histórico, não volta para o login)
+      switch (profile.role) {
+        case "admin":
+          window.location.replace("/dashboard/admin");
+          break;
+        case "seller":
+          window.location.replace("/dashboard/seller");
+          break;
+        case "producer":
+          window.location.replace("/dashboard/producer");
+          break;
+        default:
+          window.location.replace("/dashboard/seller");
+      }
+    }, 500);
   }
 
   return (
