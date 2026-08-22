@@ -1,79 +1,73 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import Button from "@/components/ui/Button";
-import { requestWithdrawal } from "./actions";
-import { useToast } from "@/components/ui/Toast";
+import { supabase } from "@/lib/supabase";
+import VelionLogo from "@/components/ui/VelionLogo";
 
-export default function WithdrawPage() {
-  const { showToast } = useToast();
-  const [loading, setLoading] = useState(false);
+export default function SellerWithdrawPage() {
+  const router = useRouter();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("Bank Transfer");
+  const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const formData = new FormData(e.currentTarget);
-      await requestWithdrawal(formData);
-      showToast("Withdrawal requested successfully!", "success");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      // Verificar saldo
+      const { data: profile } = await supabase.from("profiles").select("balance").eq("id", session.user.id).single();
+      if (!profile || profile.balance < Number(amount)) {
+        alert("Insufficient balance!");
+        setLoading(false);
+        return;
+      }
+
+      // Inserir solicitação de saque
+      await supabase.from("withdrawals").insert({
+        seller_id: session.user.id,
+        amount: Number(amount),
+        method,
+        status: "pending",
+      });
+
+      // Atualizar saldo
+      await supabase.from("profiles").update({
+        balance: profile.balance - Number(amount)
+      }).eq("id", session.user.id);
+
+      alert("Withdrawal requested!");
       setAmount("");
-    } catch (err: any) {
-      showToast(err.message || "Error processing withdrawal", "error");
+    } catch (err) {
+      alert("Error processing withdrawal");
     } finally {
       setLoading(false);
     }
-  }
-
-  const numericAmount = parseFloat(amount) || 0;
-  const fee = (numericAmount * 0.025) + 10;
-  const total = numericAmount + fee;
+  };
 
   return (
-    <DashboardLayout>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-dark">Withdraw Funds</h1>
-        <p className="text-muted text-sm">Request a payout from your available balance.</p>
-      </div>
-
-      <div className="bg-white rounded-xl border border-border shadow-sm p-6 max-w-md">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-muted mb-1">Amount (R)</label>
-            <input 
-              type="number" 
-              name="amount" 
-              value={amount} 
-              onChange={e => setAmount(e.target.value)}
-              placeholder="50.00" 
-              className="w-full px-4 py-2.5 bg-secondary/50 border border-border rounded-lg text-dark" 
-              required 
-              min="1"
-            />
-          </div>
-          {numericAmount > 0 && (
-            <div className="text-xs text-muted space-y-1 bg-secondary/50 p-3 rounded-lg">
-              <p>Withdrawal Amount: <span className="font-bold text-dark">R {numericAmount.toFixed(2)}</span></p>
-              <p>Processing Fee (2.5% + R10): <span className="font-bold text-error">R {fee.toFixed(2)}</span></p>
-              <p className="border-t border-border pt-1 mt-1">Total Deduction: <span className="font-bold text-dark">R {total.toFixed(2)}</span></p>
-            </div>
-          )}
-          <div>
-            <label className="block text-xs font-medium text-muted mb-1">Payout Method</label>
-            <select name="method" value={method} onChange={e => setMethod(e.target.value)} className="w-full px-4 py-2.5 bg-secondary/50 border border-border rounded-lg text-dark">
+    <div className="min-h-screen bg-light-bg p-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Withdraw Funds</h1>
+        <div className="bg-white p-6 rounded-xl border border-light-border max-w-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <label className="text-xs text-light-muted">Amount (R)</label>
+            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full p-3 border rounded-lg" required />
+            <label className="text-xs text-light-muted">Payout Method</label>
+            <select value={method} onChange={(e) => setMethod(e.target.value)} className="w-full p-3 border rounded-lg">
               <option>Bank Transfer</option>
               <option>M-Pesa</option>
               <option>Emola</option>
             </select>
-          </div>
-          <Button type="submit" disabled={loading || numericAmount <= 0} className="w-full">Request Withdrawal</Button>
-        </form>
-        <div className="mt-4 text-center text-xs text-muted">
-          Cash on Delivery & Electronic Payments are currently in Beta. Coming Soon.
+            <button type="submit" disabled={loading} className="w-full py-3 bg-primary text-white rounded-full">
+              {loading ? "Processing..." : "Request Withdrawal"}
+            </button>
+          </form>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
