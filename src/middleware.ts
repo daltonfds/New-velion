@@ -1,55 +1,66 @@
-import { createServerClient } from "@/lib/supabase/server";
-import { NextResponse } from "next/server";
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: Request) {
-  const supabase = createServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  const url = new URL(request.url);
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request })
 
-  // Se não estiver logado e tentar aceder a qualquer dashboard, vai para o login
-  if (!session && url.pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  // Não atualizar o token em chamadas de autenticação
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Proteção de rotas
+  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
-  // Se estiver logado, verifica as permissões de acesso
-  if (session) {
-    // Buscar o role do utilizador
+  // Proteção da role (se estiver logado)
+  if (user) {
     const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", session.user.id)
-      .single();
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
 
-    const role = profile?.role || "seller";
+    const role = profile?.role || 'seller'
 
-    // Proteção: Admin só pode aceder a /dashboard/admin
-    if (url.pathname.startsWith("/dashboard/admin") && role !== "admin") {
-      return NextResponse.redirect(new URL("/dashboard/seller", request.url));
+    if (request.nextUrl.pathname.startsWith('/dashboard/admin') && role !== 'admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard/seller'
+      return NextResponse.redirect(url)
     }
 
-    // Proteção: Producer só pode aceder a /dashboard/producer
-    if (url.pathname.startsWith("/dashboard/producer") && role !== "producer") {
-      return NextResponse.redirect(new URL("/dashboard/seller", request.url));
-    }
-
-    // Proteção: Seller não pode aceder a /admin ou /producer
-    if (role === "seller" && (url.pathname.startsWith("/dashboard/admin") || url.pathname.startsWith("/dashboard/producer"))) {
-      return NextResponse.redirect(new URL("/dashboard/seller", request.url));
-    }
-
-    // Se estiver logado e tentar aceder ao login, vai para o seu dashboard
-    if (url.pathname === "/login") {
-      switch (role) {
-        case "admin": return NextResponse.redirect(new URL("/dashboard/admin", request.url));
-        case "producer": return NextResponse.redirect(new URL("/dashboard/producer", request.url));
-        default: return NextResponse.redirect(new URL("/dashboard/seller", request.url));
-      }
+    if (request.nextUrl.pathname.startsWith('/dashboard/producer') && role !== 'producer') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard/seller'
+      return NextResponse.redirect(url)
     }
   }
 
-  return NextResponse.next();
+  return supabaseResponse
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
-};
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}

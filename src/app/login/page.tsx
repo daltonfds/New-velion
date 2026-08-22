@@ -16,7 +16,6 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    // Tentar fazer o login
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -28,19 +27,19 @@ export default function LoginPage() {
       return;
     }
 
-    // Obter o role do utilizador diretamente dos metadados da sessão
+    // Obtém a role dos metadados do Supabase
     const role = data.user?.user_metadata?.role || "seller";
 
-    // Redirecionar baseado no role (sem esperar, sem travar)
+    // Redirecionamento instantâneo (substituindo a navegação)
     setTimeout(() => {
       if (role === "admin") {
-        window.location.href = "/dashboard/admin";
+        window.location.replace("/dashboard/admin");
       } else if (role === "producer") {
-        window.location.href = "/dashboard/producer";
+        window.location.replace("/dashboard/producer");
       } else {
-        window.location.href = "/dashboard/seller";
+        window.location.replace("/dashboard/seller");
       }
-    }, 100);
+    }, 200);
   }
 
   return (
