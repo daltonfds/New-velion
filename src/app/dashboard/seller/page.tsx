@@ -1,180 +1,171 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import Button from "@/components/ui/Button";
-import TrendChart from "@/components/ui/TrendChart";
-import NotificationCenter from "@/components/ui/NotificationCenter";
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
-import { EmptyState } from "@/components/ui/Skeleton";
-import { formatMultiCurrency } from "@/lib/currency";
+import { useRouter } from "next/navigation";
+import VelionLogo from "@/components/ui/VelionLogo";
 import { supabase } from "@/lib/supabase";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
-export default function SellerDashboard() {
+export default function SellerDashboardPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [countryCode, setCountryCode] = useState("ZA");
   const [metrics, setMetrics] = useState({
     totalSales: 0,
     netProfit: 0,
     pendingCOD: 0,
-    balance: 0,
-    chartData: [] as { name: string; sales: number; profit: number }[],
-    recentOrders: [] as any[],
+    availableBalance: 0,
   });
-  const [formatted, setFormatted] = useState({
-    totalSales: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
-    netProfit: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
-    pendingCOD: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
-    balance: { zar: "R 0.00", usd: "USD 0.00", local: "0.00" },
-  });
+  const [chartData, setChartData] = useState<{ name: string; sales: number; profit: number }[]>([]);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
   useEffect(() => {
-    const getUserCountry = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("country")
-          .eq("id", user.id)
-          .single();
-        if (profile?.country) setCountryCode(profile.country);
+    const loadDashboard = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace("/login");
+        return;
       }
-    };
-    getUserCountry();
-  }, []);
 
-  const fetchOrders = async () => {
-    try {
-      const res = await fetch("/api/orders");
-      const orders = await res.json();
+      // Verificar se é Seller
+      const role = session.user.user_metadata?.role || "seller";
+      if (role !== "seller") {
+        router.replace("/dashboard/admin");
+        return;
+      }
 
-      let totalSales = 0, netProfit = 0, pendingCOD = 0, balance = 0;
-      const last30Days: { [key: string]: { sales: number; profit: number } } = {};
-      
-      orders.forEach((order: any) => {
-        const profitPerOrder = order.total_price * 0.40;
-        totalSales += order.total_price || 0;
-        netProfit += profitPerOrder;
-        if (order.status === "pending") pendingCOD += order.total_price || 0;
+      // Buscar pedidos do seller
+      const { data: orders } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("seller_id", session.user.id)
+        .order("created_at", { ascending: false });
 
-        const date = new Date(order.created_at);
-        const dayKey = `${date.getDate()}/${date.getMonth() + 1}`;
-        if (!last30Days[dayKey]) last30Days[dayKey] = { sales: 0, profit: 0 };
-        last30Days[dayKey].sales += order.total_price || 0;
-        last30Days[dayKey].profit += profitPerOrder;
-      });
+      if (orders) {
+        let totalSales = 0;
+        let profit = 0;
+        let pendingCOD = 0;
 
-      balance = netProfit * 0.8;
+        orders.forEach((order: any) => {
+          totalSales += order.total_price || 0;
+          profit += (order.total_price || 0) * 0.4; // Simulação de lucro
+          if (order.status === "pending") pendingCOD += order.total_price || 0;
+        });
 
-      const chartData = Object.keys(last30Days).map((key) => ({
-        name: key,
-        sales: last30Days[key].sales,
-        profit: last30Days[key].profit,
-      }));
+        setMetrics({
+          totalSales,
+          netProfit: profit,
+          pendingCOD,
+          availableBalance: totalSales - profit,
+        });
 
-      setMetrics({ totalSales, netProfit, pendingCOD, balance, chartData, recentOrders: orders.slice(0, 5) });
+        // Buscar últimos 30 dias de gráfico
+        const last30Days = new Date();
+        last30Days.setDate(last30Days.getDate() - 30);
 
-      // Formatar as 3 moedas
-      const [ts, np, pc, bal] = await Promise.all([
-        formatMultiCurrency(totalSales, countryCode),
-        formatMultiCurrency(netProfit, countryCode),
-        formatMultiCurrency(pendingCOD, countryCode),
-        formatMultiCurrency(balance, countryCode),
-      ]);
-      setFormatted({ totalSales: ts, netProfit: np, pendingCOD: pc, balance: bal });
-    } catch (err) {
-      console.error("Error fetching dashboard data", err);
-    } finally {
+        const recentOrdersFiltered = orders.filter((order: any) => new Date(order.created_at) > last30Days);
+        setRecentOrders(recentOrdersFiltered.slice(0, 5));
+
+        // Dados do gráfico (simplificado para este primeiro passo)
+        const chart = orders.slice(0, 7).map((order: any, index: number) => ({
+          name: `Order ${index + 1}`,
+          sales: order.total_price || 0,
+          profit: (order.total_price || 0) * 0.4,
+        }));
+        setChartData(chart);
+      }
+
       setLoading(false);
-    }
-  };
+    };
 
-  useEffect(() => {
-    if (countryCode) fetchOrders();
-  }, [countryCode]);
+    loadDashboard();
+  }, [router]);
 
   return (
-    <DashboardLayout>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-dark">Good morning, Seller</h1>
-          <p className="text-muted text-sm">Here is your sales overview.</p>
+    <div className="min-h-screen bg-light-bg p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <VelionLogo className="w-8 h-8" />
+            <span className="font-display text-xl font-semibold text-light-text">Velion Seller</span>
+          </div>
+          <button
+            onClick={() => { supabase.auth.signOut(); router.replace("/login"); }}
+            className="text-sm text-light-muted hover:text-light-text"
+          >
+            Sign Out
+          </button>
         </div>
-        <div className="flex items-center gap-3">
-          <NotificationCenter />
-          <LanguageSwitcher />
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
-          <p className="text-xs text-muted font-medium">Total Sales</p>
-          <p className="text-xl font-bold text-dark mt-1">{loading ? "..." : formatted.totalSales.zar}</p>
-          <p className="text-xs text-muted">{loading ? "" : formatted.totalSales.usd}</p>
-          <p className="text-xs text-muted">{loading ? "" : formatted.totalSales.local}</p>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
-          <p className="text-xs text-muted font-medium">Net Profit</p>
-          <p className="text-xl font-bold text-success mt-1">{loading ? "..." : formatted.netProfit.zar}</p>
-          <p className="text-xs text-muted">{loading ? "" : formatted.netProfit.usd}</p>
-          <p className="text-xs text-muted">{loading ? "" : formatted.netProfit.local}</p>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
-          <p className="text-xs text-muted font-medium">Pending COD</p>
-          <p className="text-xl font-bold text-warning mt-1">{loading ? "..." : formatted.pendingCOD.zar}</p>
-          <p className="text-xs text-muted">{loading ? "" : formatted.pendingCOD.usd}</p>
-          <p className="text-xs text-muted">{loading ? "" : formatted.pendingCOD.local}</p>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
-          <p className="text-xs text-muted font-medium">Available Balance</p>
-          <p className="text-xl font-bold text-primary mt-1">{loading ? "..." : formatted.balance.zar}</p>
-          <p className="text-xs text-muted">{loading ? "" : formatted.balance.usd}</p>
-          <p className="text-xs text-muted">{loading ? "" : formatted.balance.local}</p>
-        </div>
-      </div>
 
-      <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-dark">Sales & Profit — Last 30 Days</h3>
-        </div>
-        {loading ? (
-          <div className="h-64 w-full flex items-center justify-center text-muted text-sm">Loading chart data...</div>
-        ) : (
-          <TrendChart data={metrics.chartData} />
-        )}
-      </div>
+        {/* Título */}
+        <h1 className="text-3xl font-bold text-light-text mb-2">Good morning, Seller</h1>
+        <p className="text-light-muted text-sm mb-8">Here is your sales overview.</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm">
-          <h3 className="font-semibold text-dark mb-4">Recent Orders</h3>
+        {/* Dashboard Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
+            <p className="text-xs text-light-muted font-medium">Total Sales</p>
+            <p className="text-xl font-bold text-light-text mt-1">R {metrics.totalSales.toFixed(2)}</p>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
+            <p className="text-xs text-light-muted font-medium">Net Profit</p>
+            <p className="text-xl font-bold text-success mt-1">R {metrics.netProfit.toFixed(2)}</p>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
+            <p className="text-xs text-light-muted font-medium">Pending COD</p>
+            <p className="text-xl font-bold text-warning mt-1">R {metrics.pendingCOD.toFixed(2)}</p>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
+            <p className="text-xs text-light-muted font-medium">Available Balance</p>
+            <p className="text-xl font-bold text-primary mt-1">R {metrics.availableBalance.toFixed(2)}</p>
+          </div>
+        </div>
+
+        {/* Chart */}
+        <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm mb-8">
+          <h3 className="font-semibold text-light-text mb-4">Sales & Profit</h3>
           {loading ? (
-            <div className="text-center py-8 text-muted text-sm">Loading...</div>
-          ) : metrics.recentOrders.length === 0 ? (
-            <EmptyState title="No orders yet" description="Start selling to see your activity here." />
+            <p className="text-light-muted text-sm">Loading...</p>
+          ) : chartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={chartData}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="sales" stroke="#4F46E5" strokeWidth={2} />
+                <Line type="monotone" dataKey="profit" stroke="#10B981" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-light-muted text-sm">No sales data yet.</p>
+          )}
+        </div>
+
+        {/* Recent Orders */}
+        <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm">
+          <h3 className="font-semibold text-light-text mb-4">Recent Orders</h3>
+          {loading ? (
+            <p className="text-light-muted text-sm">Loading...</p>
+          ) : recentOrders.length === 0 ? (
+            <p className="text-light-muted text-sm">No orders yet.</p>
           ) : (
             <div className="space-y-3">
-              {metrics.recentOrders.map((order: any) => (
-                <div key={order.id} className="flex justify-between items-center border-b border-border pb-2 last:border-0">
+              {recentOrders.map((order: any) => (
+                <div key={order.id} className="flex items-center justify-between border-b border-light-border pb-3">
                   <div>
-                    <p className="text-sm font-medium text-dark">{order.customer_name}</p>
-                    <p className="text-xs text-muted">#{order.id.slice(0, 8)} • {order.status}</p>
+                    <p className="text-sm font-medium text-light-text">{order.customer_name}</p>
+                    <p className="text-xs text-light-muted">#{order.id}</p>
                   </div>
-                  <p className="text-sm font-bold text-dark">R {order.total_price}</p>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-light-text">R {order.total_price}</p>
+                    <p className="text-xs text-light-muted">{order.status}</p>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-        <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm">
-          <h3 className="font-semibold text-dark mb-4">Inventory Alerts</h3>
-          <EmptyState title="All stocked up" description="You have enough inventory for now." />
-        </div>
       </div>
-
-      <div className="flex flex-col md:flex-row gap-4">
-        <Button className="flex-1 justify-center">Find Products to Sell</Button>
-        <Button variant="outline" className="flex-1 justify-center">View Order History</Button>
-      </div>
-    </DashboardLayout>
+    </div>
   );
 }
