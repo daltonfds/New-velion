@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { subscribeToNotifications } from "@/lib/supabase/realtime";
 
 export default function NotificationCenter() {

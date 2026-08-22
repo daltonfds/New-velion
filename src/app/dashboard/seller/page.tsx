@@ -8,7 +8,7 @@ import NotificationCenter from "@/components/ui/NotificationCenter";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import { EmptyState } from "@/components/ui/Skeleton";
 import { formatMultiCurrency } from "@/lib/currency";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 export default function SellerDashboard() {
   const [loading, setLoading] = useState(true);

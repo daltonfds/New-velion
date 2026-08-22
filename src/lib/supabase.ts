@@ -10,13 +10,10 @@ if (!supabaseAnonKey) {
   throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY')
 }
 
-// Cliente principal (para browsers e actions)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-// Exportação nomeada com o mesmo nome para compatibilidade
 export { createClient }
 
-// Função auxiliar para Server Actions (não usa cookies, apenas chaves de ambiente)
+// Retorna o mesmo cliente para uso em Server Actions (usando Anon Key)
 export function createServerClient() {
   return createClient(supabaseUrl, supabaseAnonKey)
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import VelionLogo from "@/components/ui/VelionLogo";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function SetupPasswordPage() {
