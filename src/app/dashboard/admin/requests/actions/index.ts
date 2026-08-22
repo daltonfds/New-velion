@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase";
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { revalidatePath } from "next/cache";
 import { sendApprovalEmail } from "@/lib/email/sendApproval";
 
