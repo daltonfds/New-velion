@@ -1,21 +1,32 @@
-import DashboardLayout from "@/components/layout/DashboardLayout";
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import VelionLogo from "@/components/ui/VelionLogo";
 
 export default function ProducerInventoryPage() {
+  const [products, setProducts] = useState<any[]>([]);
+  useEffect(() => {
+    const load = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data } = await supabase.from("products").select("*").eq("supplier_id", session.user.id);
+      if (data) setProducts(data);
+    };
+    load();
+  }, []);
+
   return (
-    <DashboardLayout>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-dark">Inventory</h1>
-        <p className="text-muted text-sm">Manage your stock levels and batches.</p>
-      </div>
-      <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div><p className="text-xs text-muted">Available</p><p className="text-xl font-bold text-dark">0 units</p></div>
-          <div><p className="text-xs text-muted">Reserved</p><p className="text-xl font-bold text-warning">0 units</p></div>
-          <div><p className="text-xs text-muted">In Transit</p><p className="text-xl font-bold text-primary">0 units</p></div>
-          <div><p className="text-xs text-muted">Low Stock Alerts</p><p className="text-xl font-bold text-error">0</p></div>
+    <div className="min-h-screen bg-light-bg p-6">
+      <div className="max-w-6xl mx-auto"><h1 className="text-3xl font-bold mb-6">Inventory</h1>
+        <div className="bg-white p-6 rounded-xl border border-light-border">
+          {products.length === 0 ? <p className="text-light-muted">No inventory.</p> : products.map((p: any) => (
+            <div key={p.id} className="flex justify-between py-3 border-b border-light-border">
+              <p>{p.name}</p><p className="text-sm text-light-muted">Available: 0</p>
+            </div>
+          ))}
         </div>
-        <div className="text-center py-8 text-muted text-sm">Sync your inventory using the API or manually add stock.</div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
