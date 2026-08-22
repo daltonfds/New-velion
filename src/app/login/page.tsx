@@ -16,7 +16,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    // 1. Tentar fazer o login
+    // Tentar fazer o login
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -28,27 +28,15 @@ export default function LoginPage() {
       return;
     }
 
-    // 2. Verificar se a sessão existe no Supabase (GARANTIA TOTAL)
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData.session) {
-      setError("Session not created. Please try again.");
-      setLoading(false);
-      return;
-    }
-
-    // 3. Obter a role dos metadados do Supabase
+    // Redirecionar para o painel (baseado na role)
     const role = data.user?.user_metadata?.role || "seller";
-
-    // 4. Redirecionamento instantâneo (substituindo a navegação)
-    setTimeout(() => {
-      if (role === "admin") {
-        window.location.replace("/dashboard/admin");
-      } else if (role === "producer") {
-        window.location.replace("/dashboard/producer");
-      } else {
-        window.location.replace("/dashboard/seller");
-      }
-    }, 100);
+    if (role === "admin") {
+      window.location.replace("/dashboard/admin");
+    } else if (role === "producer") {
+      window.location.replace("/dashboard/producer");
+    } else {
+      window.location.replace("/dashboard/seller");
+    }
   }
 
   return (

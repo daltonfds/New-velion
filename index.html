@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velion Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: #F4F4F7; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .card { background: white; border: 1px solid #E5E7EB; border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .logo { display: flex; justify-content: center; margin-bottom: 24px; }
+    .logo img { width: 80px; }
+    h2 { text-align: center; font-size: 20px; color: #1A1A1A; margin-bottom: 8px; }
+    p.subtitle { text-align: center; font-size: 14px; color: #6B7280; margin-bottom: 32px; }
+    label { display: block; font-size: 12px; font-weight: 500; color: #6B7280; margin-bottom: 8px; }
+    input { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+    button { width: 100%; padding: 14px; background: #4F46E5; color: white; border: none; border-radius: 50px; font-size: 14px; font-weight: 500; cursor: pointer; }
+    button:hover { background: #4338CA; }
+    .error { color: #EF4444; font-size: 14px; text-align: center; padding: 8px; background: #FEF2F2; border-radius: 8px; margin-bottom: 16px; display: none; }
+    p.footer { text-align: center; font-size: 12px; color: #6B7280; margin-top: 24px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <!-- Substitua este SVG pelo logo da Velion -->
+      <svg width="80" height="80" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="27" stroke="#D4AF37" stroke-opacity="0.7" stroke-width="1.5" stroke-dasharray="3 5" fill="none"/>
+        <path d="M32 12 L52 48 H38 L32 34 L26 48 H12 Z" stroke="#D4AF37" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <h2>Sign In</h2>
+    <p class="subtitle">Enter your Velion account.</p>
+    <div class="error" id="errorMsg"></div>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" required>
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••" required>
+      <button type="submit">Sign In</button>
+    </form>
+    <p class="footer">Don't have an account? <a href="#" style="color: #4F46E5;">Apply now</a></p>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
+
+    const supabase = createClient(
+      'https://ndtitpmkfbouvaiforfx.supabase.co',
+      'sb_publishable_AORIeqXr9mchszp-YGtYcg_LYNYo5fn'
+    )
+
+    const form = document.getElementById('loginForm')
+    const errorMsg = document.getElementById('errorMsg')
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      errorMsg.style.display = 'none'
+
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        errorMsg.textContent = error.message
+        errorMsg.style.display = 'block'
+        return
+      }
+
+      // Redirecionar para o painel (baseado na role)
+      const role = data.user?.user_metadata?.role || 'seller'
+      if (role === 'admin') {
+        window.location.href = '/dashboard/admin'
+      } else if (role === 'producer') {
+        window.location.href = '/dashboard/producer'
+      } else {
+        window.location.href = '/dashboard/seller'
+      }
+    })
+  </script>
+</body>
+</html>
