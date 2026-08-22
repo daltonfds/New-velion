@@ -28,7 +28,7 @@ export default function AdminMarketplacePage() {
   return (
     <div className="min-h-screen bg-light-bg p-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-light-text mb-6">Marketplace Approvals</h1>
+        <h1 className="text-3xl font-bold mb-6">Marketplace Approvals</h1>
         <div className="bg-white p-6 rounded-xl border border-light-border">
           {products.length === 0 ? <p className="text-light-muted">No pending products.</p> : products.map((p: any) => (
             <div key={p.id} className="flex justify-between py-3 border-b border-light-border">

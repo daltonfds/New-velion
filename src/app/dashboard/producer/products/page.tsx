@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createProduct } from "./actions";
 import VelionLogo from "@/components/ui/VelionLogo";
 import { supabase } from "@/lib/supabase";
 
@@ -20,32 +21,36 @@ export default function ProducerProductsPage() {
     load();
   }, []);
 
-  const addProduct = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    await supabase.from("products").insert({
-      supplier_id: session.user.id,
-      name,
-      description,
-      price: Number(price),
-      cost_price: Number(price),
-      is_active: false
-    });
-    alert("Product added (pending admin approval)!");
-    setName(""); setDescription(""); setPrice("");
+  const addProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    try {
+      await createProduct(formData);
+      alert("Product added (pending admin approval)!");
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
   return (
     <div className="min-h-screen bg-light-bg p-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-light-text mb-6">Products</h1>
+        <h1 className="text-3xl font-bold mb-6">Products</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl border border-light-border">
             <h3 className="font-semibold mb-4">Add New Product</h3>
-            <p className="text-xs text-light-muted">Product Name</p><input value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 border rounded-lg mb-3" />
-            <p className="text-xs text-light-muted">Description</p><textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full p-3 border rounded-lg mb-3 h-20" />
-            <p className="text-xs text-light-muted">Price (R)</p><input value={price} onChange={(e) => setPrice(e.target.value)} className="w-full p-3 border rounded-lg mb-3" />
-            <button onClick={addProduct} className="w-full py-3 bg-primary text-white rounded-full">Add Product</button>
+            <form onSubmit={addProduct} className="space-y-4">
+              <label className="text-xs text-light-muted">Product Name</label>
+              <input value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 border rounded-lg" required />
+              <label className="text-xs text-light-muted">Description</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full p-3 border rounded-lg h-20" />
+              <label className="text-xs text-light-muted">Price (R)</label>
+              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full p-3 border rounded-lg" required />
+              <button type="submit" className="w-full py-3 bg-primary text-white rounded-full">Add Product</button>
+            </form>
           </div>
           <div className="bg-white p-6 rounded-xl border border-light-border">
             <h3 className="font-semibold mb-4">Your Products</h3>
