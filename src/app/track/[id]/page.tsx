@@ -1,61 +1,50 @@
-import { createServerClient } from "@/lib/supabase";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import VelionLogo from "@/components/ui/VelionLogo";
-import { notFound } from "next/navigation";
 
-export default async function TrackingPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const supabase = createServerClient();
-  const { data: order, error } = await supabase
-    .from("orders")
-    .select("*, products(*)")
-    .eq("id", id)
-    .single();
+export default function TrackOrderPage() {
+  const params = useParams();
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (error || !order) return notFound();
-
-  const statusColors: Record<string, string> = {
-    pending: "bg-warning/20 text-warning",
-    processing: "bg-blue-100 text-blue-700",
-    shipped: "bg-primary/20 text-primary",
-    delivered: "bg-success/20 text-success",
-    cancelled: "bg-error/20 text-error",
-  };
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("id", params.id)
+        .single();
+      if (data) setOrder(data);
+      setLoading(false);
+    };
+    load();
+  }, [params.id]);
 
   return (
-    <div className="min-h-screen bg-secondary flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-border shadow-sm p-8 text-center">
-        <div className="flex justify-center mb-6"><VelionLogo className="w-16 h-16" /></div>
-        <h1 className="text-xl font-bold text-dark mb-1">Order Tracking</h1>
-        <p className="text-sm text-muted mb-6">ID: #{id.slice(0, 8)}</p>
-
-        <div className="mb-6 space-y-2 text-left">
-          <div className="flex justify-between border-b border-border pb-2">
-            <span className="text-xs text-muted">Customer</span>
-            <span className="text-sm text-dark font-medium">{order.customer_name}</span>
+    <div className="min-h-screen bg-light-bg flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-white rounded-2xl border border-light-border shadow-sm p-8">
+        <div className="flex justify-center mb-6"><VelionLogo className="w-28 h-28" /></div>
+        <h2 className="text-xl font-semibold text-light-text text-center mb-2">Order Tracking</h2>
+        <p className="text-center text-light-muted text-sm mb-6">Tracking ID: #{params.id}</p>
+        {loading ? <p className="text-light-muted text-center">Loading...</p> : order ? (
+          <div className="space-y-4">
+            <div className="flex justify-between border-b border-light-border pb-2">
+              <p className="text-xs text-light-muted">Customer</p>
+              <p className="text-sm text-light-text">{order.customer_name}</p>
+            </div>
+            <div className="flex justify-between border-b border-light-border pb-2">
+              <p className="text-xs text-light-muted">Total</p>
+              <p className="text-sm font-bold text-light-text">R {order.total_price}</p>
+            </div>
+            <div className="flex justify-between border-b border-light-border pb-2">
+              <p className="text-xs text-light-muted">Status</p>
+              <span className="px-3 py-1 bg-success/10 text-success text-xs rounded-full">{order.status}</span>
+            </div>
           </div>
-          <div className="flex justify-between border-b border-border pb-2">
-            <span className="text-xs text-muted">Product</span>
-            <span className="text-sm text-dark">{order.products?.name || "Product"}</span>
-          </div>
-          <div className="flex justify-between border-b border-border pb-2">
-            <span className="text-xs text-muted">Quantity</span>
-            <span className="text-sm text-dark">{order.quantity}</span>
-          </div>
-          <div className="flex justify-between border-b border-border pb-2">
-            <span className="text-xs text-muted">Total (COD)</span>
-            <span className="text-sm font-bold text-dark">R {order.total_price}</span>
-          </div>
-          <div className="flex justify-between border-b border-border pb-2">
-            <span className="text-xs text-muted">Delivery Address</span>
-            <span className="text-sm text-dark text-right">{order.address}, {order.city}</span>
-          </div>
-        </div>
-
-        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${statusColors[order.status] || "bg-gray-100 text-gray-700"}`}>
-          <span className="w-2 h-2 rounded-full bg-current" />
-          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-        </div>
-        <p className="mt-6 text-xs text-muted">Last updated: {new Date(order.created_at).toLocaleDateString()}</p>
+        ) : <p className="text-light-muted text-center">Order not found.</p>}
       </div>
     </div>
   );

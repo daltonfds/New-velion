@@ -1,10 +1,17 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { addIntegration } from "./actions";
 import VelionLogo from "@/components/ui/VelionLogo";
 
 export default function SellerIntegrationsPage() {
   const [integrations, setIntegrations] = useState<any[]>([]);
+  const [platform, setPlatform] = useState("");
+  const [storeUrl, setStoreUrl] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [apiSecret, setApiSecret] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -16,25 +23,57 @@ export default function SellerIntegrationsPage() {
     load();
   }, []);
 
-  const addIntegration = async (platform: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    await supabase.from("integrations").insert({ seller_id: session.user.id, platform, is_active: true });
-    alert(`${platform} integration requested!`);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("platform", platform);
+    formData.append("store_url", storeUrl);
+    formData.append("api_key", apiKey);
+    formData.append("api_secret", apiSecret);
+    try {
+      await addIntegration(formData);
+      alert("Integration added!");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-light-bg p-6">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-3 mb-8"><VelionLogo className="w-8 h-8" /><span className="font-display text-xl font-semibold">Integrations</span></div>
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <button onClick={() => addIntegration("Shopify")} className="bg-white p-6 rounded-xl border border-light-border hover:border-primary">🛒 Shopify</button>
-          <button onClick={() => addIntegration("WooCommerce")} className="bg-white p-6 rounded-xl border border-light-border hover:border-primary">🛍️ WooCommerce</button>
-          <button onClick={() => addIntegration("Wix")} className="bg-white p-6 rounded-xl border border-light-border hover:border-primary">🌐 Wix</button>
-        </div>
-        <div className="bg-white p-6 rounded-xl border border-light-border">
-          <h3 className="font-semibold mb-4">Active Integrations</h3>
-          {integrations.length === 0 ? <p className="text-light-muted">No integrations yet.</p> : integrations.map((i: any) => <div key={i.id} className="flex justify-between py-2 border-b border-light-border"><p>{i.platform}</p><p className="text-sm text-success">Active</p></div>)}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-xl border border-light-border">
+            <h3 className="font-semibold mb-4">Add Integration</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <label className="text-xs text-light-muted">Platform</label>
+              <select value={platform} onChange={(e) => setPlatform(e.target.value)} className="w-full p-3 border rounded-lg">
+                <option value="">Select</option>
+                <option>Shopify</option>
+                <option>WooCommerce</option>
+                <option>Wix</option>
+              </select>
+              <label className="text-xs text-light-muted">Store URL</label>
+              <input value={storeUrl} onChange={(e) => setStoreUrl(e.target.value)} className="w-full p-3 border rounded-lg" />
+              <label className="text-xs text-light-muted">API Key</label>
+              <input value={apiKey} onChange={(e) => setApiKey(e.target.value)} className="w-full p-3 border rounded-lg" />
+              <label className="text-xs text-light-muted">API Secret</label>
+              <input value={apiSecret} onChange={(e) => setApiSecret(e.target.value)} className="w-full p-3 border rounded-lg" />
+              <button type="submit" disabled={loading} className="w-full py-3 bg-primary text-white rounded-full">Add Integration</button>
+            </form>
+          </div>
+          <div className="bg-white p-6 rounded-xl border border-light-border">
+            <h3 className="font-semibold mb-4">Active Integrations</h3>
+            {integrations.length === 0 ? <p className="text-light-muted">No integrations yet.</p> : integrations.map((i: any) => (
+              <div key={i.id} className="flex justify-between py-2 border-b border-light-border">
+                <p>{i.platform}</p>
+                <p className="text-sm text-success">Active</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

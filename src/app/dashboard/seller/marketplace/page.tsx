@@ -6,10 +6,14 @@ import VelionLogo from "@/components/ui/VelionLogo";
 
 export default function SellerMarketplacePage() {
   const [products, setProducts] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.from("products").select("*").eq("is_active", true);
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("is_active", true);
       if (data) setProducts(data);
     };
     load();
