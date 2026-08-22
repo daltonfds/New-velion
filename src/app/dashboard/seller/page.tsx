@@ -7,6 +7,16 @@ import { supabase } from "@/lib/supabase";
 import PerformanceChart from "@/components/ui/PerformanceChart";
 import { getExchangeRates, formatCurrency } from "@/lib/exchange";
 
+// Dados do gráfico (para teste inicial, depois preenchemos com dados reais)
+const chartData = [
+  { name: "Jan", sales: 0, profit: 0 },
+  { name: "Feb", sales: 1200, profit: 480 },
+  { name: "Mar", sales: 2400, profit: 960 },
+  { name: "Apr", sales: 1800, profit: 720 },
+  { name: "May", sales: 3000, profit: 1200 },
+  { name: "Jun", sales: 2500, profit: 1000 },
+];
+
 export default function SellerDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
