@@ -1,4 +1,4 @@
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
 // PUT/PATCH: Atualizar um produto existente (somente o produtor dono pode)

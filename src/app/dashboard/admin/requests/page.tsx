@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase";
 import { approveRequest, rejectRequest } from "./actions";
 
 export default async function AdminRequestsPage() {

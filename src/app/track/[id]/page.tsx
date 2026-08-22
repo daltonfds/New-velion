@@ -1,4 +1,4 @@
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase";
 import VelionLogo from "@/components/ui/VelionLogo";
 import { notFound } from "next/navigation";
 

@@ -1,4 +1,4 @@
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
 // GET: Buscar todos os produtos (para o Marketplace do Seller)
