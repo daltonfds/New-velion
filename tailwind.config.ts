@@ -9,15 +9,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#3B82F6", // Azul claro das referências
-        secondary: "#F4F4F7", // Fundo cinza clarinho
+        primary: "#4F46E5",
+        secondary: "#F4F4F7",
         "light-card": "#FFFFFF",
         "light-border": "#E5E7EB",
         "light-text": "#1A1A1A",
         "light-muted": "#6B7280",
-        gold: {
-          DEFAULT: "#D4AF37",
-        },
+        success: "#10B981",
+        warning: "#F59E0B",
+        error: "#EF4444",
+      },
+      fontFamily: {
+        sans: ['var(--font-space-grotesk)', 'sans-serif'],
+        display: ['var(--font-space-grotesk)', 'sans-serif'],
+      },
+      fontSize: {
+        // Mobile-first (base)
+        'h1': ['28px', { lineHeight: '1.25', fontWeight: '700' }],
+        'h2': ['24px', { lineHeight: '1.3', fontWeight: '600' }],
+        'h3': ['20px', { lineHeight: '1.4', fontWeight: '600' }],
+        'body': ['16px', { lineHeight: '1.6', fontWeight: '400' }],
+        'meta': ['12px', { lineHeight: '1.5', fontWeight: '500' }],
+        // Desktop (breakpoint lg)
+        'desktop-h1': ['32px', { lineHeight: '1.2', fontWeight: '700' }],
+        'desktop-h2': ['26px', { lineHeight: '1.3', fontWeight: '600' }],
+        'desktop-h3': ['22px', { lineHeight: '1.4', fontWeight: '600' }],
+        'desktop-body': ['18px', { lineHeight: '1.6', fontWeight: '400' }],
+        'desktop-meta': ['14px', { lineHeight: '1.5', fontWeight: '500' }],
       },
     },
   },
