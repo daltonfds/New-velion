@@ -2,28 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply text-body lg:text-desktop-body text-light-text;
-  }
-
-  h1 {
-    @apply text-h1 lg:text-desktop-h1 font-bold leading-tight;
-  }
-
-  h2 {
-    @apply text-h2 lg:text-desktop-h2 font-semibold leading-tight;
-  }
-
-  h3 {
-    @apply text-h3 lg:text-desktop-h3 font-semibold leading-snug;
-  }
-
-  p {
-    @apply text-body lg:text-desktop-body leading-relaxed;
-  }
-
-  label, small, .meta {
-    @apply text-meta lg:text-desktop-meta font-medium text-light-muted;
-  }
-}
+h1 { @apply text-h1 md:text-h1-desktop; }
+h2 { @apply text-h2 md:text-h2-desktop; }
+h3 { @apply text-h3 md:text-h3-desktop; }
+p, body { @apply text-body md:text-body-desktop; }
+label, .meta { @apply text-label md:text-label-desktop; }
