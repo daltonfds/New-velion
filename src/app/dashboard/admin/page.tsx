@@ -21,7 +21,6 @@ export default function AdminDashboardPage() {
         router.replace("/login");
         return;
       }
-
       const { data: profiles } = await supabase.from("profiles").select("role").eq("role", "seller");
       const { data: producers } = await supabase.from("profiles").select("role").eq("role", "producer");
       const { data: requests } = await supabase.from("registration_requests").select("*").eq("status", "pending");
@@ -39,7 +38,7 @@ export default function AdminDashboardPage() {
   }, [router]);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout userType="admin">
       <h1 className="text-2xl font-bold mb-2">Platform Overview</h1>
       <p className="text-sm text-light-muted mb-8">Manage the entire Velion ecosystem.</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -59,20 +58,6 @@ export default function AdminDashboardPage() {
           <p className="text-xs text-light-muted font-medium">Pending Withdrawals</p>
           <p className="text-xl font-bold text-error mt-1">{loading ? "..." : `R ${metrics.pendingWithdrawals.toFixed(2)}`}</p>
         </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl border border-light-border">
-          <h3 className="font-semibold mb-4">Recent Users</h3>
-          <p className="text-sm text-light-muted">Use the Users page to manage all accounts.</p>
-        </div>
-        <div className="bg-white p-6 rounded-xl border border-light-border">
-          <h3 className="font-semibold mb-4">Pending Approvals</h3>
-          <p className="text-sm text-light-muted">Check the Requests page for pending items.</p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-3">
-        <button onClick={() => router.push("/dashboard/admin/requests")} className="w-full py-3 bg-primary text-white rounded-full font-medium">View Registration Requests</button>
-        <button onClick={() => router.push("/dashboard/admin/users")} className="w-full py-3 bg-white text-light-text border border-light-border rounded-full font-medium">Manage Users</button>
       </div>
     </DashboardLayout>
   );

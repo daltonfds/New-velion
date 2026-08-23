@@ -5,21 +5,35 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import VelionLogo from "@/components/ui/VelionLogo";
-import { Menu, X, LayoutDashboard, Package, ShoppingCart, Wallet, User, Settings, LogOut } from "lucide-react";
+import { Menu, X, LayoutDashboard, Package, ShoppingCart, Wallet, User, Settings, LogOut, Users, Boxes } from "lucide-react";
 
-const menuItems = [
-  { name: "Dashboard", path: "/dashboard/seller", icon: LayoutDashboard },
-  { name: "Products", path: "/dashboard/seller/products", icon: Package },
-  { name: "Orders", path: "/dashboard/seller/orders", icon: ShoppingCart },
-  { name: "Wallet", path: "/dashboard/seller/wallet", icon: Wallet },
-  { name: "Profile", path: "/dashboard/seller/profile", icon: User },
-  { name: "Settings", path: "/dashboard/seller/settings", icon: Settings },
-];
-
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default function DashboardLayout({ children, userType = "seller" }: { children: ReactNode; userType?: "seller" | "producer" | "admin" }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Menu de itens baseado no tipo de usuário
+  const menuItems = userType === "admin" ? [
+    { name: "Dashboard", path: "/dashboard/admin", icon: LayoutDashboard },
+    { name: "Marketplace", path: "/dashboard/admin/marketplace", icon: Boxes },
+    { name: "Operations", path: "/dashboard/admin/operations", icon: ShoppingCart },
+    { name: "Finance", path: "/dashboard/admin/finance", icon: Wallet },
+    { name: "Users", path: "/dashboard/admin/users", icon: Users },
+    { name: "Profile", path: "/dashboard/admin/profile", icon: User },
+  ] : userType === "producer" ? [
+    { name: "Dashboard", path: "/dashboard/producer", icon: LayoutDashboard },
+    { name: "Products", path: "/dashboard/producer/products", icon: Package },
+    { name: "Inventory", path: "/dashboard/producer/inventory", icon: Boxes },
+    { name: "Finance", path: "/dashboard/producer/finance", icon: Wallet },
+    { name: "Profile", path: "/dashboard/producer/profile", icon: User },
+  ] : [
+    { name: "Dashboard", path: "/dashboard/seller", icon: LayoutDashboard },
+    { name: "Marketplace", path: "/dashboard/seller/marketplace", icon: Boxes },
+    { name: "Products", path: "/dashboard/seller/products", icon: Package },
+    { name: "Orders", path: "/dashboard/seller/orders", icon: ShoppingCart },
+    { name: "Wallet", path: "/dashboard/seller/wallet", icon: Wallet },
+    { name: "Profile", path: "/dashboard/seller/profile", icon: User },
+  ];
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -36,7 +50,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <VelionLogo className="w-7 h-7" />
       </div>
 
-      {/* Sidebar Desktop (visível em telas grandes) */}
+      {/* Sidebar Desktop */}
       <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-light-border hidden md:flex flex-col p-4 pt-16">
         <nav className="flex-1 space-y-1">
           {menuItems.map((item) => (
@@ -57,7 +71,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </button>
       </aside>
 
-      {/* Sidebar Mobile (abre e fecha) */}
+      {/* Sidebar Mobile */}
       {isOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setIsOpen(false)} />

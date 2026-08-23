@@ -21,30 +21,19 @@ export default function ProducerDashboardPage() {
         router.replace("/login");
         return;
       }
-
-      const { data: products } = await supabase
-        .from("products")
-        .select("*")
-        .eq("supplier_id", session.user.id);
-
+      const { data: products } = await supabase.from("products").select("*").eq("supplier_id", session.user.id);
       let inventoryValue = 0;
       if (products) {
         inventoryValue = products.reduce((sum, p) => sum + (p.price || 0), 0);
-        setMetrics({
-          totalProducts: products.length,
-          inventoryValue,
-          pendingOrders: 0,
-          totalEarnings: 0,
-        });
+        setMetrics({ totalProducts: products.length, inventoryValue, pendingOrders: 0, totalEarnings: 0 });
       }
-
       setLoading(false);
     };
     load();
   }, [router]);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout userType="producer">
       <h1 className="text-2xl font-bold mb-2">Good morning, Producer</h1>
       <p className="text-sm text-light-muted mb-8">Manage your products and inventory.</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -64,12 +53,6 @@ export default function ProducerDashboardPage() {
           <p className="text-xs text-light-muted font-medium">Total Earnings</p>
           <p className="text-xl font-bold text-primary mt-1">{loading ? "..." : `R ${metrics.totalEarnings.toFixed(2)}`}</p>
         </div>
-      </div>
-      <div className="bg-white p-6 rounded-xl border border-light-border">
-        <h3 className="font-semibold mb-4">Products Overview</h3>
-        {loading ? <p className="text-sm text-light-muted">Loading...</p> : (
-          <p className="text-sm text-light-muted">You have {metrics.totalProducts} active products.</p>
-        )}
       </div>
     </DashboardLayout>
   );
