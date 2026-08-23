@@ -4,24 +4,33 @@ import Link from "next/link";
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-light-bg text-light-text font-sans">
-      
-      {/* Menu Desktop */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-light-bg/80 backdrop-blur-sm border-b border-light-border/50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <VelionLogo className="w-8 h-8" />
-            <span className="font-display text-lg font-semibold tracking-tight">Velion</span>
-          </div>
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="#sellers" className="hover:text-primary">Sellers</Link>
-            <Link href="#producers" className="hover:text-primary">Producers</Link>
-            <Link href="#logistics" className="hover:text-primary">Logistics</Link>
-            <Link href="#about" className="hover:text-primary">About</Link>
-            <Link href="/login" className="hover:text-primary">Login</Link>
-            <Link href="/apply"><button className="px-5 py-2 bg-primary text-white text-sm rounded-full hover:bg-primary/90">Start Selling</button></Link>
-          </div>
-        </div>
+      {/* Menu Hambúrguer + Logo (Mobile) */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-light-border flex items-center gap-3 px-4 py-3">
+        <button className="text-light-text md:hidden">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <VelionLogo className="w-7 h-7" />
       </nav>
+
+      {/* Menu Desktop */}
+      <div className="hidden md:flex items-center justify-between max-w-6xl mx-auto px-6 py-4">
+        <div className="flex items-center gap-3">
+          <VelionLogo className="w-8 h-8" />
+          <span className="font-display text-lg font-semibold tracking-tight">Velion</span>
+        </div>
+        <div className="flex items-center gap-6 text-sm font-medium">
+          <Link href="#sellers" className="hover:text-primary">Sellers</Link>
+          <Link href="#producers" className="hover:text-primary">Producers</Link>
+          <Link href="#logistics" className="hover:text-primary">Logistics</Link>
+          <Link href="#about" className="hover:text-primary">About</Link>
+          <Link href="/login" className="hover:text-primary">Login</Link>
+          <Link href="/apply"><button className="px-5 py-2 bg-primary text-white text-sm rounded-full">Start Selling</button></Link>
+        </div>
+      </div>
 
       <main className="pt-24 max-w-6xl mx-auto px-6 pb-20">
         <section id="hero" className="text-center py-20">
