@@ -1,4 +1,5 @@
 import LogoMenu from "@/components/ui/LogoMenu";
+import VelionLogo from "@/components/ui/VelionLogo";
 import Link from "next/link";
 
 export default function LandingPage() {
