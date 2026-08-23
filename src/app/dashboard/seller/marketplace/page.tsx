@@ -9,10 +9,7 @@ export default function SellerMarketplacePage() {
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase
-        .from("products")
-        .select("*, profiles(full_name)")
-        .eq("is_active", true);
+      const { data } = await supabase.from("products").select("*").eq("is_active", true);
       if (data) setProducts(data);
     };
     load();
