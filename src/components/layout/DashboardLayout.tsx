@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-light-bg">
-      {/* Menu hambúrguer (abre a sidebar) */}
+      {/* Header (com hambúrguer + logo) */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-light-border flex items-center gap-3 px-4 py-3">
         <button onClick={() => setIsOpen(!isOpen)} className="text-light-text">
           {isOpen ? <X size={22} /> : <Menu size={22} />}
