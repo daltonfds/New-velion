@@ -1,19 +1,49 @@
 "use client";
 import { useState } from "react";
-import { LayoutDashboard, Package, ShoppingCart, Wallet, User, Settings, LogOut } from "lucide-react";
+import {
+  LayoutDashboard, Package, ShoppingCart, Wallet, User, Settings, LogOut,
+  Factory, Warehouse, Truck, Users, BarChart3, ClipboardCheck,
+} from "lucide-react";
 import LogoMenu from "../ui/LogoMenu";
 
-const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/seller" },
-  { icon: Package, label: "Marketplace", href: "/dashboard/seller/marketplace" },
-  { icon: ShoppingCart, label: "Orders", href: "/dashboard/seller/orders" },
-  { icon: Wallet, label: "Wallet", href: "/dashboard/seller/finance/wallet" },
-  { icon: User, label: "Profile", href: "/dashboard/seller/profile" },
-  { icon: Settings, label: "Settings", href: "/dashboard/seller/settings" },
-];
+type UserType = "seller" | "producer" | "admin";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+const NAV_BY_ROLE: Record<UserType, { icon: any; label: string; href: string }[]> = {
+  seller: [
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/seller" },
+    { icon: Package, label: "Marketplace", href: "/dashboard/seller/marketplace" },
+    { icon: ShoppingCart, label: "Orders", href: "/dashboard/seller/orders" },
+    { icon: Wallet, label: "Wallet", href: "/dashboard/seller/finance/wallet" },
+    { icon: User, label: "Profile", href: "/dashboard/seller/profile" },
+    { icon: Settings, label: "Settings", href: "/dashboard/seller/settings" },
+  ],
+  producer: [
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/producer" },
+    { icon: Factory, label: "Products", href: "/dashboard/producer/products" },
+    { icon: Warehouse, label: "Inventory", href: "/dashboard/producer/inventory" },
+    { icon: Truck, label: "Fulfillment", href: "/dashboard/producer/fulfillment" },
+    { icon: Wallet, label: "Finance", href: "/dashboard/producer/finance" },
+    { icon: User, label: "Profile", href: "/dashboard/producer/profile" },
+  ],
+  admin: [
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/admin" },
+    { icon: ClipboardCheck, label: "Marketplace", href: "/dashboard/admin/marketplace" },
+    { icon: Truck, label: "Operations", href: "/dashboard/admin/operations" },
+    { icon: BarChart3, label: "Analytics", href: "/dashboard/admin/analytics" },
+    { icon: Wallet, label: "Finance", href: "/dashboard/admin/finance" },
+    { icon: Users, label: "Users", href: "/dashboard/admin/users" },
+  ],
+};
+
+export default function DashboardLayout({
+  children,
+  userType = "seller",
+}: {
+  children: React.ReactNode;
+  userType?: UserType;
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navItems = NAV_BY_ROLE[userType] ?? NAV_BY_ROLE.seller;
 
   return (
     <div className="min-h-screen flex">
@@ -22,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         ${sidebarOpen ? "w-64" : "w-0 md:w-64"} overflow-hidden`}
       >
         <nav className="flex flex-col gap-1 p-3 mt-20">
-          {NAV_ITEMS.map(({ icon: Icon, label, href }) => (
+          {navItems.map(({ icon: Icon, label, href }) => (
             <a
               key={label}
               href={href}
