@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Add, Check, Store } from "lucide-react";
+import { PlusCircle, CheckCircle } from "lucide-react";
 
 export default function SellerIntegrationsPage() {
   const [integrations, setIntegrations] = useState<any[]>([]);
