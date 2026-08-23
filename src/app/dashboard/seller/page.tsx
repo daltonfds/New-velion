@@ -7,7 +7,6 @@ import { supabase } from "@/lib/supabase";
 import PerformanceChart from "@/components/ui/PerformanceChart";
 import { getExchangeRates, formatCurrency } from "@/lib/exchange";
 
-// Dados do gráfico (para teste inicial, depois preenchemos com dados reais)
 const chartData = [
   { name: "Jan", sales: 0, profit: 0 },
   { name: "Feb", sales: 1200, profit: 480 },
@@ -54,8 +53,8 @@ export default function SellerDashboardPage() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-2">Good morning, Seller</h1>
-      <p className="text-light-muted text-sm mb-8">Here is your sales overview.</p>
+      <h1 className="text-2xl font-bold mb-2">Good morning, Seller</h1>
+      <p className="text-sm text-light-muted mb-8">Here is your sales overview.</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
           <p className="text-xs text-light-muted font-medium">Total Sales</p>
@@ -78,7 +77,7 @@ export default function SellerDashboardPage() {
       </div>
       <div className="bg-white p-6 rounded-xl border border-light-border shadow-sm mb-8">
         <h3 className="font-semibold mb-4">Sales & Profit</h3>
-        {loading ? <p className="text-light-muted text-sm">Loading...</p> : <PerformanceChart data={chartData} />}
+        {loading ? <p className="text-sm text-light-muted">Loading...</p> : <PerformanceChart data={chartData} />}
       </div>
     </DashboardLayout>
   );

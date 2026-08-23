@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import VelionLogo from "@/components/ui/VelionLogo";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { supabase } from "@/lib/supabase";
 
 export default function AdminDashboardPage() {
@@ -40,54 +40,41 @@ export default function AdminDashboardPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-light-bg p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <VelionLogo className="w-8 h-8" />
-            <span className="font-display text-xl font-semibold text-light-text">Velion Admin</span>
-          </div>
-          <button onClick={() => { supabase.auth.signOut(); router.replace("/login"); }} className="text-sm text-light-muted hover:text-light-text">Sign Out</button>
+    <DashboardLayout>
+      <h1 className="text-2xl font-bold mb-2">Platform Overview</h1>
+      <p className="text-sm text-light-muted mb-8">Manage the entire Velion ecosystem.</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
+          <p className="text-xs text-light-muted font-medium">Total Sellers</p>
+          <p className="text-xl font-bold text-light-text mt-1">{loading ? "..." : metrics.totalSellers}</p>
         </div>
-
-        <h1 className="text-3xl font-bold text-light-text mb-2">Platform Overview</h1>
-        <p className="text-light-muted text-sm mb-8">Manage the entire Velion ecosystem.</p>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
-            <p className="text-xs text-light-muted font-medium">Total Sellers</p>
-            <p className="text-xl font-bold text-light-text mt-1">{loading ? "..." : metrics.totalSellers}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
-            <p className="text-xs text-light-muted font-medium">Total Producers</p>
-            <p className="text-xl font-bold text-light-text mt-1">{loading ? "..." : metrics.totalProducers}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
-            <p className="text-xs text-light-muted font-medium">Pending Requests</p>
-            <p className="text-xl font-bold text-warning mt-1">{loading ? "..." : metrics.pendingRequests}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
-            <p className="text-xs text-light-muted font-medium">Pending Withdrawals</p>
-            <p className="text-xl font-bold text-error mt-1">{loading ? "..." : `R ${metrics.pendingWithdrawals.toFixed(2)}`}</p>
-          </div>
+        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
+          <p className="text-xs text-light-muted font-medium">Total Producers</p>
+          <p className="text-xl font-bold text-light-text mt-1">{loading ? "..." : metrics.totalProducers}</p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl border border-light-border">
-            <h3 className="font-semibold text-light-text mb-4">Recent Users</h3>
-            <p className="text-light-muted text-sm">Use the Users page to manage all accounts.</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl border border-light-border">
-            <h3 className="font-semibold text-light-text mb-4">Pending Approvals</h3>
-            <p className="text-light-muted text-sm">Check the Requests page for pending items.</p>
-          </div>
+        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
+          <p className="text-xs text-light-muted font-medium">Pending Requests</p>
+          <p className="text-xl font-bold text-warning mt-1">{loading ? "..." : metrics.pendingRequests}</p>
         </div>
-
-        <div className="flex flex-col gap-3">
-          <button onClick={() => router.push("/dashboard/admin/requests")} className="w-full py-3 bg-primary text-white rounded-full font-medium">View Registration Requests</button>
-          <button onClick={() => router.push("/dashboard/admin/users")} className="w-full py-3 bg-white text-light-text border border-light-border rounded-full font-medium">Manage Users</button>
+        <div className="bg-white p-4 rounded-xl border border-light-border shadow-sm">
+          <p className="text-xs text-light-muted font-medium">Pending Withdrawals</p>
+          <p className="text-xl font-bold text-error mt-1">{loading ? "..." : `R ${metrics.pendingWithdrawals.toFixed(2)}`}</p>
         </div>
       </div>
-    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-xl border border-light-border">
+          <h3 className="font-semibold mb-4">Recent Users</h3>
+          <p className="text-sm text-light-muted">Use the Users page to manage all accounts.</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl border border-light-border">
+          <h3 className="font-semibold mb-4">Pending Approvals</h3>
+          <p className="text-sm text-light-muted">Check the Requests page for pending items.</p>
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <button onClick={() => router.push("/dashboard/admin/requests")} className="w-full py-3 bg-primary text-white rounded-full font-medium">View Registration Requests</button>
+        <button onClick={() => router.push("/dashboard/admin/users")} className="w-full py-3 bg-white text-light-text border border-light-border rounded-full font-medium">Manage Users</button>
+      </div>
+    </DashboardLayout>
   );
 }
