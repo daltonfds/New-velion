@@ -2,8 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-h1 { @apply text-h1 md:text-h1-desktop; }
-h2 { @apply text-h2 md:text-h2-desktop; }
-h3 { @apply text-h3 md:text-h3-desktop; }
-p, body { @apply text-body md:text-body-desktop; }
-label, .meta { @apply text-label md:text-label-desktop; }
+@layer base {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    @apply bg-light-bg text-light-text antialiased;
+    font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  }
+
+  h1 {
+    @apply text-h1 lg:text-desktop-h1 font-bold leading-tight;
+  }
+
+  h2 {
+    @apply text-h2 lg:text-desktop-h2 font-semibold leading-tight;
+  }
+
+  h3 {
+    @apply text-h3 lg:text-desktop-h3 font-semibold leading-snug;
+  }
+
+  p {
+    @apply text-body lg:text-desktop-body leading-relaxed;
+  }
+
+  label,
+  small,
+  .meta {
+    @apply text-meta lg:text-desktop-meta font-medium text-light-muted;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+}
+
+@layer components {
+  .dashboard-card {
+    @apply rounded-xl border border-light-border bg-white shadow-sm;
+  }
+}

@@ -212,8 +212,23 @@ export const menuConfig: Record<DashboardRole, MenuGroup[]> = {
       ],
     },
     {
-      label: "Management",
+      label: "Commerce",
       items: [
+        {
+          label: "Marketplace",
+          href: "/dashboard/admin/marketplace",
+          icon: ShoppingBag,
+        },
+        {
+          label: "Products",
+          href: "/dashboard/admin/products",
+          icon: Package,
+        },
+        {
+          label: "Orders",
+          href: "/dashboard/admin/operations",
+          icon: ShoppingCart,
+        },
         {
           label: "Users",
           href: "/dashboard/admin/users",
@@ -229,15 +244,25 @@ export const menuConfig: Record<DashboardRole, MenuGroup[]> = {
           href: "/dashboard/admin/kyc",
           icon: User,
         },
+      ],
+    },
+    {
+      label: "Finance",
+      items: [
         {
-          label: "Marketplace",
-          href: "/dashboard/admin/marketplace",
-          icon: ShoppingBag,
+          label: "Payments",
+          href: "/dashboard/admin/finance/payments",
+          icon: Wallet,
         },
         {
-          label: "Products",
-          href: "/dashboard/admin/products",
-          icon: Package,
+          label: "Withdrawals",
+          href: "/dashboard/admin/finance/withdrawals",
+          icon: CircleDollarSign,
+        },
+        {
+          label: "Settlements",
+          href: "/dashboard/admin/finance/settlements",
+          icon: ClipboardList,
         },
       ],
     },
@@ -245,49 +270,15 @@ export const menuConfig: Record<DashboardRole, MenuGroup[]> = {
       label: "Operations",
       items: [
         {
-          label: "Orders",
-          href: "/dashboard/admin/operations",
-          icon: ShoppingCart,
-        },
-        {
           label: "Logistics",
           href: "/dashboard/admin/logistics",
           icon: MapPin,
         },
         {
-          label: "Disputes",
+          label: "Returns & Disputes",
           href: "/dashboard/admin/disputes",
           icon: RotateCcw,
         },
-      ],
-    },
-    {
-      label: "Finance",
-      items: [
-        {
-          label: "Finance",
-          href: "/dashboard/admin/finance",
-          icon: CircleDollarSign,
-        },
-        {
-          label: "Payments",
-          href: "/dashboard/admin/finance/payments",
-          icon: Wallet,
-        },
-        {
-          label: "Settlements",
-          href: "/dashboard/admin/finance/settlements",
-          icon: ClipboardList,
-        },
-        {
-          label: "Withdrawals",
-          href: "/dashboard/admin/finance/withdrawals",
-          icon: CircleDollarSign,
-        },
-      ],
-    },
-    {
-      items: [
         {
           label: "Analytics",
           href: "/dashboard/admin/analytics",

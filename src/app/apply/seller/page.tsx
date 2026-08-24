@@ -15,12 +15,39 @@ export default function SellerApplyPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    // Simulação de envio. Numa app real, isto chamaria uma Server Action.
-    setTimeout(() => {
+
+    const form = new FormData(e.currentTarget);
+
+    try {
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: form.get("fullName"),
+          email: form.get("email"),
+          phone: form.get("phone"),
+          country: selectedCountry?.code || null,
+          city: form.get("city"),
+          role: "seller",
+          sellingMethod: form.get("sellingMethod"),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit application.");
+      }
+
       alert("Your application has been sent to the admin for review.");
-      router.push("/");
+      router.push("/apply/success");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to submit application.");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   }
 
   return (

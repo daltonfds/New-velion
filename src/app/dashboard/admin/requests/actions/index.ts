@@ -32,7 +32,27 @@ export async function approveRequest(requestId: string, tempPassword: string) {
 
   if (createError) throw new Error(createError.message);
 
-  // 3. Atualizar o status do pedido
+  // 3. Criar o perfil correspondente ao utilizador
+  const { error: profileError } = await supabaseAdmin
+    .from("profiles")
+    .insert({
+      id: user.user.id,
+      full_name: request.full_name,
+      email: request.email,
+      phone: request.phone,
+      country: request.country,
+      city: request.city,
+      role: request.requested_role,
+      balance: 0,
+    });
+
+  if (profileError) {
+    // Se o profile falhar, remover o utilizador criado no Auth
+    await supabaseAdmin.auth.admin.deleteUser(user.user.id);
+    throw new Error(profileError.message);
+  }
+
+  // 4. Atualizar o status do pedido
   const { error: updateError } = await supabase
     .from("registration_requests")
     .update({ status: "approved" })
