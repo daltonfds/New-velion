@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 const API_URL =
   process.env.NEXT_PUBLIC_NEWVELION_API_URL ||
   `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/newvelion-api`;
@@ -184,3 +185,396 @@ export async function selectAffiliateProduct(params: {
 
   return response.json();
 }
+
+export type AdminStats = {
+  counts: {
+    profiles: number;
+    products: number;
+    sales: number;
+    commissions: number;
+    withdrawals: number;
+    disputes: number;
+    kyc_submissions: number;
+    analytics_events: number;
+  };
+};
+
+export async function getAdminStats(): Promise<AdminStats> {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/stats`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload?.error || "Failed to load admin statistics.");
+  }
+
+  return payload;
+}
+
+export type AdminUser = {
+  id: string;
+  full_name?: string | null;
+  email?: string | null;
+  country?: string | null;
+  role?: "seller" | "supplier" | "admin" | string | null;
+  status?: string | null;
+  created_at?: string | null;
+};
+
+export async function getAdminUsers(): Promise<AdminUser[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/users`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload?.error || "Failed to load users.");
+  }
+
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export type AdminSeller = AdminUser & {
+  sales_count?: number | null;
+  revenue?: number | null;
+  commissions?: number | null;
+};
+
+export async function getAdminSellers(): Promise<AdminSeller[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/sellers`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload?.error || "Failed to load sellers.");
+  }
+
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export type AdminSupplier = AdminUser & {
+  products_count?: number | null;
+  sales_count?: number | null;
+  revenue?: number | null;
+};
+
+export async function getAdminSuppliers(): Promise<AdminSupplier[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/suppliers`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload?.error || "Failed to load suppliers.");
+  }
+
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+
+export type AdminCategory = {
+  id: string;
+  name_en?: string | null;
+  name_pt?: string | null;
+  slug?: string | null;
+  description?: string | null;
+  active?: boolean | null;
+  created_at?: string | null;
+};
+
+export async function getAdminCategories(): Promise<AdminCategory[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/categories`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload?.error || "Failed to load categories.");
+  }
+
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export type AdminTransaction = {
+  id: string;
+  user_id?: string | null;
+  type?: string | null;
+  direction?: string | null;
+  amount?: number | null;
+  currency?: string | null;
+  reference_type?: string | null;
+  reference_id?: string | null;
+  description?: string | null;
+  status?: string | null;
+  created_at?: string | null;
+};
+
+export async function getAdminTransactions(): Promise<AdminTransaction[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/transactions`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload?.error || "Failed to load transactions.");
+  }
+
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export type AdminCommission = {
+  id: string;
+  affiliate_id?: string | null;
+  supplier_id?: string | null;
+  product_id?: string | null;
+  conversion_id?: string | null;
+  sale_id?: string | null;
+  rate?: number | null;
+  sale_amount?: number | null;
+  amount?: number | null;
+  currency?: string | null;
+  status?: string | null;
+  available_at?: string | null;
+  created_at?: string | null;
+};
+
+export async function getAdminCommissions(): Promise<AdminCommission[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/commissions`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload?.error || "Failed to load commissions.");
+  }
+
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export type AdminWithdrawal = Record<string, unknown>;
+export type AdminDispute = Record<string, unknown>;
+export type AdminKyc = Record<string, unknown>;
+export type AdminAnalyticsEvent = Record<string, unknown>;
+
+async function protectedApi(path: string, options: RequestInit = {}) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}${path}`,
+    {
+      ...options,
+      headers: {
+        ...(options.headers || {}),
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload?.error || "Request failed.");
+  }
+
+  return payload;
+}
+
+export async function getAdminWithdrawals(): Promise<AdminWithdrawal[]> {
+  const payload = await protectedApi("/admin/withdrawals");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getAdminDisputes(): Promise<AdminDispute[]> {
+  const payload = await protectedApi("/admin/disputes");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getAdminKyc(): Promise<AdminKyc[]> {
+  const payload = await protectedApi("/admin/kyc");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getAdminAnalytics(): Promise<AdminAnalyticsEvent[]> {
+  const payload = await protectedApi("/admin/analytics");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getSupplierProducts() {
+  const payload = await protectedApi("/supplier/products");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getSupplierMaterials() {
+  const payload = await protectedApi("/supplier/materials");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getSupplierOffers() {
+  const payload = await protectedApi("/supplier/offers");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getSupplierMetrics() {
+  return protectedApi("/supplier/metrics");
+}
+
+export async function getSupplierOrders() {
+  const payload = await protectedApi("/supplier/orders");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getSupplierCommissions() {
+  const payload = await protectedApi("/finance/commissions");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getSupplierWithdrawals() {
+  const payload = await protectedApi("/finance/withdrawals");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getFinanceSummary() {
+  return protectedApi("/finance/summary");
+}
+
+export async function getFinanceTransactions() {
+  const payload = await protectedApi("/finance/transactions");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getAffiliatePerformance() {
+  return protectedApi("/affiliate/performance");
+}
+
+export async function getAffiliateSales() {
+  const payload = await protectedApi("/affiliate/sales");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getAffiliateClicks() {
+  const payload = await protectedApi("/affiliate/clicks");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getAffiliateConversions() {
+  const payload = await protectedApi("/affiliate/conversions");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getAffiliateReports() {
+  const payload = await protectedApi("/affiliate/reports");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+export async function getAffiliateProducts() {
+  const payload = await protectedApi("/affiliate/products");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
+
+export async function getFinanceWithdrawals() {
+  const payload = await protectedApi("/finance/withdrawals");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
