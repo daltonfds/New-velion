@@ -24,25 +24,26 @@ export default function DashboardPage() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
+        .select("role,status")
         .eq("id", user.id)
         .maybeSingle();
 
       if (!mounted) return;
 
-      const role = String(profile?.role || "").toLowerCase();
+      if (profile?.status === "suspended") {
+        router.replace("/login");
+        return;
+      }
+
+      const role = String(profile?.role || "seller").toLowerCase();
 
       if (role === "admin") {
         router.replace("/dashboard/admin");
-        return;
-      }
-
-      if (role === "supplier") {
+      } else if (role === "supplier") {
         router.replace("/dashboard/supplier");
-        return;
+      } else {
+        router.replace("/dashboard/seller");
       }
-
-      router.replace("/dashboard/seller");
     }
 
     resolveDashboard();
@@ -55,7 +56,7 @@ export default function DashboardPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50">
       <div className="text-center">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#16294F]" />
         <p className="mt-4 text-sm font-medium text-slate-500">
           Loading your dashboard...
         </p>
