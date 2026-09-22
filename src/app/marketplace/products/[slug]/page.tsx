@@ -163,11 +163,12 @@ export default function ProductPage({
       : 0;
 
   const [referralCode, setReferralCode] = useState("");
+  const affiliateCode = referralCode || "";
 
   useEffect(() => {
     const ref = new URLSearchParams(window.location.search).get("ref");
 
-    if (ref && ref !== "YOUR_REFERRAL_CODE") {
+    if (ref) {
       window.localStorage.setItem("newvelion_referral_code", ref);
       setReferralCode(ref);
 
@@ -203,20 +204,24 @@ export default function ProductPage({
     }
   }, []);
 
-  const affiliateCode = referralCode || "YOUR_REFERRAL_CODE";
-
   const baseUrl =
     typeof window !== "undefined"
       ? window.location.origin
       : "";
 
-  const productLink = `${baseUrl}/marketplace/products/${product.slug}?ref=${affiliateCode}`;
+  const productLink = referralCode
+    ? `${baseUrl}/marketplace/products/${product.slug}?ref=${encodeURIComponent(referralCode)}`
+    : `${baseUrl}/marketplace/products/${product.slug}`;
 
   const checkoutLink = product.checkout_url
-    ? `${product.checkout_url}${product.checkout_url.includes("?") ? "&" : "?"}ref=${affiliateCode}`
+    ? referralCode
+      ? `${product.checkout_url}${product.checkout_url.includes("?") ? "&" : "?"}ref=${encodeURIComponent(referralCode)}`
+      : product.checkout_url
     : "";
 
-  const materialsLink = `${baseUrl}/marketplace/products/${product.slug}?ref=${affiliateCode}#materials`;
+  const materialsLink = referralCode
+    ? `${baseUrl}/marketplace/products/${product.slug}?ref=${encodeURIComponent(referralCode)}#materials`
+    : `${baseUrl}/marketplace/products/${product.slug}#materials`;
 
   async function handleAffiliateClick() {
     const {
@@ -265,7 +270,7 @@ export default function ProductPage({
   async function handleCheckoutClick() {
     if (!product.checkout_url) return;
 
-    if (affiliateCode !== "YOUR_REFERRAL_CODE") {
+    if (Boolean(affiliateCode)) {
       const visitorId =
         window.localStorage.getItem("newvelion_visitor_id") || undefined;
 
@@ -486,7 +491,7 @@ export default function ProductPage({
                         key={material.id}
                         type="button"
                         onClick={async () => {
-                          if (affiliateCode !== "YOUR_REFERRAL_CODE") {
+                          if (Boolean(affiliateCode)) {
                             const visitorId =
                               window.localStorage.getItem(
                                 "newvelion_visitor_id",
@@ -598,7 +603,7 @@ export default function ProductPage({
               ))}
             </div>
 
-            {affiliateCode === "YOUR_REFERRAL_CODE" && (
+            {!affiliateCode && (
               <div className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-700">
                 Your affiliate referral code is not configured yet. Once your
                 affiliate account is connected, these links will use your real

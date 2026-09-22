@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -11,6 +11,15 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+import { getMarketplaceCategories } from "@/lib/newvelion-api";
+
+type Category = {
+  id: string;
+  name_en?: string | null;
+  name_pt?: string | null;
+  slug?: string | null;
+};
 
 type Product = {
   id: number;
@@ -34,9 +43,63 @@ const emptyProduct = (id: number): Product => ({
   description: "",
 });
 
+function makeSlug(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
 export default function NewSupplierProductsPage() {
   const [products, setProducts] = useState<Product[]>([emptyProduct(1)]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadCategories() {
+      try {
+        setLoadingCategories(true);
+        const payload = await getMarketplaceCategories();
+
+        const data = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+
+        if (mounted) {
+          setCategories(data);
+        }
+      } catch (err) {
+        if (mounted) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Failed to load categories."
+          );
+        }
+      } finally {
+        if (mounted) {
+          setLoadingCategories(false);
+        }
+      }
+    }
+
+    loadCategories();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const updateProduct = (
     id: number,
@@ -49,6 +112,7 @@ export default function NewSupplierProductsPage() {
       )
     );
     setSaved(false);
+    setError("");
   };
 
   const addProduct = () => {
@@ -65,9 +129,102 @@ export default function NewSupplierProductsPage() {
     setProducts((current) => current.filter((product) => product.id !== id));
   };
 
-  const saveProducts = () => {
-    setSaved(true);
-  };
+  async function saveProducts() {
+    setError("");
+    setSaved(false);
+
+    if (products.some((product) => !product.name.trim())) {
+      setError("Every product must have a product name.");
+      return;
+    }
+
+    if (products.some((product) => !product.category)) {
+      setError("Select a category for every product.");
+      return;
+    }
+
+    if (products.some((product) => !product.price || Number(product.price) < 0)) {
+      setError("Enter a valid price for every product.");
+      return;
+    }
+
+    if (products.some((product) => !product.stock || Number(product.stock) < 0)) {
+      setError("Enter valid stock for every product.");
+      return;
+    }
+
+    if (
+      products.some(
+        (product) =>
+          !product.commission ||
+          Number(product.commission) < 0 ||
+          Number(product.commission) > 100
+      )
+    ) {
+      setError("Commission must be between 0% and 100%.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        throw new Error("Authentication required.");
+      }
+
+      const rows = products.map((product) => {
+        const category = categories.find(
+          (item) => item.id === product.category
+        );
+
+        const baseSlug = makeSlug(product.name);
+        const uniqueSlug = `${baseSlug || "product"}-${crypto.randomUUID().slice(0, 8)}`;
+
+        return {
+          supplier_id: user.id,
+          category_id: category?.id || null,
+          name_en: product.name.trim(),
+          name_pt: product.name.trim(),
+          slug: uniqueSlug,
+          short_description_en: product.description.trim() || null,
+          short_description_pt: product.description.trim() || null,
+          description_en: product.description.trim() || null,
+          description_pt: product.description.trim() || null,
+          price: Number(product.price),
+          currency: "USD",
+          commission_percentage: Number(product.commission),
+          checkout_url: product.checkoutUrl.trim() || null,
+          stock: Number(product.stock),
+          featured: false,
+          offer: false,
+        };
+      });
+
+      const { error: insertError } = await supabase
+        .from("products")
+        .insert(rows);
+
+      if (insertError) {
+        throw new Error(insertError.message);
+      }
+
+      setSaved(true);
+      setProducts([emptyProduct(1)]);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to save products."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -92,7 +249,8 @@ export default function NewSupplierProductsPage() {
 
         <button
           onClick={addProduct}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-600"
+          disabled={saving}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-600 disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
           Add Another Product
@@ -108,8 +266,7 @@ export default function NewSupplierProductsPage() {
             </h3>
             <p className="mt-1 text-sm leading-6 text-slate-600">
               Every product can have its own price, inventory, affiliate
-              commission and payment checkout URL. Affiliates will use these
-              details when promoting your products.
+              commission and payment checkout URL.
             </p>
           </div>
         </div>
@@ -118,7 +275,13 @@ export default function NewSupplierProductsPage() {
       {saved && (
         <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
           <CheckCircle2 className="h-5 w-5" />
-          Products saved successfully. They are ready for catalog review.
+          Products saved successfully.
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+          {error}
         </div>
       )}
 
@@ -147,7 +310,8 @@ export default function NewSupplierProductsPage() {
               {products.length > 1 && (
                 <button
                   onClick={() => removeProduct(product.id)}
-                  className="rounded-xl p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                  disabled={saving}
+                  className="rounded-xl p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                   title="Remove product"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -156,7 +320,10 @@ export default function NewSupplierProductsPage() {
             </div>
 
             <div className="grid gap-6 p-5 lg:grid-cols-[180px_1fr]">
-              <button className="flex h-44 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 text-center transition hover:border-blue-300 hover:bg-blue-50/30">
+              <button
+                type="button"
+                className="flex h-44 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 text-center transition hover:border-blue-300 hover:bg-blue-50/30"
+              >
                 <ImagePlus className="h-8 w-8 text-slate-400" />
                 <span className="mt-3 text-sm font-semibold text-slate-600">
                   Add product image
@@ -190,16 +357,19 @@ export default function NewSupplierProductsPage() {
                     onChange={(e) =>
                       updateProduct(product.id, "category", e.target.value)
                     }
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    disabled={loadingCategories || saving}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50"
                   >
-                    <option value="">Select category</option>
-                    <option>Health & Wellness</option>
-                    <option>Beauty</option>
-                    <option>Fitness</option>
-                    <option>Digital Products</option>
-                    <option>Business</option>
-                    <option>Education</option>
-                    <option>Other</option>
+                    <option value="">
+                      {loadingCategories
+                        ? "Loading categories..."
+                        : "Select category"}
+                    </option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name_en || category.name_pt || category.slug}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -209,6 +379,8 @@ export default function NewSupplierProductsPage() {
                   </label>
                   <input
                     type="number"
+                    min="0"
+                    step="0.01"
                     value={product.price}
                     onChange={(e) =>
                       updateProduct(product.id, "price", e.target.value)
@@ -224,6 +396,7 @@ export default function NewSupplierProductsPage() {
                   </label>
                   <input
                     type="number"
+                    min="0"
                     value={product.stock}
                     onChange={(e) =>
                       updateProduct(product.id, "stock", e.target.value)
@@ -275,11 +448,6 @@ export default function NewSupplierProductsPage() {
                       className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
                   </div>
-
-                  <p className="mt-1.5 text-xs text-slate-400">
-                    Affiliates will receive this checkout link when they
-                    affiliate with your product.
-                  </p>
                 </div>
 
                 <div className="md:col-span-2">
@@ -337,9 +505,10 @@ export default function NewSupplierProductsPage() {
 
         <button
           onClick={saveProducts}
-          className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"
+          disabled={saving || loadingCategories}
+          className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Save Products
+          {saving ? "Saving..." : "Save Products"}
         </button>
       </div>
     </div>
