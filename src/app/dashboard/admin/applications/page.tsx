@@ -71,7 +71,7 @@ export default function ApplicationsPage() {
   }
 
   return (
-    <DashboardShell area="admin">
+    <DashboardShell area="admin" activeKey="admin" title="Partner applications" subtitle="Review and manage producer and supplier applications.">
       <div className="space-y-6">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wider text-[#8A8570]">
