@@ -1,7 +1,8 @@
 "use client";
 
-import { Bell, Menu, Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import NewvelionLogo from "@/components/ui/NewvelionLogo";
+import NotificationsBell from "@/components/platform/NotificationsBell";
 
 export default function Header() {
   return (
@@ -30,13 +31,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-3">
-        <button
-          className="relative rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-100"
-          aria-label="Notifications"
-        >
-          <Bell size={20} />
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-blue-600" />
-        </button>
+        <NotificationsBell />
 
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
           U
