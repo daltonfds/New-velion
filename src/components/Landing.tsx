@@ -386,7 +386,7 @@ export function Landing() {
             </span>
 
             <h2 className="mt-3 text-3xl font-bold text-light-text">
-              From warehouse to customer's door.
+              From warehouse to customer&apos;s door.
             </h2>
 
             <div className="mt-8 flex flex-col items-center justify-center gap-2 text-sm font-medium text-light-text sm:flex-row sm:gap-4">

@@ -12,7 +12,6 @@ import {
   BarChart3,
   Users,
   Truck,
-  Settings,
   ChevronDown,
 } from "lucide-react";
 

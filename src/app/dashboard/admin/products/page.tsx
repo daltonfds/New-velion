@@ -12,7 +12,6 @@ import {
   Search,
   ShoppingCart,
   Star,
-  ToggleLeft,
   ToggleRight,
 } from "lucide-react";
 

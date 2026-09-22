@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowUpDown,
@@ -97,9 +98,17 @@ export default function MarketplacePage() {
         setCategories([
           "All Categories",
           ...categoryData
-            .map((item: any) => {
+            .map((item) => {
               if (typeof item === "string") return item;
-              return item.name_en || item.name_pt || item.name;
+              if (item && typeof item === "object") {
+                const category = item as {
+                  name_en?: string;
+                  name_pt?: string;
+                  name?: string;
+                };
+                return category.name_en || category.name_pt || category.name;
+              }
+              return undefined;
             })
             .filter(Boolean),
         ]);
@@ -343,7 +352,7 @@ export default function MarketplacePage() {
                     }
                   >
                     {product.image_url ? (
-                      <img
+                      <Image
                         src={product.image_url}
                         alt={getProductName(product)}
                         className="h-full w-full object-cover transition duration-300 group-hover:scale-105"

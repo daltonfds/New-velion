@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ExternalLink,
@@ -70,6 +71,7 @@ export default function ProductPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -106,6 +108,49 @@ export default function ProductPage({
       cancelled = true;
     };
   }, [params]);
+
+  const [referralCode, setReferralCode] = useState("");
+  const affiliateCode = referralCode || "";
+
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get("ref");
+
+    if (ref) {
+      window.localStorage.setItem("newvelion_referral_code", ref);
+      setReferralCode(ref);
+
+      let visitorId = window.localStorage.getItem("newvelion_visitor_id");
+      if (!visitorId) {
+        visitorId = crypto.randomUUID();
+        window.localStorage.setItem("newvelion_visitor_id", visitorId);
+      }
+
+      let sessionId = window.sessionStorage.getItem("newvelion_session_id");
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        window.sessionStorage.setItem("newvelion_session_id", sessionId);
+      }
+
+      trackAffiliateClick({
+        referralCode: ref,
+        destination: "product",
+        visitorId,
+        sessionId,
+      }).catch((error) => {
+        console.error("Affiliate click tracking failed:", error);
+      });
+
+      return;
+    }
+
+    const savedRef =
+      window.localStorage.getItem("newvelion_referral_code") || "";
+
+    if (savedRef) {
+      setReferralCode(savedRef);
+    }
+  }, []);
+
 
   if (loading) {
     return (
@@ -162,48 +207,6 @@ export default function ProductPage({
       ? (product.total_conversions / product.total_clicks) * 100
       : 0;
 
-  const [referralCode, setReferralCode] = useState("");
-  const affiliateCode = referralCode || "";
-
-  useEffect(() => {
-    const ref = new URLSearchParams(window.location.search).get("ref");
-
-    if (ref) {
-      window.localStorage.setItem("newvelion_referral_code", ref);
-      setReferralCode(ref);
-
-      let visitorId = window.localStorage.getItem("newvelion_visitor_id");
-      if (!visitorId) {
-        visitorId = crypto.randomUUID();
-        window.localStorage.setItem("newvelion_visitor_id", visitorId);
-      }
-
-      let sessionId = window.sessionStorage.getItem("newvelion_session_id");
-      if (!sessionId) {
-        sessionId = crypto.randomUUID();
-        window.sessionStorage.setItem("newvelion_session_id", sessionId);
-      }
-
-      trackAffiliateClick({
-        referralCode: ref,
-        destination: "product",
-        visitorId,
-        sessionId,
-      }).catch((error) => {
-        console.error("Affiliate click tracking failed:", error);
-      });
-
-      return;
-    }
-
-    const savedRef =
-      window.localStorage.getItem("newvelion_referral_code") || "";
-
-    if (savedRef) {
-      setReferralCode(savedRef);
-    }
-  }, []);
-
   const baseUrl =
     typeof window !== "undefined"
       ? window.location.origin
@@ -229,7 +232,7 @@ export default function ProductPage({
     } = await supabase.auth.getSession();
 
     if (!session) {
-      window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
 
