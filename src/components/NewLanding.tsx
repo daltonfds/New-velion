@@ -159,21 +159,20 @@ export default function NewLanding() {
       )}
 
       {/* Hero */}
-      <section className="relative overflow-hidden pt-32">
+      <section className="relative overflow-hidden bg-white pt-32">
         <div className="mx-auto grid max-w-7xl gap-16 px-5 pb-20 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-28">
           <div>
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#C99A2E]/30 bg-[#C99A2E]/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A6B1F]">
-              Commerce infrastructure
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#16294F]/10 bg-[#16294F]/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#16294F]">
+              The climbing starts here
             </div>
 
             <h1 className="max-w-3xl text-5xl font-bold leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-7xl">
-              The infrastructure behind modern commerce.
+              The climbing starts here.
             </h1>
 
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#16294F]/65 sm:text-xl">
-              Newvelion connects sellers with producers and suppliers through
-              one commerce infrastructure for products, orders, tracking,
-              commissions and fulfillment.
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#16294F]/60 sm:text-xl">
+              Connect with the products, partners and infrastructure you need to build
+              your commerce business and keep moving upward.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -193,8 +192,8 @@ export default function NewLanding() {
             </div>
           </div>
 
-          <div className="relative">
-            <div className="border border-[#16294F]/10 bg-[#F7F7F4] p-5 sm:p-7">
+          <div className="relative rounded-[2rem] bg-[#16294F] p-2">
+            <div className="border border-white/10 bg-white p-5 sm:p-7 rounded-[1.5rem]">
               <div className="flex items-center justify-between border-b border-[#16294F]/10 pb-5">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8A8570]">
@@ -203,7 +202,7 @@ export default function NewLanding() {
                   <p className="mt-1 text-xl font-bold">Commerce network</p>
                 </div>
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C99A2E] text-sm font-bold text-[#16294F]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#16294F] text-sm font-bold text-white">
                   N
                 </div>
               </div>
@@ -247,10 +246,10 @@ export default function NewLanding() {
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#8A6B1F]">
-              One infrastructure
+              Built to help you climb
             </p>
             <h2 className="mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">
-              Everything connected around the transaction.
+              Everything you need to move from opportunity to operation.
             </h2>
           </div>
 
@@ -440,7 +439,7 @@ export default function NewLanding() {
           <NewvelionBrand size="md" className="justify-center" />
 
           <h2 className="mx-auto mt-10 max-w-3xl text-4xl font-bold tracking-[-0.05em] sm:text-6xl">
-            Build your commerce flow with Newvelion.
+            Your next step starts here.
           </h2>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-[#16294F]/60">
