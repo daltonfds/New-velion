@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply bg-light-bg text-light-text antialiased;
+    @apply bg-white text-light-text antialiased;
     font-family: var(--font-space-grotesk), system-ui, sans-serif;
   }
 
