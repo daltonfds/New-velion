@@ -3,6 +3,7 @@
 import { ReactNode, useState } from "react";
 import ProfileCompletionGuard from "@/components/profile/ProfileCompletionGuard";
 import Link from "next/link";
+import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import {
   BarChart3,
   Boxes,
@@ -191,10 +192,7 @@ export default function DashboardShell({
       >
         <div className="flex h-20 items-center justify-between border-b border-slate-100 px-6">
           <Link href="/marketplace" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1769e0] text-lg font-black text-white">
-              V
-            </div>
-            <span className="text-xl font-bold tracking-tight">NewVelion</span>
+<NewvelionBrand size="sm" />
           </Link>
 
           <button
