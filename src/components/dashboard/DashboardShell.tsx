@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import ProfileCompletionGuard from "@/components/profile/ProfileCompletionGuard";
+import SupplierCompanyCompletionGuard from "@/components/profile/SupplierCompanyCompletionGuard";
 import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import {
@@ -30,6 +31,7 @@ const labels = {
   en: {
     seller: "Seller / Affiliate",
     supplier: "Supplier",
+    companyProfile: "Company Profile",
     admin: "Administration",
     dashboard: "Dashboard",
     marketplace: "Marketplace",
@@ -66,6 +68,7 @@ const labels = {
   pt: {
     seller: "Vendedor / Afiliado",
     supplier: "Fornecedor",
+    companyProfile: "Perfil da empresa",
     admin: "Administração",
     dashboard: "Dashboard",
     marketplace: "Marketplace",
@@ -125,6 +128,7 @@ const sellerItems: NavItem[] = [
 
 const supplierItems: NavItem[] = [
   { key: "dashboard", href: "/dashboard/supplier", icon: LayoutDashboard },
+  { key: "companyProfile", href: "/dashboard/supplier/profile", icon: Users },
   { key: "addProducts", href: "/dashboard/supplier/products/new", icon: Package },
   { key: "catalog", href: "/dashboard/supplier/catalog", icon: Boxes },
   { key: "prices", href: "/dashboard/supplier/prices", icon: Tags },
@@ -185,6 +189,7 @@ export default function DashboardShell({
   return (
     <div className="min-h-screen bg-[#f6f8fc] text-slate-900">
       <ProfileCompletionGuard />
+      {area === "supplier" && <SupplierCompanyCompletionGuard />}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-[270px] border-r border-slate-200 bg-white transition-transform duration-200 lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
