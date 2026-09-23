@@ -176,7 +176,7 @@ export default function SupplierCompanyProfilePage() {
 
     setSaving(true);
 
-    const { error: rpcError } = await supabase.rpc(
+    const { data: companyId, error: rpcError } = await supabase.rpc(
       "save_supplier_company_profile",
       {
         p_company_name: form.companyName.trim(),
@@ -203,14 +203,34 @@ export default function SupplierCompanyProfilePage() {
       },
     );
 
-    setSaving(false);
-
     if (rpcError) {
+      setSaving(false);
       setError(rpcError.message);
       return;
     }
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user && companyId) {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          primary_company_id: companyId,
+        })
+        .eq("id", user.id);
+
+      if (profileError) {
+        setSaving(false);
+        setError(profileError.message);
+        return;
+      }
+    }
+
+    setSaving(false);
     setSuccess(true);
+
     window.dispatchEvent(new Event("profile-updated"));
 
     setTimeout(() => {
