@@ -1,21 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building2 } from "lucide-react";
+import { Building2, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function SupplierCompanyCompletionGuard() {
   const router = useRouter();
   const pathname = usePathname();
+
   const [checking, setChecking] = useState(true);
   const [incomplete, setIncomplete] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     let mounted = true;
 
     async function check() {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user) {
         if (mounted) setChecking(false);
@@ -30,11 +34,17 @@ export default function SupplierCompanyCompletionGuard() {
 
       if (!mounted) return;
 
-      setIncomplete(profile?.role === "supplier" && !profile.primary_company_id);
+      setIncomplete(
+        ["supplier", "producer", "producer_supplier"].includes(
+          profile?.role,
+        ) && !profile?.primary_company_id,
+      );
+
       setChecking(false);
     }
 
     check();
+
     window.addEventListener("profile-updated", check);
 
     return () => {
@@ -43,13 +53,28 @@ export default function SupplierCompanyCompletionGuard() {
     };
   }, [pathname]);
 
-  if (checking || !incomplete || pathname === "/dashboard/supplier/profile") {
+  if (
+    checking ||
+    !incomplete ||
+    dismissed ||
+    pathname === "/dashboard/supplier/profile"
+  ) {
     return null;
   }
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
+      <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
+
+        <button
+          type="button"
+          onClick={() => setDismissed(true)}
+          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+          aria-label="Close"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1769e0]/10">
           <Building2 className="h-8 w-8 text-[#1769e0]" />
         </div>
@@ -60,14 +85,13 @@ export default function SupplierCompanyCompletionGuard() {
           </h2>
 
           <p className="mt-3 text-sm leading-6 text-slate-500">
-            Your supplier account is approved. Complete your business and
-            responsible-person information before adding products.
+            Add your business information to unlock supplier features.
           </p>
         </div>
 
         <div className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-          This is separate from your personal profile. Your personal account
-          information remains in your profile; this step is for your company.
+          You can continue using the platform and complete your company profile
+          later.
         </div>
 
         <button
