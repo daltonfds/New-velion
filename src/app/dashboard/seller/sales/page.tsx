@@ -9,7 +9,7 @@ export default function SellerSalesPage() {
       area="seller"
  activeKey="sales"
       title="Sales"
-      subtitle="Real affiliate sales recorded by NewVelion."
+      subtitle="Your affiliate sales and performance."
       loader={getAffiliateSales}
       columns={[
         "id",
