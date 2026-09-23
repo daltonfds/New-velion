@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import NewvelionLogo from "@/components/ui/NewvelionLogo";
+import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -46,7 +46,7 @@ export default function Sidebar() {
     <aside className="hidden lg:flex w-[260px] shrink-0 flex-col border-r border-slate-200 bg-white">
       <div className="flex h-20 items-center border-b border-slate-100 px-6">
         <Link href="/" aria-label="Newvelion">
-          <NewvelionLogo />
+          <NewvelionBrand size="sm" />
         </Link>
       </div>
 

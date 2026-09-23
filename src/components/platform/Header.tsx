@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu, Search } from "lucide-react";
-import NewvelionLogo from "@/components/ui/NewvelionLogo";
+import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import NotificationsBell from "@/components/platform/NotificationsBell";
 
 export default function Header() {
@@ -15,7 +15,7 @@ export default function Header() {
           <Menu size={22} />
         </button>
 
-        <NewvelionLogo />
+        <NewvelionBrand size="sm" />
       </div>
 
       <div className="relative hidden w-full max-w-md sm:block">
