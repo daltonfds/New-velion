@@ -551,6 +551,11 @@ async function protectedApi(path: string, options: RequestInit = {}) {
   return payload;
 }
 
+export async function getAdminProducts() {
+  const payload = await protectedApi("/marketplace/products?limit=100");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
 export async function getAdminWithdrawals(): Promise<AdminWithdrawal[]> {
   const payload = await protectedApi("/admin/withdrawals");
   return Array.isArray(payload) ? payload : payload?.data || [];
