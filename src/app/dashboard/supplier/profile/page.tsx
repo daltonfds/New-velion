@@ -158,16 +158,6 @@ export default function SupplierCompanyProfilePage() {
     setError("");
     setSuccess(false);
 
-    if (!form.companyName.trim() || !form.countryCode) {
-      setError("Company name and country are required.");
-      return;
-    }
-
-    if (!form.businessPhone.trim()) {
-      setError("Please enter the company's business phone number.");
-      return;
-    }
-
     const country = getCountry(form.countryCode);
 
     const businessPhoneE164 = composeE164(
