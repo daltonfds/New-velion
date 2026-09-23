@@ -16,6 +16,9 @@ import {
   ShoppingCart,
   Users,
   Wallet,
+  Store,
+  UserRound,
+  TrendingUp,
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { getAdminStats, type AdminStats } from "@/lib/newvelion-api";
@@ -46,6 +49,13 @@ export default function AdminDashboardPage() {
 
   const counts = stats?.counts;
 
+  const formatMoney = (value?: number) =>
+    new Intl.NumberFormat("en-ZA", {
+      style: "currency",
+      currency: "ZAR",
+      maximumFractionDigits: 2,
+    }).format(value ?? 0);
+
   const cards = [
     {
       label: "Total Users",
@@ -54,9 +64,33 @@ export default function AdminDashboardPage() {
       href: "/dashboard/admin/users",
     },
     {
+      label: "Sellers",
+      value: counts?.sellers,
+      icon: UserRound,
+      href: "/dashboard/admin/sellers",
+    },
+    {
+      label: "Suppliers",
+      value: counts?.suppliers,
+      icon: Store,
+      href: "/dashboard/admin/suppliers",
+    },
+    {
       label: "Products",
       value: counts?.products,
       icon: Package,
+      href: "/dashboard/admin/products",
+    },
+    {
+      label: "Active Products",
+      value: counts?.active_products,
+      icon: CheckCircle2,
+      href: "/dashboard/admin/products",
+    },
+    {
+      label: "Pending Products",
+      value: counts?.pending_products,
+      icon: Clock3,
       href: "/dashboard/admin/products",
     },
     {
@@ -66,10 +100,11 @@ export default function AdminDashboardPage() {
       href: "/dashboard/admin/transactions",
     },
     {
-      label: "Commissions",
-      value: counts?.commissions,
-      icon: DollarSign,
-      href: "/dashboard/admin/commissions",
+      label: "Platform Revenue",
+      value: formatMoney(counts?.revenue),
+      icon: TrendingUp,
+      href: "/dashboard/admin/analytics",
+      money: true,
     },
   ];
 
@@ -183,11 +218,105 @@ export default function AdminDashboardPage() {
                     ? "—"
                     : typeof card.value === "number"
                       ? card.value.toLocaleString()
-                      : "0"}
+                      : card.value || "0"}
                 </p>
               </Link>
             );
           })}
+        </section>
+
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Commission Records</p>
+            <p className="mt-2 text-2xl font-bold text-slate-950">
+              {loading ? "—" : (counts?.commissions ?? 0).toLocaleString()}
+            </p>
+            <p className="mt-1 text-xs text-slate-400">Recorded commissions</p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Pending Withdrawals</p>
+            <p className="mt-2 text-2xl font-bold text-slate-950">
+              {loading ? "—" : (counts?.pending_withdrawals ?? 0).toLocaleString()}
+            </p>
+            <p className="mt-1 text-xs text-slate-400">
+              {loading ? "—" : formatMoney(counts?.pending_withdrawal_amount)} pending
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Affiliate Clicks</p>
+            <p className="mt-2 text-2xl font-bold text-slate-950">
+              {loading ? "—" : (counts?.clicks ?? 0).toLocaleString()}
+            </p>
+            <p className="mt-1 text-xs text-slate-400">Tracked marketplace clicks</p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Commission Value</p>
+            <p className="mt-2 text-2xl font-bold text-slate-950">
+              {loading ? "—" : formatMoney(counts?.commission_amount)}
+            </p>
+            <p className="mt-1 text-xs text-slate-400">Recorded commission amount</p>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-bold text-slate-950">Sales Overview</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Daily sales and revenue from the NewVelion platform.
+              </p>
+            </div>
+            <BarChart3 className="h-5 w-5 text-slate-400" />
+          </div>
+
+          <div className="mt-6">
+            {loading ? (
+              <div className="h-56 animate-pulse rounded-xl bg-slate-100" />
+            ) : stats?.salesByDay?.length ? (
+              <div className="overflow-x-auto">
+                <div className="min-w-[620px]">
+                  <div className="flex h-56 items-end gap-2 border-b border-l border-slate-200 px-3 pb-0 pt-4">
+                    {stats.salesByDay.slice(-14).map((day) => {
+                      const maxRevenue = Math.max(
+                        ...stats.salesByDay.slice(-14).map((item) => item.revenue),
+                        1
+                      );
+                      const height = Math.max(
+                        8,
+                        Math.round((day.revenue / maxRevenue) * 100)
+                      );
+
+                      return (
+                        <div
+                          key={day.date}
+                          className="flex h-full flex-1 flex-col items-center justify-end gap-2"
+                          title={`${day.date}: ${formatMoney(day.revenue)} • ${day.sales} sales`}
+                        >
+                          <span className="text-[10px] font-semibold text-slate-500">
+                            {day.sales}
+                          </span>
+                          <div
+                            className="w-full max-w-10 rounded-t-lg bg-slate-900 transition-all"
+                            style={{ height: `${height}%` }}
+                          />
+                          <span className="text-[9px] text-slate-400">
+                            {day.date.slice(5)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex h-56 items-center justify-center rounded-xl border border-dashed border-slate-200 text-sm text-slate-400">
+                No sales data available yet.
+              </div>
+            )}
+          </div>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">

@@ -196,33 +196,104 @@ export type AdminStats = {
     disputes: number;
     kyc_submissions: number;
     analytics_events: number;
+    sellers: number;
+    suppliers: number;
+    active_products: number;
+    pending_products: number;
+    revenue: number;
+    commission_amount: number;
+    pending_withdrawals: number;
+    pending_withdrawal_amount: number;
+    clicks: number;
   };
+  salesByDay: Array<{
+    date: string;
+    sales: number;
+    revenue: number;
+  }>;
 };
 
 export async function getAdminStats(): Promise<AdminStats> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   if (!session?.access_token) {
     throw new Error("Authentication required.");
   }
 
-  const response = await fetch(
-    `${API_URL}/admin/stats`,
-    {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      cache: "no-store",
-    }
-  );
+  const response = await fetch(`${API_URL}/admin/stats`, {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      apikey: API_KEY || "",
+    },
+    cache: "no-store",
+  });
 
-  const payload = await response.json();
+  const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(payload?.error || "Failed to load admin statistics.");
+    throw new Error(
+      payload?.error || "Failed to load admin statistics."
+    );
   }
 
-  return payload;
+  const totals = payload?.data?.totals ?? {};
+  const counts = payload?.counts ?? {};
+
+  return {
+    counts: {
+      profiles: Number(totals.users ?? counts.profiles ?? 0),
+      products: Number(totals.products ?? counts.products ?? 0),
+      sales: Number(totals.sales ?? counts.sales ?? 0),
+      commissions: Number(
+        totals.commissions ?? counts.commissions ?? 0
+      ),
+      withdrawals: Number(
+        totals.withdrawalsPending ?? counts.withdrawals ?? 0
+      ),
+      disputes: Number(
+        totals.disputesOpen ?? counts.disputes ?? 0
+      ),
+      kyc_submissions: Number(
+        totals.kycPending ?? counts.kyc_submissions ?? 0
+      ),
+      analytics_events: Number(
+        totals.clicks ?? counts.analytics_events ?? 0
+      ),
+      sellers: Number(totals.sellers ?? counts.sellers ?? 0),
+      suppliers: Number(totals.suppliers ?? counts.suppliers ?? 0),
+      active_products: Number(
+        totals.activeProducts ?? counts.active_products ?? 0
+      ),
+      pending_products: Number(
+        totals.pendingProducts ?? counts.pending_products ?? 0
+      ),
+      revenue: Number(totals.revenue ?? counts.revenue ?? 0),
+      commission_amount: Number(
+        totals.commissionAmount ??
+          totals.commission_amount ??
+          counts.commission_amount ??
+          0
+      ),
+      pending_withdrawals: Number(
+        totals.withdrawalsPending ?? counts.pending_withdrawals ?? 0
+      ),
+      pending_withdrawal_amount: Number(
+        totals.withdrawalAmountPending ??
+          counts.pending_withdrawal_amount ??
+          0
+      ),
+      clicks: Number(totals.clicks ?? counts.clicks ?? 0),
+    },
+    salesByDay: Array.isArray(payload?.data?.salesByDay)
+      ? payload.data.salesByDay.map((item: any) => ({
+          date: String(item?.date ?? ""),
+          sales: Number(item?.sales ?? 0),
+          revenue: Number(item?.revenue ?? 0),
+        }))
+      : [],
+  };
 }
 
 export type AdminUser = {
