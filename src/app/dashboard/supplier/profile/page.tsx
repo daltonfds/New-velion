@@ -328,8 +328,8 @@ export default function SupplierCompanyProfilePage() {
 
               <Field
                 label="Website"
-                type="url"
-                placeholder="https://"
+                type="text"
+                placeholder="https://example.com"
                 value={form.website}
                 onChange={(v) => update("website", v)}
               />
