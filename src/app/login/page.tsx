@@ -13,7 +13,6 @@ function LoginPageContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [resending, setResending] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -51,32 +50,6 @@ function LoginPageContent() {
     router.refresh();
   }
 
-  async function resendConfirmation() {
-    if (!email.trim()) {
-      setError("Enter your email address first.");
-      return;
-    }
-
-    setError("");
-    setSuccess("");
-    setResending(true);
-
-    const { error: resendError } = await supabase.auth.resend({
-      type: "signup",
-      email: email.trim(),
-    });
-
-    setResending(false);
-
-    if (resendError) {
-      setError(resendError.message);
-      return;
-    }
-
-    setSuccess(
-      "Confirmation email sent. Check your inbox and spam folder."
-    );
-  }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-white px-5 py-10">
@@ -147,17 +120,6 @@ function LoginPageContent() {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
-
-          <button
-            type="button"
-            onClick={resendConfirmation}
-            disabled={resending}
-            className="mt-4 w-full text-sm font-semibold text-blue-600 transition hover:text-blue-700 disabled:opacity-60"
-          >
-            {resending
-              ? "Sending confirmation..."
-              : "Resend confirmation email"}
-          </button>
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Don't have an account?{" "}
