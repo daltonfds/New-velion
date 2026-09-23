@@ -42,9 +42,10 @@ function LoginPageContent() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5 py-10">
       <div className="w-full max-w-md">
-        <NewvelionBrand />
-
-        <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-8">
+        <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-8">
+          <div className="mb-8 flex justify-center border-b border-slate-100 pb-7">
+            <NewvelionBrand size="md" />
+          </div>
           <h1 className="text-3xl font-bold text-[#16294F]">
             Welcome back
           </h1>

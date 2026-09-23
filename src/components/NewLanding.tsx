@@ -98,7 +98,7 @@ export default function NewLanding() {
                   </Link>
 
                   <Link
-                    href="/apply/seller"
+                    href="/register"
                     onClick={() => setMenuOpen(false)}
                     className="rounded-full bg-[#C99A2E] px-6 py-4 text-center font-semibold text-[#16294F]"
                   >
@@ -177,7 +177,7 @@ export default function NewLanding() {
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/apply/seller"
+                href="/register"
                 className="inline-flex items-center justify-center rounded-full bg-[#16294F] px-7 py-4 font-semibold text-white transition hover:bg-[#213b6b]"
               >
                 Start Selling
@@ -308,7 +308,7 @@ export default function NewLanding() {
             </p>
 
             <Link
-              href="/apply/seller"
+              href="/register"
               className="mt-8 inline-flex rounded-full bg-[#16294F] px-7 py-4 font-semibold text-white"
             >
               Start Selling
@@ -449,7 +449,7 @@ export default function NewLanding() {
 
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
-              href="/apply/seller"
+              href="/register"
               className="rounded-full bg-[#16294F] px-8 py-4 font-semibold text-white"
             >
               Start Selling
@@ -501,7 +501,7 @@ export default function NewLanding() {
                 <Link href="/login" className="block hover:text-white">
                   Sign In
                 </Link>
-                <Link href="/apply/seller" className="block hover:text-white">
+                <Link href="/register" className="block hover:text-white">
                   Start Selling
                 </Link>
                 <Link

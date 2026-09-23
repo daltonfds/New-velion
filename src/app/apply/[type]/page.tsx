@@ -74,7 +74,11 @@ export default function ApplyPage() {
         <div className="max-w-lg text-center">
           <NewvelionBrand />
 
-          <div className="mt-12 rounded-3xl border border-[#16294F]/10 p-8">
+          <div className="mt-2 rounded-3xl border border-[#16294F]/10 bg-white p-8 shadow-sm">
+            <div className="mb-7 flex justify-center border-b border-slate-100 pb-7">
+              <NewvelionBrand size="md" />
+            </div>
+
             <h1 className="text-3xl font-bold text-[#16294F]">
               Application received
             </h1>
@@ -100,9 +104,10 @@ export default function ApplyPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-10">
       <div className="mx-auto max-w-xl">
-        <NewvelionBrand />
-
-        <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="mb-8 flex justify-center border-b border-slate-100 pb-7">
+            <NewvelionBrand size="md" />
+          </div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#8A8570]">
             Partner application
           </p>

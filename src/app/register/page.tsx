@@ -72,9 +72,11 @@ export default function RegisterPage() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-white px-5">
         <div className="w-full max-w-md text-center">
-          <NewvelionBrand />
+          <div className="mt-2 rounded-3xl border border-[#16294F]/10 bg-white p-8 shadow-sm">
+            <div className="mb-7 flex justify-center border-b border-slate-100 pb-7">
+              <NewvelionBrand size="md" />
+            </div>
 
-          <div className="mt-12 rounded-3xl border border-[#16294F]/10 p-8">
             <h1 className="text-2xl font-bold text-[#16294F]">
               Check your email
             </h1>
@@ -99,9 +101,10 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-10">
       <div className="mx-auto w-full max-w-xl">
-        <NewvelionBrand />
-
-        <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="mb-8 flex justify-center border-b border-slate-100 pb-7">
+            <NewvelionBrand size="md" />
+          </div>
           <h1 className="text-3xl font-bold text-[#16294F]">
             Create your seller account
           </h1>
