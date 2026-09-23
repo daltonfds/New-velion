@@ -9,7 +9,7 @@ export default function SupplierOrdersPage() {
       area="supplier"
       activeKey="orders"
       title="Orders"
-      subtitle="Live supplier orders from the platform."
+      subtitle="Your supplier orders and activity."
       loader={getSupplierOrders}
       columns={[
         "id",

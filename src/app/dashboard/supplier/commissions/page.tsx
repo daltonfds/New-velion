@@ -9,7 +9,7 @@ export default function SupplierCommissionsPage() {
       area="supplier"
       activeKey="commissions"
       title="Commissions"
-      subtitle="Live commission records connected to sales."
+      subtitle="Commission activity from your sales."
       loader={getSupplierCommissions}
       columns={[
         "id",

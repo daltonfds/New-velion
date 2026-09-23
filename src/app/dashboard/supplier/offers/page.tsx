@@ -9,7 +9,7 @@ export default function SupplierOffersPage() {
       area="supplier"
       activeKey="offers"
       title="Offers"
-      subtitle="Live supplier offers and promotions."
+      subtitle="Manage your supplier offers and promotions."
       loader={getSupplierOffers}
     />
   );

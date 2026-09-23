@@ -194,7 +194,7 @@ export default function AdminDashboardPage() {
           <div>
             <h2 className="font-bold text-slate-950">Platform operations</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Live records currently stored in NewVelion.
+              Records currently stored in NewVelion.
             </p>
           </div>
 

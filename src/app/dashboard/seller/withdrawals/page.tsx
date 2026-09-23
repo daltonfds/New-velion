@@ -9,7 +9,7 @@ export default function SellerWithdrawalsPage() {
       area="seller"
       activeKey="withdrawals"
       title="Withdrawals"
-      subtitle="Live wallet withdrawal records."
+      subtitle="Manage your wallet withdrawals."
       loader={getFinanceWithdrawals}
     />
   );

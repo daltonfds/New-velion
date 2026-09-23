@@ -9,7 +9,7 @@ export default function SupplierDashboardPage() {
       area="supplier"
       activeKey="dashboard"
       title="Supplier Dashboard"
-      subtitle="Live supplier metrics from NewVelion."
+      subtitle="Your supplier metrics and activity."
       loader={getSupplierMetrics}
     />
   );

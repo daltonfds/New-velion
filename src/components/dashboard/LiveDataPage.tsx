@@ -126,7 +126,7 @@ export default function LiveDataPage({
       <div className="space-y-6">
         <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-slate-500">Live records</p>
+            <p className="text-sm font-medium text-slate-500">Records</p>
             <p className="mt-1 text-2xl font-bold text-slate-950">
               {rows.length}
             </p>

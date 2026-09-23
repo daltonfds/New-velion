@@ -9,7 +9,7 @@ export default function SupplierWithdrawalsPage() {
       area="supplier"
       activeKey="withdrawals"
       title="Withdrawals"
-      subtitle="Live supplier wallet withdrawal records."
+      subtitle="Manage your supplier withdrawals."
       loader={getSupplierWithdrawals}
       columns={[
         "id",

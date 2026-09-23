@@ -9,7 +9,7 @@ export default function SupplierPricesPage() {
       area="supplier"
       activeKey="prices"
       title="Prices"
-      subtitle="Live supplier product pricing."
+      subtitle="Manage your supplier product pricing."
       loader={getSupplierProducts}
       columns={[
         "id",

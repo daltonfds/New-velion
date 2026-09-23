@@ -99,7 +99,7 @@ export default function AdminSuppliersPage() {
             </h1>
 
             <p className="mt-1 text-sm text-slate-500">
-              Live supplier accounts from the database.
+              Supplier accounts on the platform.
             </p>
           </div>
 
@@ -194,7 +194,7 @@ export default function AdminSuppliersPage() {
               </h3>
 
               <p className="mt-1 text-sm text-slate-500">
-                No live supplier accounts match your filters.
+                No supplier accounts match your filters.
               </p>
             </div>
           ) : (

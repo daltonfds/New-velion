@@ -169,7 +169,7 @@ export default function AdminCommissionsPage() {
             </h1>
 
             <p className="mt-1 text-sm text-slate-500">
-              Live affiliate commission records from the database.
+              Your affiliate commission activity.
             </p>
           </div>
 
@@ -273,7 +273,7 @@ export default function AdminCommissionsPage() {
               </h3>
 
               <p className="mt-1 text-sm text-slate-500">
-                No live commissions match your filters.
+                No commissions match your filters.
               </p>
             </div>
           ) : (

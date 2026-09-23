@@ -87,7 +87,7 @@ export default function AdminCategoriesPage() {
             </h1>
 
             <p className="mt-1 text-sm text-slate-500">
-              Live marketplace categories from the database.
+              Marketplace categories.
             </p>
           </div>
 
@@ -159,7 +159,7 @@ export default function AdminCategoriesPage() {
                 No categories found
               </h3>
               <p className="mt-1 text-sm text-slate-500">
-                No live categories match your search.
+                No categories match your search.
               </p>
             </div>
           ) : (

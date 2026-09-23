@@ -9,7 +9,7 @@ export default function SupplierMetricsPage() {
       area="supplier"
       activeKey="metrics"
       title="Metrics"
-      subtitle="Live supplier performance metrics."
+      subtitle="Your supplier performance metrics."
       loader={getSupplierMetrics}
     />
   );

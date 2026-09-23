@@ -169,7 +169,7 @@ export default function AdminTransactionsPage() {
             </h1>
 
             <p className="mt-1 text-sm text-slate-500">
-              Live financial transactions from the database.
+              Financial transactions.
             </p>
           </div>
 
@@ -288,7 +288,7 @@ export default function AdminTransactionsPage() {
               </h3>
 
               <p className="mt-1 text-sm text-slate-500">
-                No live transactions match your filters.
+                No transactions match your filters.
               </p>
             </div>
           ) : (

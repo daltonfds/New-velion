@@ -79,7 +79,7 @@ export default function AdminSellersPage() {
             </Link>
             <h1 className="text-2xl font-bold text-slate-950">Sellers</h1>
             <p className="mt-1 text-sm text-slate-500">
-              Live seller accounts from the database.
+              Seller accounts on the platform.
             </p>
           </div>
 
@@ -159,7 +159,7 @@ export default function AdminSellersPage() {
                 No sellers found
               </h3>
               <p className="mt-1 text-sm text-slate-500">
-                No live seller accounts match your filters.
+                No seller accounts match your filters.
               </p>
             </div>
           ) : (
