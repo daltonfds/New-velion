@@ -423,7 +423,7 @@ export default function NewSupplierProductsPage() {
               description_pt:
                 product.description.trim() || null,
               price: Number(product.price),
-              currency: "USD",
+              currency: "ZAR",
               commission_percentage:
                 Number(product.commission),
               checkout_url:
@@ -431,6 +431,7 @@ export default function NewSupplierProductsPage() {
               stock: Number(product.stock),
               featured: false,
               offer: false,
+              status: "active",
             })
             .select("id")
             .single();
