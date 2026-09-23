@@ -572,6 +572,11 @@ export async function getAffiliateProducts() {
   return Array.isArray(payload) ? payload : payload?.data || [];
 }
 
+export async function getAvailableAffiliateProducts() {
+  const payload = await protectedApi("/marketplace/products");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
 
 export async function getFinanceWithdrawals() {
   const payload = await protectedApi("/finance/withdrawals");
