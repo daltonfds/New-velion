@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowUpDown,
   ChevronDown,
@@ -16,8 +17,10 @@ import {
 import {
   getMarketplaceCategories,
   getMarketplaceProducts,
+  selectAffiliateProduct,
   type MarketplaceProduct,
 } from "@/lib/newvelion-api";
+import { supabase } from "@/lib/supabase";
 
 type SortOption = "popular" | "commission" | "newest" | "price";
 
@@ -53,6 +56,38 @@ function commissionAmount(product: MarketplaceProduct) {
 }
 
 export default function MarketplacePage() {
+  const router = useRouter();
+  const [affiliateLoading, setAffiliateLoading] = useState<string | null>(null);
+
+  async function handleAffiliate(product: MarketplaceProduct) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.push(
+        `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
+      );
+      return;
+    }
+
+    setAffiliateLoading(product.id);
+
+    try {
+      await selectAffiliateProduct({
+        productId: product.id,
+        token: session.access_token,
+      });
+
+      router.push(`/marketplace/products/${product.slug}`);
+    } catch (error) {
+      console.error("Affiliate product selection failed:", error);
+      alert("Unable to select this product for affiliate promotion.");
+    } finally {
+      setAffiliateLoading(null);
+    }
+  }
+
   const [products, setProducts] = useState<MarketplaceProduct[]>([]);
   const [categories, setCategories] = useState<string[]>([
     "All Categories",
@@ -458,23 +493,16 @@ export default function MarketplacePage() {
                         View Product
                       </a>
 
-                      <a
-                        href={product.checkout_url || "#"}
-                        target={product.checkout_url ? "_blank" : undefined}
-                        rel={
-                          product.checkout_url
-                            ? "noopener noreferrer"
-                            : undefined
-                        }
-                        className={`flex-1 rounded-xl px-4 py-2.5 text-center text-sm font-semibold text-white transition ${
-                          product.checkout_url
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : "cursor-not-allowed bg-slate-300"
-                        }`}
-                        aria-disabled={!product.checkout_url}
+                      <button
+                        type="button"
+                        onClick={() => handleAffiliate(product)}
+                        disabled={affiliateLoading === product.id}
+                        className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        Affiliate
-                      </a>
+                        {affiliateLoading === product.id
+                          ? "Selecting..."
+                          : "Affiliate"}
+                      </button>
                     </div>
                   </div>
                 </>
