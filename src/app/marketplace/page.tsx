@@ -24,7 +24,7 @@ import { supabase } from "@/lib/supabase";
 
 type SortOption = "popular" | "commission" | "newest" | "price";
 
-function money(value: number | null | undefined, currency = "USD") {
+function money(value: number | null | undefined, currency = "ZAR") {
   if (value == null) return "—";
 
   return new Intl.NumberFormat("en-US", {
@@ -447,14 +447,14 @@ export default function MarketplacePage() {
                         </p>
                         <div className="mt-1 flex items-center gap-2">
                           <span className="text-base font-bold text-slate-900">
-                            {money(price, product.currency || "USD")}
+                            {money(price, product.currency || "ZAR")}
                           </span>
                           {originalPrice &&
                             originalPrice > price && (
                               <span className="text-xs text-slate-400 line-through">
                                 {money(
                                   originalPrice,
-                                  product.currency || "USD",
+                                  product.currency || "ZAR",
                                 )}
                               </span>
                             )}
@@ -478,7 +478,7 @@ export default function MarketplacePage() {
                       </span>
 
                       <span className="font-semibold text-emerald-600">
-                        Earn {money(earnings, product.currency || "USD")}
+                        Earn {money(earnings, product.currency || "ZAR")}
                       </span>
                     </div>
 

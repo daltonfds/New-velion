@@ -56,7 +56,7 @@ type Product = {
   }>;
 };
 
-function money(value: number | null | undefined, currency = "USD") {
+function money(value: number | null | undefined, currency = "ZAR") {
   if (value == null) return "—";
 
   return new Intl.NumberFormat("en-US", {
@@ -378,12 +378,12 @@ export default function ProductPage({
 
               <div className="mt-6 flex items-end gap-3">
                 <span className="text-3xl font-bold text-slate-900">
-                  {money(price, product.currency || "USD")}
+                  {money(price, product.currency || "ZAR")}
                 </span>
 
                 {originalPrice && originalPrice > price && (
                   <span className="mb-1 text-sm text-slate-400 line-through">
-                    {money(originalPrice, product.currency || "USD")}
+                    {money(originalPrice, product.currency || "ZAR")}
                   </span>
                 )}
               </div>
@@ -402,7 +402,7 @@ export default function ProductPage({
                       {commission.toFixed(0)}%
                     </p>
                     <p className="mt-1 text-xs text-blue-600">
-                      per approved sale
+                      per sale
                     </p>
                   </div>
 
@@ -410,7 +410,7 @@ export default function ProductPage({
                     <p className="text-lg font-bold text-emerald-600">
                       {money(
                         commissionAmount,
-                        product.currency || "USD",
+                        product.currency || "ZAR",
                       )}
                     </p>
                     <p className="text-xs text-slate-500">
