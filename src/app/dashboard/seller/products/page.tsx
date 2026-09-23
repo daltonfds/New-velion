@@ -32,7 +32,7 @@ export default function SellerProductsPage() {
       setMessage("");
 
       const [marketplace, mine] = await Promise.all([
-        getAvailableAffiliateProducts({ limit: 100 }),
+        getAvailableAffiliateProducts(),
         getAffiliateProducts(),
       ]);
 
