@@ -207,7 +207,7 @@ export async function getAdminStats(): Promise<AdminStats> {
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/stats`,
+    `${API_URL}/admin/stats`,
     {
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -243,7 +243,7 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/users`,
+    `${API_URL}/admin/users`,
     {
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -275,7 +275,7 @@ export async function getAdminSellers(): Promise<AdminSeller[]> {
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/sellers`,
+    `${API_URL}/admin/sellers`,
     {
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -307,7 +307,7 @@ export async function getAdminSuppliers(): Promise<AdminSupplier[]> {
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/suppliers`,
+    `${API_URL}/admin/suppliers`,
     {
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -344,7 +344,7 @@ export async function getAdminCategories(): Promise<AdminCategory[]> {
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/categories`,
+    `${API_URL}/admin/categories`,
     {
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -384,7 +384,7 @@ export async function getAdminTransactions(): Promise<AdminTransaction[]> {
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/transactions`,
+    `${API_URL}/admin/transactions`,
     {
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -426,7 +426,7 @@ export async function getAdminCommissions(): Promise<AdminCommission[]> {
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}/admin/commissions`,
+    `${API_URL}/admin/commissions`,
     {
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -459,7 +459,7 @@ async function protectedApi(path: string, options: RequestInit = {}) {
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_NEWVELION_API_URL}${path}`,
+    `${API_URL}${path}`,
     {
       ...options,
       headers: {
