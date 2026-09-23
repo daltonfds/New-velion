@@ -552,7 +552,7 @@ async function protectedApi(path: string, options: RequestInit = {}) {
 }
 
 export async function getAdminProducts() {
-  const payload = await protectedApi("/marketplace/products?limit=100");
+  const payload = await protectedApi("/admin/products");
   return Array.isArray(payload) ? payload : payload?.data || [];
 }
 
