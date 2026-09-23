@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
+import ProfileCompletionGuard from "@/components/profile/ProfileCompletionGuard";
 import Link from "next/link";
 import {
   BarChart3,
@@ -182,6 +183,7 @@ export default function DashboardShell({
 
   return (
     <div className="min-h-screen bg-[#f6f8fc] text-slate-900">
+      <ProfileCompletionGuard />
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-[270px] border-r border-slate-200 bg-white transition-transform duration-200 lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
@@ -234,10 +236,13 @@ export default function DashboardShell({
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 p-4">
-          <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100">
+          <Link
+            href="/dashboard/profile"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
+          >
             <Settings size={18} />
             {t.settings}
-          </button>
+          </Link>
 
           <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100">
             <LogOut size={18} />
