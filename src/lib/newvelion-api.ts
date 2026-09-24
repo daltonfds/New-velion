@@ -762,6 +762,23 @@ export async function getAvailableAffiliateProducts() {
 }
 
 
+export async function createSellerWithdrawal(params: {
+  amount: number;
+  paymentMethodId: string;
+}) {
+  return protectedApi("/finance/withdrawals", {
+    method: "POST",
+    body: JSON.stringify({
+      amount: params.amount,
+      payment_method_id: params.paymentMethodId,
+    }),
+  });
+}
+
+export async function getSellerSettings() {
+  return protectedApi("/seller-settings/settings");
+}
+
 export async function getFinanceWithdrawals() {
   const payload = await protectedApi("/finance/withdrawals");
   return Array.isArray(payload) ? payload : payload?.data || [];
