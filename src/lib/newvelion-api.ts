@@ -741,6 +741,11 @@ export async function getAffiliateConversions() {
   return Array.isArray(payload) ? payload : payload?.data || [];
 }
 
+export async function getAffiliateCommissions() {
+  const payload = await protectedApi("/finance/commissions");
+  return Array.isArray(payload) ? payload : payload?.data || [];
+}
+
 export async function getAffiliateReports() {
   const payload = await protectedApi("/affiliate/reports");
   return Array.isArray(payload) ? payload : payload?.data || [];
