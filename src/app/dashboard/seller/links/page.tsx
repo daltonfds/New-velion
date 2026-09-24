@@ -217,7 +217,7 @@ export default function SellerLinksPage() {
         <div className="mx-auto max-w-7xl space-y-6">
 
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <div className="relative p-6 md:p-8">
+            <div className="relative bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-6 md:p-8">
               <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-blue-100/60 blur-3xl" />
 
               <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -227,14 +227,15 @@ export default function SellerLinksPage() {
                     Affiliate link center
                   </div>
 
-                  <h1 className="text-2xl font-bold tracking-tight text-slate-950 md:text-3xl">
+                  <h1 className="bg-gradient-to-r from-blue-700 via-indigo-700 to-violet-700 bg-clip-text text-2xl font-bold tracking-tight text-transparent md:text-3xl">
                     Sales Links
                   </h1>
 
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 md:text-base">
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-indigo-700/80 md:text-base">
                     Your product and checkout links are connected to your
-                    referral code so clicks, conversions, sales and commissions
-                    can be attributed to your account.
+                    <span className="font-semibold text-indigo-700"> referral code</span>,
+                    so clicks, conversions, sales and commissions can be attributed
+                    to your account.
                   </p>
                 </div>
 
@@ -710,12 +711,14 @@ function InfoCard({
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 inline-flex rounded-xl bg-slate-100 p-2.5">
-        <Icon className="h-5 w-5 text-slate-700" />
+      <div className="mb-4 inline-flex rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 shadow-md shadow-blue-200">
+        <Icon className="h-5 w-5 text-white" />
       </div>
 
-      <h3 className="font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-slate-500">{text}</p>
+      <h3 className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-700">
+        {title}
+      </h3>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
     </div>
   );
 }
