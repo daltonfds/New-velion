@@ -306,7 +306,7 @@ export default function SellerMyProductsPage() {
                       </div>
                     </div>
 
-                    <div className="w-full rounded-2xl bg-gray-50 p-4 lg:max-w-sm">
+                    <div className="w-full rounded-2xl border border-gray-100 bg-gray-50 p-4 lg:max-w-sm">
                       <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                         Supplier / Producer
                       </p>
@@ -346,13 +346,43 @@ export default function SellerMyProductsPage() {
                         </div>
                       </div>
 
-                      {supplier?.company_type && (
+                      <div className="mt-4 grid grid-cols-2 gap-2">
+                        <div className="rounded-xl border border-gray-100 bg-white p-3">
+                          <p className="text-[11px] text-gray-400">Type</p>
+                          <p className="mt-1 truncate text-xs font-semibold capitalize text-gray-800">
+                            {supplier?.company_type || "Supplier"}
+                          </p>
+                        </div>
+                        <div className="rounded-xl border border-gray-100 bg-white p-3">
+                          <p className="text-[11px] text-gray-400">Verification</p>
+                          <p className="mt-1 truncate text-xs font-semibold capitalize text-gray-800">
+                            {supplier?.verification_status || "Pending"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {supplier?.full_name && supplier.full_name !== supplierName && (
                         <p className="mt-3 text-xs text-gray-500">
-                          Type:{" "}
-                          <span className="font-semibold capitalize text-gray-700">
-                            {supplier.company_type}
-                          </span>
+                          Contact: <span className="font-semibold text-gray-700">{supplier.full_name}</span>
                         </p>
+                      )}
+
+                      {supplier?.description && (
+                        <p className="mt-3 line-clamp-2 text-xs leading-5 text-gray-500">
+                          {supplier.description}
+                        </p>
+                      )}
+
+                      {supplier?.website && (
+                        <a
+                          href={supplier.website}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#3B2FE0] hover:underline"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          Visit supplier website
+                        </a>
                       )}
                     </div>
 
