@@ -39,6 +39,11 @@ type Product = {
   image_url?: string | null;
   price?: number | null;
   currency?: string | null;
+  commission_percentage?: number | null;
+  total_clicks?: number | null;
+  total_conversions?: number | null;
+  total_sales?: number | null;
+  total_commission?: number | null;
   status?: string;
   supplier?: Supplier;
 };
@@ -51,6 +56,7 @@ type AffiliateProduct = {
   status?: string;
   product_page_url?: string;
   checkout_url?: string;
+  affiliate_link?: string;
   created_at?: string;
   product?: Product;
   supplier?: Supplier;
@@ -231,21 +237,72 @@ export default function SellerMyProductsPage() {
                         </p>
                       )}
 
-                      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-500">
-                        <span className="font-bold text-gray-900">
-                          {product.price != null
-                            ? `${product.currency || "ZAR"} ${Number(product.price).toLocaleString()}`
-                            : "Price unavailable"}
-                        </span>
+                      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <div className="rounded-xl bg-gray-50 p-3">
+                          <p className="text-xs text-gray-500">Price</p>
+                          <p className="mt-1 text-sm font-bold text-gray-900">
+                            {product.price != null
+                              ? `${product.currency || "ZAR"} ${Number(product.price).toLocaleString()}`
+                              : "Unavailable"}
+                          </p>
+                        </div>
 
-                        {item.referral_code && (
-                          <span>
-                            Referral:{" "}
-                            <span className="font-semibold text-gray-700">
-                              {item.referral_code}
-                            </span>
-                          </span>
-                        )}
+                        <div className="rounded-xl bg-gray-50 p-3">
+                          <p className="text-xs text-gray-500">Commission</p>
+                          <p className="mt-1 text-sm font-bold text-emerald-600">
+                            {product.commission_percentage != null
+                              ? `${Number(product.commission_percentage)}%`
+                              : "—"}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl bg-gray-50 p-3">
+                          <p className="text-xs text-gray-500">Conversions</p>
+                          <p className="mt-1 text-sm font-bold text-gray-900">
+                            {Number(product.total_conversions || 0)}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl bg-gray-50 p-3">
+                          <p className="text-xs text-gray-500">Sales</p>
+                          <p className="mt-1 text-sm font-bold text-gray-900">
+                            {Number(product.total_sales || 0)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <div>
+                          <p className="text-xs text-gray-400">Clicks</p>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {Number(product.total_clicks || 0)}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-400">Commission earned</p>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {product.total_commission != null
+                              ? `${product.currency || "ZAR"} ${Number(product.total_commission).toLocaleString()}`
+                              : "ZAR 0"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-400">Referral code</p>
+                          <p className="truncate text-sm font-semibold text-gray-800">
+                            {item.referral_code || "—"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-400">Added</p>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {item.created_at
+                              ? new Date(item.created_at).toLocaleDateString()
+                              : "—"}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
@@ -315,15 +372,41 @@ export default function SellerMyProductsPage() {
                         </a>
                       )}
 
-                      {item.checkout_url && (
+                      {(item.affiliate_link || item.referral_code) && (
                         <a
-                          href={item.checkout_url}
+                          href={
+                            item.affiliate_link ||
+                            `${window.location.origin}/go/${item.referral_code}`
+                          }
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3B2FE0] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#3125C4]"
                         >
                           Affiliate Link
                         </a>
+                      )}
+
+                      {item.checkout_url && (
+                        <a
+                          href={item.checkout_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                        >
+                          Checkout Link
+                        </a>
+                      )}
+
+                      {item.referral_code && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigator.clipboard.writeText(item.referral_code || "")
+                          }
+                          className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                        >
+                          Copy Referral
+                        </button>
                       )}
                     </div>
                   </div>
