@@ -43,7 +43,6 @@ const labels = {
     commissions: "Commissions",
     performance: "Clicks & Conversions",
     links: "Sales Links",
-    creatives: "Creatives",
     reports: "Reports",
     withdrawals: "Withdrawals",
     addProducts: "Add Products",
@@ -80,7 +79,6 @@ const labels = {
     commissions: "Comissões",
     performance: "Cliques e conversões",
     links: "Links de venda",
-    creatives: "Criativos",
     reports: "Relatórios",
     withdrawals: "Saques",
     addProducts: "Adicionar produtos",
@@ -123,7 +121,6 @@ const sellerItems: NavItem[] = [
   { key: "commissions", href: "/dashboard/seller/commissions", icon: CircleDollarSign },
   { key: "performance", href: "/dashboard/seller/performance", icon: BarChart3 },
   { key: "links", href: "/dashboard/seller/links", icon: Tags },
-  { key: "creatives", href: "/dashboard/seller/creatives", icon: FileText },
   { key: "reports", href: "/dashboard/seller/reports", icon: BarChart3 },
   { key: "withdrawals", href: "/dashboard/seller/withdrawals", icon: Wallet },
 ];
