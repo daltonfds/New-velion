@@ -121,7 +121,6 @@ const sellerItems: NavItem[] = [
   { key: "commissions", href: "/dashboard/seller/commissions", icon: CircleDollarSign },
   { key: "performance", href: "/dashboard/seller/performance", icon: BarChart3 },
   { key: "links", href: "/dashboard/seller/links", icon: Tags },
-  { key: "reports", href: "/dashboard/seller/reports", icon: BarChart3 },
   { key: "withdrawals", href: "/dashboard/seller/withdrawals", icon: Wallet },
 ];
 
