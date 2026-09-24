@@ -540,7 +540,7 @@ export type AdminDispute = Record<string, unknown>;
 export type AdminKyc = Record<string, unknown>;
 export type AdminAnalyticsEvent = Record<string, unknown>;
 
-async function protectedApi(path: string, options: RequestInit = {}) {
+export async function protectedApi(path: string, options: RequestInit = {}) {
   const {
     data: { session },
   } = await supabase.auth.getSession();
