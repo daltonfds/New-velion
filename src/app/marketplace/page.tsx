@@ -5,9 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowUpDown,
+  Check,
   ChevronDown,
   Filter,
   Grid3X3,
+  Heart,
   List,
   Search,
   Star,
@@ -27,7 +29,7 @@ type SortOption = "popular" | "commission" | "newest" | "price";
 function money(value: number | null | undefined, currency = "ZAR") {
   if (value == null) return "—";
 
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-ZA", {
     style: "currency",
     currency,
     maximumFractionDigits: 2,
@@ -58,6 +60,7 @@ function commissionAmount(product: MarketplaceProduct) {
 export default function MarketplacePage() {
   const router = useRouter();
   const [affiliateLoading, setAffiliateLoading] = useState<string | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
   async function handleAffiliate(product: MarketplaceProduct) {
     const {
@@ -78,6 +81,12 @@ export default function MarketplacePage() {
         productId: product.id,
         token: session.access_token,
       });
+
+      setSelectedProducts((current) =>
+        current.includes(product.id)
+          ? current
+          : [...current, product.id],
+      );
 
       router.push(`/marketplace/products/${product.slug}`);
     } catch (error) {
@@ -135,14 +144,21 @@ export default function MarketplacePage() {
           ...categoryData
             .map((item) => {
               if (typeof item === "string") return item;
+
               if (item && typeof item === "object") {
                 const category = item as {
                   name_en?: string;
                   name_pt?: string;
                   name?: string;
                 };
-                return category.name_en || category.name_pt || category.name;
+
+                return (
+                  category.name_en ||
+                  category.name_pt ||
+                  category.name
+                );
               }
+
               return undefined;
             })
             .filter(Boolean),
@@ -167,158 +183,243 @@ export default function MarketplacePage() {
     };
   }, [search, category, sort, featuredOnly, offersOnly]);
 
-  const visibleProducts = useMemo(() => {
-    return products;
-  }, [products]);
+  const visibleProducts = useMemo(() => products, [products]);
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-7">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="mb-2 text-sm font-semibold text-blue-600">
-                Newvelion Marketplace
-              </p>
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-                Find products to sell
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto max-w-[1500px] px-4 pb-12 pt-5 sm:px-6 lg:px-8">
+        <section className="overflow-hidden rounded-[30px] bg-[#3B2FE0] shadow-[0_20px_60px_rgba(59,47,224,0.18)]">
+          <div className="relative px-6 py-9 sm:px-10 sm:py-12 lg:px-14">
+            <div className="relative z-10 max-w-2xl">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white backdrop-blur">
+                <TrendingUp size={14} />
+                SELLER MARKETPLACE
+              </div>
+
+              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                Find products.
+                <br />
+                Start selling.
               </h1>
-              <p className="mt-2 max-w-2xl text-sm text-slate-500">
-                Discover products, check commission opportunities, and choose
-                offers that fit your business.
+
+              <p className="mt-4 max-w-xl text-sm leading-6 text-white/80 sm:text-base">
+                Discover active products from NewVelion suppliers, choose
+                offers with the right commission, and promote them through
+                your affiliate links.
               </p>
+
+              <div className="mt-7 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOffersOnly(false);
+                    setFeaturedOnly(true);
+                    window.scrollTo({ top: 500, behavior: "smooth" });
+                  }}
+                  className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#3B2FE0] transition hover:bg-white/90"
+                >
+                  Explore featured
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFeaturedOnly(false);
+                    setOffersOnly(true);
+                    window.scrollTo({ top: 500, behavior: "smooth" });
+                  }}
+                  className="rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur transition hover:bg-white/15"
+                >
+                  View offers
+                </button>
+              </div>
+            </div>
+
+            <div className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-36 right-20 h-72 w-72 rounded-full bg-indigo-300/20 blur-3xl" />
+          </div>
+        </section>
+
+        <section className="mt-7">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
+                Browse
+              </p>
+              <h2 className="mt-1 text-xl font-extrabold tracking-tight text-[#1A1A2E]">
+                Categories
+              </h2>
+            </div>
+
+            <div className="hidden text-sm text-[#9CA3AF] sm:block">
+              {loading ? "Loading..." : `${visibleProducts.length} products`}
+            </div>
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none]">
+            {categories.map((item) => {
+              const active = category === item;
+
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setCategory(item)}
+                  className={`shrink-0 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                    active
+                      ? "bg-[#3B2FE0] text-white shadow-sm"
+                      : "border border-[#e7e7ef] bg-white text-[#6B7280] hover:border-[#cfcdf7] hover:text-[#3B2FE0]"
+                  }`}
+                >
+                  {item}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-[24px] border border-[#ececf3] bg-[#F8F8FB] p-3 sm:p-4">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+            <div className="relative min-w-0 flex-1">
+              <Search
+                size={19}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
+              />
+
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Pesquisar produtos..."
+                className="h-12 w-full rounded-xl border border-[#e7e7ef] bg-white pl-11 pr-4 text-sm text-[#1A1A2E] outline-none transition placeholder:text-[#9CA3AF] focus:border-[#3B2FE0]"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <div className="relative min-w-0 flex-1 sm:min-w-[190px]">
+                <Filter
+                  size={17}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
+                />
+
+                <select
+                  value={category}
+                  onChange={(event) => setCategory(event.target.value)}
+                  className="h-12 w-full appearance-none rounded-xl border border-[#e7e7ef] bg-white pl-10 pr-10 text-sm font-medium text-[#4B5563] outline-none focus:border-[#3B2FE0]"
+                >
+                  {categories.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+
+                <ChevronDown
+                  size={17}
+                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
+                />
+              </div>
+
+              <div className="relative min-w-0 flex-1 sm:min-w-[190px]">
+                <ArrowUpDown
+                  size={17}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
+                />
+
+                <select
+                  value={sort}
+                  onChange={(event) =>
+                    setSort(event.target.value as SortOption)
+                  }
+                  className="h-12 w-full appearance-none rounded-xl border border-[#e7e7ef] bg-white pl-10 pr-10 text-sm font-medium text-[#4B5563] outline-none focus:border-[#3B2FE0]"
+                >
+                  <option value="popular">Most Popular</option>
+                  <option value="commission">Highest Commission</option>
+                  <option value="newest">Newest</option>
+                  <option value="price">Lowest Price</option>
+                </select>
+
+                <ChevronDown
+                  size={17}
+                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setView("grid")}
-                className={`rounded-xl border p-2.5 ${
-                  view === "grid"
-                    ? "border-blue-200 bg-blue-50 text-blue-600"
-                    : "border-slate-200 bg-white text-slate-500"
+                onClick={() => setFeaturedOnly((value) => !value)}
+                className={`rounded-xl px-4 py-2.5 text-sm font-bold transition ${
+                  featuredOnly
+                    ? "bg-[#3B2FE0] text-white"
+                    : "border border-[#e7e7ef] bg-white text-[#6B7280] hover:text-[#3B2FE0]"
                 }`}
-                aria-label="Grid view"
               >
-                <Grid3X3 size={18} />
+                Featured
               </button>
 
               <button
                 type="button"
-                onClick={() => setView("list")}
-                className={`rounded-xl border p-2.5 ${
-                  view === "list"
-                    ? "border-blue-200 bg-blue-50 text-blue-600"
-                    : "border-slate-200 bg-white text-slate-500"
+                onClick={() => setOffersOnly((value) => !value)}
+                className={`rounded-xl px-4 py-2.5 text-sm font-bold transition ${
+                  offersOnly
+                    ? "bg-[#3B2FE0] text-white"
+                    : "border border-[#e7e7ef] bg-white text-[#6B7280] hover:text-[#3B2FE0]"
                 }`}
-                aria-label="List view"
               >
-                <List size={18} />
+                Offers
               </button>
+
+              <div className="hidden items-center rounded-xl border border-[#e7e7ef] bg-white p-1 sm:flex">
+                <button
+                  type="button"
+                  onClick={() => setView("grid")}
+                  className={`rounded-lg p-2.5 ${
+                    view === "grid"
+                      ? "bg-[#F1EFFF] text-[#3B2FE0]"
+                      : "text-[#9CA3AF] hover:text-[#3B2FE0]"
+                  }`}
+                  aria-label="Grid view"
+                >
+                  <Grid3X3 size={17} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setView("list")}
+                  className={`rounded-lg p-2.5 ${
+                    view === "list"
+                      ? "bg-[#F1EFFF] text-[#3B2FE0]"
+                      : "text-[#9CA3AF] hover:text-[#3B2FE0]"
+                  }`}
+                  aria-label="List view"
+                >
+                  <List size={17} />
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex flex-col gap-3 xl:flex-row">
-            <div className="relative flex-1">
-              <Search
-                size={19}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search products..."
-                className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white"
-              />
-            </div>
-
-            <div className="relative min-w-[220px]">
-              <Filter
-                size={17}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <select
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
-                className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-10 text-sm text-slate-700 outline-none focus:border-blue-400 focus:bg-white"
-              >
-                {categories.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                size={17}
-                className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-            </div>
-
-            <div className="relative min-w-[190px]">
-              <ArrowUpDown
-                size={17}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <select
-                value={sort}
-                onChange={(event) =>
-                  setSort(event.target.value as SortOption)
-                }
-                className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-10 text-sm text-slate-700 outline-none focus:border-blue-400 focus:bg-white"
-              >
-                <option value="popular">Most Popular</option>
-                <option value="commission">Highest Commission</option>
-                <option value="newest">Newest</option>
-                <option value="price">Lowest Price</option>
-              </select>
-              <ChevronDown
-                size={17}
-                className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setFeaturedOnly((value) => !value)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                featuredOnly
-                  ? "bg-blue-600 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Featured
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setOffersOnly((value) => !value)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                offersOnly
-                  ? "bg-blue-600 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Offers
-            </button>
           </div>
         </section>
 
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 mt-8 flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-slate-900">
-              {loading
-                ? "Loading products..."
-                : `${visibleProducts.length} products available`}
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
+              Live marketplace
             </p>
+
+            <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-[#1A1A2E]">
+              Products to promote
+            </h2>
+
             {!loading && (
-              <p className="mt-1 text-xs text-slate-500">
-                Updated from the Newvelion marketplace
+              <p className="mt-1 text-sm text-[#9CA3AF]">
+                {visibleProducts.length} active products available
               </p>
             )}
+          </div>
+
+          <div className="text-sm font-medium text-[#9CA3AF] sm:hidden">
+            {loading ? "Loading..." : `${visibleProducts.length}`}
           </div>
         </div>
 
@@ -333,26 +434,29 @@ export default function MarketplacePage() {
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+                className="overflow-hidden rounded-[22px] border border-[#ececf3] bg-white"
               >
-                <div className="aspect-[16/9] animate-pulse bg-slate-100" />
+                <div className="aspect-[16/10] animate-pulse bg-[#F1F1F6]" />
                 <div className="space-y-3 p-5">
-                  <div className="h-5 w-3/4 animate-pulse rounded bg-slate-100" />
-                  <div className="h-4 w-full animate-pulse rounded bg-slate-100" />
-                  <div className="h-4 w-2/3 animate-pulse rounded bg-slate-100" />
+                  <div className="h-3 w-24 animate-pulse rounded bg-[#F1F1F6]" />
+                  <div className="h-6 w-3/4 animate-pulse rounded bg-[#F1F1F6]" />
+                  <div className="h-4 w-full animate-pulse rounded bg-[#F1F1F6]" />
+                  <div className="h-11 w-full animate-pulse rounded-xl bg-[#F1F1F6]" />
                 </div>
               </div>
             ))}
           </div>
         ) : visibleProducts.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+          <div className="rounded-[24px] border border-dashed border-[#dcdce8] bg-[#FAFAFC] px-6 py-20 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F1EFFF] text-[#3B2FE0]">
               <Search size={24} />
             </div>
-            <h2 className="text-lg font-semibold text-slate-900">
+
+            <h2 className="text-lg font-bold text-[#1A1A2E]">
               No products found
             </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+
+            <p className="mx-auto mt-2 max-w-md text-sm text-[#9CA3AF]">
               Try another search, category, or filter.
             </p>
           </div>
@@ -368,48 +472,65 @@ export default function MarketplacePage() {
               const price = Number(
                 product.offer_price ?? product.price ?? 0,
               );
+
               const originalPrice =
                 product.original_price != null
                   ? Number(product.original_price)
                   : null;
+
               const commission = Number(
                 product.commission_percentage ?? 0,
               );
+
               const earnings = commissionAmount(product);
+              const selected = selectedProducts.includes(product.id);
 
               const cardContent = (
                 <>
                   <div
                     className={
                       view === "grid"
-                        ? "relative aspect-[16/9] overflow-hidden bg-slate-100"
-                        : "relative h-40 w-56 shrink-0 overflow-hidden rounded-xl bg-slate-100"
+                        ? "relative aspect-[16/10] overflow-hidden bg-[#F1F1F6]"
+                        : "relative h-44 w-full shrink-0 overflow-hidden bg-[#F1F1F6] sm:w-56"
                     }
                   >
                     {product.image_url ? (
                       <Image
                         src={product.image_url}
                         alt={getProductName(product)}
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        fill
+                        className="object-cover transition duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100">
-                        <TrendingUp className="text-blue-200" size={42} />
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F1EFFF] to-[#F7F7FA]">
+                        <TrendingUp
+                          className="text-[#C9C5FF]"
+                          size={44}
+                        />
                       </div>
                     )}
 
                     <div className="absolute left-3 top-3 flex flex-wrap gap-2">
                       {product.featured && (
-                        <span className="rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white">
+                        <span className="rounded-full bg-[#3B2FE0] px-3 py-1 text-[11px] font-bold text-white shadow-sm">
                           Featured
                         </span>
                       )}
+
                       {product.offer && (
-                        <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] font-bold text-white">
-                          Offer
+                        <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-[#3B2FE0] shadow-sm">
+                          Special offer
                         </span>
                       )}
                     </div>
+
+                    <button
+                      type="button"
+                      aria-label="Save product"
+                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#6B7280] shadow-sm backdrop-blur transition hover:text-[#3B2FE0]"
+                    >
+                      <Heart size={17} />
+                    </button>
                   </div>
 
                   <div
@@ -420,64 +541,69 @@ export default function MarketplacePage() {
                     }
                   >
                     <div className="mb-2 flex items-center justify-between gap-3">
-                      <span className="truncate text-xs font-semibold uppercase tracking-wide text-blue-600">
+                      <span className="truncate text-[11px] font-bold uppercase tracking-[0.12em] text-[#3B2FE0]">
                         {product.categories?.name_en ||
                           product.categories?.name_pt ||
                           "Marketplace"}
                       </span>
 
-                      <div className="flex shrink-0 items-center gap-1 text-xs text-slate-400">
-                        <Star size={13} fill="currentColor" />
+                      <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-[#9CA3AF]">
+                        <Star
+                          size={13}
+                          fill="currentColor"
+                          className="text-[#F59E0B]"
+                        />
                         {product.total_sales || 0} sales
-                      </div>
+                      </span>
                     </div>
 
-                    <h2 className="line-clamp-2 text-lg font-bold text-slate-900">
+                    <h2 className="line-clamp-2 text-lg font-extrabold leading-6 text-[#1A1A2E]">
                       {getProductName(product)}
                     </h2>
 
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#9CA3AF]">
                       {getProductDescription(product)}
                     </p>
 
-                    <div className="mt-5 grid grid-cols-2 gap-3">
-                      <div className="rounded-xl bg-slate-50 p-3">
-                        <p className="text-[11px] font-medium text-slate-400">
+                    <div className="mt-5 flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-[11px] font-medium text-[#9CA3AF]">
                           Product price
                         </p>
+
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="text-base font-bold text-slate-900">
+                          <span className="text-lg font-extrabold text-[#1A1A2E]">
                             {money(price, product.currency || "ZAR")}
                           </span>
-                          {originalPrice &&
-                            originalPrice > price && (
-                              <span className="text-xs text-slate-400 line-through">
-                                {money(
-                                  originalPrice,
-                                  product.currency || "ZAR",
-                                )}
-                              </span>
-                            )}
+
+                          {originalPrice && originalPrice > price && (
+                            <span className="text-xs text-[#9CA3AF] line-through">
+                              {money(
+                                originalPrice,
+                                product.currency || "ZAR",
+                              )}
+                            </span>
+                          )}
                         </div>
                       </div>
 
-                      <div className="rounded-xl bg-blue-50 p-3">
-                        <p className="text-[11px] font-medium text-blue-500">
-                          Your commission
+                      <div className="text-right">
+                        <p className="text-[11px] font-medium text-[#9CA3AF]">
+                          Commission
                         </p>
-                        <p className="mt-1 text-base font-bold text-blue-700">
+                        <p className="mt-1 text-lg font-extrabold text-[#3B2FE0]">
                           {commission.toFixed(0)}%
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-                      <span className="flex items-center gap-1.5">
+                    <div className="mt-4 flex items-center justify-between border-t border-[#f0f0f5] pt-4 text-xs">
+                      <span className="flex items-center gap-1.5 text-[#9CA3AF]">
                         <Users size={14} />
                         {product.total_clicks || 0} clicks
                       </span>
 
-                      <span className="font-semibold text-emerald-600">
+                      <span className="font-bold text-emerald-600">
                         Earn {money(earnings, product.currency || "ZAR")}
                       </span>
                     </div>
@@ -488,22 +614,31 @@ export default function MarketplacePage() {
                           product.product_page_url ||
                           `/marketplace/products/${product.slug}`
                         }
-                        className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                        className="flex-1 rounded-xl border border-[#dedee8] px-4 py-3 text-center text-sm font-bold text-[#4B5563] transition hover:border-[#3B2FE0] hover:text-[#3B2FE0]"
                       >
-                        View Product
+                        View details
                       </a>
 
                       <button
                         type="button"
                         onClick={() => handleAffiliate(product)}
                         disabled={affiliateLoading === product.id}
-                        className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex-1 rounded-xl bg-[#3B2FE0] px-4 py-3 text-center text-sm font-bold text-white shadow-sm transition hover:bg-[#3025C0] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {affiliateLoading === product.id
                           ? "Selecting..."
-                          : "Affiliate"}
+                          : selected
+                            ? "Selected"
+                            : "Promote"}
                       </button>
                     </div>
+
+                    {selected && (
+                      <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-600">
+                        <Check size={14} />
+                        Added to your affiliate products
+                      </div>
+                    )}
                   </div>
                 </>
               );
@@ -511,10 +646,8 @@ export default function MarketplacePage() {
               return (
                 <article
                   key={product.id}
-                  className={`group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ${
-                    view === "list"
-                      ? "flex flex-col sm:flex-row"
-                      : ""
+                  className={`group overflow-hidden rounded-[22px] border border-[#ececf3] bg-white shadow-[0_4px_20px_rgba(26,26,46,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_14px_35px_rgba(26,26,46,0.10)] ${
+                    view === "list" ? "flex flex-col sm:flex-row" : ""
                   }`}
                 >
                   {cardContent}

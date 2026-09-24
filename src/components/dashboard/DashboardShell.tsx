@@ -7,6 +7,7 @@ import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import {
   BarChart3,
+  Bell,
   Boxes,
   ChevronDown,
   CircleDollarSign,
@@ -15,6 +16,7 @@ import {
   LogOut,
   Menu,
   Package,
+  Search,
   Settings,
   ShoppingCart,
   Tags,
@@ -187,11 +189,11 @@ export default function DashboardShell({
   const t = labels[lang];
 
   return (
-    <div className="min-h-screen bg-[#f6f8fc] text-slate-900">
+    <div className="min-h-screen bg-white text-[#1A1A2E]">
       <ProfileCompletionGuard />
       {area === "supplier" && <SupplierCompanyCompletionGuard />}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-[270px] border-r border-slate-200 bg-white transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-[270px] border-r border-[#ececf3] bg-white transition-transform duration-200 lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -210,7 +212,7 @@ export default function DashboardShell({
         </div>
 
         <div className="px-4 py-5">
-          <div className="mb-3 px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
+          <div className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#9CA3AF]">
             {t[areaNames[area]]}
           </div>
 
@@ -226,8 +228,8 @@ export default function DashboardShell({
                   onClick={() => setOpen(false)}
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                     active
-                      ? "bg-[#1769e0] text-white shadow-sm"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                      ? "bg-[#3B2FE0] text-white shadow-sm"
+                      : "text-[#6B7280] hover:bg-[#F5F6F8] hover:text-[#1A1A2E]"
                   }`}
                 >
                   <Icon size={18} strokeWidth={1.9} />
@@ -238,7 +240,20 @@ export default function DashboardShell({
           </nav>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 p-4">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-[#f0f0f5] p-4">
+          {area === "seller" && (
+            <div className="mb-3 rounded-2xl bg-[#F1EFFF] p-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#3B2FE0]">
+                NewVelion Pro
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[#6B7280]">
+                Unlock more tools to grow your affiliate business.
+              </p>
+              <button className="mt-3 w-full rounded-xl bg-[#3B2FE0] px-3 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-[#3025C0]">
+                View plans
+              </button>
+            </div>
+          )}
           <Link
             href="/dashboard/profile"
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
@@ -263,51 +278,73 @@ export default function DashboardShell({
       )}
 
       <div className="lg:pl-[270px]">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-30 flex min-h-20 items-center justify-between gap-4 border-b border-[#ececf3] bg-white/95 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setOpen(true)}
-              className="rounded-xl p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
+              className="rounded-xl p-2 text-[#6B7280] hover:bg-[#F5F6F8] lg:hidden"
               aria-label="Open menu"
             >
               <Menu size={22} />
             </button>
 
-            <div>
-              <h1 className="text-lg font-bold sm:text-xl">{title}</h1>
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-extrabold tracking-tight text-[#1A1A2E] sm:text-xl">
+                {title}
+              </h1>
               {subtitle && (
-                <p className="hidden text-sm text-slate-500 sm:block">{subtitle}</p>
+                <p className="hidden truncate text-sm text-[#9CA3AF] sm:block">
+                  {subtitle}
+                </p>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="hidden w-full max-w-md items-center rounded-xl border border-[#e7e7ef] bg-[#F5F6F8] px-3 md:flex">
+            <Search size={17} className="shrink-0 text-[#9CA3AF]" />
+            <input
+              aria-label="Pesquisar produtos"
+              placeholder="Pesquisar produtos..."
+              className="h-10 w-full bg-transparent px-2 text-sm text-[#1A1A2E] outline-none placeholder:text-[#9CA3AF]"
+            />
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <button
+              aria-label="Notifications"
+              className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-[#e7e7ef] bg-white text-[#6B7280] hover:bg-[#F5F6F8]"
+            >
+              <Bell size={19} />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
+            </button>
+
             <div className="relative">
               <button
                 onClick={() => setLanguageOpen((value) => !value)}
-                className="flex items-center gap-1 rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1 rounded-xl border border-[#e7e7ef] px-3 py-2 text-sm font-medium text-[#6B7280] hover:bg-[#F5F6F8]"
               >
                 {lang.toUpperCase()}
                 <ChevronDown size={15} />
               </button>
 
               {languageOpen && (
-                <div className="absolute right-0 mt-2 w-28 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg">
+                <div className="absolute right-0 mt-2 w-28 overflow-hidden rounded-xl border border-[#e7e7ef] bg-white p-1 shadow-lg">
                   <button
                     onClick={() => {
                       setLang("en");
                       setLanguageOpen(false);
                     }}
-                    className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100"
+                    className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-[#F5F6F8]"
                   >
                     English
                   </button>
+
                   <button
                     onClick={() => {
                       setLang("pt");
                       setLanguageOpen(false);
                     }}
-                    className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100"
+                    className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-[#F5F6F8]"
                   >
                     Português
                   </button>
@@ -315,7 +352,10 @@ export default function DashboardShell({
               )}
             </div>
 
-            <button className="hidden h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 sm:flex">
+            <button
+              aria-label="Profile"
+              className="hidden h-10 w-10 items-center justify-center rounded-full bg-[#3B2FE0] text-sm font-bold text-white sm:flex"
+            >
               D
             </button>
           </div>

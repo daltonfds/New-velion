@@ -124,56 +124,125 @@ export default function LiveDataPage({
       subtitle={subtitle}
     >
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-500">Total</p>
-            <p className="mt-1 text-2xl font-bold text-slate-950">
+        <section className="overflow-hidden rounded-[28px] bg-[#3B2FE0] p-6 text-white shadow-sm sm:p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">
+            NewVelion Seller
+          </p>
+
+          <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Welcome to NewVelion
+          </h2>
+
+          <p className="mt-3 max-w-xl text-sm leading-6 text-white/80 sm:text-base">
+            Discover products, promote offers, generate affiliate links and
+            grow your sales from one workspace.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="/marketplace"
+              className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#3B2FE0] hover:bg-white/90"
+            >
+              Explore marketplace
+            </a>
+
+            <a
+              href="/dashboard/seller/products"
+              className="rounded-xl border border-white/30 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
+            >
+              My products
+            </a>
+          </div>
+        </section>
+
+        <section className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-[#ececf3] bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-[#9CA3AF]">Live records</p>
+            <p className="mt-2 text-3xl font-extrabold text-[#1A1A2E]">
               {rows.length}
+            </p>
+            <p className="mt-1 text-xs text-[#9CA3AF]">
+              Live data from NewVelion
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search..."
-              className="h-10 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-500"
-            />
-
-            <button
-              onClick={() => void load()}
-              disabled={loading}
-              className="h-10 rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white disabled:opacity-50"
-            >
-              {loading ? "Loading..." : "Refresh"}
-            </button>
+          <div className="rounded-2xl border border-[#ececf3] bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-[#9CA3AF]">Workspace</p>
+            <p className="mt-2 text-3xl font-extrabold text-[#1A1A2E]">
+              Seller
+            </p>
+            <p className="mt-1 text-xs text-[#9CA3AF]">
+              Affiliate commerce
+            </p>
           </div>
-        </div>
 
-        {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
+          <div className="rounded-2xl border border-[#ececf3] bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-[#9CA3AF]">Currency</p>
+            <p className="mt-2 text-3xl font-extrabold text-[#1A1A2E]">
+              ZAR
+            </p>
+            <p className="mt-1 text-xs text-[#9CA3AF]">
+              South African Rand
+            </p>
           </div>
-        )}
+        </section>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <section className="rounded-[24px] border border-[#ececf3] bg-white shadow-sm">
+          <div className="flex flex-col gap-4 border-b border-[#f0f0f5] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
+                Live data
+              </p>
+
+              <h3 className="mt-1 text-xl font-extrabold text-[#1A1A2E]">
+                {title}
+              </h3>
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search..."
+                className="h-11 rounded-xl border border-[#e7e7ef] bg-[#F5F6F8] px-4 text-sm text-[#1A1A2E] outline-none focus:border-[#3B2FE0] focus:bg-white"
+              />
+
+              <button
+                onClick={() => void load()}
+                disabled={loading}
+                className="h-11 rounded-xl bg-[#3B2FE0] px-5 text-sm font-bold text-white hover:bg-[#3025C0] disabled:opacity-50"
+              >
+                {loading ? "Loading..." : "Refresh"}
+              </button>
+            </div>
+          </div>
+
+          {error && (
+            <div className="m-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
           {loading ? (
-            <div className="p-10 text-center text-sm text-slate-500">
+            <div className="p-12 text-center text-sm text-[#9CA3AF]">
               Loading live data...
             </div>
           ) : visibleRows.length === 0 ? (
-            <div className="p-10 text-center text-sm text-slate-500">
-              No data found.
+            <div className="p-12 text-center">
+              <p className="font-semibold text-[#1A1A2E]">No data found</p>
+              <p className="mt-1 text-sm text-[#9CA3AF]">
+                Your live Seller data will appear here.
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px] text-left text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50">
+                <thead className="border-b border-[#f0f0f5] bg-[#F8F8FB]">
                   <tr>
                     {keys.map((key) => (
                       <th
                         key={key}
-                        className="px-5 py-3 font-semibold text-slate-600"
+                        className="px-5 py-4 text-xs font-bold uppercase tracking-wide text-[#9CA3AF]"
                       >
                         {key.replaceAll("_", " ")}
                       </th>
@@ -185,12 +254,12 @@ export default function LiveDataPage({
                   {visibleRows.map((row, index) => (
                     <tr
                       key={String(row.id ?? index)}
-                      className="border-b border-slate-100 last:border-0"
+                      className="border-b border-[#f5f5f8] last:border-0 hover:bg-[#FAFAFC]"
                     >
                       {keys.map((key) => (
                         <td
                           key={key}
-                          className="max-w-[280px] px-5 py-4 text-slate-700"
+                          className="max-w-[280px] px-5 py-4 text-[#4B5563]"
                         >
                           {formatValue(row[key])}
                         </td>
@@ -201,7 +270,7 @@ export default function LiveDataPage({
               </table>
             </div>
           )}
-        </div>
+        </section>
       </div>
     </DashboardShell>
   );
