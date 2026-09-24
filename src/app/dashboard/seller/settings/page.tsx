@@ -236,6 +236,8 @@ export default function SellerSettingsPage() {
     withdrawal_alerts: true,
   });
 
+  const [editingPaymentId, setEditingPaymentId] = useState<string | null>(null);
+
   const [payment, setPayment] = useState({
     method: "bank_transfer",
     account_name: "",
@@ -842,227 +844,485 @@ export default function SellerSettingsPage() {
   }
 
   function renderPayment() {
+    const methods = settings?.payment_methods || [];
+    const walletMethod =
+      payment.method === "mpesa" ||
+      payment.method === "emola" ||
+      payment.method === "mobile_money";
+    const bankMethod =
+      payment.method === "bank_transfer" || payment.method === "bank";
+
+    function resetPaymentForm() {
+      setPayment({
+        method: "bank_transfer",
+        account_name: "",
+        account_number: "",
+        bank_name: "",
+        branch_code: "",
+        mobile_number: "",
+      });
+    }
+
+    function editPaymentMethod(item: PaymentMethod) {
+      setPayment({
+        method: item.method || "bank_transfer",
+        account_name: item.account_name || "",
+        account_number: item.account_number || "",
+        bank_name: item.bank_name || "",
+        branch_code: item.branch_code || "",
+        mobile_number: item.mobile_number || "",
+      });
+      setEditingPaymentId(item.id || null);
+    }
+
+    async function savePaymentMethod() {
+      setSaving(true);
+      setError("");
+      setSuccess("");
+
+      if (walletMethod) {
+        if (!payment.account_name.trim() || !payment.mobile_number.trim()) {
+          setError(
+            `${moneyMethodLabel(payment.method)} requires Name and Number.`,
+          );
+          setSaving(false);
+          return;
+        }
+      }
+
+      if (bankMethod) {
+        if (
+          !payment.account_name.trim() ||
+          !payment.account_number.trim() ||
+          !payment.bank_name.trim()
+        ) {
+          setError(
+            "Bank Transfer requires Account name, Account number and Bank name.",
+          );
+          setSaving(false);
+          return;
+        }
+      }
+
+      if (payment.method === "paypal" && !payment.account_name.trim()) {
+        setError("PayPal requires the PayPal account email or name.");
+        setSaving(false);
+        return;
+      }
+
+      try {
+        const body = {
+          method: payment.method,
+          account_name: payment.account_name,
+          account_number: payment.account_number,
+          bank_name: payment.bank_name,
+          branch_code: payment.branch_code,
+          mobile_number: payment.mobile_number,
+        };
+
+        if (editingPaymentId) {
+          await protectedApi(
+            `/seller-settings/payment/${editingPaymentId}`,
+            {
+              method: "PATCH",
+              body: JSON.stringify(body),
+            },
+          );
+          setSuccess("Payment method updated successfully.");
+        } else {
+          await protectedApi("/seller-settings/payment", {
+            method: "POST",
+            body: JSON.stringify(body),
+          });
+          setSuccess("Payment method added successfully.");
+        }
+
+        setEditingPaymentId(null);
+        resetPaymentForm();
+        await loadSettings();
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to save payment method.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    }
+
+    async function removePaymentMethod(id?: string) {
+      if (!id) return;
+
+      setSaving(true);
+      setError("");
+      setSuccess("");
+
+      try {
+        await protectedApi(`/seller-settings/payment/${id}`, {
+          method: "DELETE",
+        });
+
+        if (editingPaymentId === id) {
+          setEditingPaymentId(null);
+          resetPaymentForm();
+        }
+
+        setSuccess("Payment method removed successfully.");
+        await loadSettings();
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to remove payment method.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    }
+
     return (
       <div className="space-y-6">
         <SectionHeader
           icon={CreditCard}
           title="Payment"
-          description="Manage the payment destination used to receive withdrawals."
+          description="Manage all payment methods available for your withdrawals."
         />
 
         <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-5">
-          <div className="flex gap-3">
+          <div className="flex items-start gap-3">
             <div className="rounded-xl bg-white p-3 text-blue-600 shadow-sm">
               <Wallet size={20} />
             </div>
             <div>
-              <p className="font-bold text-slate-900">Withdrawal payment method</p>
-              <p className="mt-1 text-sm text-slate-600">
-                Choose where your Seller commissions should be sent when you
-                request a withdrawal.
+              <p className="font-bold text-slate-900">
+                Multiple payment methods
+              </p>
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Save as many payment methods as you need. Adding a new method
+                does not replace or delete existing methods. You will choose
+                the payment method when requesting a withdrawal.
               </p>
             </div>
           </div>
         </div>
 
-        <label className="block text-sm font-semibold text-slate-700">
-          Payment method
-          <select
-            className={inputClassName()}
-            value={payment.method}
-            onChange={(e) =>
-              setPayment((current) => ({
-                ...current,
-                method: e.target.value,
-              }))
-            }
-          >
-            {paymentOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {selectedPaymentIsWallet ? (
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-5">
-            <div className="mb-5 flex items-center gap-3">
-              <div className="rounded-xl bg-white p-3 text-emerald-600 shadow-sm">
-                <Smartphone size={20} />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-900">
-                  {selectedPaymentLabel} wallet
-                </h3>
-                <p className="text-sm text-slate-600">
-                  Name and wallet number are required.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-2">
-              <label className="text-sm font-semibold text-slate-700">
-                Name
-                <input
-                  className={inputClassName()}
-                  value={payment.account_name}
-                  onChange={(e) =>
-                    setPayment((current) => ({
-                      ...current,
-                      account_name: e.target.value,
-                    }))
-                  }
-                  placeholder="Wallet account name"
-                  required
-                />
-              </label>
-
-              <label className="text-sm font-semibold text-slate-700">
-                Number
-                <input
-                  className={inputClassName()}
-                  value={payment.mobile_number}
-                  onChange={(e) =>
-                    setPayment((current) => ({
-                      ...current,
-                      mobile_number: e.target.value,
-                    }))
-                  }
-                  placeholder="Wallet number"
-                  inputMode="tel"
-                  required
-                />
-              </label>
-            </div>
+        <div>
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-slate-900">
+              Saved payment methods
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              {methods.length} saved method{methods.length === 1 ? "" : "s"}.
+            </p>
           </div>
-        ) : payment.method === "bank_transfer" ? (
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
-            <div className="mb-5 flex items-center gap-3">
-              <div className="rounded-xl bg-white p-3 text-blue-600 shadow-sm">
-                <CreditCard size={20} />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-900">Bank details</h3>
-                <p className="text-sm text-slate-500">
-                  Add the account used to receive your withdrawals.
-                </p>
-              </div>
+
+          {methods.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+              <Wallet className="mx-auto text-slate-300" size={34} />
+              <p className="mt-3 font-bold text-slate-800">
+                No payment methods saved
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Add your first payment method below.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {methods.map((item, index) => (
+                <div
+                  key={item.id || index}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+                        {item.method === "mpesa" ||
+                        item.method === "emola" ||
+                        item.method === "mobile_money" ? (
+                          <Smartphone size={20} />
+                        ) : (
+                          <CreditCard size={20} />
+                        )}
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-900">
+                          {moneyMethodLabel(item.method)}
+                        </p>
+                        <span
+                          className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${
+                            item.status === "disabled"
+                              ? "bg-slate-100 text-slate-500"
+                              : item.status === "pending"
+                                ? "bg-amber-50 text-amber-700"
+                                : "bg-emerald-50 text-emerald-700"
+                          }`}
+                        >
+                          {item.status || "active"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => editPaymentMethod(item)}
+                        className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => void removePaymentMethod(item.id)}
+                        disabled={saving}
+                        className="rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 space-y-2 rounded-xl bg-slate-50 p-4 text-sm">
+                    {item.account_name && (
+                      <div className="flex justify-between gap-4">
+                        <span className="text-slate-500">Name</span>
+                        <span className="text-right font-semibold text-slate-800">
+                          {item.account_name}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.mobile_number && (
+                      <div className="flex justify-between gap-4">
+                        <span className="text-slate-500">Number</span>
+                        <span className="text-right font-semibold text-slate-800">
+                          {item.mobile_number}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.account_number && (
+                      <div className="flex justify-between gap-4">
+                        <span className="text-slate-500">Account</span>
+                        <span className="text-right font-semibold text-slate-800">
+                          {item.account_number}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.bank_name && (
+                      <div className="flex justify-between gap-4">
+                        <span className="text-slate-500">Bank</span>
+                        <span className="text-right font-semibold text-slate-800">
+                          {item.bank_name}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.branch_code && (
+                      <div className="flex justify-between gap-4">
+                        <span className="text-slate-500">Branch</span>
+                        <span className="text-right font-semibold text-slate-800">
+                          {item.branch_code}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="font-bold text-slate-900">
+                {editingPaymentId
+                  ? "Edit payment method"
+                  : "Add payment method"}
+              </h3>
+              <p className="mt-1 text-sm text-slate-500">
+                {editingPaymentId
+                  ? "Update the selected payment method."
+                  : "Add another payment method without removing existing ones."}
+              </p>
             </div>
 
-            <div className="grid gap-5 md:grid-cols-2">
-              <label className="text-sm font-semibold text-slate-700">
-                Account name
-                <input
-                  className={inputClassName()}
-                  value={payment.account_name}
-                  onChange={(e) =>
-                    setPayment((current) => ({
-                      ...current,
-                      account_name: e.target.value,
-                    }))
-                  }
-                  placeholder="Account holder"
-                />
-              </label>
-
-              <label className="text-sm font-semibold text-slate-700">
-                Account number
-                <input
-                  className={inputClassName()}
-                  value={payment.account_number}
-                  onChange={(e) =>
-                    setPayment((current) => ({
-                      ...current,
-                      account_number: e.target.value,
-                    }))
-                  }
-                  placeholder="Account number"
-                  inputMode="numeric"
-                />
-              </label>
-
-              <label className="text-sm font-semibold text-slate-700">
-                Bank name
-                <input
-                  className={inputClassName()}
-                  value={payment.bank_name}
-                  onChange={(e) =>
-                    setPayment((current) => ({
-                      ...current,
-                      bank_name: e.target.value,
-                    }))
-                  }
-                  placeholder="Bank"
-                />
-              </label>
-
-              <label className="text-sm font-semibold text-slate-700">
-                Branch code
-                <input
-                  className={inputClassName()}
-                  value={payment.branch_code}
-                  onChange={(e) =>
-                    setPayment((current) => ({
-                      ...current,
-                      branch_code: e.target.value,
-                    }))
-                  }
-                  placeholder="Branch code"
-                />
-              </label>
-            </div>
+            {editingPaymentId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingPaymentId(null);
+                  resetPaymentForm();
+                }}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
+              >
+                Cancel edit
+              </button>
+            )}
           </div>
-        ) : (
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <label className="text-sm font-semibold text-slate-700">
-              Account name
-              <input
+
+          <div className="mt-5 grid gap-5 md:grid-cols-2">
+            <label className="text-sm font-semibold text-slate-700 md:col-span-2">
+              Payment method
+              <select
                 className={inputClassName()}
-                value={payment.account_name}
+                value={payment.method}
                 onChange={(e) =>
                   setPayment((current) => ({
                     ...current,
-                    account_name: e.target.value,
+                    method: e.target.value,
                   }))
                 }
-                placeholder="Account name"
-              />
+              >
+                {paymentOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </label>
-          </div>
-        )}
 
-        {currentPayment && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Current saved method
-            </p>
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <span className="rounded-full bg-blue-50 px-3 py-1.5 text-sm font-bold text-blue-700">
-                {moneyMethodLabel(currentPayment.method)}
-              </span>
-              <span className="text-sm text-slate-600">
-                {currentPayment.account_name || "No account name"}
-              </span>
-              {currentPayment.mobile_number && (
-                <span className="text-sm text-slate-500">
-                  {currentPayment.mobile_number}
-                </span>
+            {walletMethod ? (
+              <>
+                <label className="text-sm font-semibold text-slate-700">
+                  Name
+                  <input
+                    className={inputClassName()}
+                    value={payment.account_name}
+                    onChange={(e) =>
+                      setPayment((current) => ({
+                        ...current,
+                        account_name: e.target.value,
+                      }))
+                    }
+                    placeholder="Account holder name"
+                  />
+                </label>
+
+                <label className="text-sm font-semibold text-slate-700">
+                  Number
+                  <input
+                    className={inputClassName()}
+                    value={payment.mobile_number}
+                    onChange={(e) =>
+                      setPayment((current) => ({
+                        ...current,
+                        mobile_number: e.target.value,
+                      }))
+                    }
+                    placeholder="Wallet number"
+                    inputMode="tel"
+                  />
+                </label>
+              </>
+            ) : bankMethod ? (
+              <>
+                <label className="text-sm font-semibold text-slate-700">
+                  Account name
+                  <input
+                    className={inputClassName()}
+                    value={payment.account_name}
+                    onChange={(e) =>
+                      setPayment((current) => ({
+                        ...current,
+                        account_name: e.target.value,
+                      }))
+                    }
+                    placeholder="Account holder"
+                  />
+                </label>
+
+                <label className="text-sm font-semibold text-slate-700">
+                  Account number
+                  <input
+                    className={inputClassName()}
+                    value={payment.account_number}
+                    onChange={(e) =>
+                      setPayment((current) => ({
+                        ...current,
+                        account_number: e.target.value,
+                      }))
+                    }
+                    placeholder="Account number"
+                    inputMode="numeric"
+                  />
+                </label>
+
+                <label className="text-sm font-semibold text-slate-700">
+                  Bank name
+                  <input
+                    className={inputClassName()}
+                    value={payment.bank_name}
+                    onChange={(e) =>
+                      setPayment((current) => ({
+                        ...current,
+                        bank_name: e.target.value,
+                      }))
+                    }
+                    placeholder="Bank name"
+                  />
+                </label>
+
+                <label className="text-sm font-semibold text-slate-700">
+                  Branch code
+                  <input
+                    className={inputClassName()}
+                    value={payment.branch_code}
+                    onChange={(e) =>
+                      setPayment((current) => ({
+                        ...current,
+                        branch_code: e.target.value,
+                      }))
+                    }
+                    placeholder="Branch code"
+                  />
+                </label>
+              </>
+            ) : (
+              <label className="text-sm font-semibold text-slate-700 md:col-span-2">
+                {payment.method === "paypal"
+                  ? "PayPal account email"
+                  : "Destination details"}
+                <input
+                  className={inputClassName()}
+                  value={payment.account_name}
+                  onChange={(e) =>
+                    setPayment((current) => ({
+                      ...current,
+                      account_name: e.target.value,
+                    }))
+                  }
+                  placeholder={
+                    payment.method === "paypal"
+                      ? "PayPal email"
+                      : "Account or destination"
+                  }
+                />
+              </label>
+            )}
+          </div>
+
+          <div className="mt-5 flex justify-end border-t border-slate-200 pt-5">
+            <button
+              type="button"
+              onClick={() => void savePaymentMethod()}
+              disabled={saving}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60"
+            >
+              {saving ? (
+                <RefreshCw size={17} className="animate-spin" />
+              ) : (
+                <Save size={17} />
               )}
-            </div>
+              {editingPaymentId
+                ? "Update payment method"
+                : "Add payment method"}
+            </button>
           </div>
-        )}
-
-        <div className="flex justify-end border-t border-slate-100 pt-5">
-          <button
-            type="button"
-            onClick={savePayment}
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 disabled:opacity-60"
-          >
-            <Save size={17} />
-            {saving ? "Saving..." : "Save payment details"}
-          </button>
         </div>
       </div>
     );
