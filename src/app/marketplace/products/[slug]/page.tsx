@@ -1,5 +1,6 @@
 "use client";
 
+import { MapPin, ShieldCheck, Globe2, Building2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -46,6 +47,26 @@ type Product = {
     name_en: string;
     name_pt: string;
     slug: string;
+  } | null;
+  supplier?: {
+    id: string | null;
+    name: string | null;
+    full_name: string | null;
+    role: string | null;
+    country: string | null;
+    country_code: string | null;
+    avatar_url: string | null;
+    status: string | null;
+    verification_status: string | null;
+    company_type: string | null;
+    company_id: string | null;
+    company_name: string | null;
+    legal_name: string | null;
+    website: string | null;
+    city: string | null;
+    state_region: string | null;
+    description: string | null;
+    joined_at: string | null;
   } | null;
   product_materials?: Array<{
     id: string;
@@ -192,7 +213,97 @@ export default function ProductPage({
       <main className="min-h-screen bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="h-5 w-32 animate-pulse rounded bg-slate-200" />
-          <div className="mt-8 grid gap-8 lg:grid-cols-2">
+  
+        {product.supplier && (
+          <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900">
+                Supplier / Producer
+              </h2>
+              {product.supplier.verification_status &&
+                product.supplier.verification_status !== "unverified" && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                    <ShieldCheck className="h-4 w-4" />
+                    Verified
+                  </span>
+                )}
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gray-100">
+                {product.supplier.avatar_url ? (
+                  <img
+                    src={product.supplier.avatar_url}
+                    alt={product.supplier.company_name || product.supplier.name || "Supplier"}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <Building2 className="h-7 w-7 text-gray-400" />
+                )}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-bold text-gray-900">
+                  {product.supplier.company_name || product.supplier.name || "Supplier"}
+                </h3>
+
+                {product.supplier.company_name &&
+                  product.supplier.name &&
+                  product.supplier.name !== product.supplier.company_name && (
+                    <p className="mt-1 text-sm text-gray-500">
+                      {product.supplier.name}
+                    </p>
+                  )}
+
+                {(product.supplier.country || product.supplier.country_code) && (
+                  <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-500">
+                    <MapPin className="h-4 w-4" />
+                    {product.supplier.country || product.supplier.country_code}
+                    {product.supplier.city
+                      ? ` · ${product.supplier.city}`
+                      : ""}
+                    {product.supplier.state_region
+                      ? `, ${product.supplier.state_region}`
+                      : ""}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {product.supplier.company_type && (
+                <div className="rounded-xl bg-gray-50 p-3">
+                  <p className="text-xs font-medium text-gray-500">Business type</p>
+                  <p className="mt-1 text-sm font-semibold capitalize text-gray-900">
+                    {product.supplier.company_type}
+                  </p>
+                </div>
+              )}
+
+              {product.supplier.website && (
+                <a
+                  href={product.supplier.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 rounded-xl bg-gray-50 p-3 text-sm font-semibold text-gray-900 hover:bg-gray-100"
+                >
+                  <Globe2 className="h-4 w-4" />
+                  Company website
+                </a>
+              )}
+            </div>
+
+            {product.supplier.description && (
+              <div className="mt-4 border-t border-gray-100 pt-4">
+                <p className="text-sm leading-6 text-gray-600">
+                  {product.supplier.description}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-2">
             <div className="aspect-[4/3] animate-pulse rounded-3xl bg-slate-200" />
             <div className="space-y-4">
               <div className="h-8 w-3/4 animate-pulse rounded bg-slate-200" />

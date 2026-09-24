@@ -40,6 +40,26 @@ export type MarketplaceProduct = {
     name_pt: string;
     slug: string;
   } | null;
+  supplier?: {
+    id: string | null;
+    name: string | null;
+    full_name: string | null;
+    role: string | null;
+    country: string | null;
+    country_code: string | null;
+    avatar_url: string | null;
+    status: string | null;
+    verification_status: string | null;
+    company_type: string | null;
+    company_id: string | null;
+    company_name: string | null;
+    legal_name: string | null;
+    website: string | null;
+    city: string | null;
+    state_region: string | null;
+    description: string | null;
+    joined_at: string | null;
+  } | null;
   product_materials?: Array<{
     id: string;
     product_id: string;

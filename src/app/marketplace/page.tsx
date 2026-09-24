@@ -12,9 +12,11 @@ import {
   Heart,
   List,
   Search,
+  ShieldCheck,
   Star,
   TrendingUp,
   Users,
+  MapPin,
 } from "lucide-react";
 import {
   getMarketplaceCategories,
@@ -560,6 +562,53 @@ export default function MarketplacePage() {
                     <h2 className="line-clamp-2 text-lg font-extrabold leading-6 text-[#1A1A2E]">
                       {getProductName(product)}
                     </h2>
+
+                    {product.supplier && (
+                      <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#eeeef5] bg-[#FAFAFC] px-3 py-2.5">
+                        {product.supplier.avatar_url ? (
+                          <img
+                            src={product.supplier.avatar_url}
+                            alt={product.supplier.company_name || product.supplier.name || "Supplier"}
+                            className="h-9 w-9 shrink-0 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F1EFFF] text-sm font-extrabold text-[#3B2FE0]">
+                            {(product.supplier.company_name ||
+                              product.supplier.name ||
+                              "S")
+                              .charAt(0)
+                              .toUpperCase()}
+                          </div>
+                        )}
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <p className="truncate text-xs font-bold text-[#1A1A2E]">
+                              {product.supplier.company_name ||
+                                product.supplier.name ||
+                                "Supplier"}
+                            </p>
+
+                            {product.supplier.verification_status &&
+                              product.supplier.verification_status !== "unverified" && (
+                                <ShieldCheck
+                                  size={14}
+                                  className="shrink-0 text-[#3B2FE0]"
+                                />
+                              )}
+                          </div>
+
+                          <div className="mt-0.5 flex items-center gap-1 text-[11px] text-[#9CA3AF]">
+                            <MapPin size={11} />
+                            <span className="truncate">
+                              {product.supplier.country ||
+                                product.supplier.country_code ||
+                                "Country not specified"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#9CA3AF]">
                       {getProductDescription(product)}
