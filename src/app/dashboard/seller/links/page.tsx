@@ -300,20 +300,25 @@ export default function SellerLinksPage() {
             })}
           </section>
 
-          <section className="rounded-2xl border border-blue-100 bg-blue-50/70 p-5 md:p-6">
-            <div className="flex flex-col gap-4 md:flex-row md:items-start">
-              <div className="rounded-xl bg-white p-2.5 shadow-sm">
-                <ShieldCheck className="h-5 w-5 text-blue-600" />
+          <section className="relative overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 p-5 text-white shadow-lg shadow-blue-200/50 md:p-6">
+            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+            <div className="absolute -bottom-20 left-1/3 h-44 w-44 rounded-full bg-cyan-300/10 blur-3xl" />
+
+            <div className="relative flex flex-col gap-4 md:flex-row md:items-start">
+              <div className="rounded-xl border border-white/20 bg-white/15 p-2.5 shadow-sm backdrop-blur-sm">
+                <ShieldCheck className="h-5 w-5 text-white" />
               </div>
 
               <div>
-                <h2 className="font-semibold text-slate-950">
+                <h2 className="font-bold text-white">
                   How your tracking works
                 </h2>
 
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-blue-50">
                   Every affiliate link identifies your Seller account through
-                  its referral code. A tracked journey can follow:
+                  its <span className="font-semibold text-white">referral code</span>,
+                  allowing clicks, conversions, sales and commissions to be
+                  attributed to your account.
                 </p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold">
@@ -327,11 +332,11 @@ export default function SellerLinksPage() {
                     "Commission",
                   ].map((step, index) => (
                     <div key={step} className="flex items-center gap-2">
-                      <span className="rounded-full border border-blue-200 bg-white px-3 py-1.5 text-blue-700">
+                      <span className="rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-white shadow-sm backdrop-blur-sm">
                         {step}
                       </span>
                       {index < 6 && (
-                        <span className="text-blue-300">→</span>
+                        <span className="text-white/60">→</span>
                       )}
                     </div>
                   ))}
