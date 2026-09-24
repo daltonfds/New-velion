@@ -639,6 +639,89 @@ export async function getFinanceTransactions() {
   return Array.isArray(payload) ? payload : payload?.data || [];
 }
 
+export type AffiliateDashboard = {
+  period: {
+    type: string;
+    from: string;
+    to: string;
+  };
+  currency: string;
+  seller: {
+    id: string;
+    full_name: string | null;
+  };
+  summary: {
+    available_balance: number;
+    pending_balance: number;
+    lifetime_earnings: number;
+    sales: number;
+    revenue: number;
+    commissions: number;
+    clicks: number;
+    conversions: number;
+    conversion_rate: number;
+    selected_products: number;
+  };
+  recent_sales: any[];
+  recent_commissions: any[];
+  performance_by_product: any[];
+  evolution: Array<{
+    date: string;
+    sales: number;
+    revenue: number;
+    commissions: number;
+    clicks: number;
+    conversions: number;
+  }>;
+  activity: any[];
+  withdrawals: any[];
+};
+
+const DASHBOARD_API_URL =
+  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/newvelion-dashboard`;
+
+export async function getAffiliateDashboard(params: {
+  period?: "today" | "7d" | "30d" | "month" | "custom";
+  from?: string;
+  to?: string;
+} = {}): Promise<AffiliateDashboard> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const search = new URLSearchParams();
+
+  if (params.period) search.set("period", params.period);
+  if (params.from) search.set("from", params.from);
+  if (params.to) search.set("to", params.to);
+
+  const response = await fetch(
+    `${DASHBOARD_API_URL}/affiliate-dashboard?${search.toString()}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        apikey: API_KEY || "",
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    }
+  );
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      payload?.error || "Failed to load affiliate dashboard."
+    );
+  }
+
+  return payload as AffiliateDashboard;
+}
+
 export async function getAffiliatePerformance() {
   return protectedApi("/affiliate/performance");
 }
