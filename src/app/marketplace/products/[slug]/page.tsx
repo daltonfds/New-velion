@@ -12,7 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { getMarketplaceProduct, trackAffiliateClick, selectAffiliateProduct } from "@/lib/newvelion-api";
+import { getAffiliateProducts, getMarketplaceProduct, trackAffiliateClick, selectAffiliateProduct } from "@/lib/newvelion-api";
 import { supabase } from "@/lib/supabase";
 
 type Product = {
@@ -77,6 +77,7 @@ export default function ProductPage({
   const [error, setError] = useState("");
   const [affiliateOpen, setAffiliateOpen] = useState(false);
   const [copied, setCopied] = useState("");
+  const [isAffiliated, setIsAffiliated] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -88,6 +89,40 @@ export default function ProductPage({
 
         if (!cancelled) {
           setProduct(response?.data ?? null);
+
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+
+          if (session && response?.data?.id) {
+            try {
+              const affiliateProducts = await getAffiliateProducts();
+              const existing = affiliateProducts.find(
+                (item: any) =>
+                  item.product_id === response.data.id ||
+                  item.product?.id === response.data.id
+              );
+
+              if (existing) {
+                const code =
+                  existing.referral_code ||
+                  existing.affiliate_code ||
+                  "";
+
+                setIsAffiliated(true);
+                setReferralCode(code);
+
+                if (code) {
+                  window.localStorage.setItem(
+                    "newvelion_referral_code",
+                    code
+                  );
+                }
+              }
+            } catch {
+              // Seller affiliation lookup must never block the product page.
+            }
+          }
         }
       } catch (err) {
         console.error(err);
@@ -242,7 +277,13 @@ export default function ProductPage({
         token: session.access_token,
       });
 
-      const referralCode = result?.data?.referral_code || result?.referral_code;
+      const affiliateData = result?.data || result;
+      const referralCode =
+        affiliateData?.referral_code ||
+        result?.referral_code ||
+        "";
+
+      setIsAffiliated(true);
 
       if (referralCode) {
         setReferralCode(referralCode);
@@ -461,7 +502,9 @@ export default function ProductPage({
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-blue-700"
                 >
                   <ShoppingCart size={18} />
-                  Affiliate This Product
+                  {isAffiliated
+                    ? "Affiliated on This Product"
+                    : "Affiliate This Product"}
                 </button>
 
                 {product.checkout_url && (
