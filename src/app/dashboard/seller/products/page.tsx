@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   Building2,
@@ -15,6 +16,7 @@ type Supplier = {
   name?: string;
   full_name?: string;
   company_name?: string;
+  company_id?: string;
   logo_url?: string;
   avatar_url?: string;
   country?: string;
@@ -346,43 +348,27 @@ export default function SellerMyProductsPage() {
                         </div>
                       </div>
 
-                      <div className="mt-4 grid grid-cols-2 gap-2">
-                        <div className="rounded-xl border border-gray-100 bg-white p-3">
-                          <p className="text-[11px] text-gray-400">Type</p>
-                          <p className="mt-1 truncate text-xs font-semibold capitalize text-gray-800">
-                            {supplier?.company_type || "Supplier"}
-                          </p>
-                        </div>
-                        <div className="rounded-xl border border-gray-100 bg-white p-3">
-                          <p className="text-[11px] text-gray-400">Verification</p>
-                          <p className="mt-1 truncate text-xs font-semibold capitalize text-gray-800">
-                            {supplier?.verification_status || "Pending"}
-                          </p>
-                        </div>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <span className="rounded-full border border-gray-100 bg-white px-3 py-1.5 text-xs font-semibold capitalize text-gray-700">
+                          {supplier?.country_code || supplier?.country || "—"} · {supplier?.company_type || "Supplier"}
+                        </span>
+                        <span className="rounded-full border border-gray-100 bg-white px-3 py-1.5 text-xs font-semibold capitalize text-gray-700">
+                          {supplier?.verification_status || "Pending"}
+                        </span>
                       </div>
 
-                      {supplier?.full_name && supplier.full_name !== supplierName && (
-                        <p className="mt-3 text-xs text-gray-500">
-                          Contact: <span className="font-semibold text-gray-700">{supplier.full_name}</span>
-                        </p>
-                      )}
-
-                      {supplier?.description && (
-                        <p className="mt-3 line-clamp-2 text-xs leading-5 text-gray-500">
-                          {supplier.description}
-                        </p>
-                      )}
-
-                      {supplier?.website && (
-                        <a
-                          href={supplier.website}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#3B2FE0] hover:underline"
+                      {supplier?.company_id ? (
+                        <Link
+                          href={`/dashboard/seller/suppliers/${supplier.company_id}`}
+                          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#3B2FE0] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#3125C4]"
                         >
+                          View Supplier Profile
                           <ExternalLink className="h-3.5 w-3.5" />
-                          Visit supplier website
-                        </a>
+                        </Link>
+                      ) : (
+                        <p className="mt-4 text-xs text-gray-400">
+                          Supplier profile unavailable
+                        </p>
                       )}
                     </div>
 

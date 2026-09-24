@@ -762,3 +762,93 @@ export async function getFinanceWithdrawals() {
   return Array.isArray(payload) ? payload : payload?.data || [];
 }
 
+
+
+export type SupplierProfileResponse = {
+  company: {
+    id: string;
+    company_name?: string | null;
+    legal_name?: string | null;
+    company_type?: string | null;
+    country_code?: string | null;
+    country_name?: string | null;
+    website?: string | null;
+    city?: string | null;
+    state_region?: string | null;
+    description?: string | null;
+    logo_url?: string | null;
+    status?: string | null;
+    verification_status?: string | null;
+    business_email?: string | null;
+    business_phone?: string | null;
+    business_phone_e164?: string | null;
+    whatsapp_number?: string | null;
+    whatsapp_e164?: string | null;
+    registration_number?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+  };
+  contact?: {
+    id: string;
+    full_name?: string | null;
+    country?: string | null;
+    country_code?: string | null;
+    avatar_url?: string | null;
+    preferred_language?: string | null;
+    job_title?: string | null;
+    created_at?: string | null;
+  } | null;
+  verification: {
+    status?: string | null;
+    kyc_status?: string | null;
+    reviewed_at?: string | null;
+    verified_at?: string | null;
+  };
+  certifications: Array<{
+    id: string;
+    name: string;
+    issuer?: string | null;
+    certificate_number?: string | null;
+    issued_at?: string | null;
+    expires_at?: string | null;
+    document_url?: string | null;
+    description?: string | null;
+    created_at?: string | null;
+  }>;
+  products: Array<{
+    id: string;
+    name_en?: string | null;
+    name_pt?: string | null;
+    slug?: string | null;
+    image_url?: string | null;
+    price?: number | null;
+    currency?: string | null;
+    commission_percentage?: number | null;
+    status?: string | null;
+    created_at?: string | null;
+    product_page_url?: string | null;
+  }>;
+};
+
+export async function getSupplierProfile(companyId: string): Promise<SupplierProfileResponse> {
+  const payload = await protectedApi(`/supplier/profile/${encodeURIComponent(companyId)}`);
+  return payload?.data;
+}
+
+export async function getSupplierMessages(companyId: string) {
+  return protectedApi(`/supplier/messages/${encodeURIComponent(companyId)}`);
+}
+
+export async function sendSupplierMessage(companyId: string, body: string) {
+  return protectedApi(`/supplier/messages/${encodeURIComponent(companyId)}`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+}
+
+export async function replySupplierMessage(conversationId: string, body: string) {
+  return protectedApi(`/supplier/message/${encodeURIComponent(conversationId)}`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+}
