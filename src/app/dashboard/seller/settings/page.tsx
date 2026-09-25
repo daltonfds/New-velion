@@ -24,7 +24,7 @@ import {
   Wallet,
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { protectedApi } from "@/lib/newvelion-api";
+import { sellerSettingsApi } from "@/lib/newvelion-api";
 
 type Tab =
   | "profile"
@@ -278,7 +278,7 @@ export default function SellerSettingsPage() {
     setSuccess("");
 
     try {
-      const payload = await protectedApi("/seller-settings/settings");
+      const payload = await sellerSettingsApi("/settings");
 
       const data = payload?.data || payload;
 
@@ -335,7 +335,7 @@ export default function SellerSettingsPage() {
     setSecurityLoading(true);
 
     try {
-      const payload = await protectedApi("/seller-settings/security");
+      const payload = await sellerSettingsApi("/security");
       const data = payload?.data || payload;
       setSessions(Array.isArray(data?.sessions) ? data.sessions : []);
     } catch (err) {
@@ -363,7 +363,7 @@ export default function SellerSettingsPage() {
     setSuccess("");
 
     try {
-      await protectedApi("/seller-settings/profile", {
+      await sellerSettingsApi("/profile", {
         method: "PATCH",
         body: JSON.stringify(profile),
       });
@@ -383,7 +383,7 @@ export default function SellerSettingsPage() {
     setSuccess("");
 
     try {
-      await protectedApi("/seller-settings/preferences", {
+      await sellerSettingsApi("/preferences", {
         method: "PATCH",
         body: JSON.stringify({
           language: preferences.language,
@@ -433,7 +433,7 @@ export default function SellerSettingsPage() {
     }
 
     try {
-      await protectedApi("/seller-settings/payment", {
+      await sellerSettingsApi("/payment", {
         method: "PATCH",
         body: JSON.stringify({
           method: payment.method,
@@ -480,7 +480,7 @@ export default function SellerSettingsPage() {
     }
 
     try {
-      await protectedApi("/seller-settings/password", {
+      await sellerSettingsApi("/password", {
         method: "POST",
         body: JSON.stringify({
           current_password: passwords.current_password,
@@ -921,8 +921,8 @@ export default function SellerSettingsPage() {
         };
 
         if (editingPaymentId) {
-          await protectedApi(
-            `/seller-settings/payment/${editingPaymentId}`,
+          await sellerSettingsApi(
+            `/payment/${editingPaymentId}`,
             {
               method: "PATCH",
               body: JSON.stringify(body),
@@ -930,7 +930,7 @@ export default function SellerSettingsPage() {
           );
           setSuccess("Payment method updated successfully.");
         } else {
-          await protectedApi("/seller-settings/payment", {
+          await sellerSettingsApi("/payment", {
             method: "POST",
             body: JSON.stringify(body),
           });
@@ -959,7 +959,7 @@ export default function SellerSettingsPage() {
       setSuccess("");
 
       try {
-        await protectedApi(`/seller-settings/payment/${id}`, {
+        await sellerSettingsApi(`/payment/${id}`, {
           method: "DELETE",
         });
 

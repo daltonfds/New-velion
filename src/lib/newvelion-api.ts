@@ -540,6 +540,42 @@ export type AdminDispute = Record<string, unknown>;
 export type AdminKyc = Record<string, unknown>;
 export type AdminAnalyticsEvent = Record<string, unknown>;
 
+const SELLER_SETTINGS_API_URL =
+  process.env.NEXT_PUBLIC_SELLER_SETTINGS_API_URL ||
+  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/seller-settings-api`;
+
+export async function sellerSettingsApi(
+  path: string,
+  options: RequestInit = {},
+) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(`${SELLER_SETTINGS_API_URL}${path}`, {
+    ...options,
+    headers: {
+      apikey: API_KEY || "",
+      Authorization: `Bearer ${session.access_token}`,
+      "content-type": "application/json",
+      ...(options.headers || {}),
+    },
+    cache: "no-store",
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload?.error || `Seller Settings API error: ${response.status}`);
+  }
+
+  return payload;
+}
+
 export async function protectedApi(path: string, options: RequestInit = {}) {
   const {
     data: { session },
