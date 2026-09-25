@@ -680,6 +680,8 @@ export type AffiliateDashboard = {
     type: string;
     from: string;
     to: string;
+    previous_from?: string;
+    previous_to?: string;
   };
   currency: string;
   seller: {
@@ -709,6 +711,24 @@ export type AffiliateDashboard = {
     clicks: number;
     conversions: number;
   }>;
+  previous_evolution?: Array<{
+    date: string;
+    sales: number;
+    revenue: number;
+    commissions: number;
+    clicks: number;
+    conversions: number;
+  }>;
+  comparison?: {
+    previous: {
+      sales: number;
+      revenue: number;
+      commissions: number;
+      clicks: number;
+      conversions: number;
+      conversion_rate: number;
+    };
+  };
   activity: any[];
   withdrawals: any[];
 };

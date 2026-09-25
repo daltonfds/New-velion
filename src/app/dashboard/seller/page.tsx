@@ -12,11 +12,9 @@ import {
   Wallet,
 } from "lucide-react";
 import {
-  Bar,
+  Area,
+  AreaChart,
   CartesianGrid,
-  ComposedChart,
-  Legend,
-  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -100,14 +98,16 @@ export default function SellerDashboardPage() {
     load(period);
   }, [period]);
 
-  const chartData = useMemo(
-    () =>
-      (data?.evolution || []).map((item) => ({
-        ...item,
-        label: dateLabel(item.date),
-      })),
-    [data]
-  );
+  const chartData = useMemo(() => {
+    const current = data?.evolution || [];
+    const previous = data?.previous_evolution || [];
+
+    return current.map((item, index) => ({
+      ...item,
+      label: dateLabel(item.date),
+      previousRevenue: Number(previous[index]?.revenue || 0),
+    }));
+  }, [data]);
 
   const summary = data?.summary;
 
@@ -303,85 +303,130 @@ export default function SellerDashboardPage() {
 
                 <div className="h-[330px] w-full">
                   {chartData.length ? (
-                    <ResponsiveContainer
-                      width="100%"
-                      height="100%"
-                    >
-                      <ComposedChart
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
                         data={chartData}
                         margin={{
-                          top: 10,
-                          right: 8,
-                          left: -12,
-                          bottom: 0,
+                          top: 12,
+                          right: 12,
+                          left: 0,
+                          bottom: 4,
                         }}
                       >
+                        <defs>
+                          <linearGradient
+                            id="salesArea"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="0%"
+                              stopColor="#2563EB"
+                              stopOpacity={0.22}
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor="#2563EB"
+                              stopOpacity={0.02}
+                            />
+                          </linearGradient>
+                        </defs>
+
                         <CartesianGrid
-                          strokeDasharray="3 3"
+                          stroke="#EEF1F5"
+                          strokeDasharray="0"
                           vertical={false}
                         />
 
                         <XAxis
                           dataKey="label"
-                          tick={{ fontSize: 11 }}
+                          tick={{
+                            fontSize: 11,
+                            fill: "#8A8FA3",
+                          }}
                           tickLine={false}
                           axisLine={false}
+                          dy={8}
                         />
 
                         <YAxis
-                          yAxisId="left"
-                          tick={{ fontSize: 11 }}
+                          tick={{
+                            fontSize: 11,
+                            fill: "#8A8FA3",
+                          }}
                           tickLine={false}
                           axisLine={false}
-                        />
-
-                        <YAxis
-                          yAxisId="right"
-                          orientation="right"
-                          tick={{ fontSize: 11 }}
-                          tickLine={false}
-                          axisLine={false}
-                        />
-
-                        <Tooltip
-                          formatter={(value, name) =>
-                            name === "Revenue" ||
-                            name === "Commissions"
-                              ? money(
-                                  Number(value || 0),
-                                  data?.currency
-                                )
-                              : number(Number(value || 0))
+                          width={48}
+                          tickFormatter={(value) =>
+                            money(
+                              Number(value || 0),
+                              data?.currency
+                            )
                           }
                         />
 
-                        <Legend />
-
-                        <Bar
-                          yAxisId="left"
-                          dataKey="sales"
-                          name="Sales"
-                          radius={[4, 4, 0, 0]}
+                        <Tooltip
+                          cursor={{
+                            stroke: "#CBD5E1",
+                            strokeWidth: 1,
+                          }}
+                          contentStyle={{
+                            borderRadius: 12,
+                            border: "1px solid #E5E7EB",
+                            boxShadow:
+                              "0 8px 24px rgba(15,23,42,0.08)",
+                            padding: "10px 12px",
+                          }}
+                          labelStyle={{
+                            color: "#64748B",
+                            fontSize: 12,
+                            fontWeight: 600,
+                            marginBottom: 4,
+                          }}
+                          formatter={(value, name) => [
+                            money(
+                              Number(value || 0),
+                              data?.currency
+                            ),
+                            name === "revenue"
+                              ? "Current period"
+                              : name === "previousRevenue"
+                                ? "Previous period"
+                                : name === "commissions"
+                                  ? "Commissions"
+                                  : "Sales",
+                          ]}
                         />
 
-                        <Line
-                          yAxisId="right"
+                        <Area
+                          type="monotone"
+                          dataKey="previousRevenue"
+                          name="previousRevenue"
+                          stroke="#CBD5E1"
+                          strokeWidth={2}
+                          strokeDasharray="6 5"
+                          fill="none"
+                          dot={false}
+                          activeDot={false}
+                        />
+
+                        <Area
                           type="monotone"
                           dataKey="revenue"
-                          name="Revenue"
-                          strokeWidth={2}
+                          name="revenue"
+                          stroke="#2563EB"
+                          strokeWidth={2.5}
+                          fill="url(#salesArea)"
                           dot={false}
+                          activeDot={{
+                            r: 4,
+                            strokeWidth: 2,
+                            stroke: "#FFFFFF",
+                          }}
                         />
-
-                        <Line
-                          yAxisId="right"
-                          type="monotone"
-                          dataKey="commissions"
-                          name="Commissions"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                      </ComposedChart>
+                      </AreaChart>
                     </ResponsiveContainer>
                   ) : (
                     <div className="flex h-full items-center justify-center rounded-xl bg-[#F8F8FB] text-sm text-[#9CA3AF]">
