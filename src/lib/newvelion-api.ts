@@ -812,7 +812,7 @@ export async function createSellerWithdrawal(params: {
 }
 
 export async function getSellerSettings() {
-  return protectedApi("/seller-settings/settings");
+  return sellerSettingsApi("/settings");
 }
 
 export async function getFinanceWithdrawals() {
