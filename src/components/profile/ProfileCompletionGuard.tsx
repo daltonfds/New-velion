@@ -132,7 +132,7 @@ export default function ProfileCompletionGuard() {
 
         <button
           type="button"
-          onClick={() => router.push("/dashboard/profile")}
+          onClick={() => router.push("/dashboard/seller/settings")}
           className="mt-6 w-full rounded-2xl bg-[#1769e0] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#125bc4]"
         >
           Complete profile
