@@ -190,7 +190,7 @@ function SectionHeader({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
         <Icon size={20} />
       </div>
       <div>
@@ -516,7 +516,7 @@ export default function SellerSettingsPage() {
 
         <div className="grid gap-6 lg:grid-cols-[auto_1fr]">
           <div className="flex items-start justify-center">
-            <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 text-3xl font-bold text-white shadow-xl shadow-blue-500/20">
+            <div className="flex h-28 w-28 items-center justify-center rounded-2xl bg-blue-600 text-3xl font-bold text-white">
               {getInitials(profile.full_name)}
             </div>
           </div>
@@ -647,7 +647,7 @@ export default function SellerSettingsPage() {
             type="button"
             onClick={saveProfile}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-none transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Save size={17} />
             {saving ? "Saving..." : "Save profile"}
@@ -762,7 +762,7 @@ export default function SellerSettingsPage() {
               type="button"
               onClick={changePassword}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-none disabled:opacity-60"
             >
               <KeyRound size={17} />
               {saving ? "Updating..." : "Change password"}
@@ -813,7 +813,7 @@ export default function SellerSettingsPage() {
           </label>
         </div>
 
-        <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 p-5">
+        <div className="rounded-2xl border border-blue-100 bg-slate-50 p-5">
           <div className="flex gap-3">
             <div className="rounded-xl bg-white p-3 text-blue-600 shadow-sm">
               <Globe2 size={19} />
@@ -833,7 +833,7 @@ export default function SellerSettingsPage() {
             type="button"
             onClick={savePreferences}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-none disabled:opacity-60"
           >
             <Save size={17} />
             {saving ? "Saving..." : "Save preferences"}
@@ -1136,7 +1136,7 @@ export default function SellerSettingsPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="font-bold text-slate-900">
@@ -1311,7 +1311,7 @@ export default function SellerSettingsPage() {
               type="button"
               onClick={() => void savePaymentMethod()}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-none hover:bg-blue-700 disabled:opacity-60"
             >
               {saving ? (
                 <RefreshCw size={17} className="animate-spin" />
@@ -1415,7 +1415,7 @@ export default function SellerSettingsPage() {
             type="button"
             onClick={savePreferences}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-none disabled:opacity-60"
           >
             <Save size={17} />
             {saving ? "Saving..." : "Save notifications"}
@@ -1553,16 +1553,16 @@ export default function SellerSettingsPage() {
     <DashboardShell area="seller" activeKey="settings" title="Settings" subtitle="Manage your Seller account, payments, notifications and security.">
       <div className="min-h-full bg-slate-50/60">
         <div className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
-          <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-700 p-6 text-white shadow-xl shadow-blue-500/10 sm:p-8">
+          <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white p-6 text-slate-950 shadow-sm sm:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-sm font-semibold text-blue-100">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
                   Seller Settings
                 </p>
-                <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+                <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
                   Account & preferences
                 </h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-indigo-100 sm:text-base">
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-sm">
                   Manage your profile, account security, payment details,
                   notifications and Seller preferences from one place.
                 </p>
@@ -1572,7 +1572,7 @@ export default function SellerSettingsPage() {
                 type="button"
                 onClick={() => void loadSettings()}
                 disabled={loading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20 disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-60"
               >
                 <RefreshCw
                   size={17}
@@ -1604,10 +1604,10 @@ export default function SellerSettingsPage() {
           )}
 
           <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-            <aside className="h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="border-b border-slate-100 p-5">
+            <aside className="h-fit rounded-2xl border border-slate-200 bg-white">
+              <div className="border-b border-slate-100 px-5 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 font-bold text-white shadow-lg shadow-blue-500/20">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 font-bold text-slate-700">
                     {getInitials(profile.full_name)}
                   </div>
                   <div className="min-w-0">
@@ -1635,10 +1635,10 @@ export default function SellerSettingsPage() {
                         setError("");
                         setSuccess("");
                       }}
-                      className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition ${
+                      className={`group flex w-full items-center gap-3 border-l-2 px-3 py-3 text-left transition ${
                         active
-                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                     >
                       <Icon size={18} />
@@ -1648,7 +1648,7 @@ export default function SellerSettingsPage() {
                         </span>
                         <span
                           className={`mt-0.5 block text-xs ${
-                            active ? "text-blue-100" : "text-slate-400"
+                            active ? "text-blue-600" : "text-slate-400"
                           }`}
                         >
                           {tab.description}
@@ -1668,7 +1668,7 @@ export default function SellerSettingsPage() {
               </nav>
             </aside>
 
-            <main className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <main className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
               {loading ? (
                 <div className="flex min-h-[420px] items-center justify-center">
                   <div className="text-center">

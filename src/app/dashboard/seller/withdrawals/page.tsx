@@ -261,10 +261,10 @@ export default function SellerWithdrawalsPage() {
           </div>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
             <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-blue-50 p-2.5 text-blue-600">
+              <div className="rounded-lg bg-blue-50 p-2.5 text-blue-600">
                 <Wallet className="h-5 w-5" />
               </div>
               <div>
@@ -278,9 +278,9 @@ export default function SellerWithdrawalsPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
             <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600">
+              <div className="rounded-lg bg-indigo-50 p-2.5 text-indigo-600">
                 <CreditCard className="h-5 w-5" />
               </div>
               <div>
@@ -294,9 +294,9 @@ export default function SellerWithdrawalsPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
             <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-violet-50 p-2.5 text-violet-600">
+              <div className="rounded-lg bg-violet-50 p-2.5 text-violet-600">
                 <Wallet className="h-5 w-5" />
               </div>
               <div>
@@ -314,7 +314,7 @@ export default function SellerWithdrawalsPage() {
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <form
             onSubmit={requestWithdrawal}
-            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+            className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"
           >
             <div>
               <h2 className="text-lg font-bold text-slate-950">
@@ -457,13 +457,13 @@ export default function SellerWithdrawalsPage() {
             </div>
           </form>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
             <h2 className="text-lg font-bold text-slate-950">
               Selected destination
             </h2>
 
             {selectedMethod ? (
-              <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50 p-5">
+              <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
                 <div className="flex items-center gap-3">
                   <div className="rounded-xl bg-blue-600 p-2.5 text-white">
                     <CreditCard className="h-5 w-5" />
@@ -527,7 +527,7 @@ export default function SellerWithdrawalsPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-6 py-5">
             <h2 className="text-lg font-bold text-slate-950">
               Withdrawal history
@@ -556,7 +556,7 @@ export default function SellerWithdrawalsPage() {
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-400">
+                  <tr className="border-b border-slate-100 bg-slate-50 text-xs uppercase tracking-wide text-slate-400">
                     <th className="px-6 py-4 font-semibold">Date</th>
                     <th className="px-6 py-4 font-semibold">Method</th>
                     <th className="px-6 py-4 font-semibold">Amount</th>
