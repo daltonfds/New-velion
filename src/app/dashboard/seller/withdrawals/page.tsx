@@ -110,9 +110,6 @@ export default function SellerWithdrawalsPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [financeError, setFinanceError] = useState("");
-  const [settingsError, setSettingsError] = useState("");
-  const [withdrawalsError, setWithdrawalsError] = useState("");
   const [success, setSuccess] = useState("");
 
   const selectedMethod = useMemo(
@@ -126,36 +123,17 @@ export default function SellerWithdrawalsPage() {
   async function load() {
     setLoading(true);
     setError("");
-    setFinanceError("");
-    setSettingsError("");
-    setWithdrawalsError("");
 
-    const results = await Promise.allSettled([
-      getFinanceSummary(),
-      getSellerSettings(),
-      getFinanceWithdrawals(),
-    ]);
+    try {
+      const [finance, settings, withdrawalRows] = await Promise.all([
+        getFinanceSummary(),
+        getSellerSettings(),
+        getFinanceWithdrawals(),
+      ]);
 
-    const [financeResult, settingsResult, withdrawalsResult] = results;
-    let failed = 0;
-
-    if (financeResult.status === "fulfilled") {
-      const finance = financeResult.value;
       const wallet = finance?.data?.wallet || finance?.wallet || {};
-
       setBalance(Number(wallet?.available_balance ?? 0));
       setCurrency(String(wallet?.currency || finance?.data?.currency || "ZAR"));
-    } else {
-      failed++;
-      setFinanceError(
-        financeResult.reason instanceof Error
-          ? financeResult.reason.message
-          : String(financeResult.reason || "Finance summary request failed.")
-      );
-    }
-
-    if (settingsResult.status === "fulfilled") {
-      const settings = settingsResult.value;
 
       const savedMethods =
         settings?.data?.payment_methods ||
@@ -179,17 +157,6 @@ export default function SellerWithdrawalsPage() {
       ) {
         setSelectedMethodId("");
       }
-    } else {
-      failed++;
-      setSettingsError(
-        settingsResult.reason instanceof Error
-          ? settingsResult.reason.message
-          : String(settingsResult.reason || "Seller settings request failed.")
-      );
-    }
-
-    if (withdrawalsResult.status === "fulfilled") {
-      const withdrawalRows = withdrawalsResult.value;
 
       setWithdrawals(
         Array.isArray(withdrawalRows)
@@ -198,22 +165,11 @@ export default function SellerWithdrawalsPage() {
             ? withdrawalRows.data
             : []
       );
-    } else {
-      failed++;
-      setWithdrawalsError(
-        withdrawalsResult.reason instanceof Error
-          ? withdrawalsResult.reason.message
-          : String(withdrawalsResult.reason || "Withdrawals request failed.")
-      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load withdrawals.");
+    } finally {
+      setLoading(false);
     }
-
-    if (failed > 0) {
-      setError(
-        `${failed} request${failed === 1 ? "" : "s"} failed. See the details below.`
-      );
-    }
-
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -295,29 +251,6 @@ export default function SellerWithdrawalsPage() {
           <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
             <span>{error}</span>
-          </div>
-        )}
-
-        {(financeError || settingsError || withdrawalsError) && (
-          <div className="grid gap-3 md:grid-cols-3">
-            {financeError && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                <p className="font-bold">Finance summary API</p>
-                <p className="mt-1 break-words">{financeError}</p>
-              </div>
-            )}
-            {settingsError && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                <p className="font-bold">Seller settings API</p>
-                <p className="mt-1 break-words">{settingsError}</p>
-              </div>
-            )}
-            {withdrawalsError && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                <p className="font-bold">Withdrawals API</p>
-                <p className="mt-1 break-words">{withdrawalsError}</p>
-              </div>
-            )}
           </div>
         )}
 
