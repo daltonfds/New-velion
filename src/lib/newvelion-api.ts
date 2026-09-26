@@ -185,25 +185,95 @@ export async function selectAffiliateProduct(params: {
   productId: string;
   token: string;
 }) {
+  const headers = {
+    apikey: API_KEY || "",
+    Authorization: `Bearer ${params.token}`,
+    "content-type": "application/json",
+  };
+
   const response = await fetch(`${API_URL}/affiliate/products`, {
     method: "POST",
-    headers: {
-      apikey: API_KEY || "",
-      Authorization: `Bearer ${params.token}`,
-      "content-type": "application/json",
-    },
+    headers,
     body: JSON.stringify({
       product_id: params.productId,
     }),
     cache: "no-store",
   });
 
+  const payload = await response.json().catch(() => ({}));
+
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Affiliate product error: ${response.status}`);
+    if (response.status === 409) {
+      const existingResponse = await fetch(
+        `${API_URL}/affiliate/products`,
+        {
+          method: "GET",
+          headers,
+          cache: "no-store",
+        }
+      );
+
+      const existingPayload = await existingResponse
+        .json()
+        .catch(() => ({}));
+
+      const existingProducts = Array.isArray(existingPayload)
+        ? existingPayload
+        : existingPayload?.data || [];
+
+      const existing = existingProducts.find(
+        (item: any) =>
+          item?.product_id === params.productId ||
+          item?.product?.id === params.productId
+      );
+
+      return {
+        ...(existing || payload),
+        already_affiliated: true,
+      };
+    }
+
+    throw new Error(
+      payload?.error || `Affiliate product error: ${response.status}`
+    );
   }
 
-  return response.json();
+  return payload;
+}
+
+export async function createPayjsrCheckout(params: {
+  referralCode: string;
+}) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("Authentication required.");
+  }
+
+  const response = await fetch(`${API_URL}/affiliate/checkout`, {
+    method: "POST",
+    headers: {
+      apikey: API_KEY || "",
+      Authorization: `Bearer ${session.access_token}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      referral_code: params.referralCode,
+    }),
+    cache: "no-store",
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      payload?.error || "Unable to create PayJSR checkout session."
+    );
+  }
+
+  return payload;
 }
 
 export type AdminStats = {
@@ -930,3 +1000,46 @@ export async function replySupplierMessage(conversationId: string, body: string)
     body: JSON.stringify({ body }),
   });
 }
+
+export async function createPayJSRCheckout(params: {
+  productId: string;
+  amount: number;
+  currency: string;
+  referralCode?: string;
+}) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const response = await fetch("/api/checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(session?.access_token
+        ? { Authorization: `Bearer ${session.access_token}` }
+        : {}),
+    },
+    body: JSON.stringify({
+      product_id: params.productId,
+      amount: params.amount,
+      currency: params.currency,
+      referral_code: params.referralCode || null,
+    }),
+    cache: "no-store",
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok || payload?.ok === false) {
+    throw new Error(
+      payload?.error || "Unable to create PayJSR checkout."
+    );
+  }
+
+  if (!payload?.checkout_url) {
+    throw new Error("PayJSR did not return a checkout URL.");
+  }
+
+  return payload;
+}
+
