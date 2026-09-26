@@ -214,7 +214,7 @@ export default function ProductPage({
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="h-5 w-32 animate-pulse rounded bg-slate-200" />
   
-        {product.supplier && (
+        {product?.supplier && (
           <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-900">
