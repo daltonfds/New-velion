@@ -34,7 +34,8 @@ export async function GET(
   const location = response.headers.get("location");
 
   if (location) {
-    return NextResponse.redirect(location, response.status);
+    const redirectUrl = new URL(location, "https://api.payjsr.com").toString();
+    return NextResponse.redirect(redirectUrl, response.status);
   }
 
   const body = await response.text();
