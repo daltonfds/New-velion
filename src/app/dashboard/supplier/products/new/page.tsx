@@ -810,6 +810,37 @@ export default function NewSupplierProductsPage() {
 
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Category
+                  </label>
+
+                  <select
+                    value={product.category}
+                    onChange={(e) =>
+                      updateProduct(
+                        product.id,
+                        "category",
+                        e.target.value
+                      )
+                    }
+                    disabled={loadingCategories}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  >
+                    <option value="">
+                      {loadingCategories
+                        ? "Loading categories..."
+                        : "Select a category"}
+                    </option>
+
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name_en || category.name_pt}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
                     Sale price (ZAR)
                   </label>
 
