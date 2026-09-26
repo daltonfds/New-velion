@@ -38,9 +38,9 @@ type Product = {
   name: string;
   category: string;
   price: string;
+  supplierCost: string;
   stock: string;
   commission: string;
-  checkoutUrl: string;
   description: string;
   images: File[];
   materials: Material[];
@@ -51,9 +51,9 @@ const emptyProduct = (id: number): Product => ({
   name: "",
   category: "",
   price: "",
+  supplierCost: "",
   stock: "",
   commission: "30",
-  checkoutUrl: "",
   description: "",
   images: [],
   materials: [],
@@ -352,6 +352,17 @@ export default function NewSupplierProductsPage() {
     if (
       products.some(
         (product) =>
+          !product.supplierCost ||
+          Number(product.supplierCost) <= 0
+      )
+    ) {
+      setError("Enter a valid supplier cost for every product.");
+      return;
+    }
+
+    if (
+      products.some(
+        (product) =>
           !product.stock ||
           Number(product.stock) < 0
       )
@@ -398,6 +409,24 @@ export default function NewSupplierProductsPage() {
         throw new Error("Authentication required.");
       }
 
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("primary_company_id")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) {
+        throw new Error(
+          `Unable to load supplier company: ${profileError.message}`
+        );
+      }
+
+      if (!profile?.primary_company_id) {
+        throw new Error(
+          "Your supplier profile is not linked to a company."
+        );
+      }
+
       for (const product of products) {
         const baseSlug = makeSlug(product.name);
 
@@ -410,6 +439,7 @@ export default function NewSupplierProductsPage() {
             .from("products")
             .insert({
               supplier_id: user.id,
+              company_id: profile.primary_company_id,
               category_id: product.category || null,
               name_en: product.name.trim(),
               name_pt: product.name.trim(),
@@ -423,11 +453,10 @@ export default function NewSupplierProductsPage() {
               description_pt:
                 product.description.trim() || null,
               price: Number(product.price),
+              supplier_cost: Number(product.supplierCost),
               currency: "ZAR",
               commission_percentage:
                 Number(product.commission),
-              checkout_url:
-                product.checkoutUrl.trim() || null,
               stock: Number(product.stock),
               featured: false,
               offer: false,
@@ -570,8 +599,8 @@ export default function NewSupplierProductsPage() {
             </h3>
 
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              Every product can have its own price, inventory,
-              affiliate commission, checkout URL, product photos
+              Every product can have its own price, supplier cost,
+              inventory, affiliate commission, product photos
               and promotional materials.
             </p>
           </div>
@@ -765,6 +794,7 @@ export default function NewSupplierProductsPage() {
                   </label>
 
                   <input
+                    type="text"
                     value={product.name}
                     onChange={(e) =>
                       updateProduct(
@@ -773,54 +803,14 @@ export default function NewSupplierProductsPage() {
                         e.target.value
                       )
                     }
-                    placeholder="e.g. Premium Wellness Formula"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    placeholder="Product name"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Category
-                  </label>
-
-                  <select
-                    value={product.category}
-                    onChange={(e) =>
-                      updateProduct(
-                        product.id,
-                        "category",
-                        e.target.value
-                      )
-                    }
-                    disabled={
-                      loadingCategories || saving
-                    }
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50"
-                  >
-                    <option value="">
-                      {loadingCategories
-                        ? "Loading categories..."
-                        : categories.length === 0
-                          ? "Add a category above first"
-                          : "Select category"}
-                    </option>
-
-                    {categories.map((category) => (
-                      <option
-                        key={category.id}
-                        value={category.id}
-                      >
-                        {category.name_en ||
-                          category.name_pt ||
-                          category.slug}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Price
+                    Sale price (ZAR)
                   </label>
 
                   <input
@@ -835,9 +825,35 @@ export default function NewSupplierProductsPage() {
                         e.target.value
                       )
                     }
-                    placeholder="49.00"
+                    placeholder="0.00"
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Supplier cost (ZAR)
+                  </label>
+
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={product.supplierCost}
+                    onChange={(e) =>
+                      updateProduct(
+                        product.id,
+                        "supplierCost",
+                        e.target.value
+                      )
+                    }
+                    placeholder="0.00"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+
+                  <p className="mt-1 text-xs text-slate-500">
+                    Your actual product cost. PayJSR uses this for the sale split.
+                  </p>
                 </div>
 
                 <div>
@@ -848,6 +864,7 @@ export default function NewSupplierProductsPage() {
                   <input
                     type="number"
                     min="0"
+                    step="1"
                     value={product.stock}
                     onChange={(e) =>
                       updateProduct(
@@ -856,60 +873,32 @@ export default function NewSupplierProductsPage() {
                         e.target.value
                       )
                     }
-                    placeholder="500"
+                    placeholder="0"
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Affiliate commission
+                    Affiliate commission (%)
                   </label>
 
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={product.commission}
-                      onChange={(e) =>
-                        updateProduct(
-                          product.id,
-                          "commission",
-                          e.target.value
-                        )
-                      }
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pr-10 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">
-                      %
-                    </span>
-                  </div>
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Checkout payment URL
-                  </label>
-
-                  <div className="relative">
-                    <Link2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-
-                    <input
-                      type="url"
-                      value={product.checkoutUrl}
-                      onChange={(e) =>
-                        updateProduct(
-                          product.id,
-                          "checkoutUrl",
-                          e.target.value
-                        )
-                      }
-                      placeholder="https://your-checkout-provider.com/checkout/..."
-                      className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={product.commission}
+                    onChange={(e) =>
+                      updateProduct(
+                        product.id,
+                        "commission",
+                        e.target.value
+                      )
+                    }
+                    placeholder="30"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
                 </div>
 
                 <div className="md:col-span-2">
@@ -1076,12 +1065,7 @@ export default function NewSupplierProductsPage() {
                   </strong>
                 </span>
 
-                <span className="flex items-center gap-1">
-                  <Link2 className="h-3.5 w-3.5" />
-                  {product.checkoutUrl
-                    ? "Checkout configured"
-                    : "Checkout not configured"}
-                </span>
+
               </div>
             </div>
           </div>
