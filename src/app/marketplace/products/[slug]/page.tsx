@@ -95,6 +95,7 @@ export default function ProductPage({
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [checkoutError, setCheckoutError] = useState("");
   const [affiliateOpen, setAffiliateOpen] = useState(false);
   const [copied, setCopied] = useState("");
   const [isAffiliated, setIsAffiliated] = useState(false);
@@ -456,7 +457,7 @@ export default function ProductPage({
       window.open(url, "_blank", "noopener,noreferrer");
     } catch (error) {
       console.error("PayJSR checkout failed:", error);
-      setError(
+      setCheckoutError(
         error instanceof Error
           ? error.message
           : "Unable to create checkout."
