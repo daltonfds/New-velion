@@ -184,6 +184,7 @@ export async function trackAffiliateClick(params: {
 export async function selectAffiliateProduct(params: {
   productId: string;
   token: string;
+  sellerPrice?: number | null;
 }) {
   const headers = {
     apikey: API_KEY || "",
@@ -196,6 +197,8 @@ export async function selectAffiliateProduct(params: {
     headers,
     body: JSON.stringify({
       product_id: params.productId,
+      seller_price:
+        params.sellerPrice != null ? params.sellerPrice : null,
     }),
     cache: "no-store",
   });

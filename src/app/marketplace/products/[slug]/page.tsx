@@ -100,6 +100,10 @@ export default function ProductPage({
   const [copied, setCopied] = useState("");
   const [isAffiliated, setIsAffiliated] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [affiliateMode, setAffiliateMode] = useState<"standard" | "custom">("standard");
+  const [customPrice, setCustomPrice] = useState("");
+  const [affiliateGenerating, setAffiliateGenerating] = useState(false);
+  const [affiliateError, setAffiliateError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -732,10 +736,10 @@ export default function ProductPage({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  Your Affiliate Links
+                  Affiliate this product
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Use these links to promote this product and track your sales.
+                  Choose how you want to promote this product.
                 </p>
               </div>
 
@@ -748,41 +752,252 @@ export default function ProductPage({
               </button>
             </div>
 
-            <div className="mt-6 space-y-4">
-              {[
-                ["Product page", productLink, "product"],
-                ["Promotional materials", materialsLink, "materials"],
-              ].map(([label, value, type]) => (
-                <div key={type} className="rounded-2xl border border-slate-200 p-4">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                    {label}
-                  </p>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setAffiliateMode("standard")}
+                className={`rounded-2xl border p-5 text-left transition ${
+                  affiliateMode === "standard"
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-slate-200 hover:border-blue-200"
+                }`}
+              >
+                <p className="text-sm font-bold text-slate-900">
+                  Get affiliate link
+                </p>
 
-                  <div className="mt-2 flex gap-2">
-                    <input
-                      readOnly
-                      value={value}
-                      className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 outline-none"
-                    />
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Sell at the producer's defined price and receive the
+                  affiliate commission defined for this product.
+                </p>
 
-                    <button
-                      type="button"
-                      onClick={() => copyLink(type, value)}
-                      disabled={!value}
-                      className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
-                    >
-                      {copied === type ? "Copied!" : "Copy"}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                <p className="mt-4 text-lg font-bold text-slate-900">
+                  {money(price, product.currency)}
+                </p>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  Affiliate commission: {commission}%
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setAffiliateMode("custom");
+                  if (!customPrice) {
+                    setCustomPrice((price * 1.1).toFixed(2));
+                  }
+                }}
+                className={`rounded-2xl border p-5 text-left transition ${
+                  affiliateMode === "custom"
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-slate-200 hover:border-blue-200"
+                }`}
+              >
+                <p className="text-sm font-bold text-slate-900">
+                  Customize your price
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Add your own margin to the producer's selling price.
+                  The minimum increase is 10%.
+                </p>
+
+                <p className="mt-4 text-lg font-bold text-slate-900">
+                  Minimum: {money(price * 1.1, product.currency)}
+                </p>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  Producer price: {money(price, product.currency)}
+                </p>
+              </button>
             </div>
 
-            {!affiliateCode && (
-              <div className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-700">
-                Your affiliate referral code is not configured yet. Once your
-                affiliate account is connected, these links will use your real
-                referral code automatically.
+            {affiliateMode === "standard" ? (
+              <div className="mt-5 rounded-2xl border border-slate-200 p-4">
+                <p className="text-sm font-bold text-slate-900">
+                  Your standard affiliate link
+                </p>
+
+                <div className="mt-3 flex gap-2">
+                  <input
+                    readOnly
+                    value={productLink}
+                    className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 outline-none"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => copyLink("product", productLink)}
+                    disabled={!productLink}
+                    className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  >
+                    {copied === "product" ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+
+                <p className="mt-3 text-xs leading-5 text-slate-500">
+                  Sales generated through this link are attributed to your
+                  affiliate account.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-5 rounded-2xl border border-slate-200 p-4">
+                <p className="text-sm font-bold text-slate-900">
+                  Set your selling price
+                </p>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  Producer price: {money(price, product.currency)}
+                </p>
+
+                <div className="mt-4">
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Your price ({product.currency})
+                  </label>
+
+                  <input
+                    type="number"
+                    min={(price * 1.1).toFixed(2)}
+                    step="0.01"
+                    value={customPrice}
+                    onChange={(e) => setCustomPrice(e.target.value)}
+                    placeholder={(price * 1.1).toFixed(2)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+                </div>
+
+                <div className="mt-3 rounded-xl bg-blue-50 p-3 text-sm text-blue-700">
+                  Minimum selling price:{" "}
+                  <strong>{money(price * 1.1, product.currency)}</strong>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={
+                    affiliateGenerating ||
+                    !customPrice ||
+                    Number(customPrice) < price * 1.1
+                  }
+                  onClick={async () => {
+                    setAffiliateError("");
+
+                    if (Number(customPrice) < price * 1.1) {
+                      setAffiliateError(
+                        `Your price must be at least ${money(
+                          price * 1.1,
+                          product.currency
+                        )}.`
+                      );
+                      return;
+                    }
+
+                    setAffiliateGenerating(true);
+                    setAffiliateError("");
+
+                    try {
+                      const {
+                        data: { session },
+                      } = await supabase.auth.getSession();
+
+                      if (!session?.access_token) {
+                        router.push(
+                          `/login?redirect=${encodeURIComponent(window.location.pathname)}`
+                        );
+                        return;
+                      }
+
+                      const generatedPrice = Number(customPrice);
+
+                      const result = await selectAffiliateProduct({
+                        productId: product.id,
+                        token: session.access_token,
+                        sellerPrice: generatedPrice,
+                      });
+
+                      const affiliateData = result?.data || result;
+                      const generatedReferralCode =
+                        affiliateData?.referral_code ||
+                        result?.referral_code ||
+                        "";
+
+                      if (!generatedReferralCode) {
+                        throw new Error(
+                          "The affiliate link could not be generated."
+                        );
+                      }
+
+                      const generatedLink =
+                        `${window.location.origin}/marketplace/products/${product.slug}` +
+                        `?ref=${encodeURIComponent(generatedReferralCode)}`;
+
+                      setReferralCode(generatedReferralCode);
+                      setIsAffiliated(true);
+                      setAffiliateError("");
+                      setCopied("");
+
+                      window.localStorage.setItem(
+                        "newvelion_referral_code",
+                        generatedReferralCode
+                      );
+
+                      setAffiliateMode("custom");
+
+                      // Keep the generated custom link visible through the
+                      // existing productLink state derived from referralCode.
+                      console.log("Custom affiliate link generated:", generatedLink);
+                    } catch (error) {
+                      console.error(
+                        "Custom affiliate link generation failed:",
+                        error
+                      );
+
+                      setAffiliateError(
+                        error instanceof Error
+                          ? error.message
+                          : "Unable to generate the custom affiliate link."
+                      );
+                    } finally {
+                      setAffiliateGenerating(false);
+                    }
+                  }}
+                  className="mt-4 w-full rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {affiliateGenerating
+                    ? "Generating link..."
+                    : "Generate custom affiliate link"}
+                </button>
+
+                {affiliateError && (
+                  <div className="mt-3 rounded-xl bg-amber-50 p-3 text-sm leading-5 text-amber-700">
+                    {affiliateError}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {affiliateMode === "standard" && (
+              <div className="mt-4 rounded-2xl border border-slate-200 p-4">
+                <p className="text-sm font-bold text-slate-900">
+                  Promotional materials
+                </p>
+
+                <div className="mt-3 flex gap-2">
+                  <input
+                    readOnly
+                    value={materialsLink}
+                    className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 outline-none"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => copyLink("materials", materialsLink)}
+                    disabled={!materialsLink}
+                    className="shrink-0 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  >
+                    {copied === "materials" ? "Copied!" : "Copy"}
+                  </button>
+                </div>
               </div>
             )}
           </div>
