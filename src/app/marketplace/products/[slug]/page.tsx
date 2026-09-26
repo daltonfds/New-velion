@@ -103,6 +103,7 @@ export default function ProductPage({
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [affiliateMode, setAffiliateMode] = useState<"standard" | "custom">("standard");
   const [customPrice, setCustomPrice] = useState("");
+  const [customAffiliateLink, setCustomAffiliateLink] = useState("");
   const [affiliateGenerating, setAffiliateGenerating] = useState(false);
   const [affiliateError, setAffiliateError] = useState("");
 
@@ -371,8 +372,8 @@ export default function ProductPage({
       : "";
 
   const productLink = referralCode
-    ? `${baseUrl}/marketplace/products/${product.slug}?ref=${encodeURIComponent(referralCode)}`
-    : `${baseUrl}/marketplace/products/${product.slug}`;
+    ? `${baseUrl}/go/${encodeURIComponent(referralCode)}`
+    : "";
 
   const checkoutLink = "";
 
@@ -806,12 +807,12 @@ export default function ProductPage({
                 </p>
 
                 <p className="mt-2 text-sm leading-6 text-slate-500">
-                  Add your own margin to the producer's selling price.
-                  The minimum increase is 10%.
+                  Set your own selling price. You can sell above or below
+                  the producer's price, but never below the supplier cost + 10%.
                 </p>
 
                 <p className="mt-4 text-lg font-bold text-slate-900">
-                  Minimum: {money(price * 1.1, product.currency)}
+                  Minimum: {money(minimumCustomPrice, product.currency)}
                 </p>
 
                 <p className="mt-1 text-xs text-slate-500">
@@ -949,6 +950,11 @@ export default function ProductPage({
                       if (generatedReferralCode) {
                         setReferralCode(generatedReferralCode);
                       }
+
+                      if (generatedLink) {
+                        setCustomAffiliateLink(generatedLink);
+                      }
+
                       setIsAffiliated(true);
                       setAffiliateError("");
                       setCopied("");
@@ -991,7 +997,7 @@ export default function ProductPage({
                   </div>
                 )}
 
-                {referralCode && (
+                {customAffiliateLink && (
                   <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
                     <p className="text-sm font-bold text-emerald-900">
                       Your custom affiliate link
@@ -1005,13 +1011,13 @@ export default function ProductPage({
                     <div className="mt-3 flex gap-2">
                       <input
                         readOnly
-                        value={productLink}
+                        value={customAffiliateLink}
                         className="min-w-0 flex-1 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
                       />
 
                       <button
                         type="button"
-                        onClick={() => copyLink("custom", productLink)}
+                        onClick={() => copyLink("custom", customAffiliateLink)}
                         className="shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white"
                       >
                         {copied === "custom" ? "Copied!" : "Copy"}
