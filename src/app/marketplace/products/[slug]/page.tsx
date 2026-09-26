@@ -40,6 +40,7 @@ type Product = {
   total_commission: number;
   original_price: number | null;
   offer_price: number | null;
+  supplier_cost: number | null;
   product_page_url: string | null;
   categories?: {
     id: string;
@@ -345,6 +346,12 @@ export default function ProductPage({
   }
 
   const price = Number(product.offer_price ?? product.price ?? 0);
+  const supplierCost = Number(product.supplier_cost ?? 0);
+  const minimumCustomPrice =
+    supplierCost > 0
+      ? Math.round(supplierCost * 1.1 * 100) / 100
+      : 0;
+
   const originalPrice =
     product.original_price != null
       ? Number(product.original_price)
@@ -785,7 +792,7 @@ export default function ProductPage({
                 onClick={() => {
                   setAffiliateMode("custom");
                   if (!customPrice) {
-                    setCustomPrice((price * 1.1).toFixed(2));
+                    setCustomPrice(minimumCustomPrice.toFixed(2));
                   }
                 }}
                 className={`rounded-2xl border p-5 text-left transition ${
@@ -858,18 +865,21 @@ export default function ProductPage({
 
                   <input
                     type="number"
-                    min={(price * 1.1).toFixed(2)}
+                    min={minimumCustomPrice.toFixed(2)}
                     step="0.01"
                     value={customPrice}
                     onChange={(e) => setCustomPrice(e.target.value)}
-                    placeholder={(price * 1.1).toFixed(2)}
+                    placeholder={minimumCustomPrice.toFixed(2)}
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
 
                 <div className="mt-3 rounded-xl bg-blue-50 p-3 text-sm text-blue-700">
                   Minimum selling price:{" "}
-                  <strong>{money(price * 1.1, product.currency)}</strong>
+                  <strong>{money(minimumCustomPrice, product.currency)}</strong>
+                  <span className="ml-2">
+                    (supplier cost + 10%)
+                  </span>
                 </div>
 
                 <button
@@ -877,15 +887,16 @@ export default function ProductPage({
                   disabled={
                     affiliateGenerating ||
                     !customPrice ||
-                    Number(customPrice) < price * 1.1
+                    minimumCustomPrice <= 0 ||
+                    Number(customPrice) < minimumCustomPrice
                   }
                   onClick={async () => {
                     setAffiliateError("");
 
-                    if (Number(customPrice) < price * 1.1) {
+                    if (Number(customPrice) < minimumCustomPrice) {
                       setAffiliateError(
                         `Your price must be at least ${money(
-                          price * 1.1,
+                          minimumCustomPrice,
                           product.currency
                         )}.`
                       );
@@ -918,20 +929,26 @@ export default function ProductPage({
                       const affiliateData = result?.data || result;
                       const generatedReferralCode =
                         affiliateData?.referral_code ||
+                        affiliateData?.affiliate_code ||
                         result?.referral_code ||
+                        result?.affiliate_code ||
                         "";
 
-                      if (!generatedReferralCode) {
+                      const generatedLink =
+                        result?.affiliate_link ||
+                        affiliateData?.affiliate_link ||
+                        `${window.location.origin}/marketplace/products/${product.slug}` +
+                          `?ref=${encodeURIComponent(generatedReferralCode)}`;
+
+                      if (!generatedReferralCode && !generatedLink) {
                         throw new Error(
                           "The affiliate link could not be generated."
                         );
                       }
 
-                      const generatedLink =
-                        `${window.location.origin}/marketplace/products/${product.slug}` +
-                        `?ref=${encodeURIComponent(generatedReferralCode)}`;
-
-                      setReferralCode(generatedReferralCode);
+                      if (generatedReferralCode) {
+                        setReferralCode(generatedReferralCode);
+                      }
                       setIsAffiliated(true);
                       setAffiliateError("");
                       setCopied("");
@@ -971,6 +988,35 @@ export default function ProductPage({
                 {affiliateError && (
                   <div className="mt-3 rounded-xl bg-amber-50 p-3 text-sm leading-5 text-amber-700">
                     {affiliateError}
+                  </div>
+                )}
+
+                {referralCode && (
+                  <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                    <p className="text-sm font-bold text-emerald-900">
+                      Your custom affiliate link
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-emerald-700">
+                      Customers using this link will be charged your
+                      personalized selling price.
+                    </p>
+
+                    <div className="mt-3 flex gap-2">
+                      <input
+                        readOnly
+                        value={productLink}
+                        className="min-w-0 flex-1 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => copyLink("custom", productLink)}
+                        className="shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white"
+                      >
+                        {copied === "custom" ? "Copied!" : "Copy"}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
