@@ -57,7 +57,6 @@ type AffiliateProduct = {
   affiliate_code?: string;
   status?: string;
   product_page_url?: string;
-  checkout_url?: string;
   affiliate_link?: string;
   created_at?: string;
   product?: Product;
@@ -399,17 +398,6 @@ export default function SellerMyProductsPage() {
                           className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3B2FE0] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#3125C4]"
                         >
                           Affiliate Link
-                        </a>
-                      )}
-
-                      {item.checkout_url && (
-                        <a
-                          href={item.checkout_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                        >
-                          Checkout Link
                         </a>
                       )}
 

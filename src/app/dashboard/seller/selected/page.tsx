@@ -52,7 +52,6 @@ type AffiliateProduct = AnyRow & {
   status?: string;
   created_at?: string;
   product_page_url?: string;
-  checkout_url?: string;
   product?: AnyRow;
 };
 
@@ -815,9 +814,6 @@ export default function SellerSelectedProductsPage() {
                         ? `/marketplace/products/${item.product.slug}`
                         : "");
 
-                    const checkout =
-                      item.checkout_url || item.product?.checkout_url || "";
-
                     return (
                       <tr
                         key={item.id || item.product_id || index}
@@ -944,17 +940,6 @@ export default function SellerSelectedProductsPage() {
                               </a>
                             )}
 
-                            {checkout && (
-                              <a
-                                href={checkout}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-gray-900"
-                              >
-                                <ShoppingCart className="h-3.5 w-3.5" />
-                                Checkout
-                              </a>
-                            )}
                           </div>
                         </td>
 

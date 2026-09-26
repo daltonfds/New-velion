@@ -62,7 +62,6 @@ type AffiliateProduct = {
     currency?: string | null;
     commission_percentage?: number | string | null;
     product_page_url?: string | null;
-    checkout_url?: string | null;
   } | null;
 };
 

@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { getAffiliateProducts, getMarketplaceProduct, trackAffiliateClick, selectAffiliateProduct } from "@/lib/newvelion-api";
+import { createPayjsrCheckout, getAffiliateProducts, getMarketplaceProduct, trackAffiliateClick, selectAffiliateProduct } from "@/lib/newvelion-api";
 import { supabase } from "@/lib/supabase";
 
 type Product = {
@@ -31,7 +31,6 @@ type Product = {
   price: number | null;
   currency: string | null;
   commission_percentage: number | null;
-  checkout_url: string | null;
   stock: number | null;
   featured: boolean;
   offer: boolean;
@@ -99,6 +98,7 @@ export default function ProductPage({
   const [affiliateOpen, setAffiliateOpen] = useState(false);
   const [copied, setCopied] = useState("");
   const [isAffiliated, setIsAffiliated] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -362,11 +362,7 @@ export default function ProductPage({
     ? `${baseUrl}/marketplace/products/${product.slug}?ref=${encodeURIComponent(referralCode)}`
     : `${baseUrl}/marketplace/products/${product.slug}`;
 
-  const checkoutLink = product.checkout_url
-    ? referralCode
-      ? `${product.checkout_url}${product.checkout_url.includes("?") ? "&" : "?"}ref=${encodeURIComponent(referralCode)}`
-      : product.checkout_url
-    : "";
+  const checkoutLink = "";
 
   const materialsLink = referralCode
     ? `${baseUrl}/marketplace/products/${product.slug}?ref=${encodeURIComponent(referralCode)}#materials`
@@ -423,28 +419,51 @@ export default function ProductPage({
   }
 
   async function handleCheckoutClick() {
-    if (!product.checkout_url) return;
+    if (!affiliateCode) {
+      setAffiliateOpen(true);
+      return;
+    }
 
-    if (Boolean(affiliateCode)) {
+    setCheckoutLoading(true);
+
+    try {
       const visitorId =
         window.localStorage.getItem("newvelion_visitor_id") || undefined;
 
       const sessionId =
         window.sessionStorage.getItem("newvelion_session_id") || undefined;
 
-      try {
-        await trackAffiliateClick({
-          referralCode: affiliateCode,
-          destination: "checkout",
-          visitorId,
-          sessionId,
-        });
-      } catch (error) {
-        console.error("Checkout click tracking failed:", error);
-      }
-    }
+      await trackAffiliateClick({
+        referralCode: affiliateCode,
+        destination: "checkout",
+        visitorId,
+        sessionId,
+      });
 
-    window.open(checkoutLink, "_blank", "noopener,noreferrer");
+      const result = await createPayjsrCheckout({
+        referralCode: affiliateCode,
+      });
+
+      const url =
+        result?.checkout_url ||
+        result?.data?.checkout_url ||
+        "";
+
+      if (!url) {
+        throw new Error("PayJSR did not return a checkout URL.");
+      }
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("PayJSR checkout failed:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to create checkout."
+      );
+    } finally {
+      setCheckoutLoading(false);
+    }
   }
 
   return (
@@ -618,16 +637,15 @@ export default function ProductPage({
                     : "Affiliate This Product"}
                 </button>
 
-                {product.checkout_url && (
-                  <button
-                    type="button"
-                    onClick={handleCheckoutClick}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
-                  >
-                    View Checkout
-                    <ExternalLink size={16} />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={handleCheckoutClick}
+                  disabled={checkoutLoading}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {checkoutLoading ? "Creating secure checkout..." : "Checkout"}
+                  <ExternalLink size={16} />
+                </button>
               </div>
             </div>
 
@@ -732,7 +750,6 @@ export default function ProductPage({
             <div className="mt-6 space-y-4">
               {[
                 ["Product page", productLink, "product"],
-                ["Checkout", checkoutLink, "checkout"],
                 ["Promotional materials", materialsLink, "materials"],
               ].map(([label, value, type]) => (
                 <div key={type} className="rounded-2xl border border-slate-200 p-4">

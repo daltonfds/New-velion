@@ -47,7 +47,6 @@ type AffiliateProduct = {
   affiliate_code?: string | null;
   affiliate_link?: string | null;
   product_page_url?: string | null;
-  checkout_url?: string | null;
   status?: string | null;
   created_at?: string | null;
   product?: Product | null;
@@ -110,10 +109,6 @@ function getProductLink(item: AffiliateProduct) {
 
 function getAffiliateLink(item: AffiliateProduct) {
   return item.affiliate_link || "";
-}
-
-function getCheckoutLink(item: AffiliateProduct) {
-  return item.checkout_url || "";
 }
 
 function getStatus(item: AffiliateProduct) {
@@ -195,13 +190,11 @@ export default function SellerLinksPage() {
 
   const stats = useMemo(() => {
     const active = items.filter((item) => getStatus(item) === "active").length;
-    const withCheckout = items.filter((item) => Boolean(getCheckoutLink(item))).length;
     const withAffiliate = items.filter((item) => Boolean(getAffiliateLink(item))).length;
 
     return {
       total: items.length,
       active,
-      withCheckout,
       withAffiliate,
     };
   }, [items]);
@@ -232,7 +225,7 @@ export default function SellerLinksPage() {
                   </h1>
 
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-indigo-700/80 md:text-base">
-                    Your product and checkout links are connected to your
+                    Your product and affiliate links are connected to your
                     <span className="font-semibold text-indigo-700"> referral code</span>,
                     so clicks, conversions, sales and commissions can be attributed
                     to your account.
@@ -274,8 +267,7 @@ export default function SellerLinksPage() {
                 icon: Link2,
               },
               {
-                label: "Checkout links",
-                value: stats.withCheckout,
+                label: "Affiliate links",
                 icon: ShoppingCart,
               },
             ].map((card) => {
@@ -443,7 +435,6 @@ export default function SellerLinksPage() {
                   const referral = getReferralCode(item);
                   const productLink = getProductLink(item);
                   const affiliateLink = getAffiliateLink(item);
-                  const checkoutLink = getCheckoutLink(item);
                   const status = getStatus(item);
 
                   return (
@@ -513,19 +504,6 @@ export default function SellerLinksPage() {
                             }
                           />
 
-                          <LinkCard
-                            icon={ShoppingCart}
-                            title="Affiliate Checkout Link"
-                            description="Tracked checkout destination"
-                            value={checkoutLink}
-                            copied={copied === `${item.id}-checkout`}
-                            onCopy={() =>
-                              void copyText(
-                                checkoutLink,
-                                `${item.id}-checkout`
-                              )
-                            }
-                          />
                         </div>
                       </div>
 
@@ -590,18 +568,6 @@ export default function SellerLinksPage() {
                           </a>
                         )}
 
-                        {checkoutLink && (
-                          <a
-                            href={checkoutLink}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-700 hover:bg-violet-100"
-                          >
-                            <ShoppingCart className="h-3.5 w-3.5" />
-                            Open Checkout
-                          </a>
-                        )}
-
                         {referral && (
                           <button
                             type="button"
@@ -631,12 +597,6 @@ export default function SellerLinksPage() {
               icon={Link2}
               title="Product Page"
               text="Use the product page when you want customers to learn about the offer before buying."
-            />
-
-            <InfoCard
-              icon={ShoppingCart}
-              title="Affiliate Checkout"
-              text="Use the checkout link when you want to send the customer directly toward purchase."
             />
 
             <InfoCard
