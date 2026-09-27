@@ -63,14 +63,7 @@ export default function MarketplacePage() {
   const router = useRouter();
   const [affiliateLoading, setAffiliateLoading] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [affiliateChoiceProduct, setAffiliateChoiceProduct] =
-    useState<MarketplaceProduct | null>(null);
-
   async function handleAffiliate(product: MarketplaceProduct) {
-    setAffiliateChoiceProduct(product);
-  }
-
-  async function confirmAffiliate(product: MarketplaceProduct) {
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -82,14 +75,21 @@ export default function MarketplacePage() {
       return;
     }
 
-    setAffiliateChoiceProduct(null);
     setAffiliateLoading(product.id);
 
     try {
-      await selectAffiliateProduct({
+      const result = await selectAffiliateProduct({
         productId: product.id,
         token: session.access_token,
       });
+
+      const affiliateLink = result?.affiliate_link;
+
+      if (!affiliateLink) {
+        throw new Error("The affiliate link could not be generated.");
+      }
+
+      window.open(affiliateLink, "_blank", "noopener,noreferrer");
 
       setSelectedProducts((current) =>
         current.includes(product.id)
@@ -196,54 +196,6 @@ export default function MarketplacePage() {
 
   return (
     <main className="min-h-screen bg-white">
-      {affiliateChoiceProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl">
-            <h2 className="text-2xl font-extrabold text-[#1A1A2E]">
-              Escolha como deseja promover
-            </h2>
-            <p className="mt-2 text-sm text-[#6B7280]">
-              Selecione uma opção para continuar.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => confirmAffiliate(affiliateChoiceProduct)}
-              className="mt-6 w-full rounded-2xl border-2 border-[#3B2FE0] bg-[#F7F6FF] p-5 text-left"
-            >
-              <h3 className="font-extrabold text-[#1A1A2E]">
-                Tudo já definido
-              </h3>
-              <p className="mt-1 text-sm text-[#6B7280]">
-                Promova o produto com as configurações definidas pelo fornecedor.
-              </p>
-            </button>
-
-            <div className="mt-3 rounded-2xl border border-[#e7e7ef] bg-[#FAFAFC] p-5 opacity-60">
-              <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-[#1A1A2E]">
-                  Personalização
-                </h3>
-                <span className="rounded-full bg-[#EEEFF3] px-2 py-1 text-[10px] font-extrabold text-[#6B7280]">
-                  EM BREVE
-                </span>
-              </div>
-              <p className="mt-1 text-sm text-[#6B7280]">
-                Personalize as configurações do produto futuramente.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setAffiliateChoiceProduct(null)}
-              className="mt-5 w-full rounded-xl border border-[#dedee8] px-4 py-3 text-sm font-bold"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="mx-auto max-w-[1500px] px-4 pb-12 pt-5 sm:px-6 lg:px-8">
         <section className="overflow-hidden rounded-[30px] bg-[#3B2FE0] shadow-[0_20px_60px_rgba(59,47,224,0.18)]">
           <div className="relative px-6 py-9 sm:px-10 sm:py-12 lg:px-14">
@@ -731,16 +683,14 @@ export default function MarketplacePage() {
                       >
                         {affiliateLoading === product.id
                           ? "Selecting..."
-                          : selected
-                            ? "Selected"
-                            : "Promote"}
+                          : "Affiliate"}
                       </button>
                     </div>
 
                     {selected && (
                       <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-600">
                         <Check size={14} />
-                        Added to your affiliate products
+                        Affiliate link ready
                       </div>
                     )}
                   </div>
