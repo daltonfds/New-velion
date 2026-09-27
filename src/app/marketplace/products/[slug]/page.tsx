@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { createPayjsrCheckout, getAffiliateProducts, getMarketplaceProduct, trackAffiliateClick, selectAffiliateProduct } from "@/lib/newvelion-api";
+import { getAffiliateProducts, getMarketplaceProduct, trackAffiliateClick, selectAffiliateProduct } from "@/lib/newvelion-api";
 import { supabase } from "@/lib/supabase";
 
 type Product = {
@@ -28,6 +28,7 @@ type Product = {
   description_en: string | null;
   description_pt: string | null;
   image_url: string | null;
+  checkout_url: string | null;
   price: number | null;
   currency: string | null;
   commission_percentage: number | null;
@@ -375,7 +376,7 @@ export default function ProductPage({
     ? `${baseUrl}/go/${encodeURIComponent(referralCode)}`
     : "";
 
-  const checkoutLink = "";
+  const checkoutLink = product.checkout_url || "";
 
   const materialsLink = referralCode
     ? `${baseUrl}/marketplace/products/${product.slug}?ref=${encodeURIComponent(referralCode)}#materials`
@@ -453,22 +454,13 @@ export default function ProductPage({
         sessionId,
       });
 
-      const result = await createPayjsrCheckout({
-        referralCode: affiliateCode,
-      });
-
-      const url =
-        result?.checkout_url ||
-        result?.data?.checkout_url ||
-        "";
-
-      if (!url) {
-        throw new Error("PayJSR did not return a checkout URL.");
+      if (!checkoutLink) {
+        throw new Error("This product does not have a checkout URL configured yet.");
       }
 
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.open(checkoutLink, "_blank", "noopener,noreferrer");
     } catch (error) {
-      console.error("PayJSR checkout failed:", error);
+      console.error("External checkout failed:", error);
       setCheckoutError(
         error instanceof Error
           ? error.message

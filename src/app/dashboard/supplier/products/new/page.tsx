@@ -41,6 +41,7 @@ type Product = {
   supplierCost: string;
   stock: string;
   commission: string;
+  checkoutUrl: string;
   description: string;
   images: File[];
   materials: Material[];
@@ -54,6 +55,7 @@ const emptyProduct = (id: number): Product => ({
   supplierCost: "",
   stock: "",
   commission: "30",
+  checkoutUrl: "",
   description: "",
   images: [],
   materials: [],
@@ -457,6 +459,7 @@ export default function NewSupplierProductsPage() {
               currency: "ZAR",
               commission_percentage:
                 Number(product.commission),
+              checkout_url: product.checkoutUrl.trim() || null,
               stock: Number(product.stock),
               featured: false,
               offer: false,
@@ -907,6 +910,30 @@ export default function NewSupplierProductsPage() {
                     placeholder="0"
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Checkout URL
+                  </label>
+
+                  <input
+                    type="url"
+                    value={product.checkoutUrl}
+                    onChange={(e) =>
+                      updateProduct(
+                        product.id,
+                        "checkoutUrl",
+                        e.target.value
+                      )
+                    }
+                    placeholder="https://checkout.payjsr.com/..."
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+
+                  <p className="mt-1 text-xs text-slate-500">
+                    Create the checkout externally and paste the payment link here.
+                  </p>
                 </div>
 
                 <div>

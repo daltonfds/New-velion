@@ -244,41 +244,6 @@ export async function selectAffiliateProduct(params: {
   return payload;
 }
 
-export async function createPayjsrCheckout(params: {
-  referralCode: string;
-}) {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session?.access_token) {
-    throw new Error("Authentication required.");
-  }
-
-  const response = await fetch(`${API_URL}/affiliate/checkout`, {
-    method: "POST",
-    headers: {
-      apikey: API_KEY || "",
-      Authorization: `Bearer ${session.access_token}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      referral_code: params.referralCode,
-    }),
-    cache: "no-store",
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(
-      payload?.error || "Unable to create PayJSR checkout session."
-    );
-  }
-
-  return payload;
-}
-
 export type AdminStats = {
   counts: {
     profiles: number;
@@ -882,7 +847,24 @@ export async function getAffiliateReports() {
 
 export async function getAffiliateProducts() {
   const payload = await protectedApi("/affiliate/products");
-  return Array.isArray(payload) ? payload : payload?.data || [];
+  const items = Array.isArray(payload) ? payload : payload?.data || [];
+
+  return items.map((item: any) => {
+    const product = item?.product || item?.products;
+    const referralCode =
+      item?.referral_code ||
+      item?.affiliate_code ||
+      "";
+
+    return {
+      ...item,
+      product,
+      affiliate_link:
+        referralCode
+          ? `${window.location.origin}/go/${encodeURIComponent(referralCode)}`
+          : item?.affiliate_link || "",
+    };
+  });
 }
 
 export async function getAvailableAffiliateProducts() {
@@ -1004,45 +986,4 @@ export async function replySupplierMessage(conversationId: string, body: string)
   });
 }
 
-export async function createPayJSRCheckout(params: {
-  productId: string;
-  amount: number;
-  currency: string;
-  referralCode?: string;
-}) {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const response = await fetch("/api/checkout", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(session?.access_token
-        ? { Authorization: `Bearer ${session.access_token}` }
-        : {}),
-    },
-    body: JSON.stringify({
-      product_id: params.productId,
-      amount: params.amount,
-      currency: params.currency,
-      referral_code: params.referralCode || null,
-    }),
-    cache: "no-store",
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok || payload?.ok === false) {
-    throw new Error(
-      payload?.error || "Unable to create PayJSR checkout."
-    );
-  }
-
-  if (!payload?.checkout_url) {
-    throw new Error("PayJSR did not return a checkout URL.");
-  }
-
-  return payload;
-}
 
