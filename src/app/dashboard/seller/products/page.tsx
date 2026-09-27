@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 import { useEffect, useMemo, useState } from "react";
 import {
   Building2,
@@ -107,7 +108,13 @@ export default function SellerMyProductsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#F7F8FC] px-4 py-6 sm:px-6 lg:px-8">
+    <DashboardShell
+      area="seller"
+      activeKey="myProducts"
+      title="My Products"
+      subtitle="Your selected products, affiliate links and live performance."
+    >
+      <main className="min-h-screen bg-[#F7F8FC] px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -421,5 +428,6 @@ export default function SellerMyProductsPage() {
         )}
       </div>
     </main>
+    </DashboardShell>
   );
 }
