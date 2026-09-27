@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import ProductImageGallery from "@/components/products/ProductImageGallery";
 import { useEffect, useMemo, useState } from "react";
 import {
   Building2,
@@ -208,18 +209,11 @@ export default function SellerMyProductsPage() {
                   className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
                 >
                   <div className="flex flex-col gap-5 p-5 lg:flex-row lg:items-center">
-                    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-gray-100">
-                      {product.image_url ? (
-                        <img
-                          src={product.image_url}
-                          alt={productName}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-gray-400">
-                          <Package className="h-8 w-8" />
-                        </div>
-                      )}
+                    <div className="h-24 w-24 shrink-0">
+                      <ProductImageGallery
+                        imageUrl={product.image_url}
+                        productName={productName}
+                      />
                     </div>
 
                     <div className="min-w-0 flex-1">

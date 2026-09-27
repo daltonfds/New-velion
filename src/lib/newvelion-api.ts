@@ -60,15 +60,7 @@ export type MarketplaceProduct = {
     description: string | null;
     joined_at: string | null;
   } | null;
-  product_materials?: Array<{
-    id: string;
-    product_id: string;
-    title_en: string | null;
-    title_pt: string | null;
-    material_type: string;
-    file_url: string;
-    created_at: string;
-  }>;
+
 };
 
 type MarketplaceResponse = {
