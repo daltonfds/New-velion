@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import PhoneFields from "@/components/auth/PhoneFields";
@@ -8,6 +9,7 @@ import { composeE164, getCountry } from "@/lib/countries";
 import { supabase } from "@/lib/supabase";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [form, setForm] = useState({
     fullName: "",
     country: "",
@@ -65,7 +67,6 @@ export default function RegisterPage() {
       email: form.email.trim(),
       password: form.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/login`,
         data: {
           full_name: form.fullName.trim(),
           country_code: form.country,
@@ -88,101 +89,13 @@ export default function RegisterPage() {
       return;
     }
 
-    setRegisteredEmail(data.user?.email || form.email.trim());
-    setDone(true);
-  }
+    const registeredEmail = data.user?.email || form.email.trim();
 
-  async function resendConfirmation() {
-    if (!registeredEmail) {
-      return;
-    }
-
-    setError("");
-    setSuccess("");
-    setResending(true);
-
-    const { error: resendError } = await supabase.auth.resend({
-      type: "signup",
-      email: registeredEmail,
-    });
-
-    setResending(false);
-
-    if (resendError) {
-      setError(resendError.message);
-      return;
-    }
-
-    setSuccess(
-      "A new confirmation email has been sent. Check your inbox and spam folder."
+    router.push(
+      `/verify-email?email=${encodeURIComponent(registeredEmail)}`
     );
   }
 
-  if (done) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-white px-5 py-10">
-        <div className="w-full max-w-md">
-          <div className="rounded-3xl border border-blue-100 bg-white p-8 text-center shadow-[0_20px_60px_rgba(37,99,235,0.08)]">
-            <div className="mb-7 flex justify-center border-b border-slate-100 pb-7">
-              <NewvelionBrand size="md" />
-            </div>
-
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-600">
-              ✓
-            </div>
-
-            <h1 className="mt-6 text-2xl font-bold text-[#16294F]">
-              Check your email
-            </h1>
-
-            <p className="mt-3 text-slate-500">
-              Your seller account has been created. We sent a confirmation
-              email to:
-            </p>
-
-            <p className="mt-3 break-all font-semibold text-blue-600">
-              {registeredEmail}
-            </p>
-
-            <p className="mt-4 text-sm leading-6 text-slate-500">
-              Confirm your email address before signing in. If you do not see
-              the message, check your spam or junk folder.
-            </p>
-
-            {error && (
-              <div className="mt-5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-600">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-700">
-                {success}
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={resendConfirmation}
-              disabled={resending}
-              className="mt-6 w-full rounded-xl border border-blue-200 bg-white px-6 py-3 font-semibold text-blue-600 transition hover:bg-blue-50 disabled:opacity-60"
-            >
-              {resending
-                ? "Sending confirmation..."
-                : "Resend confirmation email"}
-            </button>
-
-            <Link
-              href="/login"
-              className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-            >
-              Go to sign in
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-white px-5 py-10">
