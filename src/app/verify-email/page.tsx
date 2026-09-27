@@ -1,12 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import { supabase } from "@/lib/supabase";
 
-export default function VerifyEmailPage() {
+function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email")?.trim().toLowerCase() || "";
@@ -169,5 +169,22 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-white">
+          <div className="text-sm font-semibold text-[#16294F]">
+            Loading...
+          </div>
+        </main>
+      }
+    >
+      <VerifyEmailForm />
+    </Suspense>
   );
 }
