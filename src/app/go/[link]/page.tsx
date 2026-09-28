@@ -1,43 +1,45 @@
-"use client";
+import { createClient } from "@supabase/supabase-js";
+import { redirect, notFound } from "next/navigation";
 
-import { useEffect } from "react";
-import { useParams } from "next/navigation";
+export const dynamic = "force-dynamic";
 
-export default function AffiliateRedirectPage() {
-  const params = useParams<{ link: string }>();
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  useEffect(() => {
-    const referralCode = params?.link;
+export default async function AffiliateRedirectPage({
+  params,
+}: {
+  params: Promise<{ link: string }>;
+}) {
+  const { link } = await params;
 
-    if (!referralCode) return;
+  if (!supabaseUrl || !supabaseAnonKey || !link) {
+    notFound();
+  }
 
-    const apiUrl = process.env.NEXT_PUBLIC_NEWVELION_API_URL;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { persistSession: false },
+  });
 
-    if (!apiUrl) {
-      console.error("NEXT_PUBLIC_NEWVELION_API_URL is not configured.");
-      return;
-    }
+  const { data, error } = await supabase.rpc("resolve_affiliate_checkout", {
+    p_link_unico: `go/${link}`,
+  });
 
-    window.location.replace(
-      `${apiUrl.replace(/\/$/, "")}/go/${encodeURIComponent(referralCode)}`
-    );
-  }, [params]);
+  if (error) {
+    console.error("Failed to resolve affiliate link:", error);
+    notFound();
+  }
 
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-white px-6">
-      <div className="w-full max-w-md text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
-        </div>
+  const checkoutUrl = Array.isArray(data)
+    ? data[0]?.checkout_url
+    : data?.checkout_url;
 
-        <h1 className="mt-5 text-xl font-semibold text-gray-900">
-          Opening product...
-        </h1>
+  if (
+    typeof checkoutUrl !== "string" ||
+    !/^https?:\/\//i.test(checkoutUrl)
+  ) {
+    notFound();
+  }
 
-        <p className="mt-2 text-sm text-gray-500">
-          Please wait while we prepare your product page.
-        </p>
-      </div>
-    </main>
-  );
+  redirect(checkoutUrl);
 }
