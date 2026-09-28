@@ -1,356 +1,341 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  DollarSign,
-  Download,
-  Loader2,
-  RefreshCw,
-  Search,
-  XCircle,
-} from "lucide-react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import {
-  AdminCommission,
-  getAdminCommissions,
-} from "@/lib/newvelion-api";
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Badge from "@/components/ui/Badge";
+import { supabase } from "@/lib/supabase";
+
+interface Sale {
+  id: string;
+  vendedor_id: string;
+  product_id: string;
+  valor_venda: number;
+  comissao_vendedor: number;
+  status: string;
+  vendido_em: string;
+}
+
+interface Product {
+  id: string;
+  nome: string;
+}
+
+interface Profile {
+  id: string;
+  nome_completo: string | null;
+  full_name: string | null;
+}
 
 export default function AdminCommissionsPage() {
-  const [commissions, setCommissions] = useState<AdminCommission[]>([]);
+  const [sales, setSales] = useState<Sale[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function loadCommissions() {
-    try {
+  useEffect(() => {
+    async function load() {
       setLoading(true);
       setError("");
-      setCommissions(await getAdminCommissions());
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load commissions."
-      );
-    } finally {
+
+      const [salesResult, productsResult, profilesResult] =
+        await Promise.all([
+          supabase
+            .from("sales")
+            .select(
+              "id, vendedor_id, product_id, valor_venda, comissao_vendedor, status, vendido_em",
+            )
+            .order("vendido_em", { ascending: false }),
+
+          supabase
+            .from("products")
+            .select("id, nome"),
+
+          supabase
+            .from("profiles")
+            .select("id, nome_completo, full_name"),
+        ]);
+
+      if (salesResult.error) {
+        setError(salesResult.error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (productsResult.error) {
+        setError(productsResult.error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (profilesResult.error) {
+        setError(profilesResult.error.message);
+        setLoading(false);
+        return;
+      }
+
+      setSales((salesResult.data ?? []) as Sale[]);
+      setProducts((productsResult.data ?? []) as Product[]);
+      setProfiles((profilesResult.data ?? []) as Profile[]);
       setLoading(false);
     }
-  }
 
-  useEffect(() => {
-    loadCommissions();
+    load();
   }, []);
 
-  const filtered = useMemo(() => {
+  const productMap = useMemo(
+    () =>
+      Object.fromEntries(
+        products.map((product) => [product.id, product.nome]),
+      ),
+    [products],
+  );
+
+  const profileMap = useMemo(
+    () =>
+      Object.fromEntries(
+        profiles.map((profile) => [
+          profile.id,
+          profile.nome_completo ||
+            profile.full_name ||
+            "Unnamed seller",
+        ]),
+      ),
+    [profiles],
+  );
+
+  const filteredSales = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return commissions.filter((commission) => {
-      const matchesStatus =
-        status === "all" ||
-        String(commission.status || "").toLowerCase() === status;
+    return sales.filter((sale) => {
+      const productName = productMap[sale.product_id] || "";
+      const sellerName = profileMap[sale.vendedor_id] || "";
 
       const matchesSearch =
         !query ||
-        String(commission.id || "").toLowerCase().includes(query) ||
-        String(commission.affiliate_id || "")
-          .toLowerCase()
-          .includes(query) ||
-        String(commission.product_id || "")
-          .toLowerCase()
-          .includes(query) ||
-        String(commission.sale_id || "")
-          .toLowerCase()
-          .includes(query);
+        sale.id.toLowerCase().includes(query) ||
+        productName.toLowerCase().includes(query) ||
+        sellerName.toLowerCase().includes(query);
 
-      return matchesStatus && matchesSearch;
+      const matchesStatus =
+        statusFilter === "all" ||
+        sale.status.toLowerCase() ===
+          statusFilter.toLowerCase();
+
+      return matchesSearch && matchesStatus;
     });
-  }, [commissions, search, status]);
+  }, [sales, productMap, profileMap, search, statusFilter]);
 
-  const totalGenerated = commissions.reduce(
-    (sum, commission) => sum + Number(commission.amount || 0),
-    0
-  );
+  const summary = useMemo(() => {
+    return sales.reduce(
+      (result, sale) => {
+        const commission = Number(
+          sale.comissao_vendedor ?? 0,
+        );
+        const saleValue = Number(sale.valor_venda ?? 0);
 
-  const available = commissions
-    .filter(
-      (commission) =>
-        String(commission.status || "").toLowerCase() === "available"
-    )
-    .reduce((sum, commission) => sum + Number(commission.amount || 0), 0);
+        result.total += commission;
 
-  const pending = commissions
-    .filter(
-      (commission) =>
-        String(commission.status || "").toLowerCase() === "pending"
-    )
-    .reduce((sum, commission) => sum + Number(commission.amount || 0), 0);
+        if (sale.status === "paga") {
+          result.paid += commission;
+          result.paidSales += 1;
+          result.paidRevenue += saleValue;
+        }
 
-  const paid = commissions
-    .filter(
-      (commission) =>
-        String(commission.status || "").toLowerCase() === "paid"
-    )
-    .reduce((sum, commission) => sum + Number(commission.amount || 0), 0);
+        if (sale.status === "pendente") {
+          result.pending += commission;
+        }
 
-  function exportCsv() {
-    const headers = [
-      "ID",
-      "Affiliate",
-      "Supplier",
-      "Product",
-      "Sale",
-      "Rate",
-      "Sale Amount",
-      "Commission",
-      "Currency",
-      "Status",
-      "Created",
-    ];
+        if (
+          sale.status === "cancelada" ||
+          sale.status === "reembolsada"
+        ) {
+          result.reversed += commission;
+        }
 
-    const rows = filtered.map((commission) => [
-      commission.id,
-      commission.affiliate_id || "",
-      commission.supplier_id || "",
-      commission.product_id || "",
-      commission.sale_id || "",
-      commission.rate || 0,
-      commission.sale_amount || 0,
-      commission.amount || 0,
-      commission.currency || "",
-      commission.status || "",
-      commission.created_at || "",
-    ]);
-
-    const csv = [headers, ...rows]
-      .map((row) =>
-        row
-          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
-          .join(",")
-      )
-      .join("\n");
-
-    const blob = new Blob([csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-
-    anchor.href = url;
-    anchor.download = "newvelion-commissions.csv";
-    anchor.click();
-
-    URL.revokeObjectURL(url);
-  }
+        return result;
+      },
+      {
+        total: 0,
+        paid: 0,
+        pending: 0,
+        reversed: 0,
+        paidSales: 0,
+        paidRevenue: 0,
+      },
+    );
+  }, [sales]);
 
   return (
-    <DashboardShell
-      area="admin"
-      activeKey="commissions"
-      title="Commissions"
-      subtitle="Monitor affiliate commissions across the platform"
-    >
+    <AppShell area="admin">
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Link
-              href="/dashboard/admin"
-              className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-              <ArrowLeft size={16} />
-              Back to dashboard
-            </Link>
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Commissions
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Monitor seller commissions generated from platform
+            sales.
+          </p>
+        </div>
 
-            <h1 className="text-2xl font-bold text-slate-950">
-              Commissions
-            </h1>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Your affiliate commission activity.
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <p className="text-sm text-slate-500">
+              Total Commissions
             </p>
-          </div>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              {summary.total.toFixed(2)}
+            </p>
+          </Card>
 
-          <div className="flex gap-2">
-            <button
-              onClick={exportCsv}
-              disabled={filtered.length === 0}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50"
-            >
-              <Download size={16} />
-              Export CSV
-            </button>
+          <Card>
+            <p className="text-sm text-slate-500">
+              Paid Commissions
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              {summary.paid.toFixed(2)}
+            </p>
+          </Card>
 
-            <button
-              onClick={loadCommissions}
-              disabled={loading}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
-            >
-              <RefreshCw
-                size={16}
-                className={loading ? "animate-spin" : ""}
-              />
-              Refresh
-            </button>
-          </div>
+          <Card>
+            <p className="text-sm text-slate-500">
+              Pending Commissions
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              {summary.pending.toFixed(2)}
+            </p>
+          </Card>
+
+          <Card>
+            <p className="text-sm text-slate-500">
+              Paid Sales
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              {summary.paidSales}
+            </p>
+          </Card>
         </div>
 
-        {error && (
-          <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            <XCircle size={18} />
-            {error}
-          </div>
-        )}
-
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            ["Total Generated", totalGenerated],
-            ["Available", available],
-            ["Pending", pending],
-            ["Paid", paid],
-          ].map(([label, value]) => (
-            <div
-              key={String(label)}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <p className="text-sm text-slate-500">
-                {String(label)}
-              </p>
-
-              <p className="mt-3 text-2xl font-bold text-slate-950">
-                R {Number(value).toLocaleString()}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex flex-col gap-3 lg:flex-row">
-            <div className="relative flex-1">
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search commission, affiliate, product or sale..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
+        <Card>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Input
+              placeholder="Search seller, product, or sale ID..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
 
             <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium outline-none focus:border-blue-500"
+              value={statusFilter}
+              onChange={(event) =>
+                setStatusFilter(event.target.value)
+              }
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
             >
               <option value="all">All statuses</option>
-              <option value="pending">Pending</option>
-              <option value="available">Available</option>
-              <option value="paid">Paid</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="paga">Paid</option>
+              <option value="pendente">Pending</option>
+              <option value="cancelada">Cancelled</option>
+              <option value="reembolsada">Refunded</option>
             </select>
           </div>
-        </div>
+        </Card>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        {error && (
+          <Card>
+            <p className="text-sm text-red-600">{error}</p>
+          </Card>
+        )}
+
+        <Card>
           {loading ? (
-            <div className="flex min-h-64 items-center justify-center">
-              <Loader2
-                size={28}
-                className="animate-spin text-blue-600"
-              />
+            <div className="py-12 text-center text-sm text-slate-500">
+              Loading commissions...
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex min-h-64 flex-col items-center justify-center text-center">
-              <DollarSign size={32} className="text-slate-300" />
-
-              <h3 className="mt-3 font-semibold text-slate-900">
+          ) : filteredSales.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="font-medium text-slate-900">
                 No commissions found
-              </h3>
-
+              </p>
               <p className="mt-1 text-sm text-slate-500">
-                No commissions match your filters.
+                No commission records match the current filters.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1100px]">
-                <thead className="border-b border-slate-200 bg-slate-50">
-                  <tr>
-                    {[
-                      "Commission",
-                      "Affiliate",
-                      "Product",
-                      "Sale",
-                      "Rate",
-                      "Commission",
-                      "Status",
-                      "Date",
-                    ].map((head) => (
-                      <th
-                        key={head}
-                        className="px-5 py-4 text-left text-xs font-bold uppercase tracking-wide text-slate-500"
-                      >
-                        {head}
-                      </th>
-                    ))}
+                <thead>
+                  <tr className="border-b border-slate-100 text-left">
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Sale
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Seller
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Product
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Sale Value
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Commission
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Date
+                    </th>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-slate-100">
-                  {filtered.map((commission) => (
+                  {filteredSales.map((sale) => (
                     <tr
-                      key={commission.id}
+                      key={sale.id}
                       className="hover:bg-slate-50"
                     >
-                      <td className="px-5 py-4">
-                        <p className="font-semibold text-slate-900">
-                          {commission.id}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {commission.currency || "ZAR"}
-                        </p>
+                      <td className="px-6 py-4">
+                        <div className="max-w-[180px] truncate text-sm font-medium text-slate-900">
+                          {sale.id}
+                        </div>
                       </td>
 
-                      <td className="px-5 py-4 text-xs text-slate-500">
-                        {commission.affiliate_id || "—"}
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        {profileMap[sale.vendedor_id] ||
+                          "Unknown seller"}
                       </td>
 
-                      <td className="px-5 py-4 text-xs text-slate-500">
-                        {commission.product_id || "—"}
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        {productMap[sale.product_id] ||
+                          "Unknown product"}
                       </td>
 
-                      <td className="px-5 py-4 text-xs text-slate-500">
-                        {commission.sale_id || "—"}
-                      </td>
-
-                      <td className="px-5 py-4 text-sm font-semibold text-slate-900">
-                        {Number(commission.rate || 0)}%
-                      </td>
-
-                      <td className="px-5 py-4 text-sm font-bold text-slate-900">
-                        {commission.currency || "ZAR"}{" "}
+                      <td className="px-6 py-4 text-sm text-slate-700">
                         {Number(
-                          commission.amount || 0
+                          sale.valor_venda ?? 0,
+                        ).toFixed(2)}
+                      </td>
+
+                      <td className="px-6 py-4 text-sm font-semibold text-slate-900">
+                        {Number(
+                          sale.comissao_vendedor ?? 0,
+                        ).toFixed(2)}
+                      </td>
+
+                      <td className="px-6 py-4">
+                        <Badge>{sale.status}</Badge>
+                      </td>
+
+                      <td className="px-6 py-4 text-sm text-slate-500">
+                        {new Date(
+                          sale.vendido_em,
                         ).toLocaleString()}
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">
-                          {commission.status || "—"}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4 text-sm text-slate-500">
-                        {commission.created_at
-                          ? new Date(
-                              commission.created_at
-                            ).toLocaleString()
-                          : "—"}
                       </td>
                     </tr>
                   ))}
@@ -358,13 +343,39 @@ export default function AdminCommissionsPage() {
               </table>
             </div>
           )}
-        </div>
+        </Card>
 
-        <div className="text-sm text-slate-500">
-          {filtered.length} commissions displayed · Connected to live
-          platform data
-        </div>
+        <Card>
+          <div className="grid gap-6 md:grid-cols-3">
+            <div>
+              <p className="text-sm text-slate-500">
+                Paid sales revenue
+              </p>
+              <p className="mt-1 text-xl font-semibold text-slate-900">
+                {summary.paidRevenue.toFixed(2)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">
+                Reversed commissions
+              </p>
+              <p className="mt-1 text-xl font-semibold text-slate-900">
+                {summary.reversed.toFixed(2)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">
+                Commission records
+              </p>
+              <p className="mt-1 text-xl font-semibold text-slate-900">
+                {sales.length}
+              </p>
+            </div>
+          </div>
+        </Card>
       </div>
-    </DashboardShell>
+    </AppShell>
   );
 }

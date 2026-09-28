@@ -1,233 +1,391 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  Loader2,
-  RefreshCw,
-  Search,
-  Store,
-  Users,
-  XCircle,
-} from "lucide-react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import { AdminSeller, getAdminSellers } from "@/lib/newvelion-api";
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Badge from "@/components/ui/Badge";
+import { supabase } from "@/lib/supabase";
+
+interface Seller {
+  id: string;
+  nome_completo: string | null;
+  full_name: string | null;
+  pais: string | null;
+  country: string | null;
+  telefone: string | null;
+  phone_number: string | null;
+  kyc_status: string | null;
+  status: string | null;
+  created_at: string;
+}
+
+interface Sale {
+  vendedor_id: string;
+  valor_venda: number;
+  comissao_vendedor: number;
+  status: string;
+}
+
+interface SellerStats {
+  sales: number;
+  revenue: number;
+  commissions: number;
+}
 
 export default function AdminSellersPage() {
-  const [sellers, setSellers] = useState<AdminSeller[]>([]);
+  const [sellers, setSellers] = useState<Seller[]>([]);
+  const [sales, setSales] = useState<Sale[]>([]);
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("all");
+  const [kycFilter, setKycFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function loadSellers() {
-    try {
+  useEffect(() => {
+    async function load() {
       setLoading(true);
       setError("");
-      setSellers(await getAdminSellers());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load sellers.");
-    } finally {
+
+      const [sellersResult, salesResult] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select(
+            "id, nome_completo, full_name, pais, country, telefone, phone_number, kyc_status, status, created_at",
+          )
+          .eq("role", "seller")
+          .order("created_at", { ascending: false }),
+
+        supabase
+          .from("sales")
+          .select(
+            "vendedor_id, valor_venda, comissao_vendedor, status",
+          ),
+      ]);
+
+      if (sellersResult.error) {
+        setError(sellersResult.error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (salesResult.error) {
+        setError(salesResult.error.message);
+        setLoading(false);
+        return;
+      }
+
+      setSellers((sellersResult.data ?? []) as Seller[]);
+      setSales((salesResult.data ?? []) as Sale[]);
       setLoading(false);
     }
-  }
 
-  useEffect(() => {
-    loadSellers();
+    load();
   }, []);
 
-  const filtered = useMemo(() => {
+  const stats = useMemo(() => {
+    const result: Record<string, SellerStats> = {};
+
+    for (const sale of sales) {
+      if (sale.status !== "paga") continue;
+
+      if (!result[sale.vendedor_id]) {
+        result[sale.vendedor_id] = {
+          sales: 0,
+          revenue: 0,
+          commissions: 0,
+        };
+      }
+
+      result[sale.vendedor_id].sales += 1;
+      result[sale.vendedor_id].revenue += Number(sale.valor_venda ?? 0);
+      result[sale.vendedor_id].commissions += Number(
+        sale.comissao_vendedor ?? 0,
+      );
+    }
+
+    return result;
+  }, [sales]);
+
+  const filteredSellers = useMemo(() => {
     const query = search.trim().toLowerCase();
 
     return sellers.filter((seller) => {
-      const matchesStatus =
-        status === "all" || String(seller.status || "active") === status;
+      const name = (
+        seller.nome_completo ||
+        seller.full_name ||
+        ""
+      ).toLowerCase();
+
+      const phone = (
+        seller.telefone ||
+        seller.phone_number ||
+        ""
+      ).toLowerCase();
 
       const matchesSearch =
         !query ||
-        String(seller.full_name || "").toLowerCase().includes(query) ||
-        String(seller.email || "").toLowerCase().includes(query) ||
-        String(seller.country || "").toLowerCase().includes(query) ||
-        String(seller.id || "").toLowerCase().includes(query);
+        name.includes(query) ||
+        phone.includes(query) ||
+        seller.id.toLowerCase().includes(query);
 
-      return matchesStatus && matchesSearch;
+      const matchesKyc =
+        kycFilter === "all" ||
+        (seller.kyc_status || "").toLowerCase() ===
+          kycFilter.toLowerCase();
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        (seller.status || "").toLowerCase() ===
+          statusFilter.toLowerCase();
+
+      return matchesSearch && matchesKyc && matchesStatus;
     });
-  }, [sellers, search, status]);
+  }, [sellers, search, kycFilter, statusFilter]);
 
-  const revenue = sellers.reduce(
-    (sum, seller) => sum + Number(seller.revenue || 0),
-    0
+  const totalRevenue = Object.values(stats).reduce(
+    (sum, item) => sum + item.revenue,
+    0,
   );
 
+  const totalCommissions = Object.values(stats).reduce(
+    (sum, item) => sum + item.commissions,
+    0,
+  );
+
+  const verifiedSellers = sellers.filter(
+    (seller) =>
+      (seller.kyc_status || "").toLowerCase() === "approved",
+  ).length;
+
+  const activeSellers = sellers.filter(
+    (seller) =>
+      !seller.status ||
+      seller.status.toLowerCase() === "active",
+  ).length;
+
   return (
-    <DashboardShell
-      area="admin"
-      activeKey="sellers"
-      title="Sellers"
-      subtitle="Manage platform sellers and affiliate activity"
-    >
+    <AppShell area="admin">
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Link
-              href="/dashboard/admin"
-              className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-              <ArrowLeft size={16} />
-              Back to dashboard
-            </Link>
-            <h1 className="text-2xl font-bold text-slate-950">Sellers</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Seller accounts on the platform.
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Sellers
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Manage affiliate sellers, verification status, and sales
+            performance.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <p className="text-sm text-slate-500">Total Sellers</p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              {sellers.length}
             </p>
-          </div>
+          </Card>
 
-          <button
-            onClick={loadSellers}
-            disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-60"
-          >
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-            Refresh
-          </button>
+          <Card>
+            <p className="text-sm text-slate-500">Verified Sellers</p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              {verifiedSellers}
+            </p>
+          </Card>
+
+          <Card>
+            <p className="text-sm text-slate-500">Active Sellers</p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              {activeSellers}
+            </p>
+          </Card>
+
+          <Card>
+            <p className="text-sm text-slate-500">Total Commissions</p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              {totalCommissions.toFixed(2)}
+            </p>
+          </Card>
         </div>
 
-        {error && (
-          <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            <XCircle size={18} />
-            {error}
-          </div>
-        )}
-
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            ["Total Sellers", sellers.length],
-            ["Active Sellers", sellers.filter((s) => !s.status || s.status === "active").length],
-            ["Total Sales", sellers.reduce((sum, s) => sum + Number(s.sales_count || 0), 0)],
-            ["Seller Revenue", `R ${revenue.toLocaleString()}`],
-          ].map(([label, value]) => (
-            <div
-              key={String(label)}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <p className="text-sm text-slate-500">{String(label)}</p>
-              <p className="mt-3 text-2xl font-bold text-slate-950">
-                {String(value)}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex flex-col gap-3 lg:flex-row">
-            <div className="relative flex-1">
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search seller by name, email, country or ID..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
+        <Card>
+          <div className="grid gap-4 md:grid-cols-3">
+            <Input
+              placeholder="Search by name, phone, or ID..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
 
             <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium outline-none focus:border-blue-500"
+              value={kycFilter}
+              onChange={(event) => setKycFilter(event.target.value)}
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+            >
+              <option value="all">All KYC statuses</option>
+              <option value="approved">Approved</option>
+              <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
+            </select>
+
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
             >
               <option value="all">All statuses</option>
               <option value="active">Active</option>
-              <option value="pending">Pending</option>
+              <option value="inactive">Inactive</option>
               <option value="suspended">Suspended</option>
             </select>
           </div>
-        </div>
+        </Card>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        {error && (
+          <Card>
+            <p className="text-sm text-red-600">{error}</p>
+          </Card>
+        )}
+
+        <Card>
           {loading ? (
-            <div className="flex min-h-64 items-center justify-center">
-              <Loader2 size={28} className="animate-spin text-blue-600" />
+            <div className="py-12 text-center text-sm text-slate-500">
+              Loading sellers...
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex min-h-64 flex-col items-center justify-center text-center">
-              <Users size={32} className="text-slate-300" />
-              <h3 className="mt-3 font-semibold text-slate-900">
+          ) : filteredSellers.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="font-medium text-slate-900">
                 No sellers found
-              </h3>
+              </p>
               <p className="mt-1 text-sm text-slate-500">
-                No seller accounts match your filters.
+                No seller accounts match the current filters.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[820px]">
-                <thead className="border-b border-slate-200 bg-slate-50">
-                  <tr>
-                    {["Seller", "Country", "Sales", "Revenue", "Status", "Action"].map(
-                      (head) => (
-                        <th
-                          key={head}
-                          className="px-5 py-4 text-left text-xs font-bold uppercase tracking-wide text-slate-500"
-                        >
-                          {head}
-                        </th>
-                      )
-                    )}
+              <table className="w-full min-w-[1100px]">
+                <thead>
+                  <tr className="border-b border-slate-100 text-left">
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Seller
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Country
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      KYC
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Sales
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Revenue
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Commission
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Registered
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-slate-100">
-                  {filtered.map((seller) => (
-                    <tr key={seller.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-                            <Store size={18} />
+                  {filteredSellers.map((seller) => {
+                    const sellerStats = stats[seller.id] || {
+                      sales: 0,
+                      revenue: 0,
+                      commissions: 0,
+                    };
+
+                    const name =
+                      seller.nome_completo ||
+                      seller.full_name ||
+                      "Unnamed seller";
+
+                    return (
+                      <tr key={seller.id} className="hover:bg-slate-50">
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-slate-900">
+                            {name}
                           </div>
-                          <div>
-                            <p className="font-semibold text-slate-900">
-                              {seller.full_name || "Unnamed seller"}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {seller.email || seller.id}
-                            </p>
+                          <div className="mt-1 max-w-[220px] truncate text-xs text-slate-400">
+                            {seller.id}
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-4 text-sm text-slate-600">
-                        {seller.country || "—"}
-                      </td>
-                      <td className="px-5 py-4 text-sm font-semibold text-slate-900">
-                        {Number(seller.sales_count || 0).toLocaleString()}
-                      </td>
-                      <td className="px-5 py-4 text-sm font-semibold text-slate-900">
-                        R {Number(seller.revenue || 0).toLocaleString()}
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold capitalize text-emerald-700">
-                          {seller.status || "active"}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="text-xs font-medium text-slate-400">
-                          Live data
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                          {(seller.telefone ||
+                            seller.phone_number) && (
+                            <div className="mt-1 text-xs text-slate-500">
+                              {seller.telefone ||
+                                seller.phone_number}
+                            </div>
+                          )}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-slate-600">
+                          {seller.pais || seller.country || "—"}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <Badge>
+                            {seller.kyc_status || "Not submitted"}
+                          </Badge>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <Badge>
+                            {seller.status || "Active"}
+                          </Badge>
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-slate-700">
+                          {sellerStats.sales}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                          {sellerStats.revenue.toFixed(2)}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                          {sellerStats.commissions.toFixed(2)}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-slate-500">
+                          {new Date(
+                            seller.created_at,
+                          ).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           )}
-        </div>
+        </Card>
 
-        <div className="text-sm text-slate-500">
-          {filtered.length} sellers displayed · Connected to live platform data
-        </div>
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-slate-500">
+                Total sales revenue
+              </p>
+              <p className="mt-1 text-xl font-semibold text-slate-900">
+                {totalRevenue.toFixed(2)}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="text-sm text-slate-500">
+                Total seller commissions
+              </p>
+              <p className="mt-1 text-xl font-semibold text-slate-900">
+                {totalCommissions.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </Card>
       </div>
-    </DashboardShell>
+    </AppShell>
   );
 }

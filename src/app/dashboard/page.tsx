@@ -8,58 +8,37 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    let mounted = true;
-
     async function resolveDashboard() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!mounted) return;
-
       if (!user) {
-        router.replace("/login?redirect=/dashboard");
+        router.replace("/login");
         return;
       }
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role,status")
+        .select("role")
         .eq("id", user.id)
         .maybeSingle();
 
-      if (!mounted) return;
-
-      if (profile?.status === "suspended") {
-        router.replace("/login");
+      if (profile?.role === "admin") {
+        router.replace("/dashboard/admin");
         return;
       }
 
-      const role = String(profile?.role || "seller").toLowerCase();
-
-      if (role === "admin") {
-        router.replace("/dashboard/admin");
-      } else if (role === "supplier") {
-        router.replace("/dashboard/supplier");
-      } else {
-        router.replace("/dashboard/seller");
-      }
+      router.replace("/dashboard/seller");
     }
 
     resolveDashboard();
-
-    return () => {
-      mounted = false;
-    };
   }, [router]);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50">
-      <div className="text-center">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#16294F]" />
-        <p className="mt-4 text-sm font-medium text-slate-500">
-          Loading your dashboard...
-        </p>
+      <div className="text-sm text-slate-500">
+        Loading Newvelion...
       </div>
     </main>
   );

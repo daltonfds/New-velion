@@ -1,850 +1,393 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import {
-  getAffiliateClicks,
-  getAffiliateConversions,
-  getAffiliateProducts,
-  getAffiliateSales,
-} from "@/lib/newvelion-api";
+import { useEffect, useMemo, useState } from "react";
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import { supabase } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/auth";
 
-type Period = "today" | "7d" | "30d" | "month" | "all";
-
-type AffiliateProduct = {
+interface Sale {
   id: string;
-  referral_code?: string | null;
-  affiliate_code?: string | null;
-  affiliate_link?: string | null;
-  product?: {
-    id: string;
-    name_en?: string | null;
-    name_pt?: string | null;
-    image_url?: string | null;
-    price?: number | null;
+  product_id: string;
+  valor_venda: number;
+  comissao_vendedor: number;
+  status: string;
+  vendido_em: string;
+  product: {
+    nome: string;
+    moeda: string;
   } | null;
-};
-
-type Click = {
-  id: string;
-  affiliate_product_id?: string | null;
-  product_id?: string | null;
-  referral_code?: string | null;
-  visitor_id?: string | null;
-  session_id?: string | null;
-  destination?: string | null;
-  referrer?: string | null;
-  created_at?: string | null;
-};
-
-type Conversion = {
-  id: string;
-  affiliate_product_id?: string | null;
-  product_id?: string | null;
-  referral_code?: string | null;
-  amount?: number | null;
-  status?: string | null;
-  created_at?: string | null;
-};
-
-type Sale = {
-  id: string;
-  product_id?: string | null;
-  amount?: number | null;
-  status?: string | null;
-  created_at?: string | null;
-  order_reference?: string | null;
-};
-
-function money(value: number) {
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
-function dateLabel(value?: string | null) {
-  if (!value) return "—";
-
-  return new Intl.DateTimeFormat("en-ZA", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
-function shortDate(value: Date) {
-  return new Intl.DateTimeFormat("en-ZA", {
-    day: "2-digit",
-    month: "short",
-  }).format(value);
-}
-
-function periodStart(period: Period) {
-  const now = new Date();
-
-  if (period === "today") {
-    const start = new Date(now);
-    start.setHours(0, 0, 0, 0);
-    return start;
-  }
-
-  if (period === "7d") {
-    const start = new Date(now);
-    start.setDate(start.getDate() - 6);
-    start.setHours(0, 0, 0, 0);
-    return start;
-  }
-
-  if (period === "30d") {
-    const start = new Date(now);
-    start.setDate(start.getDate() - 29);
-    start.setHours(0, 0, 0, 0);
-    return start;
-  }
-
-  if (period === "month") {
-    return new Date(now.getFullYear(), now.getMonth(), 1);
-  }
-
-  return new Date(0);
-}
-
-function inPeriod(value: string | null | undefined, period: Period) {
-  if (period === "all") return true;
-  if (!value) return false;
-
-  return new Date(value) >= periodStart(period);
-}
-
-function productName(product?: AffiliateProduct["product"] | null) {
-  return product?.name_en || product?.name_pt || "Unknown product";
-}
-
-function sourceName(referrer?: string | null) {
-  if (!referrer) return "Direct";
-
-  try {
-    return new URL(referrer).hostname.replace(/^www\./, "");
-  } catch {
-    return referrer.length > 32 ? `${referrer.slice(0, 29)}...` : referrer;
-  }
 }
 
 export default function SellerPerformancePage() {
-  const [period, setPeriod] = useState<Period>("30d");
-  const [products, setProducts] = useState<AffiliateProduct[]>([]);
-  const [clicks, setClicks] = useState<Click[]>([]);
-  const [conversions, setConversions] = useState<Conversion[]>([]);
   const [sales, setSales] = useState<Sale[]>([]);
+  const [period, setPeriod] = useState("30d");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
 
-  const load = useCallback(async () => {
-    try {
+  useEffect(() => {
+    async function load() {
       setLoading(true);
       setError("");
 
-      const [productRows, clickRows, conversionRows, saleRows] =
-        await Promise.all([
-          getAffiliateProducts(),
-          getAffiliateClicks(),
-          getAffiliateConversions(),
-          getAffiliateSales(),
-        ]);
+      const user = await getCurrentUser();
 
-      setProducts(Array.isArray(productRows) ? productRows : []);
-      setClicks(Array.isArray(clickRows) ? clickRows : []);
-      setConversions(Array.isArray(conversionRows) ? conversionRows : []);
-      setSales(Array.isArray(saleRows) ? saleRows : []);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load affiliate performance."
-      );
-    } finally {
+      if (!user) {
+        setError("You must be signed in to view analytics.");
+        setLoading(false);
+        return;
+      }
+
+      const { data, error: queryError } = await supabase
+        .from("sales")
+        .select(
+          `
+            id,
+            product_id,
+            valor_venda,
+            comissao_vendedor,
+            status,
+            vendido_em,
+            product:products (
+              nome,
+              moeda
+            )
+          `,
+        )
+        .eq("vendedor_id", user.id)
+        .order("vendido_em", { ascending: false });
+
+      if (queryError) {
+        setError(queryError.message);
+        setLoading(false);
+        return;
+      }
+
+      setSales((data ?? []) as unknown as Sale[]);
       setLoading(false);
     }
+
+    load();
   }, []);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const filteredSales = useMemo(() => {
+    if (period === "all") return sales;
 
-  const productMap = useMemo(() => {
-    const map = new Map<string, AffiliateProduct>();
-
-    products.forEach((item) => {
-      if (item.product?.id) map.set(item.product.id, item);
-      if (item.id) map.set(item.id, item);
-    });
-
-    return map;
-  }, [products]);
-
-  const periodClicks = useMemo(
-    () => clicks.filter((item) => inPeriod(item.created_at, period)),
-    [clicks, period]
-  );
-
-  const periodConversions = useMemo(
-    () => conversions.filter((item) => inPeriod(item.created_at, period)),
-    [conversions, period]
-  );
-
-  const periodSales = useMemo(
-    () => sales.filter((item) => inPeriod(item.created_at, period)),
-    [sales, period]
-  );
-
-  const visitors = useMemo(() => {
-    const ids = new Set<string>();
-
-    periodClicks.forEach((click) => {
-      if (click.visitor_id) ids.add(`visitor:${click.visitor_id}`);
-      else if (click.session_id) ids.add(`session:${click.session_id}`);
-      else ids.add(`click:${click.id}`);
-    });
-
-    return ids.size;
-  }, [periodClicks]);
-
-  const conversionRate = useMemo(() => {
-    if (!periodClicks.length) return 0;
-    return (periodConversions.length / periodClicks.length) * 100;
-  }, [periodClicks.length, periodConversions.length]);
-
-  const saleRevenue = useMemo(
-    () =>
-      periodSales
-        .filter((sale) =>
-          ["paid", "completed", "delivered"].includes(
-            sale.status || "paid"
-          )
-        )
-        .reduce((total, sale) => total + Number(sale.amount || 0), 0),
-    [periodSales]
-  );
-
-  const chartData = useMemo(() => {
-    const days = period === "today" ? 1 : period === "7d" ? 7 : 14;
     const now = new Date();
+    const cutoff = new Date(now);
 
-    if (period === "30d" || period === "month") {
-      const start = periodStart(period);
-      const diff = Math.max(
-        1,
-        Math.ceil(
-          (now.getTime() - start.getTime()) / (24 * 60 * 60 * 1000)
-        ) + 1
-      );
-
-      const count = Math.min(diff, 30);
-
-      return Array.from({ length: count }, (_, index) => {
-        const date = new Date(now);
-        date.setDate(now.getDate() - (count - 1 - index));
-        date.setHours(0, 0, 0, 0);
-
-        const key = date.toISOString().slice(0, 10);
-
-        return {
-          date: shortDate(date),
-          clicks: periodClicks.filter(
-            (item) => item.created_at?.slice(0, 10) === key
-          ).length,
-          conversions: periodConversions.filter(
-            (item) => item.created_at?.slice(0, 10) === key
-          ).length,
-          sales: periodSales.filter(
-            (item) => item.created_at?.slice(0, 10) === key
-          ).length,
-        };
-      });
+    if (period === "7d") {
+      cutoff.setDate(now.getDate() - 7);
     }
 
-    return Array.from({ length: days }, (_, index) => {
-      const date = new Date(now);
-      date.setDate(now.getDate() - (days - 1 - index));
-      date.setHours(0, 0, 0, 0);
+    if (period === "30d") {
+      cutoff.setDate(now.getDate() - 30);
+    }
 
-      const key = date.toISOString().slice(0, 10);
+    if (period === "90d") {
+      cutoff.setDate(now.getDate() - 90);
+    }
 
-      return {
-        date: shortDate(date),
-        clicks: periodClicks.filter(
-          (item) => item.created_at?.slice(0, 10) === key
-        ).length,
-        conversions: periodConversions.filter(
-          (item) => item.created_at?.slice(0, 10) === key
-        ).length,
-        sales: periodSales.filter(
-          (item) => item.created_at?.slice(0, 10) === key
-        ).length,
-      };
-    });
-  }, [period, periodClicks, periodConversions, periodSales]);
+    return sales.filter(
+      (sale) => new Date(sale.vendido_em) >= cutoff,
+    );
+  }, [sales, period]);
 
-  const productPerformance = useMemo(() => {
-    const rows = products.map((affiliate) => {
-      const productId = affiliate.product?.id || affiliate.id;
-      const referral =
-        affiliate.referral_code || affiliate.affiliate_code || "";
+  const metrics = useMemo(() => {
+    const paid = filteredSales.filter(
+      (sale) => sale.status === "paga",
+    );
 
-      const productClicks = periodClicks.filter(
-        (item) =>
-          item.product_id === productId ||
-          item.affiliate_product_id === affiliate.id ||
-          item.referral_code === referral
-      );
+    const revenue = paid.reduce(
+      (total, sale) =>
+        total + Number(sale.valor_venda || 0),
+      0,
+    );
 
-      const productConversions = periodConversions.filter(
-        (item) =>
-          item.product_id === productId ||
-          item.affiliate_product_id === affiliate.id ||
-          item.referral_code === referral
-      );
+    const commissions = paid.reduce(
+      (total, sale) =>
+        total + Number(sale.comissao_vendedor || 0),
+      0,
+    );
 
-      const productSales = periodSales.filter(
-        (item) => item.product_id === productId
-      );
+    const averageOrder =
+      paid.length > 0 ? revenue / paid.length : 0;
 
-      return {
-        id: affiliate.id,
-        name: productName(affiliate.product),
-        image: affiliate.product?.image_url || null,
-        referral,
-        clicks: productClicks.length,
-        conversions: productConversions.length,
-        sales: productSales.length,
-        rate: productClicks.length
-          ? (productConversions.length / productClicks.length) * 100
-          : 0,
-      };
-    });
+    const products = new Set(
+      paid.map((sale) => sale.product_id),
+    ).size;
 
-    const query = search.trim().toLowerCase();
+    return {
+      sales: paid.length,
+      revenue,
+      commissions,
+      averageOrder,
+      products,
+    };
+  }, [filteredSales]);
 
-    return rows
-      .filter((row) => {
-        if (!query) return true;
+  const topProducts = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        name: string;
+        sales: number;
+        revenue: number;
+        commission: number;
+      }
+    >();
 
-        return (
-          row.name.toLowerCase().includes(query) ||
-          row.referral.toLowerCase().includes(query)
-        );
-      })
-      .sort((a, b) => b.clicks - a.clicks);
-  }, [
-    products,
-    periodClicks,
-    periodConversions,
-    periodSales,
-    search,
-  ]);
+    filteredSales
+      .filter((sale) => sale.status === "paga")
+      .forEach((sale) => {
+        const existing = map.get(sale.product_id);
 
-  const trafficSources = useMemo(() => {
-    const counts = new Map<string, number>();
+        if (existing) {
+          existing.sales += 1;
+          existing.revenue += Number(sale.valor_venda || 0);
+          existing.commission += Number(
+            sale.comissao_vendedor || 0,
+          );
+        } else {
+          map.set(sale.product_id, {
+            name:
+              sale.product?.nome || "Unknown product",
+            sales: 1,
+            revenue: Number(sale.valor_venda || 0),
+            commission: Number(
+              sale.comissao_vendedor || 0,
+            ),
+          });
+        }
+      });
 
-    periodClicks.forEach((click) => {
-      const source = sourceName(click.referrer);
-      counts.set(source, (counts.get(source) || 0) + 1);
-    });
+    return [...map.values()]
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 8);
+  }, [filteredSales]);
 
-    return Array.from(counts.entries())
-      .map(([source, clicks]) => ({ source, clicks }))
-      .sort((a, b) => b.clicks - a.clicks)
-      .slice(0, 6);
-  }, [periodClicks]);
+  const dailyPerformance = useMemo(() => {
+    const map = new Map<
+      string,
+      { sales: number; revenue: number }
+    >();
 
-  const destinationBreakdown = useMemo(() => {
-    const counts = new Map<string, number>();
+    filteredSales
+      .filter((sale) => sale.status === "paga")
+      .forEach((sale) => {
+        const date = new Date(
+          sale.vendido_em,
+        ).toLocaleDateString();
 
-    periodClicks.forEach((click) => {
-      const destination = click.destination || "product";
-      counts.set(destination, (counts.get(destination) || 0) + 1);
-    });
+        const existing = map.get(date);
 
-    return Array.from(counts.entries()).map(([name, value]) => ({
-      name:
-        name.charAt(0).toUpperCase() +
-        name.slice(1).replaceAll("_", " "),
-      value,
-    }));
-  }, [periodClicks]);
+        if (existing) {
+          existing.sales += 1;
+          existing.revenue += Number(
+            sale.valor_venda || 0,
+          );
+        } else {
+          map.set(date, {
+            sales: 1,
+            revenue: Number(sale.valor_venda || 0),
+          });
+        }
+      });
 
-  const latestClicks = useMemo(
-    () =>
-      [...periodClicks]
-        .sort(
-          (a, b) =>
-            new Date(b.created_at || 0).getTime() -
-            new Date(a.created_at || 0).getTime()
-        )
-        .slice(0, 12),
-    [periodClicks]
-  );
+    return [...map.entries()]
+      .map(([date, data]) => ({
+        date,
+        ...data,
+      }))
+      .slice(0, 10);
+  }, [filteredSales]);
 
-  const periodLabel =
-    period === "today"
-      ? "Today"
-      : period === "7d"
-        ? "Last 7 days"
-        : period === "30d"
-          ? "Last 30 days"
-          : period === "month"
-            ? "This month"
-            : "All time";
+  const formatMoney = (
+    value: number,
+    currency = "ZAR",
+  ) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    }).format(value);
 
   return (
-    <DashboardShell
-      area="seller"
-      activeKey="performance"
-      title="Clicks & Conversions"
-      subtitle="Track traffic, conversions and sales generated by your affiliate links."
-    >
+    <AppShell area="seller">
       <div className="space-y-6">
-        <section className="rounded-[28px] bg-[#3B2FE0] p-6 text-white shadow-sm sm:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">
-                Affiliate performance
-              </p>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Know exactly what your links are doing.
-              </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/80 sm:text-base">
-                Monitor clicks, unique visitors, conversions and sales
-                generated through your selected products.
-              </p>
-            </div>
-
-            <button
-              onClick={() => void load()}
-              disabled={loading}
-              className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#3B2FE0] hover:bg-white/90 disabled:opacity-60"
-            >
-              {loading ? "Loading..." : "Refresh data"}
-            </button>
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900">
+              Analytics
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Understand your affiliate sales performance.
+            </p>
           </div>
-        </section>
 
-        <div className="flex flex-wrap gap-2">
-          {(
-            [
-              ["today", "Today"],
-              ["7d", "7 days"],
-              ["30d", "30 days"],
-              ["month", "This month"],
-              ["all", "All time"],
-            ] as [Period, string][]
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              onClick={() => setPeriod(value)}
-              className={`rounded-xl px-4 py-2.5 text-sm font-bold transition ${
-                period === value
-                  ? "bg-[#3B2FE0] text-white"
-                  : "border border-[#e8e8ef] bg-white text-[#4B5563] hover:border-[#3B2FE0]"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+          <select
+            value={period}
+            onChange={(event) =>
+              setPeriod(event.target.value)
+            }
+            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+          >
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+            <option value="all">All time</option>
+          </select>
         </div>
 
         {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
-          </div>
+          <Card>
+            <p className="text-sm text-red-600">{error}</p>
+          </Card>
         )}
 
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          {[
-            ["Clicks", periodClicks.length.toLocaleString(), "Total affiliate link clicks"],
-            ["Visitors", visitors.toLocaleString(), "Unique visitors/sessions"],
-            ["Conversions", periodConversions.length.toLocaleString(), "Tracked conversions"],
-            ["Sales", periodSales.length.toLocaleString(), "Recorded affiliate sales"],
-            ["Conversion rate", `${conversionRate.toFixed(2)}%`, "Conversions ÷ clicks"],
-          ].map(([label, value, description]) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-[#ececf3] bg-white p-5 shadow-sm"
-            >
-              <p className="text-sm font-medium text-[#9CA3AF]">{label}</p>
-              <p className="mt-2 text-3xl font-extrabold text-[#1A1A2E]">
-                {value}
-              </p>
-              <p className="mt-1 text-xs text-[#9CA3AF]">{description}</p>
+        {loading ? (
+          <Card>
+            <div className="py-12 text-center text-sm text-slate-500">
+              Loading analytics...
             </div>
-          ))}
-        </section>
-
-        <section className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-[#ececf3] bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-[#9CA3AF]">Sales revenue</p>
-            <p className="mt-2 text-2xl font-extrabold text-[#1A1A2E]">
-              {money(saleRevenue)}
-            </p>
-            <p className="mt-1 text-xs text-[#9CA3AF]">{periodLabel}</p>
-          </div>
-
-          <div className="rounded-2xl border border-[#ececf3] bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-[#9CA3AF]">Active affiliate products</p>
-            <p className="mt-2 text-2xl font-extrabold text-[#1A1A2E]">
-              {products.length}
-            </p>
-            <p className="mt-1 text-xs text-[#9CA3AF]">
-              Products currently selected
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-[#ececf3] bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-[#9CA3AF]">Funnel</p>
-            <p className="mt-2 text-2xl font-extrabold text-[#1A1A2E]">
-              {periodClicks.length} → {periodConversions.length} →{" "}
-              {periodSales.length}
-            </p>
-            <p className="mt-1 text-xs text-[#9CA3AF]">
-              Clicks → conversions → sales
-            </p>
-          </div>
-        </section>
-
-        <section className="rounded-[24px] border border-[#ececf3] bg-white p-5 shadow-sm sm:p-6">
-          <div className="mb-6">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
-              Traffic evolution
-            </p>
-            <h3 className="mt-1 text-xl font-extrabold text-[#1A1A2E]">
-              Clicks, conversions and sales
-            </h3>
-          </div>
-
-          <div className="h-[330px]">
-            {loading ? (
-              <div className="flex h-full items-center justify-center text-sm text-[#9CA3AF]">
-                Loading performance...
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Bar dataKey="clicks" name="Clicks" fill="#3B2FE0" radius={[5, 5, 0, 0]} />
-                  <Bar dataKey="conversions" name="Conversions" fill="#7C3AED" radius={[5, 5, 0, 0]} />
-                  <Bar dataKey="sales" name="Sales" fill="#111827" radius={[5, 5, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </section>
-
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-[24px] border border-[#ececf3] bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
-              Traffic sources
-            </p>
-            <h3 className="mt-1 text-xl font-extrabold text-[#1A1A2E]">
-              Where clicks come from
-            </h3>
-
-            <div className="mt-6 space-y-4">
-              {trafficSources.length === 0 ? (
-                <p className="py-8 text-center text-sm text-[#9CA3AF]">
-                  No traffic source data yet.
+          </Card>
+        ) : (
+          <>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+              <Card>
+                <p className="text-sm text-slate-500">
+                  Sales
                 </p>
-              ) : (
-                trafficSources.map((item) => (
-                  <div key={item.source}>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-semibold text-[#1A1A2E]">
-                        {item.source}
-                      </span>
-                      <span className="font-bold text-[#4B5563]">
-                        {item.clicks}
-                      </span>
-                    </div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#F0F0F5]">
-                      <div
-                        className="h-full rounded-full bg-[#3B2FE0]"
-                        style={{
-                          width: `${Math.max(
-                            4,
-                            (item.clicks /
-                              Math.max(1, trafficSources[0]?.clicks || 1)) *
-                              100
-                          )}%`,
-                        }}
-                      />
-                    </div>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">
+                  {metrics.sales}
+                </p>
+              </Card>
+
+              <Card>
+                <p className="text-sm text-slate-500">
+                  Revenue
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">
+                  {formatMoney(metrics.revenue)}
+                </p>
+              </Card>
+
+              <Card>
+                <p className="text-sm text-slate-500">
+                  Commission
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">
+                  {formatMoney(metrics.commissions)}
+                </p>
+              </Card>
+
+              <Card>
+                <p className="text-sm text-slate-500">
+                  Average Order
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">
+                  {formatMoney(metrics.averageOrder)}
+                </p>
+              </Card>
+
+              <Card>
+                <p className="text-sm text-slate-500">
+                  Products Sold
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">
+                  {metrics.products}
+                </p>
+              </Card>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Card>
+                <div className="mb-5">
+                  <h2 className="font-semibold text-slate-900">
+                    Top Products
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Your highest-revenue products.
+                  </p>
+                </div>
+
+                {topProducts.length === 0 ? (
+                  <div className="py-10 text-center text-sm text-slate-500">
+                    No paid sales in this period.
                   </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-[24px] border border-[#ececf3] bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
-              Click destinations
-            </p>
-            <h3 className="mt-1 text-xl font-extrabold text-[#1A1A2E]">
-              Product, checkout and materials
-            </h3>
-
-            <div className="mt-5 h-[220px]">
-              {destinationBreakdown.length === 0 ? (
-                <div className="flex h-full items-center justify-center text-sm text-[#9CA3AF]">
-                  No click data yet.
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={destinationBreakdown}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={55}
-                      outerRadius={85}
-                      paddingAngle={3}
-                    >
-                      {destinationBreakdown.map((entry, index) => (
-                        <Cell
-                          key={`${entry.name}-${index}`}
-                          fill={
-                            ["#3B2FE0", "#7C3AED", "#111827", "#6B7280"][
-                              index % 4
-                            ]
-                          }
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-
-            <div className="mt-2 flex flex-wrap justify-center gap-4 text-xs text-[#4B5563]">
-              {destinationBreakdown.map((item, index) => (
-                <div key={item.name} className="flex items-center gap-2">
-                  <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{
-                      background:
-                        ["#3B2FE0", "#7C3AED", "#111827", "#6B7280"][
-                          index % 4
-                        ],
-                    }}
-                  />
-                  {item.name}: {item.value}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="rounded-[24px] border border-[#ececf3] bg-white shadow-sm">
-          <div className="flex flex-col gap-4 border-b border-[#f0f0f5] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
-                Product performance
-              </p>
-              <h3 className="mt-1 text-xl font-extrabold text-[#1A1A2E]">
-                Performance by affiliate product
-              </h3>
-            </div>
-
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search product or referral..."
-              className="h-11 w-full rounded-xl border border-[#e7e7ef] bg-[#F5F6F8] px-4 text-sm text-[#1A1A2E] outline-none focus:border-[#3B2FE0] focus:bg-white sm:w-[280px]"
-            />
-          </div>
-
-          {loading ? (
-            <div className="p-12 text-center text-sm text-[#9CA3AF]">
-              Loading products...
-            </div>
-          ) : productPerformance.length === 0 ? (
-            <div className="p-12 text-center">
-              <p className="font-semibold text-[#1A1A2E]">
-                No affiliate performance yet
-              </p>
-              <p className="mt-1 text-sm text-[#9CA3AF]">
-                Select products and start sharing your affiliate links.
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="border-b border-[#f0f0f5] bg-[#F8F8FB]">
-                  <tr>
-                    {[
-                      "Product",
-                      "Referral code",
-                      "Clicks",
-                      "Conversions",
-                      "Sales",
-                      "Conversion rate",
-                    ].map((heading) => (
-                      <th
-                        key={heading}
-                        className="px-5 py-4 text-xs font-bold uppercase tracking-wide text-[#9CA3AF]"
+                ) : (
+                  <div className="space-y-4">
+                    {topProducts.map((product, index) => (
+                      <div
+                        key={`${product.name}-${index}`}
+                        className="flex items-center justify-between gap-4"
                       >
-                        {heading}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {productPerformance.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="border-b border-[#f5f5f8] last:border-0 hover:bg-[#FAFAFC]"
-                    >
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          {item.image ? (
-                            <img
-                              src={item.image}
-                              alt=""
-                              className="h-10 w-10 rounded-xl object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0EFFF] text-xs font-bold text-[#3B2FE0]">
-                              NV
-                            </div>
-                          )}
-                          <span className="font-bold text-[#1A1A2E]">
-                            {item.name}
+                        <div className="flex min-w-0 items-center gap-3">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-sm font-semibold text-indigo-600">
+                            {index + 1}
                           </span>
+
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-slate-900">
+                              {product.name}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {product.sales} sales
+                            </p>
+                          </div>
                         </div>
-                      </td>
 
-                      <td className="px-5 py-4 font-mono text-xs text-[#4B5563]">
-                        {item.referral || "—"}
-                      </td>
+                        <p className="shrink-0 text-sm font-semibold text-slate-900">
+                          {formatMoney(product.revenue)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
 
-                      <td className="px-5 py-4 font-bold text-[#1A1A2E]">
-                        {item.clicks}
-                      </td>
+              <Card>
+                <div className="mb-5">
+                  <h2 className="font-semibold text-slate-900">
+                    Recent Performance
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Daily paid sales activity.
+                  </p>
+                </div>
 
-                      <td className="px-5 py-4 font-bold text-[#1A1A2E]">
-                        {item.conversions}
-                      </td>
-
-                      <td className="px-5 py-4 font-bold text-[#1A1A2E]">
-                        {item.sales}
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span className="rounded-full bg-[#F0EFFF] px-3 py-1 text-xs font-bold text-[#3B2FE0]">
-                          {item.rate.toFixed(2)}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-
-        <section className="rounded-[24px] border border-[#ececf3] bg-white shadow-sm">
-          <div className="border-b border-[#f0f0f5] p-5 sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
-              Recent traffic
-            </p>
-            <h3 className="mt-1 text-xl font-extrabold text-[#1A1A2E]">
-              Latest affiliate clicks
-            </h3>
-          </div>
-
-          {latestClicks.length === 0 ? (
-            <div className="p-10 text-center text-sm text-[#9CA3AF]">
-              No clicks recorded for this period.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px] text-left text-sm">
-                <thead className="border-b border-[#f0f0f5] bg-[#F8F8FB]">
-                  <tr>
-                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">
-                      Product
-                    </th>
-                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">
-                      Referral code
-                    </th>
-                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">
-                      Source
-                    </th>
-                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">
-                      Destination
-                    </th>
-                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {latestClicks.map((click) => {
-                    const affiliate =
-                      productMap.get(click.product_id || "") ||
-                      productMap.get(click.affiliate_product_id || "");
-
-                    return (
-                      <tr
-                        key={click.id}
-                        className="border-b border-[#f5f5f8] last:border-0"
+                {dailyPerformance.length === 0 ? (
+                  <div className="py-10 text-center text-sm text-slate-500">
+                    No paid sales in this period.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {dailyPerformance.map((day) => (
+                      <div
+                        key={day.date}
+                        className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3"
                       >
-                        <td className="px-5 py-4 font-semibold text-[#1A1A2E]">
-                          {productName(affiliate?.product)}
-                        </td>
-                        <td className="px-5 py-4 font-mono text-xs text-[#4B5563]">
-                          {click.referral_code || affiliate?.referral_code || "—"}
-                        </td>
-                        <td className="px-5 py-4 text-[#4B5563]">
-                          {sourceName(click.referrer)}
-                        </td>
-                        <td className="px-5 py-4 capitalize text-[#4B5563]">
-                          {(click.destination || "product").replaceAll(
-                            "_",
-                            " "
-                          )}
-                        </td>
-                        <td className="px-5 py-4 text-[#4B5563]">
-                          {dateLabel(click.created_at)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        <div>
+                          <p className="text-sm font-medium text-slate-900">
+                            {day.date}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {day.sales} sales
+                          </p>
+                        </div>
+
+                        <p className="text-sm font-semibold text-slate-900">
+                          {formatMoney(day.revenue)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
             </div>
-          )}
-        </section>
+          </>
+        )}
       </div>
-    </DashboardShell>
+    </AppShell>
   );
 }

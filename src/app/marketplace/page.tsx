@@ -1,716 +1,535 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowUpDown,
-  Check,
-  ChevronDown,
-  Filter,
-  Grid3X3,
-  Heart,
-  List,
-  Search,
-  ShieldCheck,
-  Star,
-  TrendingUp,
-  Users,
-  MapPin,
-} from "lucide-react";
-import {
-  getMarketplaceCategories,
-  getMarketplaceProducts,
-  selectAffiliateProduct,
-  type MarketplaceProduct,
-} from "@/lib/newvelion-api";
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import { getActiveProducts } from "@/lib/services/products";
+import { createAffiliation } from "@/lib/services/affiliations";
 import { supabase } from "@/lib/supabase";
+import type { Product } from "@/types";
 
-type SortOption = "popular" | "commission" | "newest" | "price";
-
-function money(value: number | null | undefined, currency = "ZAR") {
-  if (value == null) return "—";
-
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(value);
+interface Category {
+  id: string;
+  nome: string;
+  slug: string;
+  icone: string | null;
+  ordem: number;
+  created_at: string;
 }
 
-function getProductName(product: MarketplaceProduct) {
-  return product.name_en || product.name_pt || "Untitled product";
-}
-
-function getProductDescription(product: MarketplaceProduct) {
-  return (
-    product.short_description_en ||
-    product.short_description_pt ||
-    product.description_en ||
-    product.description_pt ||
-    "No description available."
-  );
-}
-
-function commissionAmount(product: MarketplaceProduct) {
-  const price = Number(product.offer_price ?? product.price ?? 0);
-  const commission = Number(product.commission_percentage ?? 0);
-
-  return price * (commission / 100);
+function money(value: number, currency: string) {
+  return new Intl.NumberFormat(
+    currency === "MZN" ? "pt-MZ" : "en-ZA",
+    {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    }
+  ).format(value);
 }
 
 export default function MarketplacePage() {
   const router = useRouter();
-  const [affiliateLoading, setAffiliateLoading] = useState<string | null>(null);
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  async function handleAffiliate(product: MarketplaceProduct) {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
 
-    if (!session) {
-      router.push(
-        `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
-      );
-      return;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [categoryId, setCategoryId] = useState("all");
+  const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [newOnly, setNewOnly] = useState(false);
+
+  const [affiliating, setAffiliating] = useState<string | null>(null);
+  const [affiliateLinks, setAffiliateLinks] = useState<Record<string, string>>(
+    {}
+  );
+  const [copiedProduct, setCopiedProduct] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadMarketplace() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          router.replace("/login");
+          return;
+        }
+
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          throw profileError;
+        }
+
+        if (profile?.role === "admin") {
+          router.replace("/dashboard/admin");
+          return;
+        }
+
+        const [productData, categoryResult] = await Promise.all([
+          getActiveProducts(),
+          supabase
+            .from("categories")
+            .select("id, nome, slug, icone, ordem, created_at")
+            .order("ordem", { ascending: true })
+            .order("nome", { ascending: true }),
+        ]);
+
+        if (categoryResult.error) {
+          throw categoryResult.error;
+        }
+
+        setProducts(productData);
+        setCategories((categoryResult.data ?? []) as Category[]);
+
+        const { data: affiliations, error: affiliationError } = await supabase
+          .from("affiliations")
+          .select("product_id, link_unico")
+          .eq("vendedor_id", user.id)
+          .eq("ativo", true);
+
+        if (affiliationError) {
+          throw affiliationError;
+        }
+
+        const existingLinks: Record<string, string> = {};
+
+        for (const affiliation of affiliations ?? []) {
+          const baseUrl =
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            window.location.origin;
+
+          existingLinks[affiliation.product_id] =
+            `${baseUrl.replace(/\/$/, "")}/${affiliation.link_unico}`;
+        }
+
+        setAffiliateLinks(existingLinks);
+      } catch (err) {
+        console.error("Failed to load marketplace:", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load marketplace."
+        );
+      } finally {
+        setLoading(false);
+      }
     }
 
-    setAffiliateLoading(product.id);
+    void loadMarketplace();
+  }, [router]);
 
-    try {
-      const result = await selectAffiliateProduct({
-        productId: product.id,
-        token: session.access_token,
-      });
+  const filteredProducts = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
 
-      const affiliateLink = result?.affiliate_link;
+    return products.filter((product) => {
+      const matchesSearch =
+        !normalizedSearch ||
+        product.nome.toLowerCase().includes(normalizedSearch) ||
+        product.descricao?.toLowerCase().includes(normalizedSearch);
 
-      if (!affiliateLink) {
-        throw new Error("The affiliate link could not be generated.");
-      }
+      const matchesCategory =
+        categoryId === "all" || product.categoria_id === categoryId;
 
-      window.open(affiliateLink, "_blank", "noopener,noreferrer");
+      const matchesFeatured = !featuredOnly || product.destaque;
+      const matchesNew = !newOnly || product.novo;
 
-      setSelectedProducts((current) =>
-        current.includes(product.id)
-          ? current
-          : [...current, product.id],
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesFeatured &&
+        matchesNew
       );
+    });
+  }, [products, search, categoryId, featuredOnly, newOnly]);
 
-      router.push(`/marketplace/products/${product.slug}`);
-    } catch (error) {
-      console.error("Affiliate product selection failed:", error);
-      alert("Unable to select this product for affiliate promotion.");
+  async function handleAffiliate(productId: string) {
+    try {
+      setError(null);
+      setAffiliating(productId);
+
+      const result = await createAffiliation(productId);
+
+      setAffiliateLinks((current) => ({
+        ...current,
+        [productId]: result.affiliate_link,
+      }));
+    } catch (err) {
+      console.error("Failed to create affiliation:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to create affiliate link."
+      );
     } finally {
-      setAffiliateLoading(null);
+      setAffiliating(null);
     }
   }
 
-  const [products, setProducts] = useState<MarketplaceProduct[]>([]);
-  const [categories, setCategories] = useState<string[]>([
-    "All Categories",
-  ]);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All Categories");
-  const [sort, setSort] = useState<SortOption>("popular");
-  const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [offersOnly, setOffersOnly] = useState(false);
-  const [view, setView] = useState<"grid" | "list">("grid");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  async function handleCopy(productId: string) {
+    const link = affiliateLinks[productId];
 
-  useEffect(() => {
-    let cancelled = false;
+    if (!link) return;
 
-    async function loadMarketplace() {
-      setLoading(true);
-      setError("");
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopiedProduct(productId);
 
-      try {
-        const [productResponse, categoryResponse] = await Promise.all([
-          getMarketplaceProducts({
-            q: search.trim() || undefined,
-            category:
-              category !== "All Categories" ? category : undefined,
-            featured: featuredOnly || undefined,
-            offer: offersOnly || undefined,
-            sort,
-            limit: 100,
-          }),
-          getMarketplaceCategories(),
-        ]);
-
-        if (cancelled) return;
-
-        setProducts(productResponse.data || []);
-
-        const categoryData = Array.isArray(categoryResponse)
-          ? categoryResponse
-          : categoryResponse.data || [];
-
-        setCategories([
-          "All Categories",
-          ...categoryData
-            .map((item) => {
-              if (typeof item === "string") return item;
-
-              if (item && typeof item === "object") {
-                const category = item as {
-                  name_en?: string;
-                  name_pt?: string;
-                  name?: string;
-                };
-
-                return (
-                  category.name_en ||
-                  category.name_pt ||
-                  category.name
-                );
-              }
-
-              return undefined;
-            })
-            .filter(Boolean),
-        ]);
-      } catch (err) {
-        if (cancelled) return;
-
-        console.error(err);
-        setError(
-          "Unable to load marketplace products. Please check your connection and try again.",
+      window.setTimeout(() => {
+        setCopiedProduct((current) =>
+          current === productId ? null : current
         );
-        setProducts([]);
-      } finally {
-        if (!cancelled) setLoading(false);
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to copy affiliate link:", err);
+      setError("Could not copy the affiliate link.");
+    }
+  }
+
+  async function handleShare(product: Product) {
+    const link = affiliateLinks[product.id];
+
+    if (!link) return;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.nome,
+          text: `Check out ${product.nome}`,
+          url: link,
+        });
+      } catch {
+        // User cancelled the share dialog.
       }
+
+      return;
     }
 
-    loadMarketplace();
+    await handleCopy(product.id);
+  }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [search, category, sort, featuredOnly, offersOnly]);
-
-  const visibleProducts = useMemo(() => products, [products]);
+  function getCategoryName(product: Product) {
+    return (
+      categories.find((category) => category.id === product.categoria_id)
+        ?.nome ?? "Uncategorized"
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-white">
-      <div className="mx-auto max-w-[1500px] px-4 pb-12 pt-5 sm:px-6 lg:px-8">
-        <section className="overflow-hidden rounded-[30px] bg-[#3B2FE0] shadow-[0_20px_60px_rgba(59,47,224,0.18)]">
-          <div className="relative px-6 py-9 sm:px-10 sm:py-12 lg:px-14">
-            <div className="relative z-10 max-w-2xl">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white backdrop-blur">
-                <TrendingUp size={14} />
-                SELLER MARKETPLACE
-              </div>
-
-              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                Find products.
-                <br />
-                Start selling.
-              </h1>
-
-              <p className="mt-4 max-w-xl text-sm leading-6 text-white/80 sm:text-base">
-                Discover active products from NewVelion suppliers, choose
-                offers with the right commission, and promote them through
-                your affiliate links.
-              </p>
-
-              <div className="mt-7 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOffersOnly(false);
-                    setFeaturedOnly(true);
-                    window.scrollTo({ top: 500, behavior: "smooth" });
-                  }}
-                  className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#3B2FE0] transition hover:bg-white/90"
-                >
-                  Explore featured
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFeaturedOnly(false);
-                    setOffersOnly(true);
-                    window.scrollTo({ top: 500, behavior: "smooth" });
-                  }}
-                  className="rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur transition hover:bg-white/15"
-                >
-                  View offers
-                </button>
-              </div>
-            </div>
-
-            <div className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-36 right-20 h-72 w-72 rounded-full bg-indigo-300/20 blur-3xl" />
-          </div>
-        </section>
-
-        <section className="mt-7">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
-                Browse
-              </p>
-              <h2 className="mt-1 text-xl font-extrabold tracking-tight text-[#1A1A2E]">
-                Categories
-              </h2>
-            </div>
-
-            <div className="hidden text-sm text-[#9CA3AF] sm:block">
-              {loading ? "Loading..." : `${visibleProducts.length} products`}
-            </div>
-          </div>
-
-          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none]">
-            {categories.map((item) => {
-              const active = category === item;
-
-              return (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => setCategory(item)}
-                  className={`shrink-0 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
-                    active
-                      ? "bg-[#3B2FE0] text-white shadow-sm"
-                      : "border border-[#e7e7ef] bg-white text-[#6B7280] hover:border-[#cfcdf7] hover:text-[#3B2FE0]"
-                  }`}
-                >
-                  {item}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="mt-6 rounded-[24px] border border-[#ececf3] bg-[#F8F8FB] p-3 sm:p-4">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
-            <div className="relative min-w-0 flex-1">
-              <Search
-                size={19}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
-              />
-
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Pesquisar produtos..."
-                className="h-12 w-full rounded-xl border border-[#e7e7ef] bg-white pl-11 pr-4 text-sm text-[#1A1A2E] outline-none transition placeholder:text-[#9CA3AF] focus:border-[#3B2FE0]"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <div className="relative min-w-0 flex-1 sm:min-w-[190px]">
-                <Filter
-                  size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
-                />
-
-                <select
-                  value={category}
-                  onChange={(event) => setCategory(event.target.value)}
-                  className="h-12 w-full appearance-none rounded-xl border border-[#e7e7ef] bg-white pl-10 pr-10 text-sm font-medium text-[#4B5563] outline-none focus:border-[#3B2FE0]"
-                >
-                  {categories.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-
-                <ChevronDown
-                  size={17}
-                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
-                />
-              </div>
-
-              <div className="relative min-w-0 flex-1 sm:min-w-[190px]">
-                <ArrowUpDown
-                  size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
-                />
-
-                <select
-                  value={sort}
-                  onChange={(event) =>
-                    setSort(event.target.value as SortOption)
-                  }
-                  className="h-12 w-full appearance-none rounded-xl border border-[#e7e7ef] bg-white pl-10 pr-10 text-sm font-medium text-[#4B5563] outline-none focus:border-[#3B2FE0]"
-                >
-                  <option value="popular">Most Popular</option>
-                  <option value="commission">Highest Commission</option>
-                  <option value="newest">Newest</option>
-                  <option value="price">Lowest Price</option>
-                </select>
-
-                <ChevronDown
-                  size={17}
-                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setFeaturedOnly((value) => !value)}
-                className={`rounded-xl px-4 py-2.5 text-sm font-bold transition ${
-                  featuredOnly
-                    ? "bg-[#3B2FE0] text-white"
-                    : "border border-[#e7e7ef] bg-white text-[#6B7280] hover:text-[#3B2FE0]"
-                }`}
-              >
-                Featured
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOffersOnly((value) => !value)}
-                className={`rounded-xl px-4 py-2.5 text-sm font-bold transition ${
-                  offersOnly
-                    ? "bg-[#3B2FE0] text-white"
-                    : "border border-[#e7e7ef] bg-white text-[#6B7280] hover:text-[#3B2FE0]"
-                }`}
-              >
-                Offers
-              </button>
-
-              <div className="hidden items-center rounded-xl border border-[#e7e7ef] bg-white p-1 sm:flex">
-                <button
-                  type="button"
-                  onClick={() => setView("grid")}
-                  className={`rounded-lg p-2.5 ${
-                    view === "grid"
-                      ? "bg-[#F1EFFF] text-[#3B2FE0]"
-                      : "text-[#9CA3AF] hover:text-[#3B2FE0]"
-                  }`}
-                  aria-label="Grid view"
-                >
-                  <Grid3X3 size={17} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setView("list")}
-                  className={`rounded-lg p-2.5 ${
-                    view === "list"
-                      ? "bg-[#F1EFFF] text-[#3B2FE0]"
-                      : "text-[#9CA3AF] hover:text-[#3B2FE0]"
-                  }`}
-                  aria-label="List view"
-                >
-                  <List size={17} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="mb-5 mt-8 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B2FE0]">
-              Live marketplace
-            </p>
-
-            <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-[#1A1A2E]">
-              Products to promote
-            </h2>
-
-            {!loading && (
-              <p className="mt-1 text-sm text-[#9CA3AF]">
-                {visibleProducts.length} active products available
-              </p>
-            )}
-          </div>
-
-          <div className="text-sm font-medium text-[#9CA3AF] sm:hidden">
-            {loading ? "Loading..." : `${visibleProducts.length}`}
-          </div>
+    <AppShell area="seller">
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Marketplace
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Discover products available for promotion.
+          </p>
         </div>
 
         {error && (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
+          <Card>
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              {error}
+            </div>
+          </Card>
         )}
 
-        {loading ? (
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className="overflow-hidden rounded-[22px] border border-[#ececf3] bg-white"
+        <Card>
+          <div className="grid gap-4 lg:grid-cols-[1fr_220px_auto_auto]">
+            <div>
+              <label
+                htmlFor="marketplace-search"
+                className="mb-2 block text-sm font-medium text-gray-700"
               >
-                <div className="aspect-[16/10] animate-pulse bg-[#F1F1F6]" />
-                <div className="space-y-3 p-5">
-                  <div className="h-3 w-24 animate-pulse rounded bg-[#F1F1F6]" />
-                  <div className="h-6 w-3/4 animate-pulse rounded bg-[#F1F1F6]" />
-                  <div className="h-4 w-full animate-pulse rounded bg-[#F1F1F6]" />
-                  <div className="h-11 w-full animate-pulse rounded-xl bg-[#F1F1F6]" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : visibleProducts.length === 0 ? (
-          <div className="rounded-[24px] border border-dashed border-[#dcdce8] bg-[#FAFAFC] px-6 py-20 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F1EFFF] text-[#3B2FE0]">
-              <Search size={24} />
+                Search products
+              </label>
+
+              <input
+                id="marketplace-search"
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search by product name..."
+                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              />
             </div>
 
-            <h2 className="text-lg font-bold text-[#1A1A2E]">
-              No products found
-            </h2>
+            <div>
+              <label
+                htmlFor="marketplace-category"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Category
+              </label>
 
-            <p className="mx-auto mt-2 max-w-md text-sm text-[#9CA3AF]">
-              Try another search, category, or filter.
-            </p>
+              <select
+                id="marketplace-category"
+                value={categoryId}
+                onChange={(event) => setCategoryId(event.target.value)}
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              >
+                <option value="all">All categories</option>
+
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setFeaturedOnly((current) => !current)}
+              className={`self-end rounded-lg border px-4 py-2.5 text-sm font-medium transition ${
+                featuredOnly
+                  ? "border-indigo-600 bg-indigo-600 text-white"
+                  : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Featured
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setNewOnly((current) => !current)}
+              className={`self-end rounded-lg border px-4 py-2.5 text-sm font-medium transition ${
+                newOnly
+                  ? "border-indigo-600 bg-indigo-600 text-white"
+                  : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              New
+            </button>
           </div>
+
+          <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
+            <p className="text-sm text-gray-500">
+              {loading
+                ? "Loading products..."
+                : `${filteredProducts.length} product${
+                    filteredProducts.length === 1 ? "" : "s"
+                  } found`}
+            </p>
+
+            {(search || categoryId !== "all" || featuredOnly || newOnly) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setCategoryId("all");
+                  setFeaturedOnly(false);
+                  setNewOnly(false);
+                }}
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        </Card>
+
+        {loading ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((item) => (
+              <Card key={item}>
+                <div className="h-48 animate-pulse rounded-lg bg-gray-100" />
+                <div className="mt-4 h-5 w-2/3 animate-pulse rounded bg-gray-100" />
+                <div className="mt-3 h-4 w-1/3 animate-pulse rounded bg-gray-100" />
+              </Card>
+            ))}
+          </div>
+        ) : products.length === 0 ? (
+          <Card>
+            <div className="py-16 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-indigo-50 text-2xl text-indigo-600">
+                ▦
+              </div>
+
+              <h2 className="mt-4 text-lg font-semibold text-gray-900">
+                No products available yet
+              </h2>
+
+              <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
+                Products published by Newvelion will appear here when they
+                become available for sellers.
+              </p>
+            </div>
+          </Card>
+        ) : filteredProducts.length === 0 ? (
+          <Card>
+            <div className="py-16 text-center">
+              <h2 className="text-lg font-semibold text-gray-900">
+                No matching products
+              </h2>
+
+              <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
+                Try changing your search or clearing the selected filters.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setCategoryId("all");
+                  setFeaturedOnly(false);
+                  setNewOnly(false);
+                }}
+                className="mt-5 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+              >
+                Clear filters
+              </button>
+            </div>
+          </Card>
         ) : (
-          <div
-            className={
-              view === "grid"
-                ? "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
-                : "space-y-4"
-            }
-          >
-            {visibleProducts.map((product) => {
-              const price = Number(
-                product.offer_price ?? product.price ?? 0,
-              );
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredProducts.map((product) => {
+              const price =
+                product.preco_promocional ?? product.preco;
 
-              const originalPrice =
-                product.original_price != null
-                  ? Number(product.original_price)
-                  : null;
+              const commission =
+                product.comissao_tipo === "percentual"
+                  ? (price * product.comissao_valor) / 100
+                  : product.comissao_valor;
 
-              const commission = Number(
-                product.commission_percentage ?? 0,
-              );
-
-              const earnings = commissionAmount(product);
-              const selected = selectedProducts.includes(product.id);
-
-              const cardContent = (
-                <>
-                  <div
-                    className={
-                      view === "grid"
-                        ? "relative aspect-[16/10] overflow-hidden bg-[#F1F1F6]"
-                        : "relative h-44 w-full shrink-0 overflow-hidden bg-[#F1F1F6] sm:w-56"
-                    }
-                  >
-                    {product.image_url ? (
-                      <Image
-                        src={product.image_url}
-                        alt={getProductName(product)}
-                        fill
-                        className="object-cover transition duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F1EFFF] to-[#F7F7FA]">
-                        <TrendingUp
-                          className="text-[#C9C5FF]"
-                          size={44}
-                        />
-                      </div>
-                    )}
-
-                    <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-                      {product.featured && (
-                        <span className="rounded-full bg-[#3B2FE0] px-3 py-1 text-[11px] font-bold text-white shadow-sm">
-                          Featured
-                        </span>
-                      )}
-
-                      {product.offer && (
-                        <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-[#3B2FE0] shadow-sm">
-                          Special offer
-                        </span>
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      aria-label="Save product"
-                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#6B7280] shadow-sm backdrop-blur transition hover:text-[#3B2FE0]"
-                    >
-                      <Heart size={17} />
-                    </button>
-                  </div>
-
-                  <div
-                    className={
-                      view === "grid"
-                        ? "p-5"
-                        : "flex min-w-0 flex-1 flex-col justify-center p-5"
-                    }
-                  >
-                    <div className="mb-2 flex items-center justify-between gap-3">
-                      <span className="truncate text-[11px] font-bold uppercase tracking-[0.12em] text-[#3B2FE0]">
-                        {product.categories?.name_en ||
-                          product.categories?.name_pt ||
-                          "Marketplace"}
-                      </span>
-
-                      <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-[#9CA3AF]">
-                        <Star
-                          size={13}
-                          fill="currentColor"
-                          className="text-[#F59E0B]"
-                        />
-                        {product.total_sales || 0} sales
-                      </span>
-                    </div>
-
-                    <h2 className="line-clamp-2 text-lg font-extrabold leading-6 text-[#1A1A2E]">
-                      {getProductName(product)}
-                    </h2>
-
-                    {product.supplier && (
-                      <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#eeeef5] bg-[#FAFAFC] px-3 py-2.5">
-                        {product.supplier.avatar_url ? (
-                          <img
-                            src={product.supplier.avatar_url}
-                            alt={product.supplier.company_name || product.supplier.name || "Supplier"}
-                            className="h-9 w-9 shrink-0 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F1EFFF] text-sm font-extrabold text-[#3B2FE0]">
-                            {(product.supplier.company_name ||
-                              product.supplier.name ||
-                              "S")
-                              .charAt(0)
-                              .toUpperCase()}
-                          </div>
-                        )}
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5">
-                            <p className="truncate text-xs font-bold text-[#1A1A2E]">
-                              {product.supplier.company_name ||
-                                product.supplier.name ||
-                                "Supplier"}
-                            </p>
-
-                            {product.supplier.verification_status &&
-                              product.supplier.verification_status !== "unverified" && (
-                                <ShieldCheck
-                                  size={14}
-                                  className="shrink-0 text-[#3B2FE0]"
-                                />
-                              )}
-                          </div>
-
-                          <div className="mt-0.5 flex items-center gap-1 text-[11px] text-[#9CA3AF]">
-                            <MapPin size={11} />
-                            <span className="truncate">
-                              {product.supplier.country ||
-                                product.supplier.country_code ||
-                                "Country not specified"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#9CA3AF]">
-                      {getProductDescription(product)}
-                    </p>
-
-                    <div className="mt-5 flex items-end justify-between gap-4">
-                      <div>
-                        <p className="text-[11px] font-medium text-[#9CA3AF]">
-                          Product price
-                        </p>
-
-                        <div className="mt-1 flex items-center gap-2">
-                          <span className="text-lg font-extrabold text-[#1A1A2E]">
-                            {money(price, product.currency || "ZAR")}
-                          </span>
-
-                          {originalPrice && originalPrice > price && (
-                            <span className="text-xs text-[#9CA3AF] line-through">
-                              {money(
-                                originalPrice,
-                                product.currency || "ZAR",
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="text-right">
-                        <p className="text-[11px] font-medium text-[#9CA3AF]">
-                          Commission
-                        </p>
-                        <p className="mt-1 text-lg font-extrabold text-[#3B2FE0]">
-                          {commission.toFixed(0)}%
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between border-t border-[#f0f0f5] pt-4 text-xs">
-                      <span className="flex items-center gap-1.5 text-[#9CA3AF]">
-                        <Users size={14} />
-                        {product.total_clicks || 0} clicks
-                      </span>
-
-                      <span className="font-bold text-emerald-600">
-                        Earn {money(earnings, product.currency || "ZAR")}
-                      </span>
-                    </div>
-
-                    <div className="mt-5 flex gap-2">
-                      <a
-                        href={
-                          product.product_page_url ||
-                          `/marketplace/products/${product.slug}`
-                        }
-                        className="flex-1 rounded-xl border border-[#dedee8] px-4 py-3 text-center text-sm font-bold text-[#4B5563] transition hover:border-[#3B2FE0] hover:text-[#3B2FE0]"
-                      >
-                        View details
-                      </a>
-
-                      <button
-                        type="button"
-                        onClick={() => handleAffiliate(product)}
-                        disabled={affiliateLoading === product.id}
-                        className="flex-1 rounded-xl bg-[#3B2FE0] px-4 py-3 text-center text-sm font-bold text-white shadow-sm transition hover:bg-[#3025C0] disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {affiliateLoading === product.id
-                          ? "Selecting..."
-                          : "Affiliate"}
-                      </button>
-                    </div>
-
-                    {selected && (
-                      <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-600">
-                        <Check size={14} />
-                        Affiliate link ready
-                      </div>
-                    )}
-                  </div>
-                </>
-              );
+              const affiliateLink = affiliateLinks[product.id];
+              const isAffiliating = affiliating === product.id;
 
               return (
-                <article
-                  key={product.id}
-                  className={`group overflow-hidden rounded-[22px] border border-[#ececf3] bg-white shadow-[0_4px_20px_rgba(26,26,46,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_14px_35px_rgba(26,26,46,0.10)] ${
-                    view === "list" ? "flex flex-col sm:flex-row" : ""
-                  }`}
-                >
-                  {cardContent}
-                </article>
+                <Card key={product.id} className="overflow-hidden p-0">
+                  <div className="flex h-52 items-center justify-center bg-gray-100">
+                    {product.fotos?.[0] ? (
+                      <img
+                        src={product.fotos[0]}
+                        alt={product.nome}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-sm text-gray-400">
+                        No image
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-indigo-600">
+                          {getCategoryName(product)}
+                        </p>
+
+                        <h2 className="font-semibold text-gray-900">
+                          {product.nome}
+                        </h2>
+                      </div>
+
+                      <div className="flex shrink-0 gap-1">
+                        {product.destaque && (
+                          <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700">
+                            Featured
+                          </span>
+                        )}
+
+                        {product.novo && (
+                          <span className="rounded-full bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700">
+                            New
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {product.descricao && (
+                      <p className="mt-2 line-clamp-2 text-sm text-gray-500">
+                        {product.descricao}
+                      </p>
+                    )}
+
+                    <div className="mt-4">
+                      <p className="text-lg font-semibold text-gray-900">
+                        {money(price, product.moeda)}
+                      </p>
+
+                      {product.preco_promocional !== null && (
+                        <p className="text-sm text-gray-400 line-through">
+                          {money(product.preco, product.moeda)}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="mt-4 rounded-lg bg-indigo-50 p-3">
+                      <p className="text-xs text-indigo-600">
+                        Your commission
+                      </p>
+
+                      <p className="mt-1 font-semibold text-indigo-700">
+                        {money(commission, product.moeda)}
+                      </p>
+                    </div>
+
+                    {!affiliateLink ? (
+                      <button
+                        type="button"
+                        disabled={isAffiliating}
+                        onClick={() => handleAffiliate(product.id)}
+                        className="mt-4 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isAffiliating
+                          ? "Creating affiliate link..."
+                          : "Sell This Product"}
+                      </button>
+                    ) : (
+                      <div className="mt-4 space-y-3">
+                        <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+                          <p className="text-xs font-medium text-green-700">
+                            Affiliate link ready
+                          </p>
+
+                          <p className="mt-1 break-all text-xs text-gray-700">
+                            {affiliateLink}
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(product.id)}
+                            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            {copiedProduct === product.id
+                              ? "Copied!"
+                              : "Copy link"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleShare(product)}
+                            className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                          >
+                            Share
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Card>
               );
             })}
           </div>
         )}
       </div>
-    </main>
+    </AppShell>
   );
 }

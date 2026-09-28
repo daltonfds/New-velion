@@ -1,248 +1,296 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  FolderTree,
-  Loader2,
-  RefreshCw,
-  Search,
-  XCircle,
-} from "lucide-react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import {
-  AdminCategory,
-  getAdminCategories,
-} from "@/lib/newvelion-api";
+import { FormEvent, useEffect, useState } from "react";
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { supabase } from "@/lib/supabase";
+
+interface Category {
+  id: string;
+  nome: string;
+  slug: string;
+  icone: string | null;
+  ordem: number;
+  created_at: string;
+}
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<AdminCategory[]>([]);
-  const [search, setSearch] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [icon, setIcon] = useState("");
+  const [order, setOrder] = useState("0");
 
   async function loadCategories() {
-    try {
-      setLoading(true);
-      setError("");
-      setCategories(await getAdminCategories());
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load categories."
-      );
-    } finally {
-      setLoading(false);
+    setLoading(true);
+
+    const { data, error: fetchError } = await supabase
+      .from("categories")
+      .select("*")
+      .order("ordem", { ascending: true });
+
+    if (fetchError) {
+      setError(fetchError.message);
+    } else {
+      setCategories((data ?? []) as Category[]);
     }
+
+    setLoading(false);
   }
 
   useEffect(() => {
-    loadCategories();
+    void loadCategories();
   }, []);
 
-  const filtered = useMemo(() => {
-    const query = search.trim().toLowerCase();
+  function makeSlug(value: string) {
+    return value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
 
-    if (!query) return categories;
+  async function handleCreate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    return categories.filter(
-      (category) =>
-        String(category.name_en || "")
-          .toLowerCase()
-          .includes(query) ||
-        String(category.name_pt || "")
-          .toLowerCase()
-          .includes(query) ||
-        String(category.slug || "")
-          .toLowerCase()
-          .includes(query)
-    );
-  }, [categories, search]);
+    setSaving(true);
+    setError("");
+    setSuccess("");
 
-  const active = categories.filter(
-    (category) => category.active !== false
-  ).length;
+    if (!name.trim()) {
+      setError("Category name is required.");
+      setSaving(false);
+      return;
+    }
+
+    const finalSlug = slug.trim() || makeSlug(name);
+
+    const { error: insertError } = await supabase
+      .from("categories")
+      .insert({
+        nome: name.trim(),
+        slug: finalSlug,
+        icone: icon.trim() || null,
+        ordem: Number(order || 0),
+      });
+
+    if (insertError) {
+      setError(insertError.message);
+      setSaving(false);
+      return;
+    }
+
+    setName("");
+    setSlug("");
+    setIcon("");
+    setOrder("0");
+    setSuccess("Category created successfully.");
+
+    await loadCategories();
+    setSaving(false);
+  }
+
+  async function handleDelete(category: Category) {
+    if (
+      !window.confirm(
+        `Delete "${category.nome}"? Products using this category may prevent deletion.`,
+      )
+    ) {
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+
+    const { error: deleteError } = await supabase
+      .from("categories")
+      .delete()
+      .eq("id", category.id);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+
+    setSuccess("Category deleted successfully.");
+    await loadCategories();
+  }
 
   return (
-    <DashboardShell
-      area="admin"
-      activeKey="categories"
-      title="Categories"
-      subtitle="Manage marketplace product categories"
-    >
+    <AppShell area="admin">
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Link
-              href="/dashboard/admin"
-              className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-              <ArrowLeft size={16} />
-              Back to dashboard
-            </Link>
-
-            <h1 className="text-2xl font-bold text-slate-950">
-              Categories
-            </h1>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Marketplace categories.
-            </p>
-          </div>
-
-          <button
-            onClick={loadCategories}
-            disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-60"
-          >
-            <RefreshCw
-              size={16}
-              className={loading ? "animate-spin" : ""}
-            />
-            Refresh
-          </button>
+        <div>
+          <p className="text-sm font-medium text-indigo-600">Commerce</p>
+          <h1 className="mt-1 text-2xl font-semibold text-slate-900">
+            Categories
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Organize products into marketplace categories.
+          </p>
         </div>
 
         {error && (
-          <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            <XCircle size={18} />
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          {[
-            ["Total Categories", categories.length],
-            ["Active Categories", active],
-            ["Hidden Categories", categories.length - active],
-          ].map(([label, value]) => (
-            <div
-              key={String(label)}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <p className="text-sm text-slate-500">{String(label)}</p>
-              <p className="mt-3 text-2xl font-bold text-slate-950">
-                {String(value)}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="relative">
-            <Search
-              size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-            />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by category name or slug..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:bg-white"
-            />
+        {success && (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {success}
           </div>
-        </div>
+        )}
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          {loading ? (
-            <div className="flex min-h-64 items-center justify-center">
-              <Loader2
-                size={28}
-                className="animate-spin text-blue-600"
-              />
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex min-h-64 flex-col items-center justify-center text-center">
-              <FolderTree size={32} className="text-slate-300" />
-              <h3 className="mt-3 font-semibold text-slate-900">
-                No categories found
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">
-                No categories match your search.
+        <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+          <Card>
+            <div className="border-b border-slate-100 px-6 py-4">
+              <h2 className="font-semibold text-slate-900">
+                Add Category
+              </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                Create a category for marketplace products.
               </p>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px]">
-                <thead className="border-b border-slate-200 bg-slate-50">
-                  <tr>
-                    {["Category", "Portuguese", "Slug", "Status", "Created"].map(
-                      (head) => (
-                        <th
-                          key={head}
-                          className="px-5 py-4 text-left text-xs font-bold uppercase tracking-wide text-slate-500"
-                        >
-                          {head}
-                        </th>
-                      )
-                    )}
-                  </tr>
-                </thead>
 
-                <tbody className="divide-y divide-slate-100">
-                  {filtered.map((category) => (
-                    <tr
-                      key={category.id}
-                      className="hover:bg-slate-50"
-                    >
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                            <FolderTree size={18} />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-slate-900">
-                              {category.name_en || "Unnamed category"}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {category.id}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
+            <form onSubmit={handleCreate} className="space-y-5 p-6">
+              <Input
+                label="Category Name"
+                value={name}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setName(value);
 
-                      <td className="px-5 py-4 text-sm text-slate-600">
-                        {category.name_pt || "—"}
-                      </td>
+                  if (!slug) {
+                    setSlug(makeSlug(value));
+                  }
+                }}
+                placeholder="e.g. Electronics"
+                required
+              />
 
-                      <td className="px-5 py-4 text-sm text-slate-600">
-                        {category.slug || "—"}
-                      </td>
+              <Input
+                label="Slug"
+                value={slug}
+                onChange={(event) =>
+                  setSlug(makeSlug(event.target.value))
+                }
+                placeholder="electronics"
+                required
+              />
 
-                      <td className="px-5 py-4">
-                        {category.active !== false ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                            <CheckCircle2 size={13} />
-                            Active
-                          </span>
-                        ) : (
-                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                            Hidden
-                          </span>
-                        )}
-                      </td>
+              <Input
+                label="Icon"
+                value={icon}
+                onChange={(event) => setIcon(event.target.value)}
+                placeholder="Optional"
+              />
 
-                      <td className="px-5 py-4 text-sm text-slate-500">
-                        {category.created_at
-                          ? new Date(
-                              category.created_at
-                            ).toLocaleDateString()
-                          : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <Input
+                label="Display Order"
+                type="number"
+                min="0"
+                value={order}
+                onChange={(event) => setOrder(event.target.value)}
+              />
+
+              <Button type="submit" disabled={saving} className="w-full">
+                {saving ? "Creating..." : "Create Category"}
+              </Button>
+            </form>
+          </Card>
+
+          <Card>
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+              <div>
+                <h2 className="font-semibold text-slate-900">
+                  Category List
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  {categories.length} categor
+                  {categories.length === 1 ? "y" : "ies"}
+                </p>
+              </div>
             </div>
-          )}
-        </div>
 
-        <div className="text-sm text-slate-500">
-          {filtered.length} categories displayed · Connected to live platform
-          data
+            {loading ? (
+              <div className="px-6 py-12 text-center text-sm text-slate-500">
+                Loading categories...
+              </div>
+            ) : categories.length === 0 ? (
+              <div className="px-6 py-12 text-center text-sm text-slate-500">
+                No categories found.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[650px]">
+                  <thead>
+                    <tr className="border-b border-slate-100 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+                      <th className="px-6 py-4">Category</th>
+                      <th className="px-6 py-4">Slug</th>
+                      <th className="px-6 py-4">Order</th>
+                      <th className="px-6 py-4">Created</th>
+                      <th className="px-6 py-4">Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="divide-y divide-slate-100">
+                    {categories.map((category) => (
+                      <tr
+                        key={category.id}
+                        className="hover:bg-slate-50"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-sm text-indigo-600">
+                              {category.icone || "•"}
+                            </div>
+
+                            <span className="font-medium text-slate-900">
+                              {category.nome}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-slate-500">
+                          {category.slug}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-slate-700">
+                          {category.ordem}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-slate-500">
+                          {new Date(
+                            category.created_at,
+                          ).toLocaleDateString()}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <button
+                            type="button"
+                            onClick={() => void handleDelete(category)}
+                            className="text-sm font-medium text-red-600 hover:text-red-700"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
         </div>
       </div>
-    </DashboardShell>
+    </AppShell>
   );
 }

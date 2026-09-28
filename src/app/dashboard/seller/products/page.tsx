@@ -1,426 +1,322 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import ProductImageGallery from "@/components/products/ProductImageGallery";
-import { useEffect, useMemo, useState } from "react";
-import {
-  Building2,
-  ExternalLink,
-  MapPin,
-  Package,
-  RefreshCw,
-  ShieldCheck,
-} from "lucide-react";
-import { getAffiliateProducts } from "@/lib/newvelion-api";
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import { supabase } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/auth";
 
-type Supplier = {
-  name?: string;
-  full_name?: string;
-  company_name?: string;
-  company_id?: string;
-  logo_url?: string;
-  avatar_url?: string;
-  country?: string;
-  country_code?: string;
-  city?: string;
-  state_region?: string;
-  verification_status?: string;
-  company_type?: string;
-  website?: string;
-  description?: string;
-};
-
-type Product = {
-  id?: string;
-  name?: string;
-  name_en?: string;
-  name_pt?: string;
-  slug?: string;
-  description?: string;
-  short_description_en?: string | null;
-  short_description_pt?: string | null;
-  image_url?: string | null;
-  image_urls?: string[] | null;
-  price?: number | null;
-  currency?: string | null;
-  commission_percentage?: number | null;
-  total_clicks?: number | null;
-  total_conversions?: number | null;
-  total_sales?: number | null;
-  total_commission?: number | null;
-  status?: string;
-  supplier?: Supplier;
-};
-
-type AffiliateProduct = {
-  id?: string;
-  product_id?: string;
-  referral_code?: string;
-  affiliate_code?: string;
-  status?: string;
-  product_page_url?: string;
-  affiliate_link?: string;
-  created_at?: string;
-  product?: Product;
-  supplier?: Supplier;
-};
-
-function getProduct(item: AffiliateProduct): Product {
-  return item.product || {};
+interface Product {
+  id: string;
+  nome: string;
+  descricao: string | null;
+  preco: number;
+  preco_promocional: number | null;
+  moeda: string;
+  comissao_tipo: string;
+  comissao_valor: number;
+  fotos: string[];
+  ativo: boolean;
 }
 
-function getSupplier(item: AffiliateProduct): Supplier | undefined {
-  return item.supplier || item.product?.supplier;
+interface Affiliation {
+  id: string;
+  product_id: string;
+  link_unico: string;
+  ativo: boolean;
+  created_at: string;
+  product: Product | null;
 }
 
-export default function SellerMyProductsPage() {
-  const [items, setItems] = useState<AffiliateProduct[]>([]);
+export default function SellerProductsPage() {
+  const [affiliations, setAffiliations] = useState<Affiliation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState("");
 
-  async function loadProducts() {
-    setLoading(true);
-    setError("");
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      setError("");
 
-    try {
-      const data = await getAffiliateProducts();
-      setItems(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-      setError("Unable to load your products.");
-    } finally {
+      const user = await getCurrentUser();
+
+      if (!user) {
+        setError("You must be signed in to view your products.");
+        setLoading(false);
+        return;
+      }
+
+      const { data, error: queryError } = await supabase
+        .from("affiliations")
+        .select(
+          `
+            id,
+            product_id,
+            link_unico,
+            ativo,
+            created_at,
+            product:products (
+              id,
+              nome,
+              descricao,
+              preco,
+              preco_promocional,
+              moeda,
+              comissao_tipo,
+              comissao_valor,
+              fotos,
+              ativo
+            )
+          `,
+        )
+        .eq("vendedor_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (queryError) {
+        setError(queryError.message);
+        setLoading(false);
+        return;
+      }
+
+      setAffiliations(
+        ((data ?? []) as unknown) as Affiliation[],
+      );
       setLoading(false);
+    }
+
+    load();
+  }, []);
+
+  async function copyLink(link: string, id: string) {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(id);
+
+      setTimeout(() => {
+        setCopied("");
+      }, 2000);
+    } catch {
+      setError("Unable to copy the affiliate link.");
     }
   }
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
+  function getAffiliateUrl(linkUnico: string) {
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      window.location.origin;
 
-  const activeCount = useMemo(
-    () =>
-      items.filter(
-        (item) =>
-          !item.status ||
-          item.status === "active" ||
-          item.status === "approved"
-      ).length,
-    [items]
-  );
+    return `${siteUrl}/${linkUnico}`;
+  }
+
+  function formatMoney(
+    value: number,
+    currency: string,
+  ) {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    }).format(value);
+  }
+
+  function formatCommission(
+    type: string,
+    value: number,
+    currency: string,
+  ) {
+    if (type === "percentual") {
+      return `${value}%`;
+    }
+
+    return formatMoney(value, currency);
+  }
 
   return (
-    <DashboardShell
-      area="seller"
-      activeKey="myProducts"
-      title="My Products"
-      subtitle="Your selected products, affiliate links and live performance."
-    >
-      <main className="min-h-screen bg-[#F7F8FC] px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <AppShell area="seller">
+      <div className="space-y-6">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
-            <p className="text-sm font-semibold text-[#3B2FE0]">Seller</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#1A1A2E]">
+            <h1 className="text-2xl font-semibold text-slate-900">
               My Products
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Products you have selected for promotion on NewVelion.
+            <p className="mt-1 text-sm text-slate-500">
+              Products you have selected to promote.
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={loadProducts}
-            disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-60"
+          <Link
+            href="/marketplace"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white transition hover:bg-indigo-700"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </button>
-        </div>
-
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-indigo-50 p-2.5 text-[#3B2FE0]">
-                <Package className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Selected Products</p>
-                <p className="text-2xl font-bold text-[#1A1A2E]">{items.length}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Active Products</p>
-            <p className="mt-1 text-2xl font-bold text-[#1A1A2E]">{activeCount}</p>
-          </div>
-
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Affiliate Status</p>
-            <p className="mt-1 text-lg font-bold text-emerald-600">
-              {items.length ? "Active" : "No products yet"}
-            </p>
-          </div>
+            Browse Marketplace
+          </Link>
         </div>
 
         {error && (
-          <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
-            {error}
-          </div>
+          <Card>
+            <p className="text-sm text-red-600">{error}</p>
+          </Card>
         )}
 
         {loading ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
-            Loading your products...
-          </div>
-        ) : items.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
-            <Package className="mx-auto h-10 w-10 text-gray-300" />
-            <h2 className="mt-4 text-lg font-bold text-gray-900">
-              No products selected yet
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
-              Go to the Marketplace and select products you want to promote.
-            </p>
-            <a
-              href="/marketplace"
-              className="mt-5 inline-flex items-center rounded-xl bg-[#3B2FE0] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#3125C4]"
-            >
-              Browse Marketplace
-            </a>
-          </div>
+          <Card>
+            <div className="py-12 text-center text-sm text-slate-500">
+              Loading your products...
+            </div>
+          </Card>
+        ) : affiliations.length === 0 ? (
+          <Card>
+            <div className="py-14 text-center">
+              <h2 className="text-lg font-semibold text-slate-900">
+                No products yet
+              </h2>
+
+              <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+                Browse the marketplace and select products
+                you want to promote.
+              </p>
+
+              <Link
+                href="/marketplace"
+                className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-5 text-sm font-medium text-white hover:bg-indigo-700"
+              >
+                Browse Marketplace
+              </Link>
+            </div>
+          </Card>
         ) : (
-          <div className="space-y-4">
-            {items.map((item, index) => {
-              const product = getProduct(item);
-              const supplier = getSupplier(item);
-              const productName = product.name || product.name_en || product.name_pt || "Unnamed product";
-              const supplierName =
-                supplier?.company_name ||
-                supplier?.name ||
-                supplier?.full_name ||
-                "Supplier / Producer";
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {affiliations.map((affiliation) => {
+              const product = affiliation.product;
+
+              if (!product) {
+                return (
+                  <Card key={affiliation.id}>
+                    <p className="text-sm text-slate-500">
+                      Product information is unavailable.
+                    </p>
+                  </Card>
+                );
+              }
+
+              const price =
+                product.preco_promocional ??
+                product.preco;
+
+              const affiliateUrl =
+                getAffiliateUrl(affiliation.link_unico);
 
               return (
-                <article
-                  key={item.id || item.product_id || `${productName}-${index}`}
-                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                <Card
+                  key={affiliation.id}
+                  className="overflow-hidden p-0"
                 >
-                  <div className="flex flex-col gap-5 p-5 lg:flex-row lg:items-center">
-                    <div className="h-24 w-24 shrink-0">
-                      <ProductImageGallery
-                        imageUrl={product.image_url}
-                        images={product.image_urls}
-                        productName={productName}
+                  <div className="aspect-[16/9] overflow-hidden bg-slate-100">
+                    {product.fotos?.[0] ? (
+                      <img
+                        src={product.fotos[0]}
+                        alt={product.nome}
+                        className="h-full w-full object-cover"
                       />
-                    </div>
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-slate-400">
+                        No image
+                      </div>
+                    )}
+                  </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-lg font-bold text-gray-900">
-                          {productName}
+                  <div className="space-y-4 p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h2 className="truncate font-semibold text-slate-900">
+                          {product.nome}
                         </h2>
 
-                        {item.status && (
-                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold capitalize text-emerald-700">
-                            {item.status}
-                          </span>
-                        )}
-                      </div>
-
-                      {(product.description ||
-                        product.short_description_en ||
-                        product.short_description_pt) && (
-                        <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-                          {product.description ||
-                            product.short_description_en ||
-                            product.short_description_pt}
+                        <p className="mt-1 line-clamp-2 text-sm text-slate-500">
+                          {product.descricao ||
+                            "No description available."}
                         </p>
-                      )}
-
-                      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <div className="rounded-xl bg-gray-50 p-3">
-                          <p className="text-xs text-gray-500">Price</p>
-                          <p className="mt-1 text-sm font-bold text-gray-900">
-                            {product.price != null
-                              ? `${product.currency || "ZAR"} ${Number(product.price).toLocaleString()}`
-                              : "Unavailable"}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl bg-gray-50 p-3">
-                          <p className="text-xs text-gray-500">Commission</p>
-                          <p className="mt-1 text-sm font-bold text-emerald-600">
-                            {product.commission_percentage != null
-                              ? `${Number(product.commission_percentage)}%`
-                              : "—"}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl bg-gray-50 p-3">
-                          <p className="text-xs text-gray-500">Conversions</p>
-                          <p className="mt-1 text-sm font-bold text-gray-900">
-                            {Number(product.total_conversions || 0)}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl bg-gray-50 p-3">
-                          <p className="text-xs text-gray-500">Sales</p>
-                          <p className="mt-1 text-sm font-bold text-gray-900">
-                            {Number(product.total_sales || 0)}
-                          </p>
-                        </div>
                       </div>
 
-                      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <div>
-                          <p className="text-xs text-gray-400">Clicks</p>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {Number(product.total_clicks || 0)}
-                          </p>
-                        </div>
+                      <Badge>
+                        {affiliation.ativo
+                          ? "Active"
+                          : "Inactive"}
+                      </Badge>
+                    </div>
 
-                        <div>
-                          <p className="text-xs text-gray-400">Commission earned</p>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {product.total_commission != null
-                              ? `${product.currency || "ZAR"} ${Number(product.total_commission).toLocaleString()}`
-                              : "ZAR 0"}
-                          </p>
-                        </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-lg bg-slate-50 p-3">
+                        <p className="text-xs text-slate-500">
+                          Price
+                        </p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {formatMoney(
+                            price,
+                            product.moeda,
+                          )}
+                        </p>
+                      </div>
 
-                        <div>
-                          <p className="text-xs text-gray-400">Referral code</p>
-                          <p className="truncate text-sm font-semibold text-gray-800">
-                            {item.referral_code || "—"}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-xs text-gray-400">Added</p>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {item.created_at
-                              ? new Date(item.created_at).toLocaleDateString()
-                              : "—"}
-                          </p>
-                        </div>
+                      <div className="rounded-lg bg-slate-50 p-3">
+                        <p className="text-xs text-slate-500">
+                          Commission
+                        </p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {formatCommission(
+                            product.comissao_tipo,
+                            product.comissao_valor,
+                            product.moeda,
+                          )}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="w-full rounded-2xl border border-gray-100 bg-gray-50 p-4 lg:max-w-sm">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                        Supplier / Producer
+                    <div>
+                      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                        Affiliate Link
                       </p>
 
-                      <div className="mt-3 flex items-center gap-3">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white">
-                          {supplier?.logo_url || supplier?.avatar_url ? (
-                            <img
-                              src={supplier.logo_url || supplier.avatar_url}
-                              alt={supplierName}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <Building2 className="h-5 w-5 text-gray-400" />
-                          )}
-                        </div>
+                      <div className="flex gap-2">
+                        <input
+                          readOnly
+                          value={affiliateUrl}
+                          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 outline-none"
+                        />
 
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <p className="truncate text-sm font-bold text-gray-900">
-                              {supplierName}
-                            </p>
-
-                            {supplier?.verification_status &&
-                              supplier.verification_status !== "unverified" && (
-                                <ShieldCheck className="h-4 w-4 shrink-0 text-blue-600" />
-                              )}
-                          </div>
-
-                          {(supplier?.country || supplier?.country_code) && (
-                            <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-                              <MapPin className="h-3.5 w-3.5" />
-                              {supplier.country || supplier.country_code}
-                              {supplier.city ? ` · ${supplier.city}` : ""}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <span className="rounded-full border border-gray-100 bg-white px-3 py-1.5 text-xs font-semibold capitalize text-gray-700">
-                          {supplier?.country_code || supplier?.country || "—"} · {supplier?.company_type || "Supplier"}
-                        </span>
-                        <span className="rounded-full border border-gray-100 bg-white px-3 py-1.5 text-xs font-semibold capitalize text-gray-700">
-                          {supplier?.verification_status || "Pending"}
-                        </span>
-                      </div>
-
-                      {supplier?.company_id ? (
-                        <Link
-                          href={`/dashboard/seller/suppliers/${supplier.company_id}`}
-                          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#3B2FE0] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#3125C4]"
-                        >
-                          View Supplier Profile
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </Link>
-                      ) : (
-                        <p className="mt-4 text-xs text-gray-400">
-                          Supplier profile unavailable
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex shrink-0 flex-wrap gap-2 lg:w-40 lg:flex-col">
-                      {(item.product_page_url || product.slug) && (
-                        <a
-                          href={
-                            item.product_page_url ||
-                            `/marketplace/products/${product.slug}`
-                          }
-                          target={item.product_page_url ? "_blank" : undefined}
-                          rel={item.product_page_url ? "noreferrer" : undefined}
-                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          View Product
-                        </a>
-                      )}
-
-                      {item.referral_code && (
-                        <a
-                          href={`${window.location.origin}/go/${encodeURIComponent(item.referral_code)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3B2FE0] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#3125C4]"
-                        >
-                          Affiliate Link
-                        </a>
-                      )}
-
-                      {item.referral_code && (
                         <button
                           type="button"
                           onClick={() =>
-                            navigator.clipboard.writeText(item.referral_code || "")
+                            copyLink(
+                              affiliateUrl,
+                              affiliation.id,
+                            )
                           }
-                          className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                          className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                         >
-                          Copy Referral
+                          {copied === affiliation.id
+                            ? "Copied"
+                            : "Copy"}
                         </button>
-                      )}
+                      </div>
                     </div>
+
+                    <Link
+                      href={`/marketplace/${product.id}`}
+                      className="block text-center text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                    >
+                      View Product
+                    </Link>
                   </div>
-                </article>
+                </Card>
               );
             })}
           </div>
         )}
       </div>
-    </main>
-    </DashboardShell>
+    </AppShell>
   );
 }

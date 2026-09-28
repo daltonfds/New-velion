@@ -1,273 +1,158 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import {
-  ArrowLeft,
-  Package,
-  Search,
-  ShoppingCart,
-  ToggleRight,
-} from "lucide-react";
-import { getAdminProducts } from "@/lib/newvelion-api";
-
-type Product = {
-  id: string;
-  name_en?: string | null;
-  name_pt?: string | null;
-  slug?: string | null;
-  supplier_id?: string | null;
-  price?: number | null;
-  original_price?: number | null;
-  offer_price?: number | null;
-  currency?: string | null;
-  commission_percentage?: number | null;
-  stock?: number | null;
-  total_sales?: number | null;
-  total_clicks?: number | null;
-  featured?: boolean | null;
-  offer?: boolean | null;
-  status?: string | null;
-  created_at?: string | null;
-};
-
-function money(value: number | null | undefined) {
-  if (value == null) return "—";
-
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
-function productName(product: Product) {
-  return product.name_en || product.name_pt || "Untitled product";
-}
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import { supabase } from "@/lib/supabase";
+import type { Product } from "@/types";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   async function loadProducts() {
-    try {
-      setLoading(true);
-      setError("");
+    setLoading(true);
 
-      const data = await getAdminProducts();
-      setProducts(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-      setError("Unable to load products.");
-      setProducts([]);
-    } finally {
-      setLoading(false);
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error) {
+      setProducts((data ?? []) as Product[]);
     }
+
+    setLoading(false);
   }
 
   useEffect(() => {
-    loadProducts();
+    void loadProducts();
   }, []);
 
-  const filteredProducts = useMemo(() => {
-    const query = search.trim().toLowerCase();
-
-    if (!query) return products;
-
-    return products.filter((product) =>
-      [
-        product.id,
-        product.name_en,
-        product.name_pt,
-        product.slug,
-        product.supplier_id,
-      ]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(query)),
-    );
-  }, [products, search]);
-
-  const activeProducts = products.filter(
-    (product) => product.status === "active",
-  ).length;
-
-  const totalSales = products.reduce(
-    (sum, product) => sum + Number(product.total_sales || 0),
-    0,
-  );
-
   return (
-    <DashboardShell
-      area="admin"
-      activeKey="products"
-      title="Products"
-      subtitle="Live product catalog from NewVelion."
-    >
+    <AppShell area="admin">
       <div className="space-y-6">
-        <Link
-          href="/dashboard/admin"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-[#1769e0]"
-        >
-          <ArrowLeft size={17} />
-          Back to Admin Dashboard
-        </Link>
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <p className="text-sm font-medium text-indigo-600">Commerce</p>
+            <h1 className="mt-1 text-2xl font-semibold text-slate-900">
+              Products
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Manage products available across the Newvelion marketplace.
+            </p>
+          </div>
 
-        <section className="grid gap-4 sm:grid-cols-3">
-          {[
-            ["Total Products", products.length, Package],
-            ["Active Products", activeProducts, ToggleRight],
-            ["Total Sales", totalSales, ShoppingCart],
-          ].map(([label, value, Icon]) => {
-            const StatIcon = Icon as typeof Package;
+          <Link href="/dashboard/admin/products/new">
+            <Button>Add Product</Button>
+          </Link>
+        </div>
 
-            return (
-              <div
-                key={label as string}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-500">
-                      {label as string}
-                    </p>
-                    <p className="mt-2 text-2xl font-bold text-slate-900">
-                      {value as number}
-                    </p>
-                  </div>
-
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                    <StatIcon size={21} />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </section>
-
-        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 p-5">
-            <div className="relative max-w-xl">
-              <Search
-                size={18}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search products, supplier ID or product ID..."
-                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white"
-              />
+        <Card>
+          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+            <div>
+              <h2 className="font-semibold text-slate-900">Product Catalog</h2>
+              <p className="text-sm text-slate-500">
+                {products.length} product{products.length === 1 ? "" : "s"}
+              </p>
             </div>
           </div>
 
-          {error && (
-            <div className="m-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-
           {loading ? (
-            <div className="p-8 text-center text-sm text-slate-500">
+            <div className="px-6 py-12 text-center text-sm text-slate-500">
               Loading products...
             </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="p-12 text-center">
-              <Package className="mx-auto text-slate-300" size={34} />
-              <p className="mt-3 text-sm font-semibold text-slate-700">
-                No products found
+          ) : products.length === 0 ? (
+            <div className="px-6 py-16 text-center">
+              <h3 className="font-semibold text-slate-900">
+                No products yet
+              </h3>
+              <p className="mt-1 text-sm text-slate-500">
+                Create the first product to make it available for sellers.
               </p>
-              <p className="mt-1 text-xs text-slate-400">
-                Products created by suppliers will appear here automatically.
-              </p>
+              <div className="mt-5">
+                <Link href="/dashboard/admin/products/new">
+                  <Button>Add Product</Button>
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left">
+              <table className="w-full min-w-[900px]">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
-                    {[
-                      "Product",
-                      "Supplier",
-                      "Price",
-                      "Commission",
-                      "Stock",
-                      "Sales",
-                      "Status",
-                      "Created",
-                    ].map((heading) => (
-                      <th
-                        key={heading}
-                        className="px-5 py-4 text-xs font-bold uppercase tracking-wide text-slate-500"
-                      >
-                        {heading}
-                      </th>
-                    ))}
+                  <tr className="border-b border-slate-100 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <th className="px-6 py-4">Product</th>
+                    <th className="px-6 py-4">Price</th>
+                    <th className="px-6 py-4">Commission</th>
+                    <th className="px-6 py-4">Stock</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4">Actions</th>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-slate-100">
-                  {filteredProducts.map((product) => (
+                  {products.map((product) => (
                     <tr key={product.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-4">
-                        <div>
-                          <p className="font-semibold text-slate-900">
-                            {productName(product)}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-400">
-                            {product.id}
-                          </p>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          {product.fotos?.[0] ? (
+                            <img
+                              src={product.fotos[0]}
+                              alt={product.nome}
+                              className="h-12 w-12 rounded-lg object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-400">
+                              No image
+                            </div>
+                          )}
+
+                          <div>
+                            <p className="font-medium text-slate-900">
+                              {product.nome}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {product.id.slice(0, 8)}
+                            </p>
+                          </div>
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 text-sm text-slate-600">
-                        <span className="font-mono text-xs">
-                          {product.supplier_id || "—"}
-                        </span>
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        {product.moeda}{" "}
+                        {Number(
+                          product.preco_promocional ?? product.preco,
+                        ).toFixed(2)}
                       </td>
 
-                      <td className="px-5 py-4 text-sm font-semibold text-slate-900">
-                        {money(
-                          Number(
-                            product.offer_price ??
-                              product.price ??
-                              0,
-                          ),
-                        )}
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        {product.comissao_tipo === "percentual"
+                          ? `${product.comissao_valor}%`
+                          : `${product.moeda} ${Number(
+                              product.comissao_valor,
+                            ).toFixed(2)}`}
                       </td>
 
-                      <td className="px-5 py-4 text-sm font-semibold text-blue-600">
-                        {Number(product.commission_percentage || 0)}%
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        {product.estoque ?? 0}
                       </td>
 
-                      <td className="px-5 py-4 text-sm text-slate-600">
-                        {product.stock ?? "—"}
+                      <td className="px-6 py-4">
+                        <Badge variant={product.ativo ? "success" : "default"}>
+                          {product.ativo ? "Active" : "Inactive"}
+                        </Badge>
                       </td>
 
-                      <td className="px-5 py-4 text-sm text-slate-600">
-                        {product.total_sales ?? 0}
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                            product.status === "active"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-slate-100 text-slate-600"
-                          }`}
+                      <td className="px-6 py-4">
+                        <Link
+                          href={`/dashboard/admin/products/${product.id}`}
+                          className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
                         >
-                          {product.status || "unknown"}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4 text-xs text-slate-500">
-                        {product.created_at
-                          ? new Date(product.created_at).toLocaleDateString(
-                              "en-ZA",
-                            )
-                          : "—"}
+                          Manage
+                        </Link>
                       </td>
                     </tr>
                   ))}
@@ -275,8 +160,8 @@ export default function AdminProductsPage() {
               </table>
             </div>
           )}
-        </section>
+        </Card>
       </div>
-    </DashboardShell>
+    </AppShell>
   );
 }

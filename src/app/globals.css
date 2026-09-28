@@ -2,48 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html {
-    font-size: 14px;
-  }
-
-  body {
-    @apply bg-white text-light-text antialiased;
-    font-family: var(--font-space-grotesk), system-ui, sans-serif;
-  }
-
-  h1 {
-    @apply text-h1 lg:text-desktop-h1 font-bold leading-tight;
-  }
-
-  h2 {
-    @apply text-h2 lg:text-desktop-h2 font-semibold leading-tight;
-  }
-
-  h3 {
-    @apply text-h3 lg:text-desktop-h3 font-semibold leading-snug;
-  }
-
-  p {
-    @apply text-body lg:text-desktop-body leading-relaxed;
-  }
-
-  label,
-  small,
-  .meta {
-    @apply text-meta lg:text-desktop-meta font-medium text-light-muted;
-  }
-
-  button,
-  input,
-  textarea,
-  select {
-    font-family: inherit;
-  }
+:root {
+  --background: #f8fafc;
+  --foreground: #111827;
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --primary-light: #EEF2FF;
+  --border: #E5E7EB;
+  --muted: #6B7280;
+  --success: #16A34A;
+  --warning: #D97706;
+  --danger: #DC2626;
 }
 
-@layer components {
-  .dashboard-card {
-    @apply rounded-xl border border-light-border bg-white shadow-sm;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
