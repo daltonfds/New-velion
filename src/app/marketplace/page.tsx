@@ -47,6 +47,7 @@ export default function MarketplacePage() {
     {}
   );
   const [copiedProduct, setCopiedProduct] = useState<string | null>(null);
+  const [imageIndexes, setImageIndexes] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function loadMarketplace() {
@@ -410,17 +411,150 @@ export default function MarketplacePage() {
 
               return (
                 <Card key={product.id} className="overflow-hidden p-0">
-                  <div className="flex h-52 items-center justify-center bg-gray-100">
-                    {product.fotos?.[0] ? (
-                      <img
-                        src={product.fotos[0]}
-                        alt={product.nome}
-                        className="h-full w-full object-cover"
-                      />
+                  <div className="relative h-52 overflow-hidden bg-gray-100">
+                    {product.fotos?.length > 0 ? (
+                      <>
+                        <div
+                          id={`product-images-${product.id}`}
+                          className="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                          onScroll={(event) => {
+                            const element = event.currentTarget;
+                            const width = element.clientWidth;
+
+                            if (!width) return;
+
+                            const index = Math.round(
+                              element.scrollLeft / width
+                            );
+
+                            setImageIndexes((current) => ({
+                              ...current,
+                              [product.id]: Math.min(
+                                index,
+                                product.fotos.length - 1
+                              ),
+                            }));
+                          }}
+                        >
+                          {product.fotos.map((image, index) => (
+                            <div
+                              key={`${image}-${index}`}
+                              className="h-full min-w-full snap-center"
+                            >
+                              <img
+                                src={image}
+                                alt={`${product.nome} image ${index + 1}`}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        {product.fotos.length > 1 && (
+                          <>
+                            <button
+                              type="button"
+                              aria-label="Previous product image"
+                              onClick={() => {
+                                const currentIndex =
+                                  imageIndexes[product.id] ?? 0;
+                                const nextIndex =
+                                  currentIndex === 0
+                                    ? product.fotos.length - 1
+                                    : currentIndex - 1;
+
+                                const container = document.getElementById(
+                                  `product-images-${product.id}`
+                                );
+
+                                container?.scrollTo({
+                                  left: container.clientWidth * nextIndex,
+                                  behavior: "smooth",
+                                });
+
+                                setImageIndexes((current) => ({
+                                  ...current,
+                                  [product.id]: nextIndex,
+                                }));
+                              }}
+                              className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-lg font-semibold text-gray-800 shadow-sm transition hover:bg-white"
+                            >
+                              ‹
+                            </button>
+
+                            <button
+                              type="button"
+                              aria-label="Next product image"
+                              onClick={() => {
+                                const currentIndex =
+                                  imageIndexes[product.id] ?? 0;
+                                const nextIndex =
+                                  currentIndex === product.fotos.length - 1
+                                    ? 0
+                                    : currentIndex + 1;
+
+                                const container = document.getElementById(
+                                  `product-images-${product.id}`
+                                );
+
+                                container?.scrollTo({
+                                  left: container.clientWidth * nextIndex,
+                                  behavior: "smooth",
+                                });
+
+                                setImageIndexes((current) => ({
+                                  ...current,
+                                  [product.id]: nextIndex,
+                                }));
+                              }}
+                              className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-lg font-semibold text-gray-800 shadow-sm transition hover:bg-white"
+                            >
+                              ›
+                            </button>
+
+                            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1.5">
+                              {product.fotos.map((_, index) => (
+                                <button
+                                  key={index}
+                                  type="button"
+                                  aria-label={`Show image ${index + 1}`}
+                                  onClick={() => {
+                                    const container = document.getElementById(
+                                      `product-images-${product.id}`
+                                    );
+
+                                    container?.scrollTo({
+                                      left: container.clientWidth * index,
+                                      behavior: "smooth",
+                                    });
+
+                                    setImageIndexes((current) => ({
+                                      ...current,
+                                      [product.id]: index,
+                                    }));
+                                  }}
+                                  className={`h-1.5 rounded-full transition-all ${
+                                    (imageIndexes[product.id] ?? 0) === index
+                                      ? "w-5 bg-white"
+                                      : "w-1.5 bg-white/60"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+
+                            <span className="absolute right-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-xs font-medium text-white">
+                              {(imageIndexes[product.id] ?? 0) + 1}/
+                              {product.fotos.length}
+                            </span>
+                          </>
+                        )}
+                      </>
                     ) : (
-                      <span className="text-sm text-gray-400">
-                        No image
-                      </span>
+                      <div className="flex h-full items-center justify-center">
+                        <span className="text-sm text-gray-400">
+                          No image
+                        </span>
+                      </div>
                     )}
                   </div>
 
