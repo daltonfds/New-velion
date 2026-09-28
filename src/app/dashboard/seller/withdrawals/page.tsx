@@ -43,6 +43,11 @@ interface WalletSummary {
 export default function SellerWithdrawalsPage() {
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [methods, setMethods] = useState<PayoutMethod[]>([]);
+  const [countryCode, setCountryCode] = useState<string | null>(null);
+  const [currency, setCurrency] = useState<"ZAR" | "MZN">("ZAR");
+  const [exchangeRate, setExchangeRate] = useState(1);
+  const [rateLoading, setRateLoading] = useState(false);
+
   const [wallet, setWallet] = useState<WalletSummary>({
     disponivel: 0,
     retido: 0,
@@ -194,10 +199,13 @@ export default function SellerWithdrawalsPage() {
       const { data, error: rpcError } = await supabase.rpc(
         "server_request_withdrawal",
         {
-          p_vendedor_id: user.id,
-          p_valor_solicitado: numericAmount,
-          p_metodo: method,
-          p_dados_pagamento: parsedDetails,
+          p_user_id: user.id,
+          p_amount: numericAmount,
+          p_method: method,
+          p_data: {
+            ...parsedDetails,
+            exchange_rate: currency === "MZN" ? exchangeRate : 1,
+          },
         },
       );
 
@@ -258,7 +266,7 @@ export default function SellerWithdrawalsPage() {
   function formatMoney(value: number) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "ZAR",
+      currency: currency,
       minimumFractionDigits: 2,
     }).format(value);
   }
@@ -309,6 +317,37 @@ export default function SellerWithdrawalsPage() {
   return (
     <AppShell area="seller">
       <div className="space-y-6">
+      <div className="rounded-xl border bg-white p-4">
+        <div className="text-sm font-medium text-gray-900">Payout region</div>
+        <div className="mt-1 text-sm text-gray-600">
+          Country: {countryCode || "Not configured"} · Currency: {currency}
+        </div>
+        {countryCode === "MZ" && (
+          <div className="mt-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
+            {rateLoading ? (
+              "Loading live exchange rate..."
+            ) : exchangeRate > 0 ? (
+              <>
+                <div>
+                  <strong>Exchange rate:</strong> 1 ZAR ≈ {exchangeRate.toFixed(4)} MZN
+                </div>
+                <div className="mt-1">
+                  Your wallet remains in ZAR. The withdrawal amount is converted to MZN before payout.
+                </div>
+              </>
+            ) : (
+              <span className="text-red-600">
+                Exchange rate unavailable.
+              </span>
+            )}
+          </div>
+        )}
+        {!countryCode && (
+          <div className="mt-2 text-sm text-red-600">
+            Complete your country information before requesting a withdrawal.
+          </div>
+        )}
+      </div>
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">
             Withdrawals
