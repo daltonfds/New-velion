@@ -551,10 +551,12 @@ export default function NewSupplierProductsPage() {
       setSaved(true);
       setProducts([emptyProduct(1)]);
     } catch (err) {
+      console.error("NEW PRODUCT ERROR:", err);
+
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to save products."
+          : `Failed to save products: ${String(err)}`
       );
     } finally {
       setSaving(false);
