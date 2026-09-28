@@ -108,7 +108,10 @@ function getProductLink(item: AffiliateProduct) {
 }
 
 function getAffiliateLink(item: AffiliateProduct) {
-  return item.affiliate_link || "";
+  const referralCode = String(item.referral_code || "").trim();
+  return referralCode
+    ? `${window.location.origin}/go/${encodeURIComponent(referralCode)}`
+    : "";
 }
 
 function getStatus(item: AffiliateProduct) {

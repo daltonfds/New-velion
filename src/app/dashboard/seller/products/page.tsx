@@ -41,6 +41,7 @@ type Product = {
   short_description_en?: string | null;
   short_description_pt?: string | null;
   image_url?: string | null;
+  image_urls?: string[] | null;
   price?: number | null;
   currency?: string | null;
   commission_percentage?: number | null;
@@ -212,6 +213,7 @@ export default function SellerMyProductsPage() {
                     <div className="h-24 w-24 shrink-0">
                       <ProductImageGallery
                         imageUrl={product.image_url}
+                        images={product.image_urls}
                         productName={productName}
                       />
                     </div>
@@ -388,12 +390,9 @@ export default function SellerMyProductsPage() {
                         </a>
                       )}
 
-                      {(item.affiliate_link || item.referral_code) && (
+                      {item.referral_code && (
                         <a
-                          href={
-                            item.affiliate_link ||
-                            `${window.location.origin}/go/${item.referral_code}`
-                          }
+                          href={`${window.location.origin}/go/${encodeURIComponent(item.referral_code)}`}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3B2FE0] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#3125C4]"

@@ -801,11 +801,10 @@ export default function SellerSelectedProductsPage() {
                       ? (conversions / clicks) * 100
                       : 0;
 
-                    const affiliateLink =
-                      item.affiliate_link ||
-                      (item.referral_code
-                        ? `${window.location.origin}/go/${item.referral_code}`
-                        : "");
+                    const referralCode = String(item.referral_code || "").trim();
+                    const affiliateLink = referralCode
+                      ? `${window.location.origin}/go/${encodeURIComponent(referralCode)}`
+                      : "";
 
                     const productPage =
                       item.product_page_url ||

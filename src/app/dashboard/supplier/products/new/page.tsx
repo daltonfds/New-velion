@@ -492,6 +492,7 @@ export default function NewSupplierProductsPage() {
             .from("products")
             .update({
               image_url: imageUrls[0],
+              image_urls: imageUrls,
             })
             .eq("id", createdProduct.id)
             .eq("supplier_id", user.id);

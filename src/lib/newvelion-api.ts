@@ -17,6 +17,7 @@ export type MarketplaceProduct = {
   description_en: string | null;
   description_pt: string | null;
   image_url: string | null;
+  image_urls?: string[] | null;
   price: number | null;
   currency: string | null;
   commission_percentage: number | null;
@@ -843,18 +844,14 @@ export async function getAffiliateProducts() {
 
   return items.map((item: any) => {
     const product = item?.product || item?.products;
-    const referralCode =
-      item?.referral_code ||
-      item?.affiliate_code ||
-      "";
+    const referralCode = String(item?.referral_code || "").trim();
 
     return {
       ...item,
       product,
-      affiliate_link:
-        referralCode
-          ? `${window.location.origin}/go/${encodeURIComponent(referralCode)}`
-          : item?.affiliate_link || "",
+      affiliate_link: referralCode
+        ? `${window.location.origin}/go/${encodeURIComponent(referralCode)}`
+        : "",
     };
   });
 }
