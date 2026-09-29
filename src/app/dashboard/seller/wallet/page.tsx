@@ -106,7 +106,7 @@ export default function SellerWalletPage() {
       const [summary, result] = await Promise.all([
         getWalletSummary(user.id),
         supabase
-          .from("wallet_entries")
+          .from("wallet_entries_canonical")
           .select("id,tipo,valor,estado,created_at,sale_id")
           .eq("vendedor_id", user.id)
           .order("created_at", { ascending: false }),
