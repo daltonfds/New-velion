@@ -110,28 +110,28 @@ export default function SellerDashboardPage() {
 
   const totalCommission = financialSummary?.commission_earned ?? 0;
 
-  const monthly = useMemo(() => {
-    const now = new Date();
+  const dailyPerformance = useMemo(() => {
+    const today = new Date();
 
-    return Array.from({ length: 6 }, (_, index) => {
-      const date = new Date(
-        now.getFullYear(),
-        now.getMonth() - (5 - index),
-        1
-      );
+    return Array.from({ length: 30 }, (_, index) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - (29 - index));
+      date.setHours(0, 0, 0, 0);
 
-      const monthSales = paidSales.filter((sale) => {
+      const nextDate = new Date(date);
+      nextDate.setDate(date.getDate() + 1);
+
+      const daySales = paidSales.filter((sale) => {
         const saleDate = new Date(sale.vendido_em);
-        return (
-          saleDate.getFullYear() === date.getFullYear() &&
-          saleDate.getMonth() === date.getMonth()
-        );
+        return saleDate >= date && saleDate < nextDate;
       });
 
       return {
-        month: date.toLocaleDateString("en-US", { month: "short" }),
-        sales: monthSales.length,
-        commission: monthSales.reduce(
+        date: date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }),
+        commission: daySales.reduce(
           (sum, sale) => sum + Number(sale.comissao_vendedor || 0),
           0
         ),
@@ -140,7 +140,7 @@ export default function SellerDashboardPage() {
   }, [paidSales]);
 
   const maxCommission = Math.max(
-    ...monthly.map((item) => item.commission),
+    ...dailyPerformance.map((item) => item.commission),
     1
   );
 
@@ -227,8 +227,7 @@ export default function SellerDashboardPage() {
                     Sales performance
                   </h2>
                   <p className="mt-1 text-sm text-[#7C8798]">
-                    Commission generated from paid sales over the last six
-                    months.
+                    Daily commission generated from paid sales over the last 30 days.
                   </p>
                 </div>
 
@@ -237,44 +236,85 @@ export default function SellerDashboardPage() {
                 </span>
               </div>
 
-              <div className="mt-8 h-64">
-                <div className="flex h-full items-end gap-3 sm:gap-5">
-                  {monthly.map((item) => {
-                    const height =
-                      item.commission === 0
-                        ? 4
-                        : Math.max(
-                            8,
-                            (item.commission / maxCommission) * 100
-                          );
+              <div className="mt-8">
+                <div className="relative h-64 w-full">
+                  <svg
+                    viewBox="0 0 900 240"
+                    className="h-full w-full overflow-visible"
+                    preserveAspectRatio="none"
+                  >
+                    {[0, 25, 50, 75, 100].map((level) => {
+                      const y = 220 - (level / 100) * 190;
 
-                    return (
-                      <div
-                        key={item.month}
-                        className="flex h-full flex-1 flex-col justify-end"
-                      >
-                        <div className="mb-2 text-center text-[11px] font-medium text-[#60708A]">
-                          {item.commission > 0
-                            ? money(item.commission)
-                            : "R 0,00"}
-                        </div>
+                      return (
+                        <line
+                          key={level}
+                          x1="0"
+                          x2="900"
+                          y1={y}
+                          y2={y}
+                          stroke="#E8EDF4"
+                          strokeWidth="1"
+                        />
+                      );
+                    })}
 
-                        <div className="flex h-[185px] items-end">
-                          <div
-                            className="w-full rounded-t-md bg-[#2B5F9E] transition-all"
-                            style={{ height: `${height}%` }}
-                            title={`${item.month}: ${money(
-                              item.commission
-                            )}`}
-                          />
-                        </div>
+                    <polyline
+                      fill="none"
+                      stroke="#2563EB"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      points={dailyPerformance
+                        .map((item, index) => {
+                          const x =
+                            (index / (dailyPerformance.length - 1)) * 900;
+                          const y =
+                            220 -
+                            (item.commission / maxCommission) * 190;
 
-                        <div className="mt-3 text-center text-xs font-medium text-[#7C8798]">
-                          {item.month}
-                        </div>
-                      </div>
-                    );
-                  })}
+                          return `${x},${y}`;
+                        })
+                        .join(" ")}
+                    />
+
+                    {dailyPerformance.map((item, index) => {
+                      const x =
+                        (index / (dailyPerformance.length - 1)) * 900;
+                      const y =
+                        220 -
+                        (item.commission / maxCommission) * 190;
+
+                      return (
+                        <circle
+                          key={`${item.date}-${index}`}
+                          cx={x}
+                          cy={y}
+                          r="3.5"
+                          fill="#FFFFFF"
+                          stroke="#2563EB"
+                          strokeWidth="2"
+                        />
+                      );
+                    })}
+                  </svg>
+                </div>
+
+                <div className="mt-2 flex justify-between text-[11px] text-[#8A96A8]">
+                  {dailyPerformance
+                    .filter(
+                      (_, index) =>
+                        index === 0 ||
+                        index === 5 ||
+                        index === 10 ||
+                        index === 15 ||
+                        index === 20 ||
+                        index === 25 ||
+                        index === 29
+                    )
+                    .map((item) => (
+                      <span key={item.date}>{item.date}</span>
+                    ))}
                 </div>
               </div>
             </Card>
