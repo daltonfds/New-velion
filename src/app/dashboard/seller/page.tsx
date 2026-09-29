@@ -17,7 +17,7 @@ type Sale = {
 
 type WalletEntry = {
   id: string;
-  vendido_em: string;
+  created_at: string;
   valor: number | null;
   tipo: string | null;
 };
