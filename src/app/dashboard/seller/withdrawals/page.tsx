@@ -86,6 +86,7 @@ export default function SellerWithdrawalsPage() {
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [country, setCountry] = useState("");
   const [minimumWithdrawal, setMinimumWithdrawal] = useState(100);
+  const [minimumWithdrawal, setMinimumWithdrawal] = useState(100);
   const [configured, setConfigured] = useState<Record<Method, Details | null>>({
     bank_transfer: null,
     mpesa: null,
@@ -260,6 +261,15 @@ export default function SellerWithdrawalsPage() {
 
     if (numeric <= 0) {
       setError("Enter a valid withdrawal amount.");
+      return;
+    }
+
+    if (numeric < minimumWithdrawal) {
+      setError(
+        "The minimum withdrawal amount is " +
+          money(minimumWithdrawal) +
+          "."
+      );
       return;
     }
 
