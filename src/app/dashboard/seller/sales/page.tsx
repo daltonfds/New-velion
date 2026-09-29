@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -25,6 +26,38 @@ interface Sale {
   } | null;
 }
 
+const icons = {
+  sales: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+      <path d="M4 19V5M4 19h16" />
+      <path d="m7 15 3-4 3 2 5-7" />
+    </svg>
+  ),
+  revenue: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+      <path d="M12 3v18M17 7.5c0-1.7-2.2-3-5-3s-5 1.3-5 3 2.2 3 5 3 5 1.3 5 3-2.2 3-5 3-5-1.3-5-3" />
+    </svg>
+  ),
+  commission: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+      <path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6H15a3 3 0 0 1 0 6H7" />
+    </svg>
+  ),
+  fees: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+      <path d="M7 3h10l2 4H5l2-4Z" />
+      <path d="M5 7h14v13H5zM9 11h6M9 15h4" />
+    </svg>
+  ),
+  refund: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+      <path d="M9 7H5v4" />
+      <path d="M5 11a7 7 0 1 0 2-5" />
+      <path d="M12 9v4l3 2" />
+    </svg>
+  ),
+};
+
 export default function SellerSalesPage() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [search, setSearch] = useState("");
@@ -47,25 +80,23 @@ export default function SellerSalesPage() {
 
       const { data, error: queryError } = await supabase
         .from("sales")
-        .select(
-          `
-            id,
-            vendedor_id,
-            product_id,
-            valor_venda,
-            taxa_gateway,
-            valor_garantia,
-            comissao_vendedor,
-            status,
-            gateway_ref,
-            vendido_em,
-            garantia_libera_em,
-            product:products (
-              nome,
-              moeda
-            )
-          `,
-        )
+        .select(`
+          id,
+          vendedor_id,
+          product_id,
+          valor_venda,
+          taxa_gateway,
+          valor_garantia,
+          comissao_vendedor,
+          status,
+          gateway_ref,
+          vendido_em,
+          garantia_libera_em,
+          product:products (
+            nome,
+            moeda
+          )
+        `)
         .eq("vendedor_id", user.id)
         .order("vendido_em", { ascending: false });
 
@@ -75,9 +106,7 @@ export default function SellerSalesPage() {
         return;
       }
 
-      setSales(
-        ((data ?? []) as unknown) as Sale[],
-      );
+      setSales(((data ?? []) as unknown) as Sale[]);
       setLoading(false);
     }
 
@@ -88,11 +117,8 @@ export default function SellerSalesPage() {
     const query = search.trim().toLowerCase();
 
     return sales.filter((sale) => {
-      const productName =
-        sale.product?.nome?.toLowerCase() || "";
-
-      const gatewayRef =
-        sale.gateway_ref?.toLowerCase() || "";
+      const productName = sale.product?.nome?.toLowerCase() || "";
+      const gatewayRef = sale.gateway_ref?.toLowerCase() || "";
 
       const matchesSearch =
         !query ||
@@ -101,53 +127,34 @@ export default function SellerSalesPage() {
         gatewayRef.includes(query);
 
       const matchesStatus =
-        statusFilter === "all" ||
-        sale.status === statusFilter;
+        statusFilter === "all" || sale.status === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
   }, [sales, search, statusFilter]);
 
   const metrics = useMemo(() => {
-    const paid = sales.filter(
-      (sale) => sale.status === "paga",
-    );
-
-    const revenue = paid.reduce(
-      (total, sale) =>
-        total + Number(sale.valor_venda || 0),
-      0,
-    );
-
-    const commissions = paid.reduce(
-      (total, sale) =>
-        total + Number(sale.comissao_vendedor || 0),
-      0,
-    );
-
-    const gatewayFees = paid.reduce(
-      (total, sale) =>
-        total + Number(sale.taxa_gateway || 0),
-      0,
-    );
-
-    const refunds = sales.filter(
-      (sale) => sale.status === "reembolsada",
-    ).length;
+    const paid = sales.filter((sale) => sale.status === "paga");
 
     return {
       sales: paid.length,
-      revenue,
-      commissions,
-      gatewayFees,
-      refunds,
+      revenue: paid.reduce(
+        (total, sale) => total + Number(sale.valor_venda || 0),
+        0,
+      ),
+      commissions: paid.reduce(
+        (total, sale) => total + Number(sale.comissao_vendedor || 0),
+        0,
+      ),
+      gatewayFees: paid.reduce(
+        (total, sale) => total + Number(sale.taxa_gateway || 0),
+        0,
+      ),
+      refunds: sales.filter((sale) => sale.status === "reembolsada").length,
     };
   }, [sales]);
 
-  const formatMoney = (
-    value: number,
-    currency = "ZAR",
-  ) =>
+  const formatMoney = (value: number, currency = "ZAR") =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
       currency,
@@ -158,211 +165,344 @@ export default function SellerSalesPage() {
     if (status === "paga") return "Paid";
     if (status === "reembolsada") return "Refunded";
     if (status === "cancelada") return "Cancelled";
+    if (status === "pendente") return "Pending";
     return status;
   };
 
+  const statusClass = (status: string) => {
+    if (status === "paga") {
+      return "border-emerald-200 bg-emerald-50 text-emerald-700";
+    }
+
+    if (status === "reembolsada") {
+      return "border-amber-200 bg-amber-50 text-amber-700";
+    }
+
+    if (status === "cancelada") {
+      return "border-red-200 bg-red-50 text-red-700";
+    }
+
+    return "border-slate-200 bg-slate-50 text-slate-600";
+  };
+
+  const metricCards = [
+    {
+      label: "Paid sales",
+      value: metrics.sales.toString(),
+      icon: icons.sales,
+      description: "Completed purchases",
+    },
+    {
+      label: "Revenue",
+      value: formatMoney(metrics.revenue),
+      icon: icons.revenue,
+      description: "Gross sales value",
+    },
+    {
+      label: "Commissions",
+      value: formatMoney(metrics.commissions),
+      icon: icons.commission,
+      description: "Your affiliate earnings",
+    },
+    {
+      label: "Gateway fees",
+      value: formatMoney(metrics.gatewayFees),
+      icon: icons.fees,
+      description: "Processing costs",
+    },
+    {
+      label: "Refunds",
+      value: metrics.refunds.toString(),
+      icon: icons.refund,
+      description: "Refunded orders",
+    },
+  ];
+
   return (
     <AppShell area="seller">
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Orders & Sales
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Track your affiliate sales and commissions.
-          </p>
+      <div className="mx-auto max-w-7xl space-y-7">
+        <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#C99A2E]">
+              Sales
+            </p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#16294F]">
+              Orders & Sales
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm text-slate-500">
+              Monitor purchases generated through your affiliate links,
+              commissions, fees and order status.
+            </p>
+          </div>
+
+          <Link
+            href="/marketplace"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#16294F] px-5 text-sm font-semibold text-white transition hover:bg-[#10203d]"
+          >
+            Find products
+          </Link>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          <Card>
-            <p className="text-sm text-slate-500">
-              Paid Sales
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-900">
-              {metrics.sales}
-            </p>
-          </Card>
+          {metricCards.map((metric) => (
+            <Card key={metric.label} className="border-slate-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">
+                    {metric.label}
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+                    {metric.value}
+                  </p>
+                </div>
 
-          <Card>
-            <p className="text-sm text-slate-500">
-              Revenue
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-900">
-              {formatMoney(metrics.revenue)}
-            </p>
-          </Card>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-[#16294F]">
+                  {metric.icon}
+                </div>
+              </div>
 
-          <Card>
-            <p className="text-sm text-slate-500">
-              Commissions
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-900">
-              {formatMoney(metrics.commissions)}
-            </p>
-          </Card>
-
-          <Card>
-            <p className="text-sm text-slate-500">
-              Gateway Fees
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-900">
-              {formatMoney(metrics.gatewayFees)}
-            </p>
-          </Card>
-
-          <Card>
-            <p className="text-sm text-slate-500">
-              Refunds
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-900">
-              {metrics.refunds}
-            </p>
-          </Card>
+              <p className="mt-3 text-xs text-slate-400">
+                {metric.description}
+              </p>
+            </Card>
+          ))}
         </div>
 
-        <Card>
-          <div className="grid gap-4 md:grid-cols-2">
-            <input
-              value={search}
-              onChange={(event) =>
-                setSearch(event.target.value)
-              }
-              placeholder="Search by product, sale ID, or gateway reference..."
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
-            />
+        <Card className="border-slate-200 p-0">
+          <div className="flex flex-col gap-4 border-b border-slate-200 p-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">
+                Sales history
+              </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                {sales.length} total {sales.length === 1 ? "sale" : "sales"}
+              </p>
+            </div>
 
-            <select
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value)
-              }
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
-            >
-              <option value="all">All statuses</option>
-              <option value="paga">Paid</option>
-              <option value="reembolsada">
-                Refunded
-              </option>
-              <option value="cancelada">
-                Cancelled
-              </option>
-            </select>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="relative">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-4-4" />
+                </svg>
+
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search sales..."
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-[#16294F] sm:w-72"
+                />
+              </div>
+
+              <select
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#16294F]"
+              >
+                <option value="all">All statuses</option>
+                <option value="paga">Paid</option>
+                <option value="pendente">Pending</option>
+                <option value="reembolsada">Refunded</option>
+                <option value="cancelada">Cancelled</option>
+              </select>
+            </div>
           </div>
-        </Card>
 
-        {error && (
-          <Card>
-            <p className="text-sm text-red-600">{error}</p>
-          </Card>
-        )}
+          {error && (
+            <div className="border-b border-red-100 bg-red-50 px-5 py-4">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
 
-        <Card>
           {loading ? (
-            <div className="py-12 text-center text-sm text-slate-500">
-              Loading sales...
+            <div className="space-y-4 p-5">
+              {[1, 2, 3, 4].map((item) => (
+                <div
+                  key={item}
+                  className="h-16 animate-pulse rounded-lg bg-slate-100"
+                />
+              ))}
             </div>
           ) : filteredSales.length === 0 ? (
-            <div className="py-12 text-center">
-              <p className="font-medium text-slate-900">
-                No sales found
+            <div className="px-5 py-16 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-[#16294F]">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  className="h-6 w-6"
+                >
+                  <path d="M6 3h12v18H6z" />
+                  <path d="M9 7h6M9 11h6M9 15h4" />
+                </svg>
+              </div>
+
+              <h3 className="mt-5 text-base font-semibold text-slate-900">
+                {search || statusFilter !== "all"
+                  ? "No matching sales"
+                  : "No sales yet"}
+              </h3>
+
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                {search || statusFilter !== "all"
+                  ? "Try changing your search or status filter."
+                  : "Once customers purchase through your affiliate links, your orders, revenue and commissions will appear here."}
               </p>
-              <p className="mt-1 text-sm text-slate-500">
-                Your sales will appear here when customers
-                purchase through your affiliate links.
-              </p>
+
+              {!search && statusFilter === "all" && (
+                <Link
+                  href="/marketplace"
+                  className="mt-6 inline-flex h-10 items-center justify-center rounded-lg border border-[#16294F] px-5 text-sm font-semibold text-[#16294F] transition hover:bg-slate-50"
+                >
+                  Browse Marketplace
+                </Link>
+              )}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[1100px]">
-                <thead>
-                  <tr className="border-b border-slate-100 text-left">
-                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Sale
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Product
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Sale Value
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Gateway Fee
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Commission
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Sold At
-                    </th>
-                  </tr>
-                </thead>
+            <>
+              <div className="hidden overflow-x-auto md:block">
+                <table className="w-full min-w-[1050px]">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50/70 text-left">
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Sale
+                      </th>
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Product
+                      </th>
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Value
+                      </th>
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Commission
+                      </th>
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Status
+                      </th>
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Date
+                      </th>
+                    </tr>
+                  </thead>
 
-                <tbody className="divide-y divide-slate-100">
-                  {filteredSales.map((sale) => (
-                    <tr
-                      key={sale.id}
-                      className="hover:bg-slate-50"
-                    >
-                      <td className="px-6 py-4">
-                        <p className="font-medium text-slate-900">
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredSales.map((sale) => (
+                      <tr key={sale.id} className="transition hover:bg-slate-50/70">
+                        <td className="px-5 py-4">
+                          <p className="font-semibold text-slate-900">
+                            #{sale.id.slice(0, 8)}
+                          </p>
+                          {sale.gateway_ref && (
+                            <p className="mt-1 max-w-[180px] truncate text-xs text-slate-400">
+                              {sale.gateway_ref}
+                            </p>
+                          )}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <p className="font-medium text-slate-900">
+                            {sale.product?.nome || "Unknown product"}
+                          </p>
+                        </td>
+
+                        <td className="px-5 py-4 text-sm font-medium text-slate-700">
+                          {formatMoney(
+                            Number(sale.valor_venda || 0),
+                            sale.product?.moeda || "ZAR",
+                          )}
+                        </td>
+
+                        <td className="px-5 py-4 text-sm font-semibold text-[#16294F]">
+                          {formatMoney(
+                            Number(sale.comissao_vendedor || 0),
+                            sale.product?.moeda || "ZAR",
+                          )}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <span
+                            className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClass(
+                              sale.status,
+                            )}`}
+                          >
+                            {formatStatus(sale.status)}
+                          </span>
+                        </td>
+
+                        <td className="px-5 py-4 text-sm text-slate-500">
+                          {new Date(sale.vendido_em).toLocaleDateString(
+                            undefined,
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="divide-y divide-slate-100 md:hidden">
+                {filteredSales.map((sale) => (
+                  <div key={sale.id} className="space-y-4 p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-900">
+                          {sale.product?.nome || "Unknown product"}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-400">
                           #{sale.id.slice(0, 8)}
                         </p>
-                        {sale.gateway_ref && (
-                          <p className="mt-1 text-xs text-slate-400">
-                            {sale.gateway_ref}
-                          </p>
-                        )}
-                      </td>
+                      </div>
 
-                      <td className="px-6 py-4">
-                        <p className="font-medium text-slate-900">
-                          {sale.product?.nome ||
-                            "Unknown product"}
+                      <span
+                        className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClass(
+                          sale.status,
+                        )}`}
+                      >
+                        {formatStatus(sale.status)}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 rounded-lg bg-slate-50 p-4">
+                      <div>
+                        <p className="text-xs text-slate-500">Sale value</p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {formatMoney(
+                            Number(sale.valor_venda || 0),
+                            sale.product?.moeda || "ZAR",
+                          )}
                         </p>
-                      </td>
+                      </div>
 
-                      <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                        {formatMoney(
-                          Number(sale.valor_venda || 0),
-                          sale.product?.moeda || "ZAR",
-                        )}
-                      </td>
+                      <div>
+                        <p className="text-xs text-slate-500">Commission</p>
+                        <p className="mt-1 text-sm font-semibold text-[#16294F]">
+                          {formatMoney(
+                            Number(sale.comissao_vendedor || 0),
+                            sale.product?.moeda || "ZAR",
+                          )}
+                        </p>
+                      </div>
+                    </div>
 
-                      <td className="px-6 py-4 text-sm text-slate-600">
-                        {formatMoney(
-                          Number(sale.taxa_gateway || 0),
-                          sale.product?.moeda || "ZAR",
-                        )}
-                      </td>
-
-                      <td className="px-6 py-4 text-sm font-semibold text-slate-900">
-                        {formatMoney(
-                          Number(
-                            sale.comissao_vendedor || 0,
-                          ),
-                          sale.product?.moeda || "ZAR",
-                        )}
-                      </td>
-
-                      <td className="px-6 py-4">
-                        <Badge>
-                          {formatStatus(sale.status)}
-                        </Badge>
-                      </td>
-
-                      <td className="px-6 py-4 text-sm text-slate-500">
-                        {new Date(
-                          sale.vendido_em,
-                        ).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                    <p className="text-xs text-slate-400">
+                      {new Date(sale.vendido_em).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </Card>
       </div>
