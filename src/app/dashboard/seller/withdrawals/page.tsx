@@ -178,23 +178,10 @@ export default function SellerWithdrawalsPage() {
       return;
     }
 
-    if (!paymentDetails.trim()) {
-      setError("Enter your payment details.");
-      return;
-    }
-
     setSubmitting(true);
 
     try {
-      let parsedDetails: Record<string, unknown>;
-
-      try {
-        parsedDetails = JSON.parse(paymentDetails);
-      } catch {
-        parsedDetails = {
-          details: paymentDetails.trim(),
-        };
-      }
+      const parsedDetails: Record<string, unknown> = {};
 
       const { data, error: rpcError } = await supabase.rpc(
         "server_request_withdrawal",
@@ -204,6 +191,7 @@ export default function SellerWithdrawalsPage() {
           p_method: method,
           p_data: {
             ...parsedDetails,
+            payout_method: method,
             exchange_rate: currency === "MZN" ? exchangeRate : 1,
           },
         },
@@ -479,48 +467,37 @@ export default function SellerWithdrawalsPage() {
                       }
                       className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
                     >
-                      {availableMethods.length > 0 ? (
+                      {countryCode === "MZ" ? (
+                        <>
+                          <option value="bank_transfer">Bank Transfer</option>
+                          <option value="mpesa">M-Pesa</option>
+                          <option value="emola">e-Mola</option>
+                        </>
+                      ) : availableMethods.length > 0 ? (
                         availableMethods.map((item) => (
-                          <option
-                            key={item.id}
-                            value={item.metodo}
-                          >
+                          <option key={item.id} value={item.metodo}>
                             {methodLabel(item.metodo)}
                           </option>
                         ))
                       ) : (
-                        <>
-                          <option value="bank_transfer">
-                            Bank Transfer
-                          </option>
-                          <option value="mobile_wallet">
-                            Mobile Wallet
-                          </option>
-                        </>
+                        <option value="bank_transfer">Bank Transfer</option>
                       )}
                     </select>
                   </div>
 
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                      Payment Details
-                    </label>
-
-                    <textarea
-                      value={paymentDetails}
-                      onChange={(event) =>
-                        setPaymentDetails(event.target.value)
-                      }
-                      rows={5}
-                      placeholder={
-                        'Example: bank name, account holder, account number, branch'
-                      }
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
-                    />
-
-                    <p className="mt-1.5 text-xs text-slate-500">
-                      You can enter plain text or JSON.
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-800">
+                      Payout details
                     </p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                      Your payout account is managed in Settings. This page only selects the payout method.
+                    </p>
+                    <a
+                      href="/dashboard/seller/settings"
+                      className="mt-3 inline-flex text-sm font-semibold text-[#16294F] hover:underline"
+                    >
+                      Manage payout settings →
+                    </a>
                   </div>
 
                   <button
