@@ -31,10 +31,10 @@ export default function SellerWithdrawalsPage(){
     if(targetCountry!=="MZ"){setExchangeRate(1);return}
     setRateLoading(true);
     try{
-      const response=await fetch("https://api.frankfurter.app/latest?from=ZAR&to=MZN",{cache:"no-store"});
+      const response=await fetch("/api/exchange-rate?from=ZAR&to=MZN",{cache:"no-store"});
       if(!response.ok)throw new Error("Unable to load the current ZAR to MZN exchange rate.");
       const data=await response.json();
-      const rate=Number(data?.rates?.MZN);
+      const rate=Number(data?.rate);
       if(!Number.isFinite(rate)||rate<=0)throw new Error("Invalid ZAR to MZN exchange rate.");
       setExchangeRate(rate);
     }catch(e){
