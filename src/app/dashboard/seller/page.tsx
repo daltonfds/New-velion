@@ -186,7 +186,7 @@ export default function SellerDashboardPage() {
               },
               {
                 label: "Total sales",
-                value: paidSales.length.toString(),
+                value: (financialSummary?.sales_count ?? 0).toString(),
                 note: "Paid sales",
                 accent: "bg-[#EDF4FF] text-[#245EA8]",
               },
@@ -366,7 +366,7 @@ export default function SellerDashboardPage() {
                 Paid conversions
               </p>
               <p className="mt-3 text-2xl font-semibold text-[#16294F]">
-                {paidSales.length}
+                {financialSummary?.sales_count ?? 0}
               </p>
               <p className="mt-1 text-xs text-[#7C8798]">
                 Successfully completed sales
