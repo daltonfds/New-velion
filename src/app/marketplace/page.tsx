@@ -231,30 +231,78 @@ export default function MarketplacePage() {
   return (
     <AppShell area="seller">
       <div className="space-y-7">
-        <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600">
-              Seller marketplace
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              Find products to sell
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              Browse products published by suppliers and choose the offers you want to promote.
-            </p>
+        <section className="overflow-hidden rounded-xl bg-[#3730d9] px-7 py-7 text-white lg:px-9 lg:py-8">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-100">
+                Seller marketplace
+              </p>
+
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+                Find products to sell
+              </h1>
+
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-indigo-100 sm:text-base">
+                Browse products published by suppliers and choose the offers
+                you want to promote.
+              </p>
+
+              <div className="mt-6 flex items-center gap-3 text-sm font-semibold">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/30">
+                  <svg
+                    width="19"
+                    height="19"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="m4 7 8-4 8 4-8 4-8-4Z" />
+                    <path d="M4 7v10l8 4 8-4V7" />
+                    <path d="M12 11v10" />
+                  </svg>
+                </span>
+                {loading
+                  ? "Loading products..."
+                  : `${filteredProducts.length} available products`}
+              </div>
+            </div>
+
+            <div className="hidden min-w-[250px] border-l border-white/25 pl-8 lg:block">
+              <svg
+                width="58"
+                height="58"
+                viewBox="0 0 64 64"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="text-white"
+              >
+                <path d="M8 28h48" />
+                <path d="M12 28v24h40V28" />
+                <path d="M8 28 16 12h32l8 16" />
+                <path d="M20 28v7a6 6 0 0 0 12 0v-7" />
+                <path d="M32 28v7a6 6 0 0 0 12 0v-7" />
+                <path d="M20 52h24" />
+                <circle cx="51" cy="48" r="8" fill="#3730d9" />
+                <path d="M51 44v8M47 48h8" />
+              </svg>
+
+              <h2 className="mt-4 text-lg font-semibold">
+                Marketplace
+              </h2>
+              <p className="mt-1 text-sm leading-5 text-indigo-100">
+                Discover products available for promotion.
+              </p>
+            </div>
           </div>
-          <div className="text-sm text-slate-500">
-            {loading ? "Loading..." : `${filteredProducts.length} available products`}
-          </div>
-        </div>
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Marketplace
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Discover products available for promotion.
-          </p>
-        </div>
+        </section>
 
         {error && (
           <Card>
