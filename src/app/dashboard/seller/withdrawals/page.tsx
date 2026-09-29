@@ -85,6 +85,7 @@ const icons = {
 export default function SellerWithdrawalsPage() {
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [country, setCountry] = useState("");
+  const [minimumWithdrawal, setMinimumWithdrawal] = useState(100);
   const [configured, setConfigured] = useState<Record<Method, Details | null>>({
     bank_transfer: null,
     mpesa: null,
@@ -180,6 +181,19 @@ export default function SellerWithdrawalsPage() {
         ).toUpperCase();
 
         setCountry(detected);
+
+        const { data: payoutConfig } = await supabase
+          .from("payout_methods")
+          .select("valor_minimo_saque")
+          .eq("pais", detected)
+          .maybeSingle();
+
+        const minimum = Number(payoutConfig?.valor_minimo_saque);
+
+        if (Number.isFinite(minimum) && minimum > 0) {
+          setMinimumWithdrawal(minimum);
+        }
+
         await loadExchangeRate(detected);
       }
 
@@ -246,6 +260,15 @@ export default function SellerWithdrawalsPage() {
 
     if (numeric <= 0) {
       setError("Enter a valid withdrawal amount.");
+      return;
+    }
+
+    if (numeric < minimumWithdrawal) {
+      setError(
+        "The minimum withdrawal amount is " +
+          money(minimumWithdrawal) +
+          "."
+      );
       return;
     }
 
@@ -474,14 +497,19 @@ export default function SellerWithdrawalsPage() {
                         </span>
                         <input
                           type="number"
-                          min="0"
+                          min={minimumWithdrawal}
+                          max={wallet.disponivel}
                           step="0.01"
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
-                          placeholder="0.00"
+                          placeholder={minimumWithdrawal.toFixed(2)}
                           className="min-w-0 flex-1 px-3 text-sm outline-none"
                         />
                       </div>
+
+                      <p className="mt-2 text-xs text-slate-500">
+                        Minimum withdrawal: {money(minimumWithdrawal)}
+                      </p>
                     </div>
 
                     <div className="rounded-md border border-slate-200">
@@ -620,7 +648,7 @@ export default function SellerWithdrawalsPage() {
                       onClick={requestWithdrawal}
                       disabled={
                         submitting ||
-                        numeric <= 0 ||
+                        numeric < minimumWithdrawal ||
                         numeric > wallet.disponivel ||
                         !available.length ||
                         (country === "MZ" && !exchangeRate)
