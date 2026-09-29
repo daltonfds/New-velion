@@ -7,6 +7,7 @@ import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { supabase } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/auth";
 
 interface Product {
   id: string;
@@ -27,12 +28,15 @@ export default function SellerProductPage() {
   const productId = params.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [affiliateLink, setAffiliateLink] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadProduct() {
       if (!productId) return;
+
+      const user = await getCurrentUser();
 
       const { data, error: queryError } = await supabase
         .from("products")
@@ -67,6 +71,26 @@ export default function SellerProductPage() {
       }
 
       setProduct(data as Product);
+
+      if (user) {
+        const { data: affiliation } = await supabase
+          .from("affiliations")
+          .select("link_unico")
+          .eq("product_id", productId)
+          .eq("vendedor_id", user.id)
+          .maybeSingle();
+
+        if (affiliation?.link_unico) {
+          const siteUrl =
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            window.location.origin;
+
+          setAffiliateLink(
+            `${siteUrl}/${affiliation.link_unico}`,
+          );
+        }
+      }
+
       setLoading(false);
     }
 
@@ -189,15 +213,50 @@ export default function SellerProductPage() {
               </div>
             </div>
 
-            {product.checkout_url && (
-              <a
-                href={product.checkout_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-12 items-center justify-center rounded-lg bg-[#16294F] px-6 text-sm font-semibold text-white transition hover:bg-[#10203d]"
-              >
-                Open Checkout
-              </a>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {product.checkout_url ? (
+                <a
+                  href={product.checkout_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-12 items-center justify-center rounded-lg bg-[#16294F] px-6 text-sm font-semibold text-white transition hover:bg-[#10203d]"
+                >
+                  Open Checkout
+                </a>
+              ) : (
+                <div className="flex h-12 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-6 text-sm font-medium text-slate-400">
+                  Checkout unavailable
+                </div>
+              )}
+
+              {affiliateLink ? (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(affiliateLink);
+                  }}
+                  className="flex h-12 items-center justify-center rounded-lg border border-[#16294F] bg-white px-6 text-sm font-semibold text-[#16294F] transition hover:bg-slate-50"
+                >
+                  Affiliate Link
+                </button>
+              ) : (
+                <div className="flex h-12 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-6 text-sm font-medium text-slate-400">
+                  Affiliate Link unavailable
+                </div>
+              )}
+            </div>
+
+            {affiliateLink && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Your Affiliate Link
+                </p>
+                <input
+                  readOnly
+                  value={affiliateLink}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
+                />
+              </div>
             )}
           </div>
         </div>
