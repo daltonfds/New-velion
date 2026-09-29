@@ -26,12 +26,10 @@ type Sale = {
 };
 
 const money = (value: number) =>
-  new Intl.NumberFormat("pt-PT", {
-    style: "currency",
-    currency: "ZAR",
-
-    minimumFractionDigits: 2,
-  }).format(value).replace("ZAR", "R").replace("R ", "R").replace("R ", "R").replace("R ", "R");
+  `R${new Intl.NumberFormat("en-ZA", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(Number(value) || 0)}`;
 
 export default function SellerDashboardPage() {
   const db = supabase;
@@ -101,8 +99,16 @@ export default function SellerDashboardPage() {
         "Seller";
 
       setUserName(name);
+
+      const canonicalWallet = {
+        disponivel: Number(financialSummary?.commission_available ?? walletSummary.disponivel ?? 0),
+        retido: Number(financialSummary?.guarantee_retained ?? walletSummary.retido ?? 0),
+        reservado: Number(financialSummary?.reserved ?? walletSummary.reservado ?? 0),
+        saldo_total: Number(financialSummary?.total_balance ?? walletSummary.saldo_total ?? 0),
+      };
+
       setSales((salesData || []) as Sale[]);
-      setWallet(walletSummary);
+      setWallet(canonicalWallet);
       setFinancialSummary(financialSummary);
 
       if (dailyError) {
