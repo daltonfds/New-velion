@@ -1,43 +1,33 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const from = searchParams.get("from") || "ZAR";
-    const to = searchParams.get("to") || "MZN";
-
     const response = await fetch(
-      `https://api.frankfurter.app/latest?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
+      "https://api.exchangerate-api.com/v4/latest/ZAR",
       { cache: "no-store" }
     );
 
     if (!response.ok) {
-      return NextResponse.json(
-        { error: "Exchange rate provider unavailable" },
-        { status: 502 }
-      );
+      throw new Error("Exchange rate provider unavailable");
     }
 
     const data = await response.json();
-    const rate = Number(data?.rates?.[to]);
+    const rate = Number(data?.rates?.MZN);
 
     if (!Number.isFinite(rate) || rate <= 0) {
-      return NextResponse.json(
-        { error: "Invalid exchange rate" },
-        { status: 502 }
-      );
+      throw new Error("Invalid exchange rate");
     }
 
     return NextResponse.json({
-      from,
-      to,
+      from: "ZAR",
+      to: "MZN",
       rate,
       date: data?.date ?? null,
     });
   } catch {
     return NextResponse.json(
       { error: "Unable to retrieve exchange rate" },
-      { status: 500 }
+      { status: 502 }
     );
   }
 }
