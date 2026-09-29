@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -8,7 +8,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getWalletSummary } from "@/lib/services/wallet";
 import { supabase } from "@/lib/supabase";
 
-type WalletEntry = {
+type Entry = {
   id: string;
   tipo: "comissao" | "garantia_retida" | "garantia_liberada" | "estorno" | "saque";
   valor: number;
@@ -17,7 +17,7 @@ type WalletEntry = {
   sale_id: string | null;
 };
 
-const typeLabels: Record<WalletEntry["tipo"], string> = {
+const labels: Record<Entry["tipo"], string> = {
   comissao: "Commission",
   garantia_retida: "Guarantee held",
   garantia_liberada: "Guarantee released",
@@ -25,12 +25,57 @@ const typeLabels: Record<WalletEntry["tipo"], string> = {
   saque: "Withdrawal",
 };
 
-const stateLabels: Record<WalletEntry["estado"], string> = {
+const states: Record<Entry["estado"], string> = {
   pendente: "Pending",
   disponivel: "Available",
   retido: "On hold",
   sacado: "Withdrawn",
 };
+
+function Icon({ type }: { type?: Entry["tipo"] }) {
+  const p = {
+    width: 19,
+    height: 19,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+
+  if (type === "saque")
+    return (
+      <svg {...p}>
+        <path d="M12 3v12" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 21h14" />
+      </svg>
+    );
+
+  if (type === "estorno")
+    return (
+      <svg {...p}>
+        <path d="M3 12a9 9 0 1 0 3-6.7" />
+        <path d="M3 4v6h6" />
+      </svg>
+    );
+
+  if (type === "garantia_retida" || type === "garantia_liberada")
+    return (
+      <svg {...p}>
+        <rect x="4" y="6" width="16" height="13" rx="2" />
+        <path d="M8 6V4h8v2" />
+      </svg>
+    );
+
+  return (
+    <svg {...p}>
+      <path d="M12 3v18" />
+      <path d="M17 8c-.8-1.3-2.5-2-4.7-2-2.8 0-4.8 1.2-4.8 3s2 2.8 4.8 3.2c2.7.4 4.7 1.1 4.7 3.1s-2 3.3-4.8 3.3c-2.2 0-4-.8-4.9-2" />
+    </svg>
+  );
+}
 
 export default function SellerWalletPage() {
   const [wallet, setWallet] = useState({
@@ -39,9 +84,11 @@ export default function SellerWalletPage() {
     reservado: 0,
     saldo_total: 0,
   });
-  const [entries, setEntries] = useState<WalletEntry[]>([]);
+
+  const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [period, setPeriod] = useState<"30" | "90" | "all">("30");
 
   async function load() {
     setLoading(true);
@@ -60,7 +107,7 @@ export default function SellerWalletPage() {
         getWalletSummary(user.id),
         supabase
           .from("wallet_entries")
-          .select("id, tipo, valor, estado, created_at, sale_id")
+          .select("id,tipo,valor,estado,created_at,sale_id")
           .eq("vendedor_id", user.id)
           .order("created_at", { ascending: false }),
       ]);
@@ -68,12 +115,10 @@ export default function SellerWalletPage() {
       if (result.error) throw result.error;
 
       setWallet(summary);
-      setEntries((result.data ?? []) as WalletEntry[]);
-    } catch (loadError) {
+      setEntries((result.data ?? []) as Entry[]);
+    } catch (e) {
       setError(
-        loadError instanceof Error
-          ? loadError.message
-          : "Unable to load your wallet.",
+        e instanceof Error ? e.message : "Unable to load your wallet.",
       );
     } finally {
       setLoading(false);
@@ -84,27 +129,86 @@ export default function SellerWalletPage() {
     void load();
   }, []);
 
-  function money(value: number) {
-    return new Intl.NumberFormat("en-US", {
+  const money = (value: number) =>
+    new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "ZAR",
       minimumFractionDigits: 2,
     }).format(value);
-  }
 
-  function date(value: string) {
-    return new Intl.DateTimeFormat("en-US", {
+  const date = (value: string) =>
+    new Intl.DateTimeFormat("en-US", {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(new Date(value));
-  }
 
-  function stateClass(state: WalletEntry["estado"]) {
-    if (state === "disponivel") return "bg-emerald-50 text-emerald-700";
-    if (state === "retido") return "bg-amber-50 text-amber-700";
-    if (state === "sacado") return "bg-slate-100 text-slate-600";
-    return "bg-blue-50 text-blue-700";
-  }
+  const filtered = useMemo(() => {
+    if (period === "all") return entries;
+
+    return entries.filter(
+      (entry) =>
+        Date.now() - new Date(entry.created_at).getTime() <=
+        Number(period) * 86400000,
+    );
+  }, [entries, period]);
+
+  const chart = useMemo(() => {
+    const now = new Date();
+
+    const months = Array.from({ length: 6 }, (_, index) => {
+      const d = new Date(
+        now.getFullYear(),
+        now.getMonth() - 5 + index,
+        1,
+      );
+
+      return {
+        key: `${d.getFullYear()}-${d.getMonth()}`,
+        label: d.toLocaleDateString("en-US", { month: "short" }),
+        value: 0,
+      };
+    });
+
+    entries.forEach((entry) => {
+      const d = new Date(entry.created_at);
+
+      const month = months.find(
+        (item) =>
+          item.key === `${d.getFullYear()}-${d.getMonth()}`,
+      );
+
+      if (month) month.value += Number(entry.valor);
+    });
+
+    return {
+      months,
+      max: Math.max(
+        ...months.map((month) => Math.abs(month.value)),
+        1,
+      ),
+      inflow: entries
+        .filter((entry) => entry.valor > 0)
+        .reduce((sum, entry) => sum + Number(entry.valor), 0),
+      outflow: Math.abs(
+        entries
+          .filter((entry) => entry.valor < 0)
+          .reduce((sum, entry) => sum + Number(entry.valor), 0),
+      ),
+    };
+  }, [entries]);
+
+  const badge = (state: Entry["estado"]) => {
+    if (state === "disponivel")
+      return "border-emerald-100 bg-emerald-50 text-emerald-700";
+
+    if (state === "retido")
+      return "border-amber-100 bg-amber-50 text-amber-700";
+
+    if (state === "sacado")
+      return "border-slate-200 bg-slate-100 text-slate-600";
+
+    return "border-blue-100 bg-blue-50 text-blue-700";
+  };
 
   return (
     <AppShell
@@ -113,106 +217,353 @@ export default function SellerWalletPage() {
       subtitle="Manage your balance and wallet activity."
     >
       <div className="space-y-6">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Wallet</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+              Finance
+            </p>
+
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+              Wallet
+            </h1>
+
             <p className="mt-1 text-sm text-slate-500">
-              Your NewVelion earnings and balance activity.
+              Manage earnings, available funds and every balance movement in
+              one place.
             </p>
           </div>
 
-          <Link
-            href="/dashboard/seller/withdrawals"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white hover:bg-indigo-700"
-          >
-            Withdraw funds
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/dashboard/seller/withdrawals"
+              className="inline-flex h-10 items-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Withdrawal history
+            </Link>
+
+            <Link
+              href="/dashboard/seller/withdrawals"
+              className="inline-flex h-10 items-center rounded-lg bg-[#16294F] px-4 text-sm font-semibold text-white hover:bg-[#10213f]"
+            >
+              Withdraw funds
+            </Link>
+          </div>
         </div>
 
         {error && (
           <Card className="p-4">
-            <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
           </Card>
         )}
 
         {loading ? (
-          <Card className="p-10 text-center text-sm text-slate-500">
-            Loading wallet...
-          </Card>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {[1, 2, 3, 4].map((item) => (
+              <Card
+                key={item}
+                className="h-32 animate-pulse bg-slate-50"
+              />
+            ))}
+          </div>
         ) : (
           <>
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {[
-                ["Available Balance", wallet.disponivel],
-                ["Balance on Hold", wallet.retido],
-                ["Reserved", wallet.reservado],
-                ["Total Balance", wallet.saldo_total],
-              ].map(([label, value]) => (
+                [
+                  "Available Balance",
+                  wallet.disponivel,
+                  "Ready to withdraw",
+                ],
+                [
+                  "Balance on Hold",
+                  wallet.retido,
+                  "Awaiting release",
+                ],
+                [
+                  "Reserved",
+                  wallet.reservado,
+                  "Reserved funds",
+                ],
+                [
+                  "Total Balance",
+                  wallet.saldo_total,
+                  "Current wallet position",
+                ],
+              ].map(([label, value, hint]) => (
                 <Card key={String(label)} className="p-5">
-                  <p className="text-sm text-slate-500">{label}</p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-900">
-                    {money(Number(value))}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-400">
-                    South African Rand (ZAR)
+                  <div className="flex justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        {label}
+                      </p>
+
+                      <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                        {money(Number(value))}
+                      </p>
+                    </div>
+
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600">
+                      <Icon />
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-xs text-slate-400">
+                    {hint}
                   </p>
                 </Card>
               ))}
             </div>
 
-            <Card className="overflow-hidden">
-              <div className="border-b border-slate-200 px-5 py-5">
-                <h2 className="font-semibold text-slate-900">
-                  Wallet History
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Every ledger movement recorded for your account.
+            <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+              <Card className="overflow-hidden">
+                <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
+                  <div>
+                    <h2 className="font-semibold text-slate-950">
+                      Wallet performance
+                    </h2>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                      Actual ledger movements across the last six months.
+                    </p>
+                  </div>
+
+                  <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                    Live data
+                  </span>
+                </div>
+
+                <div className="px-5 pb-5 pt-7">
+                  <div className="flex h-56 items-end gap-3 sm:gap-5">
+                    {chart.months.map((month) => {
+                      const height = Math.max(
+                        7,
+                        Math.round(
+                          (Math.abs(month.value) / chart.max) * 100,
+                        ),
+                      );
+
+                      return (
+                        <div
+                          key={month.key}
+                          className="flex h-full flex-1 flex-col justify-end"
+                        >
+                          <div className="group relative flex h-full items-end">
+                            <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-[#16294F] px-2 py-1 text-[10px] font-semibold text-white group-hover:block">
+                              {money(month.value)}
+                            </span>
+
+                            <div
+                              className="w-full rounded-t-md bg-[#16294F] transition hover:bg-[#29436f]"
+                              style={{ height: `${height}%` }}
+                            />
+                          </div>
+
+                          <p className="mt-3 text-center text-xs font-medium text-slate-400">
+                            {month.label}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-5">
+                <div className="flex justify-between">
+                  <div>
+                    <h2 className="font-semibold text-slate-950">
+                      Balance position
+                    </h2>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                      How your current funds are allocated.
+                    </p>
+                  </div>
+
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600">
+                    <Icon />
+                  </span>
+                </div>
+
+                <div className="mt-7">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">
+                      Available balance
+                    </span>
+
+                    <span className="font-semibold text-slate-900">
+                      {wallet.saldo_total
+                        ? Math.round(
+                            (wallet.disponivel / wallet.saldo_total) * 100,
+                          )
+                        : 0}
+                      %
+                    </span>
+                  </div>
+
+                  <div className="mt-2 h-2 rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-emerald-500"
+                      style={{
+                        width: `${
+                          wallet.saldo_total
+                            ? Math.min(
+                                (wallet.disponivel /
+                                  wallet.saldo_total) *
+                                  100,
+                                100,
+                              )
+                            : 0
+                        }%`,
+                      }}
+                    />
+                  </div>
+
+                  <div className="mt-6 space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Available</span>
+                      <b>{money(wallet.disponivel)}</b>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">On hold</span>
+                      <b>{money(wallet.retido)}</b>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Reserved</span>
+                      <b>{money(wallet.reservado)}</b>
+                    </div>
+
+                    <div className="flex justify-between border-t border-slate-100 pt-3">
+                      <span className="font-medium text-slate-700">
+                        Total
+                      </span>
+                      <b>{money(wallet.saldo_total)}</b>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card className="p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Total inflow
                 </p>
+
+                <p className="mt-2 text-xl font-semibold text-emerald-700">
+                  {money(chart.inflow)}
+                </p>
+
+                <p className="mt-1 text-xs text-slate-400">
+                  Positive movements recorded in the ledger
+                </p>
+              </Card>
+
+              <Card className="p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Total outflow
+                </p>
+
+                <p className="mt-2 text-xl font-semibold text-slate-900">
+                  {money(chart.outflow)}
+                </p>
+
+                <p className="mt-1 text-xs text-slate-400">
+                  Withdrawals and negative adjustments
+                </p>
+              </Card>
+            </div>
+
+            <Card className="overflow-hidden">
+              <div className="flex flex-col justify-between gap-4 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center">
+                <div>
+                  <h2 className="font-semibold text-slate-950">
+                    Wallet history
+                  </h2>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Every ledger movement recorded for your account.
+                  </p>
+                </div>
+
+                <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+                  {(
+                    [
+                      ["30", "30 days"],
+                      ["90", "90 days"],
+                      ["all", "All time"],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <button
+                      key={value}
+                      onClick={() => setPeriod(value)}
+                      className={`rounded-md px-3 py-1.5 text-xs font-semibold ${
+                        period === value
+                          ? "bg-white text-slate-900 shadow-sm"
+                          : "text-slate-500"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {entries.length === 0 ? (
+              {filtered.length === 0 ? (
                 <div className="px-5 py-14 text-center">
-                  <p className="text-sm font-medium text-slate-700">
-                    No wallet activity yet.
+                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500">
+                    <Icon />
+                  </span>
+
+                  <p className="mt-4 text-sm font-semibold text-slate-800">
+                    No wallet activity yet
                   </p>
+
                   <p className="mt-1 text-sm text-slate-500">
-                    Your commissions and balance movements will appear here.
+                    Your commissions, withdrawals and balance movements will
+                    appear here.
                   </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[720px] text-left">
+                  <table className="w-full min-w-[760px] text-left">
                     <thead className="border-b border-slate-200 bg-slate-50">
-                      <tr className="text-xs uppercase tracking-wide text-slate-500">
-                        <th className="px-5 py-3 font-medium">Activity</th>
-                        <th className="px-5 py-3 font-medium">Amount</th>
-                        <th className="px-5 py-3 font-medium">Status</th>
-                        <th className="px-5 py-3 font-medium">Date</th>
+                      <tr className="text-[11px] uppercase tracking-wider text-slate-500">
+                        <th className="px-5 py-3">Activity</th>
+                        <th className="px-5 py-3">Amount</th>
+                        <th className="px-5 py-3">Status</th>
+                        <th className="px-5 py-3">Reference</th>
+                        <th className="px-5 py-3">Date</th>
                       </tr>
                     </thead>
 
                     <tbody className="divide-y divide-slate-100">
-                      {entries.map((entry) => (
-                        <tr key={entry.id} className="hover:bg-slate-50">
+                      {filtered.map((entry) => (
+                        <tr
+                          key={entry.id}
+                          className="hover:bg-slate-50"
+                        >
                           <td className="px-5 py-4">
-                            <p className="font-medium text-slate-900">
-                              {typeLabels[entry.tipo]}
-                            </p>
+                            <div className="flex items-center gap-3">
+                              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600">
+                                <Icon type={entry.tipo} />
+                              </span>
 
-                            {entry.sale_id && (
-                              <p className="mt-1 text-xs text-slate-500">
-                                Sale: {entry.sale_id.slice(0, 8)}
-                              </p>
-                            )}
+                              <span className="font-medium text-slate-900">
+                                {labels[entry.tipo]}
+                              </span>
+                            </div>
                           </td>
 
                           <td
                             className={`px-5 py-4 text-sm font-semibold ${
                               entry.valor >= 0
                                 ? "text-emerald-700"
-                                : "text-red-700"
+                                : "text-slate-900"
                             }`}
                           >
                             {entry.valor > 0 ? "+" : ""}
@@ -221,12 +572,18 @@ export default function SellerWalletPage() {
 
                           <td className="px-5 py-4">
                             <span
-                              className={`rounded-full px-2.5 py-1 text-xs font-medium ${stateClass(
+                              className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${badge(
                                 entry.estado,
                               )}`}
                             >
-                              {stateLabels[entry.estado]}
+                              {states[entry.estado]}
                             </span>
+                          </td>
+
+                          <td className="px-5 py-4 text-xs text-slate-500">
+                            {entry.sale_id
+                              ? `Sale #${entry.sale_id.slice(0, 8)}`
+                              : "Wallet ledger"}
                           </td>
 
                           <td className="px-5 py-4 text-sm text-slate-500">
