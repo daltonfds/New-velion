@@ -199,15 +199,15 @@ export default function SellerWalletPage() {
 
   const badge = (state: Entry["estado"]) => {
     if (state === "disponivel")
-      return "border-emerald-100 bg-emerald-50 text-emerald-700";
+      return "border-emerald-100 bg-[#EAF7F0] text-[#18794E]";
 
     if (state === "retido")
       return "border-amber-100 bg-amber-50 text-amber-700";
 
     if (state === "sacado")
-      return "border-slate-200 bg-slate-100 text-slate-600";
+      return "border-[#DCE3EE] bg-[#EEF3F9] text-[#60708A]";
 
-    return "border-blue-100 bg-blue-50 text-blue-700";
+    return "border-blue-100 bg-[#EDF4FF] text-[#245EA8]";
   };
 
   return (
@@ -223,11 +223,11 @@ export default function SellerWalletPage() {
               Finance
             </p>
 
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#16294F]">
               Wallet
             </h1>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-[#7C8798]">
               Manage earnings, available funds and every balance movement in
               one place.
             </p>
@@ -236,7 +236,7 @@ export default function SellerWalletPage() {
           <div className="flex gap-2">
             <Link
               href="/dashboard/seller/withdrawals"
-              className="inline-flex h-10 items-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="inline-flex h-10 items-center rounded-lg border border-[#DCE3EE] bg-white px-4 text-sm font-semibold text-[#405579] hover:bg-[#F5F8FC]"
             >
               Withdrawal history
             </Link>
@@ -263,7 +263,7 @@ export default function SellerWalletPage() {
             {[1, 2, 3, 4].map((item) => (
               <Card
                 key={item}
-                className="h-32 animate-pulse bg-slate-50"
+                className="h-32 animate-pulse bg-[#F5F8FC]"
               />
             ))}
           </div>
@@ -299,12 +299,12 @@ export default function SellerWalletPage() {
                         {label}
                       </p>
 
-                      <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                      <p className="mt-2 text-2xl font-semibold tracking-tight text-[#16294F]">
                         {money(Number(value))}
                       </p>
                     </div>
 
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#DCE3EE] bg-[#F5F8FC] text-[#60708A]">
                       <Icon />
                     </span>
                   </div>
@@ -318,18 +318,18 @@ export default function SellerWalletPage() {
 
             <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
               <Card className="overflow-hidden">
-                <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
+                <div className="flex items-center justify-between border-b border-[#DCE3EE] px-5 py-5">
                   <div>
-                    <h2 className="font-semibold text-slate-950">
+                    <h2 className="font-semibold text-[#16294F]">
                       Wallet performance
                     </h2>
 
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-[#7C8798]">
                       Actual ledger movements across the last six months.
                     </p>
                   </div>
 
-                  <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                  <span className="rounded-full border border-emerald-100 bg-[#EAF7F0] px-3 py-1.5 text-xs font-semibold text-[#18794E]">
                     Live data
                   </span>
                 </div>
@@ -373,27 +373,27 @@ export default function SellerWalletPage() {
               <Card className="p-5">
                 <div className="flex justify-between">
                   <div>
-                    <h2 className="font-semibold text-slate-950">
+                    <h2 className="font-semibold text-[#16294F]">
                       Balance position
                     </h2>
 
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-[#7C8798]">
                       How your current funds are allocated.
                     </p>
                   </div>
 
-                  <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#DCE3EE] bg-[#F5F8FC] text-[#60708A]">
                     <Icon />
                   </span>
                 </div>
 
                 <div className="mt-7">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">
+                    <span className="text-[#7C8798]">
                       Available balance
                     </span>
 
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-[#16294F]">
                       {wallet.saldo_total
                         ? Math.round(
                             (wallet.disponivel / wallet.saldo_total) * 100,
@@ -403,9 +403,9 @@ export default function SellerWalletPage() {
                     </span>
                   </div>
 
-                  <div className="mt-2 h-2 rounded-full bg-slate-100">
+                  <div className="mt-2 h-2 rounded-full bg-[#EEF3F9]">
                     <div
-                      className="h-full rounded-full bg-emerald-500"
+                      className="h-full rounded-full bg-[#EAF7F0]0"
                       style={{
                         width: `${
                           wallet.saldo_total
@@ -423,22 +423,22 @@ export default function SellerWalletPage() {
 
                   <div className="mt-6 space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Available</span>
+                      <span className="text-[#7C8798]">Available</span>
                       <b>{money(wallet.disponivel)}</b>
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-slate-500">On hold</span>
+                      <span className="text-[#7C8798]">On hold</span>
                       <b>{money(wallet.retido)}</b>
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Reserved</span>
+                      <span className="text-[#7C8798]">Reserved</span>
                       <b>{money(wallet.reservado)}</b>
                     </div>
 
-                    <div className="flex justify-between border-t border-slate-100 pt-3">
-                      <span className="font-medium text-slate-700">
+                    <div className="flex justify-between border-t border-[#E9EEF5] pt-3">
+                      <span className="font-medium text-[#405579]">
                         Total
                       </span>
                       <b>{money(wallet.saldo_total)}</b>
@@ -454,7 +454,7 @@ export default function SellerWalletPage() {
                   Total inflow
                 </p>
 
-                <p className="mt-2 text-xl font-semibold text-emerald-700">
+                <p className="mt-2 text-xl font-semibold text-[#18794E]">
                   {money(chart.inflow)}
                 </p>
 
@@ -468,7 +468,7 @@ export default function SellerWalletPage() {
                   Total outflow
                 </p>
 
-                <p className="mt-2 text-xl font-semibold text-slate-900">
+                <p className="mt-2 text-xl font-semibold text-[#16294F]">
                   {money(chart.outflow)}
                 </p>
 
@@ -479,18 +479,18 @@ export default function SellerWalletPage() {
             </div>
 
             <Card className="overflow-hidden">
-              <div className="flex flex-col justify-between gap-4 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center">
+              <div className="flex flex-col justify-between gap-4 border-b border-[#DCE3EE] px-5 py-5 sm:flex-row sm:items-center">
                 <div>
-                  <h2 className="font-semibold text-slate-950">
+                  <h2 className="font-semibold text-[#16294F]">
                     Wallet history
                   </h2>
 
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-[#7C8798]">
                     Every ledger movement recorded for your account.
                   </p>
                 </div>
 
-                <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+                <div className="flex rounded-lg border border-[#DCE3EE] bg-[#F5F8FC] p-1">
                   {(
                     [
                       ["30", "30 days"],
@@ -503,8 +503,8 @@ export default function SellerWalletPage() {
                       onClick={() => setPeriod(value)}
                       className={`rounded-md px-3 py-1.5 text-xs font-semibold ${
                         period === value
-                          ? "bg-white text-slate-900 shadow-sm"
-                          : "text-slate-500"
+                          ? "bg-white text-[#16294F] shadow-sm"
+                          : "text-[#7C8798]"
                       }`}
                     >
                       {label}
@@ -515,15 +515,15 @@ export default function SellerWalletPage() {
 
               {filtered.length === 0 ? (
                 <div className="px-5 py-14 text-center">
-                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500">
+                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-[#DCE3EE] bg-[#F5F8FC] text-[#7C8798]">
                     <Icon />
                   </span>
 
-                  <p className="mt-4 text-sm font-semibold text-slate-800">
+                  <p className="mt-4 text-sm font-semibold text-[#233B63]">
                     No wallet activity yet
                   </p>
 
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-[#7C8798]">
                     Your commissions, withdrawals and balance movements will
                     appear here.
                   </p>
@@ -531,8 +531,8 @@ export default function SellerWalletPage() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[760px] text-left">
-                    <thead className="border-b border-slate-200 bg-slate-50">
-                      <tr className="text-[11px] uppercase tracking-wider text-slate-500">
+                    <thead className="border-b border-[#DCE3EE] bg-[#F5F8FC]">
+                      <tr className="text-[11px] uppercase tracking-wider text-[#7C8798]">
                         <th className="px-5 py-3">Activity</th>
                         <th className="px-5 py-3">Amount</th>
                         <th className="px-5 py-3">Status</th>
@@ -545,15 +545,15 @@ export default function SellerWalletPage() {
                       {filtered.map((entry) => (
                         <tr
                           key={entry.id}
-                          className="hover:bg-slate-50"
+                          className="hover:bg-[#F5F8FC]"
                         >
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-3">
-                              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600">
+                              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#DCE3EE] bg-white text-[#60708A]">
                                 <Icon type={entry.tipo} />
                               </span>
 
-                              <span className="font-medium text-slate-900">
+                              <span className="font-medium text-[#16294F]">
                                 {labels[entry.tipo]}
                               </span>
                             </div>
@@ -562,8 +562,8 @@ export default function SellerWalletPage() {
                           <td
                             className={`px-5 py-4 text-sm font-semibold ${
                               entry.valor >= 0
-                                ? "text-emerald-700"
-                                : "text-slate-900"
+                                ? "text-[#18794E]"
+                                : "text-[#16294F]"
                             }`}
                           >
                             {entry.valor > 0 ? "+" : ""}
@@ -580,13 +580,13 @@ export default function SellerWalletPage() {
                             </span>
                           </td>
 
-                          <td className="px-5 py-4 text-xs text-slate-500">
+                          <td className="px-5 py-4 text-xs text-[#7C8798]">
                             {entry.sale_id
                               ? `Sale #${entry.sale_id.slice(0, 8)}`
                               : "Wallet ledger"}
                           </td>
 
-                          <td className="px-5 py-4 text-sm text-slate-500">
+                          <td className="px-5 py-4 text-sm text-[#7C8798]">
                             {date(entry.created_at)}
                           </td>
                         </tr>
