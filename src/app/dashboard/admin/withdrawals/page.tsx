@@ -279,7 +279,36 @@ export default function AdminWithdrawalsPage() {
     if (error) {
       setActionError(error.message);
     } else {
-      setDetail(data);
+      const sellerId = data?.withdrawal?.vendedor_id ?? withdrawal.vendedor_id;
+
+      const { data: financials, error: financialError } = await supabase.rpc(
+        "get_seller_financial_summary",
+        {
+          p_vendedor_id: sellerId,
+          p_days: null,
+        },
+      );
+
+      if (financialError) {
+        setActionError(financialError.message);
+        setDetail(data);
+      } else {
+        const row = Array.isArray(financials) ? financials[0] : financials;
+
+        setDetail({
+          ...data,
+          wallet: {
+            available_balance: Number(row?.available_balance ?? 0),
+            on_hold: Number(row?.guarantee_retained ?? 0),
+            reserved: Number(row?.reserved ?? 0),
+            total_balance: Number(row?.total_balance ?? 0),
+            total_earned: Number(row?.commission_earned ?? 0),
+            total_withdrawn: 0,
+            previous_withdrawals_count: 0,
+            last_withdrawal_at: null,
+          },
+        });
+      }
     }
 
     setDetailLoading(false);
