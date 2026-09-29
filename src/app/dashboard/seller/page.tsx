@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { supabase } from "@/lib/supabase";
+import { getWalletSummary } from "@/lib/services/wallet";
 
 type Sale = {
   id: string;
@@ -13,13 +14,14 @@ type Sale = {
   valor_venda: number | null;
   comissao_vendedor: number | null;
   vendedor_id: string;
-};
-
-type WalletEntry = {
-  id: string;
-  created_at: string;
-  valor: number | null;
-  tipo: string | null;
+  product_id: string;
+  product: {
+    nome: string;
+    moeda: string;
+  } | {
+    nome: string;
+    moeda: string;
+  }[] | null;
 };
 
 const money = (value: number) =>
@@ -34,7 +36,12 @@ export default function SellerDashboardPage() {
 
   const [loading, setLoading] = useState(true);
   const [sales, setSales] = useState<Sale[]>([]);
-  const [walletEntries, setWalletEntries] = useState<WalletEntry[]>([]);
+  const [wallet, setWallet] = useState({
+    disponivel: 0,
+    retido: 0,
+    reservado: 0,
+    saldo_total: 0,
+  });
   const [userName, setUserName] = useState("Seller");
 
   useEffect(() => {
@@ -50,7 +57,7 @@ export default function SellerDashboardPage() {
         return;
       }
 
-      const [{ data: profile }, { data: salesData }, { data: walletData }] =
+      const [{ data: profile }, { data: salesData }, walletSummary] =
         await Promise.all([
           supabase
             .from("profiles")
@@ -61,16 +68,12 @@ export default function SellerDashboardPage() {
           supabase
             .from("sales")
             .select(
-              "id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id"
+              `id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id,product:products(nome,moeda)`
             )
             .eq("vendedor_id", user.id)
             .order("created_at", { ascending: false }),
 
-          supabase
-            .from("wallet_entries")
-            .select("id,created_at,valor,tipo")
-            .eq("vendedor_id", user.id)
-            .order("created_at", { ascending: false }),
+          getWalletSummary(user.id),
         ]);
 
       const name =
@@ -82,7 +85,7 @@ export default function SellerDashboardPage() {
 
       setUserName(name);
       setSales((salesData || []) as Sale[]);
-      setWalletEntries((walletData || []) as WalletEntry[]);
+      setWallet(walletSummary);
       setLoading(false);
     }
 
@@ -92,7 +95,7 @@ export default function SellerDashboardPage() {
   const paidSales = useMemo(
     () =>
       sales.filter((sale) =>
-        ["paid", "approved", "completed", "success"].includes(
+        ["paga", "paid", "approved", "completed", "success"].includes(
           (sale.status || "").toLowerCase()
         )
       ),
@@ -108,33 +111,6 @@ export default function SellerDashboardPage() {
     (sum, sale) => sum + Number(sale.comissao_vendedor || 0),
     0
   );
-
-  const wallet = useMemo(() => {
-    return walletEntries.reduce(
-      (acc, entry) => {
-        const amount = Number(entry.valor || 0);
-        const type = (entry.tipo || "").toLowerCase();
-
-        if (amount > 0) acc.available += amount;
-        else acc.outflow += Math.abs(amount);
-
-        if (
-          type.includes("hold") ||
-          type.includes("retain") ||
-          type.includes("guarantee")
-        ) {
-          acc.retained += Math.abs(amount);
-        }
-
-        if (type.includes("reserv")) {
-          acc.reserved += Math.abs(amount);
-        }
-
-        return acc;
-      },
-      { available: 0, retained: 0, reserved: 0, outflow: 0 }
-    );
-  }, [walletEntries]);
 
   const monthly = useMemo(() => {
     const now = new Date();
@@ -200,13 +176,13 @@ export default function SellerDashboardPage() {
             {[
               {
                 label: "Available balance",
-                value: money(wallet.available),
+                value: money(wallet.disponivel),
                 note: "Ready for withdrawal",
                 accent: "bg-[#EAF7F0] text-[#18794E]",
               },
               {
                 label: "Pending balance",
-                value: money(wallet.retained),
+                value: money(wallet.retido),
                 note: "Guarantee currently retained",
                 accent: "bg-[#FFF7E5] text-[#9A7018]",
               },
@@ -317,12 +293,12 @@ export default function SellerDashboardPage() {
 
               <div className="mt-8 space-y-5">
                 {[
-                  ["Available", wallet.available, "bg-[#2B5F9E]"],
-                  ["Retained", wallet.retained, "bg-[#C99A2E]"],
-                  ["Reserved", wallet.reserved, "bg-[#8A8570]"],
+                  ["Available", wallet.disponivel, "bg-[#2B5F9E]"],
+                  ["Retained", wallet.retido, "bg-[#C99A2E]"],
+                  ["Reserved", wallet.reservado, "bg-[#8A8570]"],
                 ].map(([label, value, color]) => {
                   const total =
-                    wallet.available + wallet.retained + wallet.reserved;
+                    wallet.disponivel + wallet.retido + wallet.reservado;
 
                   const percent =
                     total > 0 ? (Number(value) / total) * 100 : 0;
@@ -354,7 +330,7 @@ export default function SellerDashboardPage() {
                   <span className="text-sm text-[#60708A]">Total balance</span>
                   <span className="text-lg font-semibold text-[#16294F]">
                     {money(
-                      wallet.available + wallet.retained + wallet.reserved
+                      wallet.disponivel + wallet.retido + wallet.reservado
                     )}
                   </span>
                 </div>
