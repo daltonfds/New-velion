@@ -29,6 +29,8 @@ export default function SellerProductPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [affiliateLink, setAffiliateLink] = useState("");
+  const [currentPhoto, setCurrentPhoto] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -159,13 +161,82 @@ export default function SellerProductPage() {
 
         <div className="grid gap-8 lg:grid-cols-2">
           <Card className="overflow-hidden p-0">
-            <div className="aspect-square bg-slate-100">
-              {product.fotos?.[0] ? (
-                <img
-                  src={product.fotos[0]}
-                  alt={product.nome}
-                  className="h-full w-full object-cover"
-                />
+            <div
+              className="relative aspect-square overflow-hidden bg-slate-100 touch-pan-y"
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                e.currentTarget.dataset.touchX = String(touch.clientX);
+              }}
+              onTouchEnd={(e) => {
+                const startX = Number(e.currentTarget.dataset.touchX || 0);
+                const endX = e.changedTouches[0]?.clientX || startX;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) < 50 || product.fotos.length <= 1) return;
+
+                if (diff > 0) {
+                  setCurrentPhoto((index) =>
+                    Math.min(index + 1, product.fotos.length - 1),
+                  );
+                } else {
+                  setCurrentPhoto((index) => Math.max(index - 1, 0));
+                }
+              }}
+            >
+              {product.fotos?.length ? (
+                <>
+                  <img
+                    src={product.fotos[currentPhoto]}
+                    alt={`${product.nome} ${currentPhoto + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+
+                  {product.fotos.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        aria-label="Previous image"
+                        onClick={() =>
+                          setCurrentPhoto((index) => Math.max(index - 1, 0))
+                        }
+                        disabled={currentPhoto === 0}
+                        className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-xl text-slate-700 shadow-sm disabled:opacity-30"
+                      >
+                        ‹
+                      </button>
+
+                      <button
+                        type="button"
+                        aria-label="Next image"
+                        onClick={() =>
+                          setCurrentPhoto((index) =>
+                            Math.min(index + 1, product.fotos.length - 1),
+                          )
+                        }
+                        disabled={currentPhoto === product.fotos.length - 1}
+                        className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-xl text-slate-700 shadow-sm disabled:opacity-30"
+                      >
+                        ›
+                      </button>
+
+                      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-black/30 px-2.5 py-1.5">
+                        {product.fotos.map((_, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            aria-label={`Go to image ${index + 1}`}
+                            onClick={() => setCurrentPhoto(index)}
+                            className={`h-1.5 rounded-full transition-all ${
+                              index === currentPhoto
+                                ? "w-5 bg-white"
+                                : "w-1.5 bg-white/60"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
               ) : (
                 <div className="flex h-full items-center justify-center text-sm text-slate-400">
                   No image available
@@ -234,10 +305,12 @@ export default function SellerProductPage() {
                   type="button"
                   onClick={async () => {
                     await navigator.clipboard.writeText(affiliateLink);
+                    setCopied(true);
+                    window.setTimeout(() => setCopied(false), 1800);
                   }}
                   className="flex h-12 items-center justify-center rounded-lg border border-[#16294F] bg-white px-6 text-sm font-semibold text-[#16294F] transition hover:bg-slate-50"
                 >
-                  Affiliate Link
+                  {copied ? "Copied!" : "Affiliate Link"}
                 </button>
               ) : (
                 <div className="flex h-12 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-6 text-sm font-medium text-slate-400">
@@ -246,18 +319,7 @@ export default function SellerProductPage() {
               )}
             </div>
 
-            {affiliateLink && (
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-                  Your Affiliate Link
-                </p>
-                <input
-                  readOnly
-                  value={affiliateLink}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
-                />
-              </div>
-            )}
+
           </div>
         </div>
       </div>
