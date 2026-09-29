@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { supabase } from "@/lib/supabase";
+import { getSellerFinancialSummary } from "@/lib/services/seller-financials";
 import { getCurrentUser } from "@/lib/auth";
 
 interface Commission {
@@ -29,6 +30,7 @@ export default function SellerCommissionsPage() {
   const [period, setPeriod] = useState("30");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -42,6 +44,9 @@ export default function SellerCommissionsPage() {
         setLoading(false);
         return;
       }
+
+      const financial = await getSellerFinancialSummary(user.id);
+      setFinancialSummary(financial);
 
       const { data, error: queryError } = await supabase
         .from("sales")
@@ -106,23 +111,11 @@ export default function SellerCommissionsPage() {
       (commission) => commission.status === "paga",
     );
 
-    const totalCommission = paid.reduce(
-      (total, commission) =>
-        total + Number(commission.comissao_vendedor || 0),
-      0,
-    );
+    const totalCommission = financialSummary?.commission_earned ?? 0;
 
-    const totalSalesValue = paid.reduce(
-      (total, commission) =>
-        total + Number(commission.valor_venda || 0),
-      0,
-    );
+    const totalSalesValue = financialSummary?.gross_sales ?? 0;
 
-    const retainedGuarantee = paid.reduce(
-      (total, commission) =>
-        total + Number(commission.valor_garantia || 0),
-      0,
-    );
+    const retainedGuarantee = financialSummary?.guarantee_retained ?? 0;
 
     const refunded = filteredCommissions
       .filter((commission) => commission.status === "reembolsada")
@@ -146,9 +139,10 @@ export default function SellerCommissionsPage() {
       retainedGuarantee,
       refunded,
       pending,
-      paidCount: paid.length,
+      paidCount: financialSummary?.sales_count ?? 0,
+      availableCommission: financialSummary?.commission_available ?? 0,
     };
-  }, [filteredCommissions]);
+  }, [filteredCommissions, financialSummary]);
 
   const chartData = useMemo(() => {
     const now = new Date();
@@ -227,7 +221,7 @@ export default function SellerCommissionsPage() {
     return Array.from(map.values())
       .sort((a, b) => b.commission - a.commission)
       .slice(0, 5);
-  }, [filteredCommissions]);
+  }, [filteredCommissions, financialSummary]);
 
   const formatMoney = (
     value: number,

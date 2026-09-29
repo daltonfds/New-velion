@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { supabase } from "@/lib/supabase";
+import { getSellerFinancialSummary } from "@/lib/services/seller-financials";
 import { getCurrentUser } from "@/lib/auth";
 
 interface Sale {
@@ -24,6 +25,7 @@ export default function SellerPerformancePage() {
   const [period, setPeriod] = useState("30d");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -37,6 +39,9 @@ export default function SellerPerformancePage() {
         setLoading(false);
         return;
       }
+
+      const financial = await getSellerFinancialSummary(user.id);
+      setFinancialSummary(financial);
 
       const { data, error: queryError } = await supabase
         .from("sales")
@@ -98,17 +103,9 @@ export default function SellerPerformancePage() {
       (sale) => sale.status === "paga",
     );
 
-    const revenue = paid.reduce(
-      (total, sale) =>
-        total + Number(sale.valor_venda || 0),
-      0,
-    );
+    const revenue = financialSummary?.gross_sales ?? 0;
 
-    const commissions = paid.reduce(
-      (total, sale) =>
-        total + Number(sale.comissao_vendedor || 0),
-      0,
-    );
+    const commissions = financialSummary?.commission_earned ?? 0;
 
     const averageOrder =
       paid.length > 0 ? revenue / paid.length : 0;
@@ -118,13 +115,13 @@ export default function SellerPerformancePage() {
     ).size;
 
     return {
-      sales: paid.length,
+      sales: financialSummary?.sales_count ?? 0,
       revenue,
       commissions,
       averageOrder,
       products,
     };
-  }, [filteredSales]);
+  }, [filteredSales, financialSummary]);
 
   const topProducts = useMemo(() => {
     const map = new Map<
@@ -164,7 +161,7 @@ export default function SellerPerformancePage() {
     return [...map.values()]
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 8);
-  }, [filteredSales]);
+  }, [filteredSales, financialSummary]);
 
   const dailyPerformance = useMemo(() => {
     const map = new Map<
@@ -200,7 +197,7 @@ export default function SellerPerformancePage() {
         ...data,
       }))
       .slice(0, 10);
-  }, [filteredSales]);
+  }, [filteredSales, financialSummary]);
 
   const formatMoney = (
     value: number,

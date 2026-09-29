@@ -6,6 +6,7 @@ import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { supabase } from "@/lib/supabase";
 import { getWalletSummary } from "@/lib/services/wallet";
+import { getSellerFinancialSummary } from "@/lib/services/seller-financials";
 
 type Sale = {
   id: string;
@@ -43,6 +44,7 @@ export default function SellerDashboardPage() {
     saldo_total: 0,
   });
   const [userName, setUserName] = useState("Seller");
+  const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -57,7 +59,7 @@ export default function SellerDashboardPage() {
         return;
       }
 
-      const [{ data: profile }, { data: salesData }, walletSummary] =
+      const [{ data: profile }, { data: salesData }, walletSummary, financialSummary] =
         await Promise.all([
           supabase
             .from("profiles")
@@ -74,6 +76,7 @@ export default function SellerDashboardPage() {
             .order("created_at", { ascending: false }),
 
           getWalletSummary(user.id),
+          getSellerFinancialSummary(user.id),
         ]);
 
       const name =
@@ -86,6 +89,7 @@ export default function SellerDashboardPage() {
       setUserName(name);
       setSales((salesData || []) as Sale[]);
       setWallet(walletSummary);
+      setFinancialSummary(financialSummary);
       setLoading(false);
     }
 
@@ -102,15 +106,9 @@ export default function SellerDashboardPage() {
     [sales]
   );
 
-  const totalSales = paidSales.reduce(
-    (sum, sale) => sum + Number(sale.valor_venda || 0),
-    0
-  );
+  const totalSales = financialSummary?.gross_sales ?? 0;
 
-  const totalCommission = paidSales.reduce(
-    (sum, sale) => sum + Number(sale.comissao_vendedor || 0),
-    0
-  );
+  const totalCommission = financialSummary?.commission_earned ?? 0;
 
   const monthly = useMemo(() => {
     const now = new Date();
