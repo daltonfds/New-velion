@@ -70,7 +70,7 @@ export default function SellerDashboardPage() {
           supabase
             .from("sales")
             .select(
-              `id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id,product:products(nome,moeda)`
+              `id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id`
             )
             .eq("vendedor_id", user.id)
             .order("created_at", { ascending: false }),
