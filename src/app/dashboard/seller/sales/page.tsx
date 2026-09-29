@@ -6,6 +6,7 @@ import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { supabase } from "@/lib/supabase";
+import { getSellerFinancialSummary } from "@/lib/services/seller-financials";
 import { getCurrentUser } from "@/lib/auth";
 
 interface Sale {
@@ -60,6 +61,7 @@ const icons = {
 
 export default function SellerSalesPage() {
   const [sales, setSales] = useState<Sale[]>([]);
+  const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -78,7 +80,12 @@ export default function SellerSalesPage() {
         return;
       }
 
-      const { data, error: queryError } = await supabase
+      const [{ data: financialData, error: financialError }, { data, error: queryError }] =
+        await Promise.all([
+          supabase.rpc("get_seller_financial_summary", {
+            p_vendedor_id: user.id,
+          }),
+          supabase
         .from("sales")
         .select(`
           id,
@@ -98,7 +105,26 @@ export default function SellerSalesPage() {
           )
         `)
         .eq("vendedor_id", user.id)
-        .order("vendido_em", { ascending: false });
+        .order("vendido_em", { ascending: false })
+        ]);
+
+      if (financialError) {
+        setError(financialError.message);
+        setLoading(false);
+        return;
+      }
+
+      const financial = Array.isArray(financialData) ? financialData[0] : financialData;
+      setFinancialSummary({
+        sales_count: Number(financial?.sales_count ?? 0),
+        gross_sales: Number(financial?.gross_sales ?? 0),
+        commission_earned: Number(financial?.commission_earned ?? 0),
+        commission_available: Number(financial?.commission_available ?? 0),
+        guarantee_retained: Number(financial?.guarantee_retained ?? 0),
+        reserved: Number(financial?.reserved ?? 0),
+        available_balance: Number(financial?.available_balance ?? 0),
+        total_balance: Number(financial?.total_balance ?? 0),
+      });
 
       if (queryError) {
         setError(queryError.message);
