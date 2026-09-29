@@ -12,10 +12,12 @@ export interface SellerFinancialSummary {
 }
 
 export async function getSellerFinancialSummary(
-  vendedorId: string
+  vendedorId: string,
+  days: number | null = null
 ): Promise<SellerFinancialSummary> {
   const { data, error } = await supabase.rpc("get_seller_financial_summary", {
     p_vendedor_id: vendedorId,
+    p_days: days,
   });
 
   if (error) throw error;

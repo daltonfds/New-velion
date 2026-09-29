@@ -45,7 +45,8 @@ export default function SellerCommissionsPage() {
         return;
       }
 
-      const financial = await getSellerFinancialSummary(user.id);
+      const days = period === "all" ? null : Number(period);
+      const financial = await getSellerFinancialSummary(user.id, days);
       setFinancialSummary(financial);
 
       const { data, error: queryError } = await supabase
