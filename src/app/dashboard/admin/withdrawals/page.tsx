@@ -37,6 +37,15 @@ export default function AdminWithdrawalsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
+  const [countryFilter, setCountryFilter] = useState("all");
+  const [selected, setSelected] = useState<Withdrawal | null>(null);
+  const [detail, setDetail] = useState<any>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [actionNote, setActionNote] = useState("");
+  const [paymentReference, setPaymentReference] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -105,13 +114,18 @@ export default function AdminWithdrawalsPage() {
         profile?.full_name ||
         "";
 
+      const paymentSearch = JSON.stringify(
+        withdrawal.dados_pagamento ?? {},
+      ).toLowerCase();
+
       const matchesSearch =
         !query ||
         withdrawal.id.toLowerCase().includes(query) ||
         sellerName.toLowerCase().includes(query) ||
-        withdrawal.vendedor_id
-          .toLowerCase()
-          .includes(query);
+        String(profile?.email ?? "").toLowerCase().includes(query) ||
+        String(profile?.telefone ?? profile?.phone ?? "").toLowerCase().includes(query) ||
+        withdrawal.vendedor_id.toLowerCase().includes(query) ||
+        paymentSearch.includes(query);
 
       const matchesStatus =
         statusFilter === "all" ||
@@ -123,10 +137,15 @@ export default function AdminWithdrawalsPage() {
         withdrawal.metodo.toLowerCase() ===
           methodFilter.toLowerCase();
 
+      const matchesCountry =
+        countryFilter === "all" ||
+        (profile?.pais || profile?.country || "") === countryFilter;
+
       return (
         matchesSearch &&
         matchesStatus &&
-        matchesMethod
+        matchesMethod &&
+        matchesCountry
       );
     });
   }, [
@@ -135,6 +154,7 @@ export default function AdminWithdrawalsPage() {
     search,
     statusFilter,
     methodFilter,
+    countryFilter,
   ]);
 
   const summary = useMemo(() => {
@@ -190,6 +210,133 @@ export default function AdminWithdrawalsPage() {
       },
     );
   }, [withdrawals]);
+
+
+  async function openDetails(withdrawal: Withdrawal) {
+    setSelected(withdrawal);
+    setDetail(null);
+    setDetailLoading(true);
+    setActionError("");
+    setActionNote("");
+    setPaymentReference("");
+    setRejectionReason("");
+
+    const { data, error } = await supabase.rpc(
+      "admin_get_withdrawal_detail",
+      { p_withdrawal_id: withdrawal.id },
+    );
+
+    if (error) {
+      setActionError(error.message);
+    } else {
+      setDetail(data);
+    }
+
+    setDetailLoading(false);
+  }
+
+  async function updateStatus(status: string) {
+    if (!selected) return;
+
+    if (status === "rejeitado" && !rejectionReason.trim()) {
+      setActionError("A rejection reason is required.");
+      return;
+    }
+
+    if (status === "pago" && !paymentReference.trim()) {
+      setActionError("A payment reference is required before marking as paid.");
+      return;
+    }
+
+    setActionLoading(true);
+    setActionError("");
+
+    const { error } = await supabase.rpc(
+      "admin_update_withdrawal_status",
+      {
+        p_withdrawal_id: selected.id,
+        p_status: status,
+        p_note:
+          status === "rejeitado"
+            ? rejectionReason.trim()
+            : actionNote.trim() || null,
+        p_payment_reference:
+          status === "pago"
+            ? paymentReference.trim()
+            : null,
+      },
+    );
+
+    if (error) {
+      setActionError(error.message);
+      setActionLoading(false);
+      return;
+    }
+
+    await load();
+
+    const updated = withdrawals.find(
+      (item) => item.id === selected.id,
+    );
+
+    if (updated) {
+      const next = { ...updated, status };
+      setSelected(next);
+      await openDetails(next);
+    }
+
+    setActionLoading(false);
+  }
+
+  const current = detail?.withdrawal ?? selected;
+  const seller = detail?.seller ?? (
+    current ? profileMap[current.vendedor_id] : null
+  );
+  const wallet = detail?.wallet ?? {};
+  const payment = current?.dados_pagamento ?? {};
+
+  const paymentValue = (...keys: string[]) => {
+    for (const key of keys) {
+      if (
+        payment[key] !== undefined &&
+        payment[key] !== null &&
+        payment[key] !== ""
+      ) {
+        return String(payment[key]);
+      }
+    }
+    return "—";
+  };
+
+  const sellerName =
+    seller?.nome_completo ||
+    seller?.full_name ||
+    "Unknown seller";
+
+  const paymentPhone = paymentValue(
+    "phone",
+    "telefone",
+    "wallet_number",
+    "numero",
+    "mobile",
+    "mpesa_number",
+  );
+
+  const paymentAccount = paymentValue(
+    "account_number",
+    "account",
+    "bank_account",
+    "iban",
+    "number",
+  );
+
+  const paymentHolder = paymentValue(
+    "holder_name",
+    "account_holder",
+    "titular",
+    "nome_titular",
+    "name",
+  );
 
   return (
     <AppShell area="admin">
@@ -281,7 +428,7 @@ export default function AdminWithdrawalsPage() {
         </div>
 
         <Card>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-4">
             <Input
               placeholder="Search withdrawal or seller..."
               value={search}
@@ -304,6 +451,27 @@ export default function AdminWithdrawalsPage() {
               </option>
               <option value="pago">Paid</option>
               <option value="rejeitado">Rejected</option>
+            </select>
+
+            <select
+              value={countryFilter}
+              onChange={(event) =>
+                setCountryFilter(event.target.value)
+              }
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none"
+            >
+              <option value="all">All countries</option>
+              {Array.from(
+                new Set(
+                  profiles
+                    .map((profile) => profile.pais || profile.country)
+                    .filter(Boolean),
+                ),
+              ).map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
             </select>
 
             <select
@@ -378,6 +546,9 @@ export default function AdminWithdrawalsPage() {
                     </th>
                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
                       Requested At
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -466,6 +637,15 @@ export default function AdminWithdrawalsPage() {
                               withdrawal.created_at,
                             ).toLocaleString()}
                           </td>
+
+                          <td className="px-6 py-4">
+                            <button
+                              onClick={() => openDetails(withdrawal)}
+                              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                              View details
+                            </button>
+                          </td>
                         </tr>
                       );
                     },
@@ -475,7 +655,427 @@ export default function AdminWithdrawalsPage() {
             </div>
           )}
         </Card>
+
       </div>
+
+      {selected && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 p-4 md:p-8">
+          <div className="mx-auto max-w-6xl rounded-2xl bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Withdrawal
+                </p>
+                <h2 className="mt-1 text-lg font-semibold text-slate-900">
+                  {selected.id}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  {current?.status}
+                </p>
+              </div>
+
+              <button
+                onClick={() => {
+                  setSelected(null);
+                  setDetail(null);
+                }}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600"
+              >
+                Close
+              </button>
+            </div>
+
+            {detailLoading ? (
+              <div className="px-6 py-16 text-center text-sm text-slate-500">
+                Loading withdrawal details...
+              </div>
+            ) : (
+              <div className="space-y-6 p-6">
+                {actionError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {actionError}
+                  </div>
+                )}
+
+                <div className="grid gap-4 md:grid-cols-4">
+                  <Card>
+                    <p className="text-xs text-slate-500">
+                      Requested amount
+                    </p>
+                    <p className="mt-2 text-xl font-semibold text-slate-900">
+                      R{Number(current?.valor_solicitado || 0).toFixed(2)}
+                    </p>
+                  </Card>
+
+                  <Card>
+                    <p className="text-xs text-slate-500">
+                      Platform fee
+                    </p>
+                    <p className="mt-2 text-xl font-semibold text-slate-900">
+                      R{(
+                        Number(current?.taxa_percentual || 0) +
+                        Number(current?.taxa_fixa || 0)
+                      ).toFixed(2)}
+                    </p>
+                  </Card>
+
+                  <Card>
+                    <p className="text-xs text-slate-500">
+                      Net amount
+                    </p>
+                    <p className="mt-2 text-xl font-semibold text-slate-900">
+                      R{Number(current?.valor_liquido || 0).toFixed(2)}
+                    </p>
+                  </Card>
+
+                  <Card>
+                    <p className="text-xs text-slate-500">
+                      Converted amount
+                    </p>
+                    <p className="mt-2 text-xl font-semibold text-slate-900">
+                      {current?.valor_convertido
+                        ? `${current.payout_currency || "MZN"} ${Number(
+                            current.valor_convertido,
+                          ).toFixed(2)}`
+                        : "—"}
+                    </p>
+                  </Card>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <Card>
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      Withdrawal details
+                    </h3>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      {[
+                        ["Withdrawal ID", current?.id],
+                        ["Seller", sellerName],
+                        ["Seller email", seller?.email],
+                        ["Country", seller?.pais || seller?.country],
+                        ["KYC status", seller?.kyc_status],
+                        ["Currency", current?.wallet_currency],
+                        ["Exchange rate", current?.exchange_rate],
+                        ["Payment method", current?.metodo],
+                        [
+                          "Requested date",
+                          current?.created_at
+                            ? new Date(current.created_at).toLocaleString()
+                            : "—",
+                        ],
+                        [
+                          "Processing date",
+                          current?.processado_em
+                            ? new Date(current.processado_em).toLocaleString()
+                            : "—",
+                        ],
+                        [
+                          "Paid date",
+                          current?.status === "pago" &&
+                          current?.processado_em
+                            ? new Date(
+                                current.processado_em,
+                              ).toLocaleString()
+                            : "—",
+                        ],
+                        ["Current status", current?.status],
+                      ].map(([label, value]) => (
+                        <div
+                          key={label}
+                          className="rounded-lg bg-slate-50 p-3"
+                        >
+                          <p className="text-xs text-slate-500">
+                            {label}
+                          </p>
+                          <p className="mt-1 break-all text-sm font-medium text-slate-900">
+                            {value || "—"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card>
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      Payment destination
+                    </h3>
+
+                    <div className="mt-4 rounded-lg border border-slate-200 p-4">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">
+                        Send payment to
+                      </p>
+                      <p className="mt-2 text-2xl font-semibold text-slate-900">
+                        {paymentPhone !== "—"
+                          ? paymentPhone
+                          : paymentAccount}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <p className="text-xs text-slate-500">
+                          Account holder
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-slate-900">
+                          {paymentHolder}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500">
+                          Phone / wallet number
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-slate-900">
+                          {paymentPhone}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500">
+                          Account / IBAN
+                        </p>
+                        <p className="mt-1 break-all text-sm font-medium text-slate-900">
+                          {paymentAccount}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500">
+                          Provider
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-slate-900">
+                          {paymentValue(
+                            "provider",
+                            "bank_name",
+                            "wallet_provider",
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <Card>
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      Seller information
+                    </h3>
+
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                      {[
+                        ["Seller", sellerName],
+                        ["Email", seller?.email],
+                        ["Country", seller?.pais || seller?.country],
+                        ["KYC", seller?.kyc_status],
+                        ["Phone", seller?.telefone || seller?.phone],
+                        ["WhatsApp", seller?.whatsapp],
+                      ].map(([label, value]) => (
+                        <div key={label}>
+                          <p className="text-xs text-slate-500">
+                            {label}
+                          </p>
+                          <p className="mt-1 text-sm font-medium text-slate-900">
+                            {value || "—"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card>
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      Seller wallet
+                    </h3>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      {[
+                        [
+                          "Available balance",
+                          wallet.available_balance ??
+                            wallet.disponivel,
+                        ],
+                        [
+                          "Balance on hold",
+                          wallet.on_hold ?? wallet.retido,
+                        ],
+                        [
+                          "Reserved for withdrawals",
+                          wallet.reserved ?? wallet.reservado,
+                        ],
+                        [
+                          "Total balance",
+                          wallet.total_balance ??
+                            wallet.saldo_total,
+                        ],
+                        [
+                          "Total earned",
+                          wallet.total_earned ??
+                            wallet.total_ganho,
+                        ],
+                        [
+                          "Total withdrawn",
+                          wallet.total_withdrawn ??
+                            wallet.sacado,
+                        ],
+                        [
+                          "Previous withdrawals",
+                          wallet.previous_withdrawals_count ??
+                            wallet.withdrawals_count,
+                        ],
+                        [
+                          "Last withdrawal",
+                          wallet.last_withdrawal_at
+                            ? new Date(
+                                wallet.last_withdrawal_at,
+                              ).toLocaleString()
+                            : "—",
+                        ],
+                        [
+                          "KYC status",
+                          seller?.kyc_status || "—",
+                        ],
+                      ].map(([label, value]) => (
+                        <div
+                          key={label}
+                          className="rounded-lg bg-slate-50 p-3"
+                        >
+                          <p className="text-xs text-slate-500">
+                            {label}
+                          </p>
+                          <p className="mt-1 text-sm font-semibold text-slate-900">
+                            {typeof value === "number"
+                              ? `R${value.toFixed(2)}`
+                              : value || "—"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                </div>
+
+                {(current?.status === "solicitado" ||
+                  current?.status === "em_processamento") && (
+                  <Card>
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      Processing actions
+                    </h3>
+
+                    <div className="mt-4 grid gap-3 md:grid-cols-3">
+                      {current?.status === "solicitado" && (
+                        <button
+                          disabled={actionLoading}
+                          onClick={() =>
+                            updateStatus("em_processamento")
+                          }
+                          className="rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                        >
+                          Approve / Process
+                        </button>
+                      )}
+
+                      <button
+                        disabled={actionLoading}
+                        onClick={() =>
+                          updateStatus("rejeitado")
+                        }
+                        className="rounded-lg border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:opacity-50"
+                      >
+                        Reject
+                      </button>
+
+                      {current?.status === "em_processamento" && (
+                        <button
+                          disabled={actionLoading}
+                          onClick={() =>
+                            updateStatus("pago")
+                          }
+                          className="rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                        >
+                          Mark as paid
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="mt-4 grid gap-4 md:grid-cols-2">
+                      <textarea
+                        value={actionNote}
+                        onChange={(event) =>
+                          setActionNote(event.target.value)
+                        }
+                        placeholder="Processing note"
+                        className="min-h-24 rounded-lg border border-slate-200 p-3 text-sm"
+                      />
+
+                      <div className="space-y-3">
+                        <input
+                          value={rejectionReason}
+                          onChange={(event) =>
+                            setRejectionReason(event.target.value)
+                          }
+                          placeholder="Rejection reason"
+                          className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+                        />
+
+                        <input
+                          value={paymentReference}
+                          onChange={(event) =>
+                            setPaymentReference(event.target.value)
+                          }
+                          placeholder="Payment reference"
+                          className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                )}
+
+                <Card>
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    Audit history
+                  </h3>
+
+                  <div className="mt-4 divide-y divide-slate-100">
+                    {(detail?.audit_log ?? []).length === 0 ? (
+                      <p className="py-4 text-sm text-slate-500">
+                        No audit events yet.
+                      </p>
+                    ) : (
+                      detail.audit_log.map(
+                        (event: any, index: number) => (
+                          <div
+                            key={event.id || index}
+                            className="flex flex-wrap items-center justify-between gap-3 py-3"
+                          >
+                            <div>
+                              <p className="text-sm font-medium text-slate-900">
+                                {event.from_status || "New"} →{" "}
+                                {event.to_status}
+                              </p>
+                              <p className="mt-1 text-xs text-slate-500">
+                                {event.note || "No note"}
+                              </p>
+                            </div>
+
+                            <p className="text-xs text-slate-500">
+                              {event.created_at
+                                ? new Date(
+                                    event.created_at,
+                                  ).toLocaleString()
+                                : "—"}
+                            </p>
+                          </div>
+                        ),
+                      )
+                    )}
+                  </div>
+                </Card>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </AppShell>
   );
 }
