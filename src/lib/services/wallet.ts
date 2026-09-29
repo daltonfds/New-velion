@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSellerFinancialSummary } from "@/lib/services/seller-financials";
 
 export interface WalletSummary {
   disponivel: number;
@@ -10,20 +10,12 @@ export interface WalletSummary {
 export async function getWalletSummary(
   vendedorId: string
 ): Promise<WalletSummary> {
-  const { data, error } = await supabase.rpc("get_wallet_summary", {
-    p_vendedor_id: vendedorId,
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  const row = Array.isArray(data) ? data[0] : data;
+  const summary = await getSellerFinancialSummary(vendedorId);
 
   return {
-    disponivel: Number(row?.disponivel ?? 0),
-    retido: Number(row?.retido ?? 0),
-    reservado: Number(row?.reservado ?? 0),
-    saldo_total: Number(row?.saldo_total ?? 0),
+    disponivel: summary.commission_available,
+    retido: summary.guarantee_retained,
+    reservado: summary.reserved,
+    saldo_total: summary.total_balance,
   };
 }
