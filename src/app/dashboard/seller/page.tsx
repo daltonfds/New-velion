@@ -121,28 +121,45 @@ export default function SellerDashboardPage() {
       const nextDate = new Date(date);
       nextDate.setDate(date.getDate() + 1);
 
-      const daySales = paidSales.filter((sale) => {
-        const saleDate = new Date(sale.vendido_em);
-        return saleDate >= date && saleDate < nextDate;
-      });
+      const commission = paidSales
+        .filter((sale) => {
+          const saleDate = new Date(sale.vendido_em);
+          return saleDate >= date && saleDate < nextDate;
+        })
+        .reduce(
+          (sum, sale) => sum + Number(sale.comissao_vendedor || 0),
+          0
+        );
 
       return {
-        date: date.toLocaleDateString("en-US", {
+        date,
+        label: date.toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
         }),
-        commission: daySales.reduce(
-          (sum, sale) => sum + Number(sale.comissao_vendedor || 0),
-          0
-        ),
+        commission,
       };
     });
   }, [paidSales]);
 
-  const maxCommission = Math.max(
-    ...dailyPerformance.map((item) => item.commission),
-    1
-  );
+  const chartPoints = useMemo(() => {
+    const max = Math.max(
+      ...dailyPerformance.map((item) => item.commission),
+      1
+    );
+
+    return dailyPerformance.map((item, index) => ({
+      ...item,
+      x: (index / Math.max(dailyPerformance.length - 1, 1)) * 100,
+      y: 100 - (item.commission / max) * 88,
+    }));
+  }, [dailyPerformance]);
+
+  const chartPath = chartPoints
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+    .join(" ");
+
+
 
   return (
     <AppShell area="seller">
@@ -239,69 +256,49 @@ export default function SellerDashboardPage() {
               <div className="mt-8">
                 <div className="relative h-64 w-full">
                   <svg
-                    viewBox="0 0 900 240"
+                    viewBox="0 0 100 100"
                     className="h-full w-full overflow-visible"
                     preserveAspectRatio="none"
                   >
-                    {[0, 25, 50, 75, 100].map((level) => {
-                      const y = 220 - (level / 100) * 190;
+                    {[12, 34, 56, 78].map((y) => (
+                      <line
+                        key={y}
+                        x1="0"
+                        x2="100"
+                        y1={y}
+                        y2={y}
+                        stroke="#E8EDF4"
+                        strokeWidth="0.35"
+                      />
+                    ))}
 
-                      return (
-                        <line
-                          key={level}
-                          x1="0"
-                          x2="900"
-                          y1={y}
-                          y2={y}
-                          stroke="#E8EDF4"
-                          strokeWidth="1"
-                        />
-                      );
-                    })}
-
-                    <polyline
+                    <path
+                      d={chartPath}
                       fill="none"
                       stroke="#2563EB"
-                      strokeWidth="3"
+                      strokeWidth="1.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      points={dailyPerformance
-                        .map((item, index) => {
-                          const x =
-                            (index / (dailyPerformance.length - 1)) * 900;
-                          const y =
-                            220 -
-                            (item.commission / maxCommission) * 190;
-
-                          return `${x},${y}`;
-                        })
-                        .join(" ")}
+                      vectorEffect="non-scaling-stroke"
                     />
 
-                    {dailyPerformance.map((item, index) => {
-                      const x =
-                        (index / (dailyPerformance.length - 1)) * 900;
-                      const y =
-                        220 -
-                        (item.commission / maxCommission) * 190;
-
-                      return (
-                        <circle
-                          key={`${item.date}-${index}`}
-                          cx={x}
-                          cy={y}
-                          r="3.5"
-                          fill="#FFFFFF"
-                          stroke="#2563EB"
-                          strokeWidth="2"
-                        />
-                      );
-                    })}
+                    {chartPoints.map((point) => (
+                      <circle
+                        key={point.date.toISOString()}
+                        cx={point.x}
+                        cy={point.y}
+                        r="1.4"
+                        fill="#FFFFFF"
+                        stroke="#2563EB"
+                        strokeWidth="1"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    ))}
                   </svg>
                 </div>
 
-                <div className="mt-2 flex justify-between text-[11px] text-[#8A96A8]">
-                  {dailyPerformance
+                <div className="mt-3 flex justify-between text-[11px] text-[#8A96A8]">
+                  {chartPoints
                     .filter(
                       (_, index) =>
                         index === 0 ||
@@ -312,8 +309,10 @@ export default function SellerDashboardPage() {
                         index === 25 ||
                         index === 29
                     )
-                    .map((item) => (
-                      <span key={item.date}>{item.date}</span>
+                    .map((point) => (
+                      <span key={point.date.toISOString()}>
+                        {point.label}
+                      </span>
                     ))}
                 </div>
               </div>
