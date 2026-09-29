@@ -28,6 +28,10 @@ interface Profile {
   full_name: string | null;
   pais: string | null;
   country: string | null;
+  email: string | null;
+  telefone: string | null;
+  phone: string | null;
+  whatsapp: string | null;
   kyc_status: string | null;
 }
 
@@ -49,8 +53,7 @@ export default function AdminWithdrawalsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    async function load() {
+  const load = async () => {
       setLoading(true);
       setError("");
 
@@ -87,8 +90,9 @@ export default function AdminWithdrawalsPage() {
       );
       setProfiles((profilesResult.data ?? []) as Profile[]);
       setLoading(false);
-    }
+  };
 
+  useEffect(() => {
     load();
   }, []);
 
