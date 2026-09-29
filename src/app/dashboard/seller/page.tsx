@@ -101,7 +101,7 @@ export default function SellerDashboardPage() {
       setUserName(name);
 
       const canonicalWallet = {
-        disponivel: Number(financialSummary?.commission_available ?? walletSummary.disponivel ?? 0),
+        disponivel: Number(financialSummary?.available_balance ?? walletSummary.disponivel ?? 0),
         retido: Number(financialSummary?.guarantee_retained ?? walletSummary.retido ?? 0),
         reservado: Number(financialSummary?.reserved ?? walletSummary.reservado ?? 0),
         saldo_total: Number(financialSummary?.total_balance ?? walletSummary.saldo_total ?? 0),

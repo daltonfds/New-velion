@@ -13,7 +13,7 @@ export async function getWalletSummary(
   const summary = await getSellerFinancialSummary(vendedorId);
 
   return {
-    disponivel: summary.commission_available,
+    disponivel: summary.available_balance,
     retido: summary.guarantee_retained,
     reservado: summary.reserved,
     saldo_total: summary.total_balance,
