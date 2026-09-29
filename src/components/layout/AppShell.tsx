@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 
@@ -15,7 +16,9 @@ type IconName =
   | "chart"
   | "link"
   | "download"
-  | "users";
+  | "users"
+  | "bell"
+  | "menu";
 
 interface NavItem {
   label: string;
@@ -87,6 +90,15 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
       <path d="M17 11a3 3 0 0 0 0-6" />
       <path d="M21 21v-2a4 4 0 0 0-3-3.87" />
     </>,
+    bell: <>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+      <path d="M10 21h4" />
+    </>,
+    menu: <>
+      <path d="M4 6h16" />
+      <path d="M4 12h16" />
+      <path d="M4 18h16" />
+    </>,
   };
 
   return <svg {...props}>{icons[name]}</svg>;
@@ -134,6 +146,7 @@ export default function AppShell({
   subtitle,
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
   const items = navigation[area];
 
@@ -170,9 +183,25 @@ export default function AppShell({
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-indigo-50 hover:text-indigo-700"
+                className={[
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  pathname === item.href
+                    ? "bg-[#eef4fb] text-[#16294F]"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-[#16294F]",
+                ].join(" ")}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-slate-500 transition group-hover:text-indigo-600">
+                {pathname === item.href && (
+                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-[#C99A2E]" />
+                )}
+
+                <span
+                  className={[
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
+                    pathname === item.href
+                      ? "text-[#16294F]"
+                      : "text-slate-500 group-hover:text-[#16294F]",
+                  ].join(" ")}
+                >
                   <Icon name={item.icon} />
                 </span>
 
@@ -185,9 +214,9 @@ export default function AppShell({
         <div className="border-t border-gray-100 p-3">
           <Link
             href="/dashboard/profile"
-            className="flex items-center gap-3 rounded-xl px-3 py-3 hover:bg-gray-50"
+            className="flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-slate-50"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef4fb] text-sm font-bold text-[#16294F]">
               U
             </div>
 
@@ -204,15 +233,15 @@ export default function AppShell({
       </aside>
 
       <div className="lg:pl-[252px]">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-gray-200 bg-white/95 px-4 backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-8">
           <div className="flex items-center gap-3">
             <button
               type="button"
               aria-label="Open menu"
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 lg:hidden"
               onClick={() => setMobileOpen(true)}
             >
-              ☰
+              <Icon name="menu" size={19} />
             </button>
 
             <div>
@@ -232,14 +261,14 @@ export default function AppShell({
             <button
               type="button"
               aria-label="Notifications"
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
             >
-              ♧
+              <Icon name="bell" size={18} />
             </button>
 
             <Link
               href="/dashboard/profile"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef4fb] text-sm font-bold text-[#16294F]"
             >
               U
             </Link>
