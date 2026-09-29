@@ -230,7 +230,23 @@ export default function MarketplacePage() {
 
   return (
     <AppShell area="seller">
-      <div className="space-y-6">
+      <div className="space-y-7">
+        <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600">
+              Seller marketplace
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+              Find products to sell
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+              Browse products published by suppliers and choose the offers you want to promote.
+            </p>
+          </div>
+          <div className="text-sm text-slate-500">
+            {loading ? "Loading..." : `${filteredProducts.length} available products`}
+          </div>
+        </div>
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">
             Marketplace
@@ -248,8 +264,62 @@ export default function MarketplacePage() {
           </Card>
         )}
 
-        <Card>
-          <div className="grid gap-4 lg:grid-cols-[1fr_220px_auto_auto]">
+        <Card className="border-slate-200 bg-white p-0">
+          <div className="border-b border-slate-100 px-5 py-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+              <div className="relative flex-1">
+                <svg className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-4-4" />
+                </svg>
+                <input
+                  id="marketplace-search"
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search products, categories..."
+                  className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white"
+                />
+              </div>
+              <select
+                id="marketplace-category"
+                value={categoryId}
+                onChange={(event) => setCategoryId(event.target.value)}
+                className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 lg:w-56"
+              >
+                <option value="all">All categories</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>{category.nome}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 px-5 py-3">
+            <button type="button" onClick={() => setFeaturedOnly((current) => !current)}
+              className={`rounded-md border px-3.5 py-2 text-sm font-medium transition ${featuredOnly ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>
+              Featured
+            </button>
+            <button type="button" onClick={() => setNewOnly((current) => !current)}
+              className={`rounded-md border px-3.5 py-2 text-sm font-medium transition ${newOnly ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>
+              New
+            </button>
+            {(search || categoryId !== "all" || featuredOnly || newOnly) && (
+              <button type="button" onClick={() => { setSearch(""); setCategoryId("all"); setFeaturedOnly(false); setNewOnly(false); }}
+                className="ml-auto px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                Clear filters
+              </button>
+            )}
+          </div>
+
+          <div className="border-t border-slate-100 px-5 py-3">
+            <p className="text-xs font-medium text-slate-500">
+              {loading ? "Loading products..." : `${filteredProducts.length} products`}
+            </p>
+          </div>
+
+          <div className="hidden">
+            <div className="grid gap-4 lg:grid-cols-[1fr_220px_auto_auto]">
             <div>
               <label
                 htmlFor="marketplace-search"
@@ -341,6 +411,7 @@ export default function MarketplacePage() {
               </button>
             )}
           </div>
+        </div>
         </Card>
 
         {loading ? (
@@ -410,8 +481,8 @@ export default function MarketplacePage() {
               const isAffiliating = affiliating === product.id;
 
               return (
-                <Card key={product.id} className="overflow-hidden p-0">
-                  <div className="relative h-52 overflow-hidden bg-gray-100">
+                <Card key={product.id} className="overflow-hidden border-slate-200 bg-white p-0 shadow-none transition hover:border-slate-300">
+                  <div className="relative h-56 overflow-hidden border-b border-slate-100 bg-slate-50">
                     {product.fotos?.length > 0 ? (
                       <>
                         <div
@@ -444,7 +515,7 @@ export default function MarketplacePage() {
                               <img
                                 src={image}
                                 alt={`${product.nome} image ${index + 1}`}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-cover transition duration-300 hover:scale-[1.02]"
                               />
                             </div>
                           ))}
@@ -477,7 +548,7 @@ export default function MarketplacePage() {
                                   [product.id]: nextIndex,
                                 }));
                               }}
-                              className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-lg font-semibold text-gray-800 shadow-sm transition hover:bg-white"
+                              className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-semibold text-slate-700 shadow-none transition hover:bg-slate-50"
                             >
                               ‹
                             </button>
@@ -507,7 +578,7 @@ export default function MarketplacePage() {
                                   [product.id]: nextIndex,
                                 }));
                               }}
-                              className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-lg font-semibold text-gray-800 shadow-sm transition hover:bg-white"
+                              className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-semibold text-slate-700 shadow-none transition hover:bg-slate-50"
                             >
                               ›
                             </button>
