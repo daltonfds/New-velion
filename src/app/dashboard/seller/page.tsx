@@ -29,9 +29,9 @@ const money = (value: number) =>
   new Intl.NumberFormat("pt-PT", {
     style: "currency",
     currency: "ZAR",
-      currencyDisplay: "narrowSymbol",
+
     minimumFractionDigits: 2,
-  }).format(value).replace("ZAR", "R");
+  }).format(value).replace("ZAR", "R").replace("R ", "R");
 
 export default function SellerDashboardPage() {
   const db = supabase;

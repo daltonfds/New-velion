@@ -185,7 +185,7 @@ export default function SellerSalesPage() {
       style: "currency",
       currency,
       minimumFractionDigits: 2,
-    }).format(value).replace("ZAR", "R");
+    }).format(value).replace("ZAR", "R").replace("R ", "R");
 
   const formatStatus = (status: string) => {
     if (status === "paga") return "Paid";

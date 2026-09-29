@@ -133,10 +133,10 @@ export default function SellerWalletPage() {
     new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "ZAR",
-      currencyDisplay: "narrowSymbol",
+
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(value).replace("ZAR", "R");
+    }).format(value).replace("ZAR", "R").replace("R ", "R");
 
   const date = (value: string) =>
     new Intl.DateTimeFormat("en-US", {

@@ -149,7 +149,7 @@ export default function SellerLinksPage() {
       style: "currency",
       currency,
       minimumFractionDigits: 2,
-    }).format(value).replace("ZAR", "R");
+    }).format(value).replace("ZAR", "R").replace("R ", "R");
   }
 
   return (
