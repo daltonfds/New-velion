@@ -31,7 +31,7 @@ const money = (value: number) =>
     currency: "ZAR",
 
     minimumFractionDigits: 2,
-  }).format(value).replace("ZAR", "R").replace("R ", "R");
+  }).format(value).replace("ZAR", "R").replace("R ", "R").replace("R ", "R").replace("R ", "R");
 
 export default function SellerDashboardPage() {
   const db = supabase;

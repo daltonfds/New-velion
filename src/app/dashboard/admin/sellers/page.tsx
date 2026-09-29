@@ -202,7 +202,7 @@ export default function AdminSellersPage() {
           <Card>
             <p className="text-sm text-slate-500">Total Commissions</p>
             <p className="mt-2 text-2xl font-semibold text-slate-900">
-              {totalCommissions.toFixed(2)}
+              R{totalCommissions.toFixed(2)}
             </p>
           </Card>
         </div>
@@ -371,7 +371,7 @@ export default function AdminSellersPage() {
                 Total sales revenue
               </p>
               <p className="mt-1 text-xl font-semibold text-slate-900">
-                {totalRevenue.toFixed(2)}
+                R{totalRevenue.toFixed(2)}
               </p>
             </div>
 
@@ -380,7 +380,7 @@ export default function AdminSellersPage() {
                 Total seller commissions
               </p>
               <p className="mt-1 text-xl font-semibold text-slate-900">
-                {totalCommissions.toFixed(2)}
+                R{totalCommissions.toFixed(2)}
               </p>
             </div>
           </div>
