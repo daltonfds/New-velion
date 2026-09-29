@@ -16,7 +16,7 @@ type Sale = {
   comissao_vendedor: number | null;
   vendedor_id: string;
   product_id: string;
-  product: {
+  product?: {
     nome: string;
     moeda: string;
   } | {
