@@ -45,6 +45,9 @@ export default function SellerDashboardPage() {
   });
   const [userName, setUserName] = useState("Seller");
   const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
+  const [dailyPerformance, setDailyPerformance] = useState<
+    { day: string; commission: number; sales_count: number; gross_sales: number }[]
+  >([]);
 
   useEffect(() => {
     async function load() {
@@ -59,8 +62,13 @@ export default function SellerDashboardPage() {
         return;
       }
 
-      const [{ data: profile }, { data: salesData }, walletSummary, financialSummary] =
-        await Promise.all([
+      const [
+        { data: profile },
+        { data: salesData },
+        { data: dailyData, error: dailyError },
+        walletSummary,
+        financialSummary,
+      ] = await Promise.all([
           supabase
             .from("profiles")
             .select("full_name,nome_completo")
@@ -74,6 +82,11 @@ export default function SellerDashboardPage() {
             )
             .eq("vendedor_id", user.id)
             .order("created_at", { ascending: false }),
+
+          supabase.rpc("get_seller_daily_performance", {
+            p_vendedor_id: user.id,
+            p_days: 30,
+          }),
 
           getWalletSummary(user.id),
           getSellerFinancialSummary(user.id),
@@ -90,6 +103,20 @@ export default function SellerDashboardPage() {
       setSales((salesData || []) as Sale[]);
       setWallet(walletSummary);
       setFinancialSummary(financialSummary);
+
+      if (dailyError) {
+        console.error("Seller daily performance:", dailyError);
+        setDailyPerformance([]);
+      } else {
+        setDailyPerformance(
+          (dailyData || []).map((row) => ({
+            day: row.day,
+            commission: Number(row.commission || 0),
+            sales_count: Number(row.sales_count || 0),
+            gross_sales: Number(row.gross_sales || 0),
+          }))
+        );
+      }
       setLoading(false);
     }
 
@@ -110,37 +137,6 @@ export default function SellerDashboardPage() {
 
   const totalCommission = financialSummary?.commission_earned ?? 0;
 
-  const dailyPerformance = useMemo(() => {
-    const today = new Date();
-
-    return Array.from({ length: 30 }, (_, index) => {
-      const date = new Date(today);
-      date.setDate(today.getDate() - (29 - index));
-      date.setHours(0, 0, 0, 0);
-
-      const nextDate = new Date(date);
-      nextDate.setDate(date.getDate() + 1);
-
-      const commission = paidSales
-        .filter((sale) => {
-          const saleDate = new Date(sale.vendido_em);
-          return saleDate >= date && saleDate < nextDate;
-        })
-        .reduce(
-          (sum, sale) => sum + Number(sale.comissao_vendedor || 0),
-          0
-        );
-
-      return {
-        date,
-        label: date.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        }),
-        commission,
-      };
-    });
-  }, [paidSales]);
 
   const chartPoints = useMemo(() => {
     const max = Math.max(
@@ -284,7 +280,7 @@ export default function SellerDashboardPage() {
 
                     {chartPoints.map((point) => (
                       <circle
-                        key={point.date.toISOString()}
+                        key={point.day}
                         cx={point.x}
                         cy={point.y}
                         r="1.4"
@@ -310,8 +306,11 @@ export default function SellerDashboardPage() {
                         index === 29
                     )
                     .map((point) => (
-                      <span key={point.date.toISOString()}>
-                        {point.label}
+                      <span key={point.day}>
+                        {new Date(`${point.day}T00:00:00`).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </span>
                     ))}
                 </div>
