@@ -8,18 +8,18 @@ import { supabase } from "@/lib/supabase";
 
 type Sale = {
   id: string;
-  created_at: string;
+  vendido_em: string;
   status: string | null;
   valor_venda: number | null;
-  valor_comissao: number | null;
+  comissao_vendedor: number | null;
   vendedor_id: string;
 };
 
 type WalletEntry = {
   id: string;
-  created_at: string;
-  amount: number | null;
-  type: string | null;
+  vendido_em: string;
+  valor: number | null;
+  tipo: string | null;
 };
 
 const money = (value: number) =>
@@ -61,15 +61,15 @@ export default function SellerDashboardPage() {
           supabase
             .from("sales")
             .select(
-              "id,created_at,status,valor_venda,valor_comissao,vendedor_id"
+              "id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id"
             )
             .eq("vendedor_id", user.id)
             .order("created_at", { ascending: false }),
 
           supabase
             .from("wallet_entries")
-            .select("id,created_at,amount,type")
-            .eq("user_id", user.id)
+            .select("id,created_at,valor,tipo")
+            .eq("vendedor_id", user.id)
             .order("created_at", { ascending: false }),
         ]);
 
@@ -105,15 +105,15 @@ export default function SellerDashboardPage() {
   );
 
   const totalCommission = paidSales.reduce(
-    (sum, sale) => sum + Number(sale.valor_comissao || 0),
+    (sum, sale) => sum + Number(sale.comissao_vendedor || 0),
     0
   );
 
   const wallet = useMemo(() => {
     return walletEntries.reduce(
       (acc, entry) => {
-        const amount = Number(entry.amount || 0);
-        const type = (entry.type || "").toLowerCase();
+        const amount = Number(entry.valor || 0);
+        const type = (entry.tipo || "").toLowerCase();
 
         if (amount > 0) acc.available += amount;
         else acc.outflow += Math.abs(amount);
@@ -147,7 +147,7 @@ export default function SellerDashboardPage() {
       );
 
       const monthSales = paidSales.filter((sale) => {
-        const saleDate = new Date(sale.created_at);
+        const saleDate = new Date(sale.vendido_em);
         return (
           saleDate.getFullYear() === date.getFullYear() &&
           saleDate.getMonth() === date.getMonth()
@@ -158,7 +158,7 @@ export default function SellerDashboardPage() {
         month: date.toLocaleDateString("en-US", { month: "short" }),
         sales: monthSales.length,
         commission: monthSales.reduce(
-          (sum, sale) => sum + Number(sale.valor_comissao || 0),
+          (sum, sale) => sum + Number(sale.comissao_vendedor || 0),
           0
         ),
       };
@@ -460,7 +460,7 @@ export default function SellerDashboardPage() {
                       {paidSales.slice(0, 6).map((sale) => (
                         <tr key={sale.id} className="hover:bg-[#FAFBFD]">
                           <td className="px-6 py-4 text-[#60708A]">
-                            {new Date(sale.created_at).toLocaleDateString(
+                            {new Date(sale.vendido_em).toLocaleDateString(
                               "en-GB"
                             )}
                           </td>
@@ -468,7 +468,7 @@ export default function SellerDashboardPage() {
                             {money(Number(sale.valor_venda || 0))}
                           </td>
                           <td className="px-6 py-4 font-medium text-[#18794E]">
-                            {money(Number(sale.valor_comissao || 0))}
+                            {money(Number(sale.comissao_vendedor || 0))}
                           </td>
                           <td className="px-6 py-4">
                             <span className="inline-flex rounded-full bg-[#EAF7F0] px-2.5 py-1 text-xs font-medium text-[#18794E]">
