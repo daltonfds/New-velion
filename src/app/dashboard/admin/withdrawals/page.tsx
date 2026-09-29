@@ -53,6 +53,52 @@ export default function AdminWithdrawalsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const handleWithdrawalAction = async (
+    withdrawalId: string,
+    action: "approve" | "reject",
+  ) => {
+    if (actionLoading) return;
+
+    const confirmed = window.confirm(
+      action === "approve"
+        ? "Approve this withdrawal?"
+        : "Reject this withdrawal? The amount will be returned to the seller's available balance.",
+    );
+
+    if (!confirmed) return;
+
+    setActionLoading(true);
+
+    try {
+      const { error } = await supabase.rpc(
+        action === "approve"
+          ? "admin_approve_withdrawal"
+          : "admin_reject_withdrawal",
+        action === "approve"
+          ? {
+              p_withdrawal_id: withdrawalId,
+              p_payment_reference: null,
+              p_note: "Withdrawal approved by admin",
+            }
+          : {
+              p_withdrawal_id: withdrawalId,
+              p_note: "Withdrawal rejected by admin",
+            },
+      );
+
+      if (error) throw error;
+
+      await load();
+    } catch (error) {
+      console.error(error);
+      window.alert(
+        error instanceof Error ? error.message : "Failed to update withdrawal.",
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const load = async () => {
       setLoading(true);
       setError("");
