@@ -9,33 +9,37 @@ import { supabase } from "@/lib/supabase";
 
 interface Seller {
   id: string;
+  email: string | null;
   nome_completo: string | null;
   full_name: string | null;
   pais: string | null;
   country: string | null;
+  country_code: string | null;
+  country_calling_code: string | null;
   telefone: string | null;
   phone_number: string | null;
+  phone_e164: string | null;
+  whatsapp_number: string | null;
+  whatsapp_e164: string | null;
+  avatar_url: string | null;
   kyc_status: string | null;
   status: string | null;
+  primary_company_id: string | null;
   created_at: string;
-}
-
-interface Sale {
-  vendedor_id: string;
-  valor_venda: number;
-  comissao_vendedor: number;
-  status: string;
-}
-
-interface SellerStats {
-  sales: number;
-  revenue: number;
-  commissions: number;
+  updated_at: string;
+  sales_count: number;
+  gross_sales: number;
+  commission_earned: number;
+  commission_available: number;
+  guarantee_retained: number;
+  reserved: number;
+  withdrawn: number;
+  available_balance: number;
+  total_balance: number;
 }
 
 export default function AdminSellersPage() {
   const [sellers, setSellers] = useState<Seller[]>([]);
-  const [sales, setSales] = useState<Sale[]>([]);
   const [search, setSearch] = useState("");
   const [kycFilter, setKycFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -47,65 +51,42 @@ export default function AdminSellersPage() {
       setLoading(true);
       setError("");
 
-      const [sellersResult, salesResult] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select(
-            "id, nome_completo, full_name, pais, country, telefone, phone_number, kyc_status, status, created_at",
-          )
-          .eq("role", "seller")
-          .order("created_at", { ascending: false }),
+      const { data, error } = await supabase.rpc(
+        "get_admin_seller_overview",
+      );
 
-        supabase
-          .from("sales")
-          .select(
-            "vendedor_id, valor_venda, comissao_vendedor, status",
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      setSellers(
+        (data ?? []).map((seller: Seller) => ({
+          ...seller,
+          sales_count: Number(seller.sales_count ?? 0),
+          gross_sales: Number(seller.gross_sales ?? 0),
+          commission_earned: Number(seller.commission_earned ?? 0),
+          commission_available: Number(
+            seller.commission_available ?? 0,
           ),
-      ]);
+          guarantee_retained: Number(
+            seller.guarantee_retained ?? 0,
+          ),
+          reserved: Number(seller.reserved ?? 0),
+          withdrawn: Number(seller.withdrawn ?? 0),
+          available_balance: Number(
+            seller.available_balance ?? 0,
+          ),
+          total_balance: Number(seller.total_balance ?? 0),
+        })),
+      );
 
-      if (sellersResult.error) {
-        setError(sellersResult.error.message);
-        setLoading(false);
-        return;
-      }
-
-      if (salesResult.error) {
-        setError(salesResult.error.message);
-        setLoading(false);
-        return;
-      }
-
-      setSellers((sellersResult.data ?? []) as Seller[]);
-      setSales((salesResult.data ?? []) as Sale[]);
       setLoading(false);
     }
 
     load();
   }, []);
-
-  const stats = useMemo(() => {
-    const result: Record<string, SellerStats> = {};
-
-    for (const sale of sales) {
-      if (sale.status !== "paga") continue;
-
-      if (!result[sale.vendedor_id]) {
-        result[sale.vendedor_id] = {
-          sales: 0,
-          revenue: 0,
-          commissions: 0,
-        };
-      }
-
-      result[sale.vendedor_id].sales += 1;
-      result[sale.vendedor_id].revenue += Number(sale.valor_venda ?? 0);
-      result[sale.vendedor_id].commissions += Number(
-        sale.comissao_vendedor ?? 0,
-      );
-    }
-
-    return result;
-  }, [sales]);
 
   const filteredSellers = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -117,15 +98,19 @@ export default function AdminSellersPage() {
         ""
       ).toLowerCase();
 
+      const email = (seller.email || "").toLowerCase();
+
       const phone = (
         seller.telefone ||
         seller.phone_number ||
+        seller.phone_e164 ||
         ""
       ).toLowerCase();
 
       const matchesSearch =
         !query ||
         name.includes(query) ||
+        email.includes(query) ||
         phone.includes(query) ||
         seller.id.toLowerCase().includes(query);
 
@@ -143,14 +128,31 @@ export default function AdminSellersPage() {
     });
   }, [sellers, search, kycFilter, statusFilter]);
 
-  const totalRevenue = Object.values(stats).reduce(
-    (sum, item) => sum + item.revenue,
-    0,
-  );
-
-  const totalCommissions = Object.values(stats).reduce(
-    (sum, item) => sum + item.commissions,
-    0,
+  const totals = useMemo(
+    () =>
+      sellers.reduce(
+        (acc, seller) => ({
+          sales: acc.sales + seller.sales_count,
+          revenue: acc.revenue + seller.gross_sales,
+          commissions:
+            acc.commissions + seller.commission_earned,
+          available:
+            acc.available + seller.available_balance,
+          retained:
+            acc.retained + seller.guarantee_retained,
+          totalBalance:
+            acc.totalBalance + seller.total_balance,
+        }),
+        {
+          sales: 0,
+          revenue: 0,
+          commissions: 0,
+          available: 0,
+          retained: 0,
+          totalBalance: 0,
+        },
+      ),
+    [sellers],
   );
 
   const verifiedSellers = sellers.filter(
@@ -172,12 +174,12 @@ export default function AdminSellersPage() {
             Sellers
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Manage affiliate sellers, verification status, and sales
-            performance.
+            Manage affiliate sellers, verification status, and
+            financial performance.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
           <Card>
             <p className="text-sm text-slate-500">Total Sellers</p>
             <p className="mt-2 text-2xl font-semibold text-slate-900">
@@ -186,7 +188,9 @@ export default function AdminSellersPage() {
           </Card>
 
           <Card>
-            <p className="text-sm text-slate-500">Verified Sellers</p>
+            <p className="text-sm text-slate-500">
+              Verified Sellers
+            </p>
             <p className="mt-2 text-2xl font-semibold text-slate-900">
               {verifiedSellers}
             </p>
@@ -200,9 +204,23 @@ export default function AdminSellersPage() {
           </Card>
 
           <Card>
-            <p className="text-sm text-slate-500">Total Commissions</p>
+            <p className="text-sm text-slate-500">Sales</p>
             <p className="mt-2 text-2xl font-semibold text-slate-900">
-              R{totalCommissions.toFixed(2)}
+              {totals.sales}
+            </p>
+          </Card>
+
+          <Card>
+            <p className="text-sm text-slate-500">Revenue</p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              R{totals.revenue.toFixed(2)}
+            </p>
+          </Card>
+
+          <Card>
+            <p className="text-sm text-slate-500">Commissions</p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">
+              R{totals.commissions.toFixed(2)}
             </p>
           </Card>
         </div>
@@ -210,7 +228,7 @@ export default function AdminSellersPage() {
         <Card>
           <div className="grid gap-4 md:grid-cols-3">
             <Input
-              placeholder="Search by name, phone, or ID..."
+              placeholder="Search by name, email, phone, or ID..."
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
@@ -224,11 +242,14 @@ export default function AdminSellersPage() {
               <option value="approved">Approved</option>
               <option value="pending">Pending</option>
               <option value="rejected">Rejected</option>
+              <option value="not_started">Not started</option>
             </select>
 
             <select
               value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value)}
+              onChange={(event) =>
+                setStatusFilter(event.target.value)
+              }
               className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
             >
               <option value="all">All statuses</option>
@@ -261,7 +282,7 @@ export default function AdminSellersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1100px]">
+              <table className="w-full min-w-[1500px]">
                 <thead>
                   <tr className="border-b border-slate-100 text-left">
                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -286,6 +307,15 @@ export default function AdminSellersPage() {
                       Commission
                     </th>
                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Available
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Retained
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Total Balance
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
                       Registered
                     </th>
                   </tr>
@@ -293,31 +323,35 @@ export default function AdminSellersPage() {
 
                 <tbody className="divide-y divide-slate-100">
                   {filteredSellers.map((seller) => {
-                    const sellerStats = stats[seller.id] || {
-                      sales: 0,
-                      revenue: 0,
-                      commissions: 0,
-                    };
-
                     const name =
                       seller.nome_completo ||
                       seller.full_name ||
                       "Unnamed seller";
 
                     return (
-                      <tr key={seller.id} className="hover:bg-slate-50">
+                      <tr
+                        key={seller.id}
+                        className="hover:bg-slate-50"
+                      >
                         <td className="px-6 py-4">
                           <div className="font-medium text-slate-900">
                             {name}
                           </div>
+                          {seller.email && (
+                            <div className="mt-1 text-xs text-slate-500">
+                              {seller.email}
+                            </div>
+                          )}
                           <div className="mt-1 max-w-[220px] truncate text-xs text-slate-400">
                             {seller.id}
                           </div>
                           {(seller.telefone ||
-                            seller.phone_number) && (
+                            seller.phone_number ||
+                            seller.phone_e164) && (
                             <div className="mt-1 text-xs text-slate-500">
                               {seller.telefone ||
-                                seller.phone_number}
+                                seller.phone_number ||
+                                seller.phone_e164}
                             </div>
                           )}
                         </td>
@@ -339,15 +373,27 @@ export default function AdminSellersPage() {
                         </td>
 
                         <td className="px-6 py-4 text-sm text-slate-700">
-                          {sellerStats.sales}
+                          {seller.sales_count}
                         </td>
 
                         <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                          {sellerStats.revenue.toFixed(2)}
+                          R{seller.gross_sales.toFixed(2)}
                         </td>
 
                         <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                          {sellerStats.commissions.toFixed(2)}
+                          R{seller.commission_earned.toFixed(2)}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                          R{seller.available_balance.toFixed(2)}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-slate-600">
+                          R{seller.guarantee_retained.toFixed(2)}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm font-semibold text-slate-900">
+                          R{seller.total_balance.toFixed(2)}
                         </td>
 
                         <td className="px-6 py-4 text-sm text-slate-500">
@@ -365,22 +411,40 @@ export default function AdminSellersPage() {
         </Card>
 
         <Card>
-          <div className="flex items-center justify-between">
+          <div className="grid gap-6 md:grid-cols-4">
             <div>
               <p className="text-sm text-slate-500">
                 Total sales revenue
               </p>
               <p className="mt-1 text-xl font-semibold text-slate-900">
-                R{totalRevenue.toFixed(2)}
+                R{totals.revenue.toFixed(2)}
               </p>
             </div>
 
-            <div className="text-right">
+            <div>
               <p className="text-sm text-slate-500">
                 Total seller commissions
               </p>
               <p className="mt-1 text-xl font-semibold text-slate-900">
-                R{totalCommissions.toFixed(2)}
+                R{totals.commissions.toFixed(2)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">
+                Available to sellers
+              </p>
+              <p className="mt-1 text-xl font-semibold text-slate-900">
+                R{totals.available.toFixed(2)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">
+                Seller balances
+              </p>
+              <p className="mt-1 text-xl font-semibold text-slate-900">
+                R{totals.totalBalance.toFixed(2)}
               </p>
             </div>
           </div>
