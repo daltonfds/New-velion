@@ -232,7 +232,7 @@ export default function SellerCommissionsPage() {
       style: "currency",
       currency,
       minimumFractionDigits: 2,
-    }).format(value);
+    }).format(value).replace("ZAR", "R");
 
   const formatStatus = (status: string) => {
     if (status === "paga") return "Paid";

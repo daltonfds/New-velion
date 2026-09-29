@@ -207,7 +207,7 @@ export default function SellerPerformancePage() {
       style: "currency",
       currency,
       minimumFractionDigits: 2,
-    }).format(value);
+    }).format(value).replace("ZAR", "R");
 
   return (
     <AppShell area="seller">
