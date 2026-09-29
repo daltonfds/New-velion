@@ -66,6 +66,9 @@ export default function SellerSalesPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [financial, setFinancial] = useState<Awaited<
+    ReturnType<typeof getSellerFinancialSummary>
+  > | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -73,6 +76,8 @@ export default function SellerSalesPage() {
       setError("");
 
       const user = await getCurrentUser();
+      const financialSummary = await getSellerFinancialSummary(user.id);
+      setFinancial(financialSummary);
 
       if (!user) {
         setError("You must be signed in to view your sales.");

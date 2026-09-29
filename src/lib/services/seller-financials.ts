@@ -1,3 +1,4 @@
+
 import { supabase } from "@/lib/supabase";
 
 export interface SellerFinancialSummary {
@@ -13,12 +14,15 @@ export interface SellerFinancialSummary {
 
 export async function getSellerFinancialSummary(
   vendedorId: string,
-  days: number | null = null
+  days?: number | null
 ): Promise<SellerFinancialSummary> {
-  const { data, error } = await supabase.rpc("get_seller_financial_summary", {
-    p_vendedor_id: vendedorId,
-    p_days: days,
-  });
+  const { data, error } = await supabase.rpc(
+    "get_seller_financial_summary",
+    {
+      p_vendedor_id: vendedorId,
+      p_days: days ?? null,
+    }
+  );
 
   if (error) throw error;
 
