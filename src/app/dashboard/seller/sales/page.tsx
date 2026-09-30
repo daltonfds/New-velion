@@ -76,8 +76,6 @@ export default function SellerSalesPage() {
       setError("");
 
       const user = await getCurrentUser();
-      const financialSummary = await getSellerFinancialSummary(user.id);
-      setFinancial(financialSummary);
 
       if (!user) {
         setError("You must be signed in to view your sales.");
@@ -85,11 +83,9 @@ export default function SellerSalesPage() {
         return;
       }
 
-      const [{ data: financialData, error: financialError }, { data, error: queryError }] =
+      const [financialSummary, { data, error: queryError }] =
         await Promise.all([
-          supabase.rpc("get_seller_financial_summary", {
-            p_vendedor_id: user.id,
-          }),
+          getSellerFinancialSummary(user.id),
           supabase
         .from("sales")
         .select(`
@@ -113,23 +109,8 @@ export default function SellerSalesPage() {
         .order("vendido_em", { ascending: false })
         ]);
 
-      if (financialError) {
-        setError(financialError.message);
-        setLoading(false);
-        return;
-      }
-
-      const financial = Array.isArray(financialData) ? financialData[0] : financialData;
-      setFinancialSummary({
-        sales_count: Number(financial?.sales_count ?? 0),
-        gross_sales: Number(financial?.gross_sales ?? 0),
-        commission_earned: Number(financial?.commission_earned ?? 0),
-        commission_available: Number(financial?.commission_available ?? 0),
-        guarantee_retained: Number(financial?.guarantee_retained ?? 0),
-        reserved: Number(financial?.reserved ?? 0),
-        available_balance: Number(financial?.available_balance ?? 0),
-        total_balance: Number(financial?.total_balance ?? 0),
-      });
+      setFinancial(financialSummary);
+      setFinancialSummary(financialSummary);
 
       if (queryError) {
         setError(queryError.message);
@@ -168,15 +149,9 @@ export default function SellerSalesPage() {
     const paid = sales.filter((sale) => sale.status === "paga");
 
     return {
-      sales: paid.length,
-      revenue: paid.reduce(
-        (total, sale) => total + Number(sale.valor_venda || 0),
-        0,
-      ),
-      commissions: paid.reduce(
-        (total, sale) => total + Number(sale.comissao_vendedor || 0),
-        0,
-      ),
+      sales: financialSummary?.sales_count ?? paid.length,
+      revenue: financialSummary?.gross_sales ?? 0,
+      commissions: financialSummary?.commission_earned ?? 0,
       gatewayFees: paid.reduce(
         (total, sale) => total + Number(sale.taxa_gateway || 0),
         0,
