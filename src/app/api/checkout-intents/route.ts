@@ -16,7 +16,6 @@ export async function POST(request: Request) {
     const form = await request.formData();
 
     const affiliateLink = String(form.get("affiliate_link") || "").trim();
-    console.log("[checkout] affiliate_link:", JSON.stringify(affiliateLink));
 
     const fullName = String(form.get("full_name") || "").trim();
     const phone = String(form.get("phone") || "").trim();
@@ -49,30 +48,47 @@ export async function POST(request: Request) {
       auth: { persistSession: false },
     });
 
-    const normalizedLink = affiliateLink
-      .trim()
+    /*
+     * The affiliate link is the attribution key.
+     * Accept:
+     *   go/xxxxxxxx
+     *   /go/xxxxxxxx
+     *   xxxxxxxx
+     */
+    const rawLink = affiliateLink
+      .replace(/^https?:\/\/[^/]+\/?/i, "")
       .replace(/^\/+/, "")
-      .replace(/^go\//i, "go/");
+      .trim();
 
-    const canonicalLink = normalizedLink.startsWith("go/")
-      ? normalizedLink
-      : `go/${normalizedLink}`;
+    const linkCode = rawLink.replace(/^go\//i, "").replace(/\/+$/, "");
+    const canonicalLink = `go/${linkCode}`;
 
-    console.log("[checkout] canonicalLink:", JSON.stringify(canonicalLink));
-
+    /*
+     * Resolve the affiliate directly from the database.
+     * No client-provided seller/product IDs are trusted.
+     */
     const { data: affiliation, error: affiliationError } = await supabase
       .from("affiliations")
-      .select("id, vendedor_id, product_id, link_unico, ativo")
+      .select("id,vendedor_id,product_id,link_unico,ativo")
       .eq("link_unico", canonicalLink)
       .eq("ativo", true)
       .maybeSingle();
 
-    if (affiliationError || !affiliation) {
-      console.error("Affiliate lookup failed:", {
+    if (affiliationError) {
+      console.error("Affiliate database lookup failed:", affiliationError);
+
+      return NextResponse.json(
+        { error: "Could not validate affiliate link." },
+        { status: 500 }
+      );
+    }
+
+    if (!affiliation) {
+      console.error("Affiliate not found:", {
         affiliateLink,
-        normalizedLink,
+        rawLink,
+        linkCode,
         canonicalLink,
-        affiliationError,
       });
 
       return NextResponse.json(
@@ -81,27 +97,41 @@ export async function POST(request: Request) {
       );
     }
 
+    /*
+     * Product controls the checkout URL.
+     * The customer never supplies this URL.
+     */
     const { data: product, error: productError } = await supabase
       .from("products")
-      .select("id, preco, preco_promocional, moeda, checkout_url, ativo")
+      .select(
+        "id,nome,preco,preco_promocional,moeda,checkout_url,ativo"
+      )
       .eq("id", affiliation.product_id)
       .eq("ativo", true)
       .maybeSingle();
 
+    if (productError) {
+      console.error("Product lookup failed:", productError);
+
+      return NextResponse.json(
+        { error: "Could not load product checkout." },
+        { status: 500 }
+      );
+    }
+
+    if (!product) {
+      return NextResponse.json(
+        { error: "Product is unavailable." },
+        { status: 409 }
+      );
+    }
+
     if (
-      productError ||
-      !product ||
       !product.checkout_url ||
       !/^https?:\/\//i.test(product.checkout_url)
     ) {
-      console.error("Product checkout unavailable:", {
-        productId: affiliation.product_id,
-        productError,
-        checkoutUrl: product?.checkout_url,
-      });
-
       return NextResponse.json(
-        { error: "Product checkout is unavailable." },
+        { error: "This product does not have a valid checkout link." },
         { status: 409 }
       );
     }
@@ -112,23 +142,33 @@ export async function POST(request: Request) {
         ? Number(product.preco_promocional)
         : Number(product.preco);
 
-    const { data: session, error: sessionError } = await supabase
+    /*
+     * FIRST:
+     * Save everything the customer entered.
+     *
+     * This creates the administrative record BEFORE redirecting
+     * the customer to the external checkout.
+     */
+    const { data: checkoutSession, error: sessionError } = await supabase
       .from("checkout_sessions")
       .insert({
         affiliation_id: affiliation.id,
         product_id: product.id,
         seller_id: affiliation.vendedor_id,
         affiliate_link: affiliation.link_unico,
+
         full_name: fullName,
+        email,
         phone,
         whatsapp,
-        email,
+
         country,
         province,
         city,
         postal_code: postalCode,
         address,
         address_reference: addressReference,
+
         amount,
         currency: product.moeda,
         checkout_url: product.checkout_url,
@@ -137,16 +177,28 @@ export async function POST(request: Request) {
       .select("id")
       .single();
 
-    if (sessionError || !session) {
-      console.error("Failed to create checkout session:", sessionError);
+    if (sessionError || !checkoutSession) {
+      console.error("Checkout session creation failed:", sessionError);
+
       return NextResponse.json(
-        { error: "Could not create checkout session." },
+        { error: "Could not save customer delivery information." },
         { status: 500 }
       );
     }
 
+    /*
+     * SECOND:
+     * Open the checkout URL configured on the product.
+     *
+     * NewVelion session ID is appended only as attribution/reference.
+     * The destination itself always comes from products.checkout_url.
+     */
     const checkoutUrl = new URL(product.checkout_url);
-    checkoutUrl.searchParams.set("newvelion_session", session.id);
+
+    checkoutUrl.searchParams.set(
+      "newvelion_session",
+      checkoutSession.id
+    );
 
     return NextResponse.redirect(checkoutUrl.toString(), 303);
   } catch (error) {
