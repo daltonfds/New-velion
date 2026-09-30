@@ -57,39 +57,19 @@ export async function POST(request: Request) {
       ? normalizedLink
       : `go/${normalizedLink}`;
 
-    const { data: resolved, error: resolveError } = await supabase.rpc(
-      "resolve_affiliate_product",
-      { p_link_unico: canonicalLink }
-    );
-
-    const resolvedProduct = Array.isArray(resolved)
-      ? resolved[0]
-      : resolved;
-
-    if (
-      resolveError ||
-      !resolvedProduct?.product_id ||
-      !resolvedProduct?.affiliate_id
-    ) {
-      console.error("Failed to resolve affiliate link:", {
-        canonicalLink,
-        resolveError,
-      });
-
-      return NextResponse.json(
-        { error: "Invalid affiliate link." },
-        { status: 404 }
-      );
-    }
-
     const { data: affiliation, error: affiliationError } = await supabase
       .from("affiliations")
       .select("id, vendedor_id, product_id, link_unico, ativo")
-      .eq("id", resolvedProduct.affiliate_id)
+      .eq("link_unico", canonicalLink)
       .eq("ativo", true)
       .maybeSingle();
 
     if (affiliationError || !affiliation) {
+      console.error("Affiliate link not found:", {
+        canonicalLink,
+        affiliationError,
+      });
+
       return NextResponse.json(
         { error: "Invalid affiliate link." },
         { status: 404 }
@@ -99,7 +79,7 @@ export async function POST(request: Request) {
     const { data: product, error: productError } = await supabase
       .from("products")
       .select("id, preco, preco_promocional, moeda, checkout_url, ativo")
-      .eq("id", resolvedProduct.product_id)
+      .eq("id", affiliation.product_id)
       .eq("ativo", true)
       .maybeSingle();
 
