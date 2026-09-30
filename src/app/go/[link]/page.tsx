@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
@@ -36,10 +37,12 @@ export default async function AffiliateProductPage({
     notFound();
   }
 
+  const requestHeaders = await headers();
+
   await supabase.rpc("record_affiliate_click", {
     p_link_unico: `go/${link}`,
-    p_user_agent: undefined,
-    p_referrer: undefined,
+    p_user_agent: requestHeaders.get("user-agent"),
+    p_referrer: requestHeaders.get("referer"),
   });
 
   return (
