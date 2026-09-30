@@ -37,7 +37,6 @@ export default async function AffiliateProductPage({
   }
 
   const productId = String(product.product_id);
-  const affiliateId = String(product.affiliate_id);
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -75,7 +74,9 @@ export default async function AffiliateProductPage({
 
               <div className="mt-6">
                 <span className="text-3xl font-bold text-slate-950">
-                  {Number(product.preco || 0).toLocaleString("pt-MZ", {
+                  {Number(
+                    product.preco_promocional ?? product.preco ?? 0,
+                  ).toLocaleString("pt-MZ", {
                     minimumFractionDigits: 2,
                   })}
                 </span>
@@ -106,18 +107,6 @@ export default async function AffiliateProductPage({
               method="POST"
               className="mt-8 space-y-5"
             >
-              <input
-                type="hidden"
-                name="affiliate_id"
-                value={affiliateId}
-              />
-
-              <input
-                type="hidden"
-                name="product_id"
-                value={productId}
-              />
-
               <input
                 type="hidden"
                 name="affiliate_link"

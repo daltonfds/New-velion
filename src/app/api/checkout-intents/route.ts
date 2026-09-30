@@ -15,8 +15,6 @@ export async function POST(request: Request) {
 
     const form = await request.formData();
 
-    const affiliateId = String(form.get("affiliate_id") || "").trim();
-    const productId = String(form.get("product_id") || "").trim();
     const affiliateLink = String(form.get("affiliate_link") || "").trim();
 
     const fullName = String(form.get("full_name") || "").trim();
@@ -32,8 +30,6 @@ export async function POST(request: Request) {
       String(form.get("address_reference") || "").trim() || null;
 
     if (
-      !affiliateId ||
-      !productId ||
       !affiliateLink ||
       !fullName ||
       !phone ||
@@ -52,12 +48,14 @@ export async function POST(request: Request) {
       auth: { persistSession: false },
     });
 
+    const normalizedLink = affiliateLink.startsWith("go/")
+      ? affiliateLink
+      : `go/${affiliateLink}`;
+
     const { data: affiliation, error: affiliationError } = await supabase
       .from("affiliations")
       .select("id, vendedor_id, product_id, link_unico, ativo")
-      .eq("id", affiliateId)
-      .eq("product_id", productId)
-      .eq("link_unico", `go/${affiliateLink}`)
+      .eq("link_unico", normalizedLink)
       .eq("ativo", true)
       .maybeSingle();
 
@@ -71,7 +69,7 @@ export async function POST(request: Request) {
     const { data: product, error: productError } = await supabase
       .from("products")
       .select("id, preco, preco_promocional, moeda, checkout_url, ativo")
-      .eq("id", productId)
+      .eq("id", affiliation.product_id)
       .eq("ativo", true)
       .maybeSingle();
 
