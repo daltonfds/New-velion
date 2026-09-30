@@ -123,6 +123,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Sellers", href: "/dashboard/admin/sellers", icon: "users" },
     { label: "Products", href: "/dashboard/admin/products", icon: "box" },
     { label: "Categories", href: "/dashboard/admin/categories", icon: "grid" },
+    { label: "Orders", href: "/dashboard/admin/checkout-sessions", icon: "box" },
     { label: "Transactions", href: "/dashboard/admin/transactions", icon: "sales" },
     { label: "Commissions", href: "/dashboard/admin/commissions", icon: "wallet" },
     { label: "Withdrawals", href: "/dashboard/admin/withdrawals", icon: "download" },
