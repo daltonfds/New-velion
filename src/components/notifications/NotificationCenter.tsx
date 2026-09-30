@@ -1,0 +1,350 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+type NotificationItem = {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  data: Record<string, unknown> | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+function BellIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+      <path d="M10 21h4" />
+    </svg>
+  );
+}
+
+function relativeTime(value: string) {
+  const seconds = Math.max(
+    1,
+    Math.floor(
+      (Date.now() - new Date(value).getTime()) / 1000,
+    ),
+  );
+
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
+  return `${Math.floor(seconds / 86400)}d`;
+}
+
+function base64ToUint8Array(value: string) {
+  const padding = "=".repeat(
+    (4 - (value.length % 4)) % 4,
+  );
+
+  const base64 = (value + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const raw = window.atob(base64);
+
+  return Uint8Array.from(
+    Array.from(raw).map((char) =>
+      char.charCodeAt(0),
+    ),
+  );
+}
+
+export default function NotificationCenter() {
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState<NotificationItem[]>([]);
+  const [pushEnabled, setPushEnabled] = useState(false);
+
+  const unread = useMemo(
+    () =>
+      items.filter((notification) => !notification.read_at)
+        .length,
+    [items],
+  );
+
+  useEffect(() => {
+    let channel:
+      | ReturnType<typeof supabase.channel>
+      | null = null;
+
+    let cancelled = false;
+
+    async function start() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user || cancelled) return;
+
+      const { data } = await supabase
+        .from("notifications")
+        .select(
+          "id,type,title,message,data,read_at,created_at",
+        )
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(30);
+
+      if (!cancelled) {
+        setItems((data || []) as NotificationItem[]);
+      }
+
+      channel = supabase
+        .channel(`notifications-${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            const notification =
+              payload.new as NotificationItem;
+
+            setItems((current) => [
+              notification,
+              ...current.filter(
+                (item) => item.id !== notification.id,
+              ),
+            ]);
+          },
+        )
+        .subscribe();
+
+      if (
+        "Notification" in window &&
+        window.Notification.permission === "granted"
+      ) {
+        setPushEnabled(true);
+      }
+    }
+
+    void start();
+
+    return () => {
+      cancelled = true;
+
+      if (channel) {
+        void supabase.removeChannel(channel);
+      }
+    };
+  }, []);
+
+  async function enablePush() {
+    if (
+      !("Notification" in window) ||
+      !("serviceWorker" in navigator) ||
+      !("PushManager" in window)
+    ) {
+      return;
+    }
+
+    const publicKey =
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+
+    if (!publicKey) {
+      console.error(
+        "NEXT_PUBLIC_VAPID_PUBLIC_KEY is missing.",
+      );
+      return;
+    }
+
+    const permission =
+      await window.Notification.requestPermission();
+
+    if (permission !== "granted") return;
+
+    const registration =
+      await navigator.serviceWorker.register("/sw.js");
+
+    let subscription =
+      await registration.pushManager.getSubscription();
+
+    if (!subscription) {
+      subscription =
+        await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey:
+            base64ToUint8Array(publicKey),
+        });
+    }
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) return;
+
+    const response = await fetch(
+      "/api/notifications/push/subscribe",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(subscription.toJSON()),
+      },
+    );
+
+    if (response.ok) {
+      setPushEnabled(true);
+    }
+  }
+
+  async function markRead(id: string) {
+    await supabase
+      .from("notifications")
+      .update({
+        read_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              read_at: new Date().toISOString(),
+            }
+          : item,
+      ),
+    );
+  }
+
+  async function markAllRead() {
+    const ids = items
+      .filter((item) => !item.read_at)
+      .map((item) => item.id);
+
+    if (!ids.length) return;
+
+    const timestamp = new Date().toISOString();
+
+    await supabase
+      .from("notifications")
+      .update({ read_at: timestamp })
+      .in("id", ids);
+
+    setItems((current) =>
+      current.map((item) => ({
+        ...item,
+        read_at: item.read_at || timestamp,
+      })),
+    );
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        aria-label="Notifications"
+        onClick={() => setOpen((value) => !value)}
+        className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
+      >
+        <BellIcon />
+
+        {unread > 0 && (
+          <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#C99A2E] px-1 text-[10px] font-bold text-white">
+            {unread > 9 ? "9+" : unread}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-12 z-[80] w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+            <div>
+              <p className="text-sm font-bold text-[#16294F]">
+                Notifications
+              </p>
+              <p className="text-xs text-slate-400">
+                Sales and withdrawal updates
+              </p>
+            </div>
+
+            {unread > 0 && (
+              <button
+                type="button"
+                onClick={() => void markAllRead()}
+                className="text-xs font-semibold text-[#16294F]"
+              >
+                Mark all read
+              </button>
+            )}
+          </div>
+
+          {!pushEnabled && (
+            <button
+              type="button"
+              onClick={() => void enablePush()}
+              className="m-3 w-[calc(100%-1.5rem)] rounded-lg border border-[#C99A2E]/40 bg-[#FCF8ED] px-3 py-2 text-left text-xs font-semibold text-[#705313]"
+            >
+              Enable external notifications on this device
+            </button>
+          )}
+
+          <div className="max-h-[420px] overflow-y-auto">
+            {items.length === 0 ? (
+              <div className="px-5 py-10 text-center text-sm text-slate-500">
+                No notifications yet.
+              </div>
+            ) : (
+              items.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => void markRead(item.id)}
+                  className={`block w-full border-b border-slate-100 px-4 py-4 text-left ${
+                    item.read_at
+                      ? "bg-white"
+                      : "bg-slate-50"
+                  }`}
+                >
+                  <div className="flex gap-3">
+                    <span
+                      className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                        item.read_at
+                          ? "bg-slate-200"
+                          : "bg-[#C99A2E]"
+                      }`}
+                    />
+
+                    <div>
+                      <p className="text-sm font-semibold text-[#16294F]">
+                        {item.title}
+                      </p>
+
+                      <p className="mt-1 text-xs leading-5 text-slate-500">
+                        {item.message}
+                      </p>
+
+                      <p className="mt-2 text-[10px] text-slate-400">
+                        {relativeTime(item.created_at)} ago
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

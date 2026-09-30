@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
+import NotificationCenter from "@/components/notifications/NotificationCenter";
 
 export type AppArea = "seller" | "admin";
 
@@ -259,13 +260,7 @@ export default function AppShell({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
-            >
-              <Icon name="bell" size={18} />
-            </button>
+<NotificationCenter />
 
             <Link
               href="/dashboard/profile"

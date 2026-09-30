@@ -330,24 +330,46 @@ export default function AdminWithdrawalsPage() {
     setActionLoading(true);
     setActionError("");
 
-    const { error } = await supabase.rpc(
-      "admin_update_withdrawal_status",
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setActionError("Your admin session has expired.");
+      setActionLoading(false);
+      return;
+    }
+
+    const response = await fetch(
+      "/api/admin/withdrawals/status",
       {
-        p_withdrawal_id: selected.id,
-        p_status: status,
-        p_note:
-          status === "rejeitado"
-            ? rejectionReason.trim()
-            : actionNote.trim() || null,
-        p_payment_reference:
-          status === "pago"
-            ? paymentReference.trim()
-            : null,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          withdrawal_id: selected.id,
+          status,
+          note:
+            status === "rejeitado"
+              ? rejectionReason.trim()
+              : actionNote.trim() || null,
+          payment_reference:
+            status === "pago"
+              ? paymentReference.trim()
+              : null,
+        }),
       },
     );
 
-    if (error) {
-      setActionError(error.message);
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      setActionError(
+        result?.error ||
+          "Failed to update withdrawal.",
+      );
       setActionLoading(false);
       return;
     }

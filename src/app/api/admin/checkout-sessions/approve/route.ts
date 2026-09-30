@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { dispatchNotification } from "@/lib/notifications/server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -70,9 +71,25 @@ export async function POST(request: Request) {
       );
     }
 
+    const saleId = Array.isArray(data)
+      ? data[0]?.sale_id
+      : data?.sale_id;
+
+    if (saleId) {
+      const { data: notification } = await admin
+        .from("notifications")
+        .select("id")
+        .eq("event_key", `sale_confirmed:${saleId}`)
+        .maybeSingle();
+
+      if (notification?.id) {
+        await dispatchNotification(notification.id);
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      sale_id: Array.isArray(data) ? data[0]?.sale_id : data?.sale_id,
+      sale_id: saleId,
     });
   } catch (error) {
     console.error("Admin checkout approval error:", error);
