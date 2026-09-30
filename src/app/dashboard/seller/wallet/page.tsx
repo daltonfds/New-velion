@@ -171,7 +171,7 @@ export default function SellerWalletPage() {
       };
     });
 
-    entries.forEach((entry) => {
+    filtered.forEach((entry) => {
       const d = new Date(entry.created_at);
 
       const month = months.find(
@@ -188,16 +188,16 @@ export default function SellerWalletPage() {
         ...months.map((month) => Math.abs(month.value)),
         1,
       ),
-      inflow: entries
+      inflow: filtered
         .filter((entry) => entry.valor > 0)
         .reduce((sum, entry) => sum + Number(entry.valor), 0),
       outflow: Math.abs(
-        entries
+        filtered
           .filter((entry) => entry.valor < 0)
           .reduce((sum, entry) => sum + Number(entry.valor), 0),
       ),
     };
-  }, [entries]);
+  }, [filtered]);
 
   const badge = (state: Entry["estado"]) => {
     if (state === "disponivel")

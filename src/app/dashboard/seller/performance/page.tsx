@@ -40,7 +40,10 @@ export default function SellerPerformancePage() {
         return;
       }
 
-      const financial = await getSellerFinancialSummary(user.id);
+      const days =
+        period === "all" ? null : Number(period.replace("d", ""));
+
+      const financial = await getSellerFinancialSummary(user.id, days);
       setFinancialSummary(financial);
 
       const { data, error: queryError } = await supabase
@@ -73,7 +76,7 @@ export default function SellerPerformancePage() {
     }
 
     load();
-  }, []);
+  }, [period]);
 
   const filteredSales = useMemo(() => {
     if (period === "all") return sales;
@@ -108,7 +111,9 @@ export default function SellerPerformancePage() {
     const commissions = financialSummary?.commission_earned ?? 0;
 
     const averageOrder =
-      paid.length > 0 ? revenue / paid.length : 0;
+      (financialSummary?.sales_count ?? 0) > 0
+        ? revenue / (financialSummary?.sales_count ?? 1)
+        : 0;
 
     const products = new Set(
       paid.map((sale) => sale.product_id),

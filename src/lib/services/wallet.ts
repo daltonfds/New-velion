@@ -18,14 +18,14 @@ export async function getWalletSummary(
   const summary = await getSellerFinancialSummary(vendedorId);
 
   return {
-    disponivel: summary.available_balance,
-    retido: summary.guarantee_retained,
-    reservado: summary.reserved,
-    saldo_total: summary.total_balance,
-    sales_count: summary.sales_count,
-    gross_sales: summary.gross_sales,
-    commission_earned: summary.commission_earned,
-    commission_available: summary.commission_available,
-    guarantee_retained: summary.guarantee_retained,
+    disponivel: Number(summary.available_balance),
+    retido: Number(summary.guarantee_retained),
+    reservado: Number(summary.reserved),
+    saldo_total: Number(summary.total_balance),
+    sales_count: Number(summary.sales_count),
+    gross_sales: Number(summary.gross_sales),
+    commission_earned: Number(summary.commission_earned),
+    commission_available: Number(summary.commission_available),
+    guarantee_retained: Number(summary.guarantee_retained),
   };
 }
