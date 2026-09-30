@@ -896,7 +896,16 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </footer>
+      <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-slate-500">
+  <a href="/terms" className="hover:text-[#16294F]">Terms</a>
+  <a href="/privacy" className="hover:text-[#16294F]">Privacy</a>
+  <a href="/cookies" className="hover:text-[#16294F]">Cookies</a>
+  <a href="/refund-policy" className="hover:text-[#16294F]">Refunds</a>
+  <a href="/seller-terms" className="hover:text-[#16294F]">Seller Terms</a>
+  <a href="/acceptable-use" className="hover:text-[#16294F]">Acceptable Use</a>
+  <a href="/support" className="hover:text-[#16294F]">Support</a>
+</div>
+</footer>
     </main>
   );
 }
