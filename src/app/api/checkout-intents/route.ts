@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     const form = await request.formData();
 
     const affiliateLink = String(form.get("affiliate_link") || "").trim();
+    console.log("[checkout] affiliate_link:", JSON.stringify(affiliateLink));
 
     const fullName = String(form.get("full_name") || "").trim();
     const phone = String(form.get("phone") || "").trim();
@@ -56,6 +57,8 @@ export async function POST(request: Request) {
     const canonicalLink = normalizedLink.startsWith("go/")
       ? normalizedLink
       : `go/${normalizedLink}`;
+
+    console.log("[checkout] canonicalLink:", JSON.stringify(canonicalLink));
 
     const { data: affiliation, error: affiliationError } = await supabase
       .from("affiliations")
