@@ -141,6 +141,23 @@ export default async function AffiliateProductPage({
                 />
               </div>
 
+              <div>
+                <label
+                  htmlFor="email"
+                  className="text-sm font-medium text-slate-900"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-900"
+                  placeholder="you@example.com"
+                />
+              </div>
+
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label
