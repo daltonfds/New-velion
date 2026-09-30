@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     const { data: session, error: sessionError } = await supabase
       .from("checkout_sessions")
-      .select("id,status")
+      .select("id,status,payment_comparison_status")
       .eq("id", sessionId)
       .maybeSingle();
 
@@ -77,6 +77,19 @@ export async function POST(request: NextRequest) {
     if (session.status === "approved") {
       return NextResponse.json(
         { error: "Approved sessions cannot be changed." },
+        { status: 409 },
+      );
+    }
+
+    if (
+      status === "paid_pending_review" &&
+      session.payment_comparison_status !== "matched"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Register and match the external payment before marking the session as paid.",
+        },
         { status: 409 },
       );
     }

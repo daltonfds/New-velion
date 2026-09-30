@@ -22,6 +22,16 @@ type Session = {
   seller_id: string;
   product_id: string;
   affiliate_link: string;
+  payment_comparison_status: string;
+  external_payment_reference: string | null;
+  external_payment_amount: number | null;
+  external_payment_currency: string | null;
+  external_payment_paid_at: string | null;
+  external_payment_method: string | null;
+  external_customer_name: string | null;
+  external_customer_phone: string | null;
+  external_customer_email: string | null;
+  external_payment_notes: string | null;
 };
 
 export default function AdminCheckoutSessionsPage() {
@@ -29,6 +39,18 @@ export default function AdminCheckoutSessionsPage() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Session | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [paymentSaving, setPaymentSaving] = useState(false);
+  const [payment, setPayment] = useState({
+    reference: "",
+    amount: "",
+    currency: "",
+    paidAt: "",
+    method: "",
+    customerName: "",
+    customerPhone: "",
+    customerEmail: "",
+    notes: "",
+  });
 
   async function loadSessions() {
     setLoading(true);
@@ -36,7 +58,7 @@ export default function AdminCheckoutSessionsPage() {
     const { data, error } = await supabase
       .from("checkout_sessions")
       .select(
-        "id,created_at,status,full_name,phone,whatsapp,email,country,province,city,postal_code,address,address_reference,amount,currency,seller_id,product_id,affiliate_link"
+        "id,created_at,status,full_name,phone,whatsapp,email,country,province,city,postal_code,address,address_reference,amount,currency,seller_id,product_id,affiliate_link,payment_comparison_status,external_payment_reference,external_payment_amount,external_payment_currency,external_payment_paid_at,external_payment_method,external_customer_name,external_customer_phone,external_customer_email,external_payment_notes"
       )
       .order("created_at", { ascending: false });
 
@@ -50,6 +72,92 @@ export default function AdminCheckoutSessionsPage() {
   useEffect(() => {
     loadSessions();
   }, []);
+
+  function openSession(session: Session) {
+    setSelected(session);
+    setError(null);
+    setPayment({
+      reference: session.external_payment_reference || "",
+      amount:
+        session.external_payment_amount != null
+          ? String(session.external_payment_amount)
+          : String(session.amount),
+      currency: session.external_payment_currency || session.currency,
+      paidAt: session.external_payment_paid_at
+        ? new Date(session.external_payment_paid_at).toISOString().slice(0, 16)
+        : "",
+      method: session.external_payment_method || "",
+      customerName: session.external_customer_name || "",
+      customerPhone: session.external_customer_phone || "",
+      customerEmail: session.external_customer_email || "",
+      notes: session.external_payment_notes || "",
+    });
+  }
+
+  async function registerExternalPayment() {
+    if (!selected) return;
+
+    setPaymentSaving(true);
+    setError(null);
+
+    try {
+      const { data, error: rpcError } = await supabase.rpc(
+        "record_external_payment",
+        {
+          p_session_id: selected.id,
+          p_external_payment_reference: payment.reference,
+          p_external_payment_amount: Number(payment.amount),
+          p_external_payment_currency: payment.currency,
+          p_external_payment_paid_at: payment.paidAt
+            ? new Date(payment.paidAt).toISOString()
+            : null,
+          p_external_payment_method: payment.method || null,
+          p_external_customer_name: payment.customerName || null,
+          p_external_customer_phone: payment.customerPhone || null,
+          p_external_customer_email: payment.customerEmail || null,
+          p_external_payment_notes: payment.notes || null,
+        }
+      );
+
+      if (rpcError) throw rpcError;
+
+      await loadSessions();
+
+      const { data: refreshed, error: refreshError } = await supabase
+        .from("checkout_sessions")
+        .select(
+          "id,created_at,status,full_name,phone,whatsapp,email,country,province,city,postal_code,address,address_reference,amount,currency,seller_id,product_id,affiliate_link,payment_comparison_status,external_payment_reference,external_payment_amount,external_payment_currency,external_payment_paid_at,external_payment_method,external_customer_name,external_customer_phone,external_customer_email,external_payment_notes"
+        )
+        .eq("id", selected.id)
+        .maybeSingle();
+
+      if (refreshError) throw refreshError;
+
+      if (refreshed) {
+        openSession(refreshed as Session);
+      }
+
+      const result = Array.isArray(data) ? data[0] : data;
+
+      if (result?.comparison_status === "mismatch") {
+        setError(
+          "Payment mismatch: amount or currency does not match the NewVelion order."
+        );
+      } else if (result?.comparison_status === "review") {
+        setError(
+          "Payment recorded, but the external customer information requires review."
+        );
+      }
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Failed to register external payment."
+      );
+    } finally {
+      setPaymentSaving(false);
+    }
+  }
 
   async function updateStatus(sessionId: string, status: string) {
     setError(null);
@@ -207,10 +315,10 @@ export default function AdminCheckoutSessionsPage() {
                       <td className="px-5 py-4 text-right">
                         <button
                           type="button"
-                          onClick={() => setSelected(session)}
+                          onClick={() => openSession(session)}
                           className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
                         >
-                          View
+                          Review
                         </button>
                       </td>
                     </tr>
@@ -245,6 +353,198 @@ export default function AdminCheckoutSessionsPage() {
             </div>
 
             <div className="grid gap-6 p-6 sm:grid-cols-2">
+              <div className="sm:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                      Payment verification
+                    </p>
+                    <h3 className="mt-1 text-lg font-semibold text-slate-950">
+                      Compare external payment
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Compare the payment received from PayJSR or another external checkout with the order captured by NewVelion.
+                    </p>
+                  </div>
+                  <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
+                    {selected.payment_comparison_status === "matched"
+                      ? "Matched"
+                      : selected.payment_comparison_status === "mismatch"
+                        ? "Mismatch"
+                        : selected.payment_comparison_status === "review"
+                          ? "Needs review"
+                          : "Not checked"}
+                  </span>
+                </div>
+
+                <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs text-slate-500">NewVelion amount</p>
+                    <p className="mt-1 text-lg font-semibold text-slate-950">
+                      {Number(selected.amount).toLocaleString("pt-MZ", {
+                        minimumFractionDigits: 2,
+                      })}{" "}
+                      {selected.currency}
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs text-slate-500">External amount</p>
+                    <p className="mt-1 text-lg font-semibold text-slate-950">
+                      {selected.external_payment_amount == null
+                        ? "Not registered"
+                        : `${Number(
+                            selected.external_payment_amount
+                          ).toLocaleString("pt-MZ", {
+                            minimumFractionDigits: 2,
+                          })} ${selected.external_payment_currency || ""}`}
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs text-slate-500">Payment reference</p>
+                    <p className="mt-1 break-all text-sm font-semibold text-slate-950">
+                      {selected.external_payment_reference || "Not registered"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <label className="text-xs font-semibold text-slate-600">
+                    External payment reference *
+                    <input
+                      value={payment.reference}
+                      onChange={(e) =>
+                        setPayment({ ...payment, reference: e.target.value })
+                      }
+                      placeholder="Transaction ID / payment reference"
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                    />
+                  </label>
+
+                  <label className="text-xs font-semibold text-slate-600">
+                    External amount *
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={payment.amount}
+                      onChange={(e) =>
+                        setPayment({ ...payment, amount: e.target.value })
+                      }
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                    />
+                  </label>
+
+                  <label className="text-xs font-semibold text-slate-600">
+                    External currency *
+                    <input
+                      value={payment.currency}
+                      onChange={(e) =>
+                        setPayment({
+                          ...payment,
+                          currency: e.target.value.toUpperCase(),
+                        })
+                      }
+                      placeholder="ZAR"
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm uppercase outline-none focus:border-slate-500"
+                    />
+                  </label>
+
+                  <label className="text-xs font-semibold text-slate-600">
+                    Payment date
+                    <input
+                      type="datetime-local"
+                      value={payment.paidAt}
+                      onChange={(e) =>
+                        setPayment({ ...payment, paidAt: e.target.value })
+                      }
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                    />
+                  </label>
+
+                  <label className="text-xs font-semibold text-slate-600">
+                    Payment method
+                    <input
+                      value={payment.method}
+                      onChange={(e) =>
+                        setPayment({ ...payment, method: e.target.value })
+                      }
+                      placeholder="PayJSR / M-Pesa / Card"
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                    />
+                  </label>
+
+                  <label className="text-xs font-semibold text-slate-600">
+                    External customer name
+                    <input
+                      value={payment.customerName}
+                      onChange={(e) =>
+                        setPayment({
+                          ...payment,
+                          customerName: e.target.value,
+                        })
+                      }
+                      placeholder={selected.full_name}
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                    />
+                  </label>
+
+                  <label className="text-xs font-semibold text-slate-600">
+                    External customer phone
+                    <input
+                      value={payment.customerPhone}
+                      onChange={(e) =>
+                        setPayment({
+                          ...payment,
+                          customerPhone: e.target.value,
+                        })
+                      }
+                      placeholder={selected.phone}
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                    />
+                  </label>
+
+                  <label className="text-xs font-semibold text-slate-600">
+                    External customer email
+                    <input
+                      type="email"
+                      value={payment.customerEmail}
+                      onChange={(e) =>
+                        setPayment({
+                          ...payment,
+                          customerEmail: e.target.value,
+                        })
+                      }
+                      placeholder={selected.email || "Customer email"}
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                    />
+                  </label>
+
+                  <label className="sm:col-span-2 text-xs font-semibold text-slate-600">
+                    Verification notes
+                    <textarea
+                      rows={3}
+                      value={payment.notes}
+                      onChange={(e) =>
+                        setPayment({ ...payment, notes: e.target.value })
+                      }
+                      placeholder="Optional notes about the external payment verification"
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                    />
+                  </label>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={paymentSaving}
+                  onClick={registerExternalPayment}
+                  className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  {paymentSaving
+                    ? "Comparing payment..."
+                    : "Register payment & compare"}
+                </button>
+              </div>
               <div>
                 <p className="text-xs font-medium text-slate-500">Full name</p>
                 <p className="mt-1 text-sm font-medium text-slate-900">
@@ -357,20 +657,14 @@ export default function AdminCheckoutSessionsPage() {
             <div className="flex flex-wrap gap-3 border-t border-slate-200 p-6">
               <button
                 type="button"
-                onClick={() =>
-                  updateStatus(selected.id, "paid_pending_review")
+                disabled={
+                  selected.payment_comparison_status !== "matched" ||
+                  selected.status !== "paid_pending_review"
                 }
-                className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-800"
-              >
-                Mark payment received
-              </button>
-
-              <button
-                type="button"
                 onClick={() => updateStatus(selected.id, "approved")}
-                className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white"
+                className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Approve
+                Approve sale
               </button>
 
               <button
