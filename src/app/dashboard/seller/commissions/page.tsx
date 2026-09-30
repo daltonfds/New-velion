@@ -79,7 +79,7 @@ export default function SellerCommissionsPage() {
     }
 
     load();
-  }, []);
+  }, [period]);
 
   const filteredCommissions = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -113,10 +113,10 @@ export default function SellerCommissionsPage() {
     );
 
     const totalCommission = financialSummary?.commission_earned ?? 0;
-
     const totalSalesValue = financialSummary?.gross_sales ?? 0;
-
     const retainedGuarantee = financialSummary?.guarantee_retained ?? 0;
+    const availableCommission = financialSummary?.commission_available ?? 0;
+    const totalBalance = financialSummary?.total_balance ?? 0;
 
     const refunded = filteredCommissions
       .filter((commission) => commission.status === "reembolsada")
@@ -141,7 +141,8 @@ export default function SellerCommissionsPage() {
       refunded,
       pending,
       paidCount: financialSummary?.sales_count ?? 0,
-      availableCommission: financialSummary?.commission_available ?? 0,
+      availableCommission,
+      totalBalance,
     };
   }, [filteredCommissions, financialSummary]);
 

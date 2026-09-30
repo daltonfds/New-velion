@@ -149,7 +149,7 @@ export default function SellerSalesPage() {
     const paid = sales.filter((sale) => sale.status === "paga");
 
     return {
-      sales: financialSummary?.sales_count ?? paid.length,
+      sales: financialSummary?.sales_count ?? 0,
       revenue: financialSummary?.gross_sales ?? 0,
       commissions: financialSummary?.commission_earned ?? 0,
       gatewayFees: paid.reduce(
