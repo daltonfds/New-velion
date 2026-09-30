@@ -31,6 +31,7 @@ export default function SellerLinksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
+  const [stats, setStats] = useState<Record<string, { clicks: number; sessions: number; approved: number }>>({});
 
   useEffect(() => {
     async function load() {
@@ -76,9 +77,49 @@ export default function SellerLinksPage() {
         return;
       }
 
-      setAffiliations(
-        (data ?? []) as unknown as Affiliation[],
-      );
+      const affiliationRows =
+        (data ?? []) as unknown as Affiliation[];
+
+      setAffiliations(affiliationRows);
+
+      const ids = affiliationRows.map((item) => item.id);
+
+      if (ids.length) {
+        const [{ data: clickRows }, { data: sessionRows }] =
+          await Promise.all([
+            supabase
+              .from("affiliate_clicks")
+              .select("affiliation_id")
+              .in("affiliation_id", ids),
+            supabase
+              .from("checkout_sessions")
+              .select("affiliation_id,status")
+              .in("affiliation_id", ids),
+          ]);
+
+        const nextStats: Record<string, { clicks: number; sessions: number; approved: number }> = {};
+
+        for (const id of ids) {
+          nextStats[id] = { clicks: 0, sessions: 0, approved: 0 };
+        }
+
+        for (const row of clickRows ?? []) {
+          if (nextStats[row.affiliation_id]) {
+            nextStats[row.affiliation_id].clicks += 1;
+          }
+        }
+
+        for (const row of sessionRows ?? []) {
+          if (nextStats[row.affiliation_id]) {
+            nextStats[row.affiliation_id].sessions += 1;
+            if (row.status === "approved") {
+              nextStats[row.affiliation_id].approved += 1;
+            }
+          }
+        }
+
+        setStats(nextStats);
+      }
 
       setLoading(false);
     }
@@ -341,6 +382,27 @@ export default function SellerLinksPage() {
                           </p>
                           <p className="mt-0.5 text-xs text-slate-500">
                             This link identifies you
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-3 gap-2">
+                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Clicks</p>
+                          <p className="mt-1 text-lg font-semibold text-slate-900">
+                            {stats[item.id]?.clicks ?? 0}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Leads</p>
+                          <p className="mt-1 text-lg font-semibold text-slate-900">
+                            {stats[item.id]?.sessions ?? 0}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Sales</p>
+                          <p className="mt-1 text-lg font-semibold text-slate-900">
+                            {stats[item.id]?.approved ?? 0}
                           </p>
                         </div>
                       </div>
