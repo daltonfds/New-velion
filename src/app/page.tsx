@@ -231,23 +231,23 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-white text-[#16294F]">
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
+      <header className="sticky top-0 z-50 border-b border-[#E2E8F0] bg-white">
+        <div className="mx-auto flex h-20 max-w-[1180px] items-center justify-between px-5 sm:px-8">
           <Link href="/" aria-label="Newvelion home">
             <NewvelionBrand size="sm" showTagline={false} />
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
-            <a href="#how-it-works" className="text-sm font-medium text-slate-600 hover:text-[#16294F]">
+            <a href="#how-it-works" className="text-sm font-medium text-[#475569] hover:text-[#16294F]">
               How it works
             </a>
-            <a href="#earnings" className="text-sm font-medium text-slate-600 hover:text-[#16294F]">
+            <a href="#earnings" className="text-sm font-medium text-[#475569] hover:text-[#16294F]">
               Earnings
             </a>
-            <a href="#payouts" className="text-sm font-medium text-slate-600 hover:text-[#16294F]">
+            <a href="#payouts" className="text-sm font-medium text-[#475569] hover:text-[#16294F]">
               Payments
             </a>
-            <a href="#faq" className="text-sm font-medium text-slate-600 hover:text-[#16294F]">
+            <a href="#faq" className="text-sm font-medium text-[#475569] hover:text-[#16294F]">
               FAQ
             </a>
           </nav>
@@ -255,7 +255,7 @@ export default function HomePage() {
           <div className="hidden items-center gap-3 md:flex">
             <Link
               href="/login"
-              className="rounded-lg px-4 py-2.5 text-sm font-semibold text-[#16294F] hover:bg-slate-50"
+              className="rounded-lg px-4 py-2.5 text-sm font-semibold text-[#16294F] hover:bg-[#F8FAFC]"
             >
               Log in
             </Link>
@@ -270,7 +270,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => setMobileMenu(!mobileMenu)}
-            className="rounded-lg border border-slate-200 p-2 md:hidden"
+            className="rounded-lg border border-[#E2E8F0] p-2 md:hidden"
             aria-label="Open menu"
           >
             <Icon name={mobileMenu ? "x" : "menu"} />
@@ -278,7 +278,7 @@ export default function HomePage() {
         </div>
 
         {mobileMenu && (
-          <div className="border-t border-slate-200 bg-white px-5 py-5 md:hidden">
+          <div className="border-t border-[#E2E8F0] bg-white px-5 py-5 md:hidden">
             <div className="flex flex-col gap-4">
               <a href="#how-it-works" onClick={() => setMobileMenu(false)} className="font-medium">
                 How it works
@@ -292,8 +292,8 @@ export default function HomePage() {
               <a href="#faq" onClick={() => setMobileMenu(false)} className="font-medium">
                 FAQ
               </a>
-              <div className="flex gap-3 border-t border-slate-200 pt-4">
-                <Link href="/login" className="flex-1 rounded-lg border border-slate-200 py-3 text-center text-sm font-semibold">
+              <div className="flex gap-3 border-t border-[#E2E8F0] pt-4">
+                <Link href="/login" className="flex-1 rounded-lg border border-[#E2E8F0] py-3 text-center text-sm font-semibold">
                   Log in
                 </Link>
                 <Link href="/register" className="flex-1 rounded-lg bg-[#16294F] py-3 text-center text-sm font-semibold text-white">
@@ -305,22 +305,22 @@ export default function HomePage() {
         )}
       </header>
 
-      <section className="border-b border-slate-200">
-        <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1.05fr_.95fr] lg:py-24">
+      <section className="border-b border-[#E2E8F0]">
+        <div className="mx-auto grid max-w-[1180px] items-center gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1.05fr_.95fr] lg:py-24">
           <div>
             <NewvelionBrand size="md" className="mb-10" />
 
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#C99A2E]/30 bg-[#C99A2E]/5 px-3 py-1.5 text-xs font-semibold text-[#8A6A18]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#C99A2E]" />
+            <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-[#C99A2E]/30 bg-[#C99A2E]/5 px-3 py-1.5 text-xs font-semibold text-[#8A6A18]">
+              <span className="h-1.5 w-1.5 rounded-lg bg-[#C99A2E]" />
               Commerce infrastructure for Southern Africa
             </div>
 
-            <h1 className="max-w-3xl text-5xl font-bold leading-[1.03] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
+            <h1 className="max-w-3xl text-5xl font-bold tracking-[-0.045em] leading-[1.03] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
               Sell products.
               <span className="block text-[#C99A2E]">We handle stock and delivery.</span>
             </h1>
 
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#475569] sm:text-xl">
               Newvelion is a dropshipping platform built for Mozambique and South Africa.
               Choose a product, share your unique link and earn a commission on every sale.
               You do not buy stock, pack orders or make deliveries.
@@ -336,13 +336,13 @@ export default function HomePage() {
               </Link>
               <a
                 href="#how-it-works"
-                className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-6 py-3.5 text-sm font-bold text-[#16294F] hover:bg-slate-50"
+                className="inline-flex items-center justify-center rounded-lg border border-[#CBD5E1] px-6 py-3.5 text-sm font-bold text-[#16294F] hover:bg-[#F8FAFC]"
               >
                 See how it works
               </a>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-600">
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#475569]">
               <span className="inline-flex items-center gap-2">
                 <Icon name="check" size={16} />
                 No monthly fees
@@ -359,11 +359,11 @@ export default function HomePage() {
           </div>
 
           <div className="relative">
-            <div className="border border-slate-200 bg-slate-50 p-4 sm:p-6">
-              <div className="border border-slate-200 bg-white">
-                <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <div className="border border-[#E2E8F0] bg-[#F8FAFC] p-4 sm:p-6">
+              <div className="border border-[#E2E8F0] bg-white">
+                <div className="flex items-center justify-between border-b border-[#E2E8F0] px-5 py-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
                       Seller performance
                     </p>
                     <p className="mt-1 text-lg font-bold">Commissions · 30 days</p>
@@ -376,13 +376,13 @@ export default function HomePage() {
                 <div className="p-5">
                   <div className="flex items-end justify-between">
                     <div>
-                      <p className="text-sm text-slate-500">Commissions in the last 30 days</p>
-                      <p className="mt-1 text-4xl font-bold tracking-tight">R6,120</p>
+                      <p className="text-sm text-[#64748B]">Commissions in the last 30 days</p>
+                      <p className="mt-1 text-4xl font-bold tracking-[-0.035em] tracking-tight">R6,120</p>
                     </div>
                     <span className="text-sm font-semibold text-emerald-600">+18.4%</span>
                   </div>
 
-                  <div className="mt-8 flex h-40 items-end gap-3 border-b border-slate-200">
+                  <div className="mt-8 flex h-40 items-end gap-3 border-b border-[#E2E8F0]">
                     {[34, 49, 42, 65, 58, 76, 68, 91, 78, 100, 84, 96].map((height, i) => (
                       <div key={i} className="flex h-full flex-1 items-end">
                         <div
@@ -393,15 +393,15 @@ export default function HomePage() {
                     ))}
                   </div>
 
-                  <div className="mt-2 flex justify-between text-[11px] text-slate-400">
+                  <div className="mt-2 flex justify-between text-[11px] text-[#94A3B8]">
                     <span>Week 1</span>
                     <span>Week 2</span>
                     <span>Week 3</span>
                     <span>Week 4</span>
                   </div>
 
-                  <div className="mt-6 border-t border-slate-200 pt-5">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <div className="mt-6 border-t border-[#E2E8F0] pt-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
                       New sale through your link
                     </p>
                     <div className="mt-2 flex items-center justify-between">
@@ -413,17 +413,17 @@ export default function HomePage() {
               </div>
 
               <div className="mt-4 grid grid-cols-3 gap-3">
-                <div className="border border-slate-200 bg-white p-4">
+                <div className="border border-[#E2E8F0] bg-white p-4">
                   <p className="text-2xl font-bold">Up to 30%</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">commission per sale</p>
+                  <p className="mt-1 text-xs leading-5 text-[#64748B]">commission per sale</p>
                 </div>
-                <div className="border border-slate-200 bg-white p-4">
+                <div className="border border-[#E2E8F0] bg-white p-4">
                   <p className="text-2xl font-bold">30 days</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">attribution cookie</p>
+                  <p className="mt-1 text-xs leading-5 text-[#64748B]">attribution cookie</p>
                 </div>
-                <div className="border border-slate-200 bg-white p-4">
+                <div className="border border-[#E2E8F0] bg-white p-4">
                   <p className="text-2xl font-bold">2 markets</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">Mozambique & South Africa</p>
+                  <p className="mt-1 text-xs leading-5 text-[#64748B]">Mozambique & South Africa</p>
                 </div>
               </div>
             </div>
@@ -431,22 +431,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="border-b border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
+      <section id="how-it-works" className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
+        <div className="mx-auto max-w-[1180px] px-5 py-20 sm:px-8 lg:py-28">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#C99A2E]">
               How it works
             </p>
-            <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            <h2 className="mt-3 text-4xl font-bold tracking-[-0.035em] tracking-tight sm:text-5xl">
               The simpler way to sell online
             </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-600">
+            <p className="mt-5 text-lg leading-8 text-[#475569]">
               From your phone to the customer, every stage has a clear owner.
               You make the sale; the platform handles the rest.
             </p>
           </div>
 
-          <div className="mt-14 grid gap-px overflow-hidden border border-slate-200 bg-slate-200 md:grid-cols-5">
+          <div className="mt-14 grid gap-px overflow-hidden border border-[#E2E8F0] bg-slate-200 md:grid-cols-5">
             {[
               ["01", "Choose", "Browse the catalog, commission and final customer price.", "box"],
               ["02", "Share", "Copy your unique link and send it through WhatsApp or social media.", "link"],
@@ -462,25 +462,25 @@ export default function HomePage() {
                   </span>
                 </div>
                 <h3 className="mt-10 text-xl font-bold">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{text}</p>
+                <p className="mt-3 text-sm leading-6 text-[#475569]">{text}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-6 text-sm font-semibold text-slate-500">
+          <p className="mt-6 text-sm font-semibold text-[#64748B]">
             The steps in gold are yours. The remaining steps belong to the platform.
           </p>
 
           <div className="mt-16 grid gap-6 lg:grid-cols-2">
-            <div className="border border-slate-200 bg-white p-7 sm:p-9">
-              <p className="text-sm font-bold uppercase tracking-wider text-slate-400">
+            <div className="border border-[#E2E8F0] bg-white p-7 sm:p-9">
+              <p className="text-sm font-bold uppercase tracking-wider text-[#94A3B8]">
                 Selling on your own
               </p>
               <h3 className="mt-3 text-2xl font-bold">More work before every sale</h3>
               <ul className="mt-7 space-y-4">
                 {comparison.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm leading-6 text-slate-600">
-                    <span className="mt-1 text-slate-400">
+                  <li key={item} className="flex gap-3 text-sm leading-6 text-[#475569]">
+                    <span className="mt-1 text-[#94A3B8]">
                       <Icon name="x" size={16} />
                     </span>
                     {item}
@@ -501,7 +501,7 @@ export default function HomePage() {
                   "Checkout and payment experience ready",
                   "You earn when an eligible sale happens",
                 ].map((item) => (
-                  <li key={item} className="flex gap-3 text-sm leading-6 text-slate-600">
+                  <li key={item} className="flex gap-3 text-sm leading-6 text-[#475569]">
                     <span className="mt-1 text-[#C99A2E]">
                       <Icon name="check" size={16} />
                     </span>
@@ -514,23 +514,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="earnings" className="border-b border-slate-200">
-        <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
+      <section id="earnings" className="border-b border-[#E2E8F0]">
+        <div className="mx-auto max-w-[1180px] px-5 py-20 sm:px-8 lg:py-28">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#C99A2E]">
               Earnings simulator
             </p>
-            <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            <h2 className="mt-3 text-4xl font-bold tracking-[-0.035em] tracking-tight sm:text-5xl">
               See what you could earn per sale
             </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-600">
+            <p className="mt-5 text-lg leading-8 text-[#475569]">
               Adjust the values and see an illustrative amount reaching your wallet.
               No hidden fees are included in this example.
             </p>
           </div>
 
-          <div className="mt-14 grid overflow-hidden border border-slate-200 lg:grid-cols-[1fr_1fr]">
-            <div className="space-y-8 bg-slate-50 p-7 sm:p-10">
+          <div className="mt-14 grid overflow-hidden border border-[#E2E8F0] lg:grid-cols-[1fr_1fr]">
+            <div className="space-y-8 bg-[#F8FAFC] p-7 sm:p-10">
               <div>
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-bold">Sale value</label>
@@ -580,7 +580,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-[#16294F] p-7 text-white sm:p-10">
+            <div className="bg-[#0F1F3D] p-7 text-white sm:p-10">
               <p className="text-sm font-semibold text-slate-300">Illustrative calculation</p>
 
               <div className="mt-8 space-y-5">
@@ -601,11 +601,11 @@ export default function HomePage() {
 
                 <div className="pt-2">
                   <p className="text-sm text-slate-300">Estimated monthly net</p>
-                  <p className="mt-2 text-4xl font-bold">{money(earnings.monthly)}</p>
+                  <p className="mt-2 text-4xl font-bold tracking-[-0.035em]">{money(earnings.monthly)}</p>
                 </div>
               </div>
 
-              <p className="mt-8 text-xs leading-5 text-slate-400">
+              <p className="mt-8 text-xs leading-5 text-[#94A3B8]">
                 *The withdrawal fee is applied when funds are withdrawn. Values are illustrative
                 and may not represent your actual withdrawal conditions.
               </p>
@@ -614,16 +614,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
+      <section className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
+        <div className="mx-auto max-w-[1180px] px-5 py-20 sm:px-8 lg:py-28">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#C99A2E]">
               Built for sellers
             </p>
-            <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            <h2 className="mt-3 text-4xl font-bold tracking-[-0.035em] tracking-tight sm:text-5xl">
               Everything you need to sell seriously
             </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-600">
+            <p className="mt-5 text-lg leading-8 text-[#475569]">
               Business tools designed to work well on your phone, without unnecessary complexity.
             </p>
           </div>
@@ -632,29 +632,29 @@ export default function HomePage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="border border-slate-200 bg-white p-7 transition hover:border-[#C99A2E]"
+                className="border border-[#E2E8F0] bg-white p-7 transition hover:border-[#C99A2E]"
               >
                 <div className="flex h-11 w-11 items-center justify-center border border-[#C99A2E]/30 bg-[#C99A2E]/5 text-[#8A6A18]">
                   <Icon name={feature.icon} size={21} />
                 </div>
                 <h3 className="mt-6 text-lg font-bold">{feature.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{feature.text}</p>
+                <p className="mt-3 text-sm leading-6 text-[#475569]">{feature.text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-b border-slate-200">
-        <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-20 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:py-28">
+      <section className="border-b border-[#E2E8F0]">
+        <div className="mx-auto grid max-w-[1180px] items-center gap-14 px-5 py-20 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:py-28">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#C99A2E]">
               Seller dashboard
             </p>
-            <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            <h2 className="mt-3 text-4xl font-bold tracking-[-0.035em] tracking-tight sm:text-5xl">
               A clear dashboard, without surprises
             </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-600">
+            <p className="mt-5 text-lg leading-8 text-[#475569]">
               See what you sold, what is being held and what is already available to withdraw.
             </p>
 
@@ -670,18 +670,18 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h3 className="font-bold">{title}</h3>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">{text}</p>
+                    <p className="mt-1 text-sm leading-6 text-[#475569]">{text}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="border border-slate-200 bg-slate-50 p-4 sm:p-6">
-            <div className="border border-slate-200 bg-white">
-              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
+          <div className="border border-[#E2E8F0] bg-[#F8FAFC] p-4 sm:p-6">
+            <div className="border border-[#E2E8F0] bg-white">
+              <div className="flex items-center justify-between border-b border-[#E2E8F0] px-5 py-5">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
                     Seller wallet
                   </p>
                   <p className="mt-1 text-xl font-bold">Available balance</p>
@@ -689,17 +689,17 @@ export default function HomePage() {
                 <Icon name="wallet" size={24} />
               </div>
 
-              <div className="grid grid-cols-3 border-b border-slate-200">
+              <div className="grid grid-cols-3 border-b border-[#E2E8F0]">
                 <div className="p-5">
-                  <p className="text-xs text-slate-400">Available</p>
+                  <p className="text-xs text-[#94A3B8]">Available</p>
                   <p className="mt-1 text-xl font-bold">R4,275</p>
                 </div>
-                <div className="border-l border-slate-200 p-5">
-                  <p className="text-xs text-slate-400">Sales (30d)</p>
+                <div className="border-l border-[#E2E8F0] p-5">
+                  <p className="text-xs text-[#94A3B8]">Sales (30d)</p>
                   <p className="mt-1 text-xl font-bold">38</p>
                 </div>
-                <div className="border-l border-slate-200 p-5">
-                  <p className="text-xs text-slate-400">Conversion</p>
+                <div className="border-l border-[#E2E8F0] p-5">
+                  <p className="text-xs text-[#94A3B8]">Conversion</p>
                   <p className="mt-1 text-xl font-bold">6.2%</p>
                 </div>
               </div>
@@ -713,17 +713,17 @@ export default function HomePage() {
                 ].map(([name, value]) => (
                   <div key={name} className="flex items-center justify-between px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 border border-slate-200 bg-slate-50" />
+                      <div className="h-8 w-8 border border-[#E2E8F0] bg-[#F8FAFC]" />
                       <span className="text-sm font-medium">{name}</span>
                     </div>
-                    <span className={`text-sm font-bold ${value.startsWith("+") ? "text-emerald-600" : "text-slate-600"}`}>
+                    <span className={`text-sm font-bold ${value.startsWith("+") ? "text-emerald-600" : "text-[#475569]"}`}>
                       {value}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="border-t border-slate-200 px-5 py-4 text-xs text-slate-400">
+              <div className="border-t border-[#E2E8F0] px-5 py-4 text-xs text-[#94A3B8]">
                 Example data for illustration.
               </div>
             </div>
@@ -731,23 +731,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="payouts" className="border-b border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
+      <section id="payouts" className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
+        <div className="mx-auto max-w-[1180px] px-5 py-20 sm:px-8 lg:py-28">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#C99A2E]">
               Payouts
             </p>
-            <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            <h2 className="mt-3 text-4xl font-bold tracking-[-0.035em] tracking-tight sm:text-5xl">
               Withdraw in your country, your way
             </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-600">
+            <p className="mt-5 text-lg leading-8 text-[#475569]">
               Payment methods are adapted to your location, with processing depending on the
               selected method and verification requirements.
             </p>
           </div>
 
           <div className="mt-14 grid gap-5 lg:grid-cols-2">
-            <div className="border border-slate-200 bg-white p-7 sm:p-9">
+            <div className="border border-[#E2E8F0] bg-white p-7 sm:p-9">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-3xl">🇲🇿</span>
@@ -765,13 +765,13 @@ export default function HomePage() {
                 ].map(([title, text]) => (
                   <div key={title} className="py-5 first:pt-0 last:pb-0">
                     <h4 className="font-bold">{title}</h4>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">{text}</p>
+                    <p className="mt-1 text-sm leading-6 text-[#475569]">{text}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="border border-slate-200 bg-white p-7 sm:p-9">
+            <div className="border border-[#E2E8F0] bg-white p-7 sm:p-9">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-3xl">🇿🇦</span>
@@ -784,17 +784,17 @@ export default function HomePage() {
               <div className="mt-8 divide-y divide-slate-200">
                 <div className="py-5 first:pt-0">
                   <h4 className="font-bold">Bank transfer</h4>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                  <p className="mt-1 text-sm leading-6 text-[#475569]">
                     Major banks supported, subject to processing and verification.
                   </p>
                 </div>
                 <div className="py-5">
                   <h4 className="font-bold">Identity verification</h4>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                  <p className="mt-1 text-sm leading-6 text-[#475569]">
                     The account holder must match the verified seller profile to protect your funds.
                   </p>
                 </div>
-                <div className="flex items-center gap-3 pt-5 text-sm text-slate-500">
+                <div className="flex items-center gap-3 pt-5 text-sm text-[#64748B]">
                   <Icon name="clock" size={18} />
                   Processing time can vary by payment method.
                 </div>
@@ -804,18 +804,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="faq" className="border-b border-slate-200">
+      <section id="faq" className="border-b border-[#E2E8F0]">
         <div className="mx-auto max-w-4xl px-5 py-20 sm:px-8 lg:py-28">
           <div className="text-center">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#C99A2E]">
               FAQ
             </p>
-            <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            <h2 className="mt-3 text-4xl font-bold tracking-[-0.035em] tracking-tight sm:text-5xl">
               Frequently asked questions
             </h2>
           </div>
 
-          <div className="mt-12 divide-y divide-slate-200 border-y border-slate-200">
+          <div className="mt-12 divide-y divide-slate-200 border-y border-[#E2E8F0]">
             {faqs.map((faq) => (
               <details key={faq.q} className="group py-6">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-5 text-left font-bold">
@@ -824,17 +824,17 @@ export default function HomePage() {
                     <Icon name="x" size={20} />
                   </span>
                 </summary>
-                <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">{faq.a}</p>
+                <p className="mt-4 max-w-3xl text-sm leading-7 text-[#475569]">{faq.a}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-[#16294F]">
+      <section className="bg-[#0F1F3D]">
         <div className="mx-auto max-w-5xl px-5 py-20 text-center sm:px-8 lg:py-24">
           <NewvelionBrand size="md" className="justify-center [&_span]:!text-white" />
-          <h2 className="mt-10 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          <h2 className="mt-10 text-4xl font-bold tracking-[-0.035em] tracking-tight text-white sm:text-5xl">
             Your first commission is one link away.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
@@ -851,11 +851,11 @@ export default function HomePage() {
       </section>
 
       <footer className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
+        <div className="mx-auto max-w-[1180px] px-5 py-14 sm:px-8">
           <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
             <div>
               <NewvelionBrand size="sm" />
-              <p className="mt-5 max-w-md text-sm leading-6 text-slate-500">
+              <p className="mt-5 max-w-md text-sm leading-6 text-[#64748B]">
                 Commerce infrastructure for Mozambique and South Africa.
                 Sell without inventory and grow without managing fulfilment yourself.
               </p>
@@ -863,7 +863,7 @@ export default function HomePage() {
 
             <div>
               <h3 className="text-sm font-bold">Platform</h3>
-              <div className="mt-5 space-y-3 text-sm text-slate-500">
+              <div className="mt-5 space-y-3 text-sm text-[#64748B]">
                 <a href="#how-it-works" className="block hover:text-[#16294F]">How it works</a>
                 <a href="#earnings" className="block hover:text-[#16294F]">Earnings simulator</a>
                 <a href="#payouts" className="block hover:text-[#16294F]">Payments</a>
@@ -873,7 +873,7 @@ export default function HomePage() {
 
             <div>
               <h3 className="text-sm font-bold">Contact</h3>
-              <div className="mt-5 space-y-3 text-sm text-slate-500">
+              <div className="mt-5 space-y-3 text-sm text-[#64748B]">
                 <a href="mailto:contact@newvelion.com" className="block hover:text-[#16294F]">
                   contact@newvelion.com
                 </a>
@@ -887,7 +887,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col gap-4 border-t border-slate-200 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-12 flex flex-col gap-4 border-t border-[#E2E8F0] pt-6 text-xs text-[#94A3B8] sm:flex-row sm:items-center sm:justify-between">
             <span>© 2026 Newvelion</span>
             <div className="flex gap-5">
               <Link href="/terms" className="hover:text-[#16294F]">Terms</Link>
@@ -896,7 +896,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-slate-500">
+      <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-[#64748B]">
   <a href="/terms" className="hover:text-[#16294F]">Terms</a>
   <a href="/privacy" className="hover:text-[#16294F]">Privacy</a>
   <a href="/cookies" className="hover:text-[#16294F]">Cookies</a>
