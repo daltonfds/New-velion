@@ -5,7 +5,6 @@ import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { supabase } from "@/lib/supabase";
-import { getWalletSummary } from "@/lib/services/wallet";
 import { getSellerFinancialSummary } from "@/lib/services/seller-financials";
 
 type Sale = {
@@ -65,31 +64,28 @@ export default function SellerDashboardPage() {
         { data: profile },
         { data: salesData },
         { data: dailyData, error: dailyError },
-        walletSummary,
-        financialSummary,
       ] = await Promise.all([
-          supabase
-            .from("profiles")
-            .select("full_name,nome_completo")
-            .eq("id", user.id)
-            .maybeSingle(),
+        supabase
+          .from("profiles")
+          .select("full_name,nome_completo")
+          .eq("id", user.id)
+          .maybeSingle(),
 
-          supabase
-            .from("sales")
-            .select(
-              `id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id`
-            )
-            .eq("vendedor_id", user.id)
-            .order("created_at", { ascending: false }),
+        supabase
+          .from("sales")
+          .select(
+            "id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id",
+          )
+          .eq("vendedor_id", user.id)
+          .order("created_at", { ascending: false }),
 
-          supabase.rpc("get_seller_daily_performance", {
-            p_vendedor_id: user.id,
-            p_days: 30,
-          }),
+        supabase.rpc("get_seller_daily_performance", {
+          p_vendedor_id: user.id,
+          p_days: 30,
+        }),
+      ]);
 
-          getWalletSummary(user.id),
-          getSellerFinancialSummary(user.id),
-        ]);
+      const financialSummary = await getSellerFinancialSummary(user.id);
 
       const name =
         profile?.full_name ||
@@ -101,10 +97,10 @@ export default function SellerDashboardPage() {
       setUserName(name);
 
       const canonicalWallet = {
-        disponivel: Number(financialSummary?.available_balance ?? walletSummary.disponivel ?? 0),
-        retido: Number(financialSummary?.guarantee_retained ?? walletSummary.retido ?? 0),
-        reservado: Number(financialSummary?.reserved ?? walletSummary.reservado ?? 0),
-        saldo_total: Number(financialSummary?.total_balance ?? walletSummary.saldo_total ?? 0),
+        disponivel: Number(financialSummary.available_balance ?? 0),
+        retido: Number(financialSummary.guarantee_retained ?? 0),
+        reservado: Number(financialSummary.reserved ?? 0),
+        saldo_total: Number(financialSummary.total_balance ?? 0),
       };
 
       setSales((salesData || []) as Sale[]);
@@ -141,8 +137,8 @@ export default function SellerDashboardPage() {
   );
 
   const totalSales = financialSummary?.gross_sales ?? 0;
-
   const totalCommission = financialSummary?.commission_earned ?? 0;
+  const totalBalance = financialSummary?.total_balance ?? 0;
 
 
   const chartPoints = useMemo(() => {
@@ -373,7 +369,7 @@ export default function SellerDashboardPage() {
                   <span className="text-sm text-[#60708A]">Total balance</span>
                   <span className="text-lg font-semibold text-[#16294F]">
                     {money(
-                      wallet.disponivel + wallet.retido + wallet.reservado
+                      totalBalance
                     )}
                   </span>
                 </div>
