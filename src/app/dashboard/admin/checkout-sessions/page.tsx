@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AppShell from "@/components/layout/AppShell";
 import { supabase } from "@/lib/supabase";
 
 type Session = {
@@ -22,6 +23,7 @@ type Session = {
   seller_id: string;
   product_id: string;
   affiliate_link: string;
+  checkout_url: string;
   payment_comparison_status: string;
   external_payment_reference: string | null;
   external_payment_amount: number | null;
@@ -32,14 +34,27 @@ type Session = {
   external_customer_phone: string | null;
   external_customer_email: string | null;
   external_payment_notes: string | null;
+  product?: {
+    nome: string;
+    slug: string | null;
+    fotos: string[] | null;
+  } | null;
 };
+
+function money(value: number, currency: string) {
+  return `${Number(value).toLocaleString("pt-MZ", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} ${currency}`;
+}
 
 export default function AdminCheckoutSessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Session | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const [paymentSaving, setPaymentSaving] = useState(false);
+
   const [payment, setPayment] = useState({
     reference: "",
     amount: "",
@@ -54,16 +69,60 @@ export default function AdminCheckoutSessionsPage() {
 
   async function loadSessions() {
     setLoading(true);
+    setError("");
 
-    const { data, error } = await supabase
+    const { data, error: sessionsError } = await supabase
       .from("checkout_sessions")
-      .select(
-        "id,created_at,status,full_name,phone,whatsapp,email,country,province,city,postal_code,address,address_reference,amount,currency,seller_id,product_id,affiliate_link,payment_comparison_status,external_payment_reference,external_payment_amount,external_payment_currency,external_payment_paid_at,external_payment_method,external_customer_name,external_customer_phone,external_customer_email,external_payment_notes"
-      )
+      .select(`
+        id,
+        created_at,
+        status,
+        full_name,
+        phone,
+        whatsapp,
+        email,
+        country,
+        province,
+        city,
+        postal_code,
+        address,
+        address_reference,
+        amount,
+        currency,
+        seller_id,
+        product_id,
+        affiliate_link,
+        checkout_url,
+        payment_comparison_status,
+        external_payment_reference,
+        external_payment_amount,
+        external_payment_currency,
+        external_payment_paid_at,
+        external_payment_method,
+        external_customer_name,
+        external_customer_phone,
+        external_customer_email,
+        external_payment_notes,
+        products (
+          nome,
+          slug,
+          fotos
+        )
+      `)
       .order("created_at", { ascending: false });
 
-    if (!error) {
-      setSessions((data || []) as Session[]);
+    if (sessionsError) {
+      setError(sessionsError.message);
+      setSessions([]);
+    } else {
+      const normalized = ((data || []) as any[]).map((row) => ({
+        ...row,
+        product: Array.isArray(row.products)
+          ? row.products[0] || null
+          : row.products || null,
+      }));
+
+      setSessions(normalized as Session[]);
     }
 
     setLoading(false);
@@ -75,16 +134,20 @@ export default function AdminCheckoutSessionsPage() {
 
   function openSession(session: Session) {
     setSelected(session);
-    setError(null);
+    setError("");
+
     setPayment({
       reference: session.external_payment_reference || "",
       amount:
         session.external_payment_amount != null
           ? String(session.external_payment_amount)
           : String(session.amount),
-      currency: session.external_payment_currency || session.currency,
+      currency:
+        session.external_payment_currency || session.currency,
       paidAt: session.external_payment_paid_at
-        ? new Date(session.external_payment_paid_at).toISOString().slice(0, 16)
+        ? new Date(session.external_payment_paid_at)
+            .toISOString()
+            .slice(0, 16)
         : "",
       method: session.external_payment_method || "",
       customerName: session.external_customer_name || "",
@@ -98,7 +161,7 @@ export default function AdminCheckoutSessionsPage() {
     if (!selected) return;
 
     setPaymentSaving(true);
-    setError(null);
+    setError("");
 
     try {
       const { data, error: rpcError } = await supabase.rpc(
@@ -123,18 +186,10 @@ export default function AdminCheckoutSessionsPage() {
 
       await loadSessions();
 
-      const { data: refreshed, error: refreshError } = await supabase
-        .from("checkout_sessions")
-        .select(
-          "id,created_at,status,full_name,phone,whatsapp,email,country,province,city,postal_code,address,address_reference,amount,currency,seller_id,product_id,affiliate_link,payment_comparison_status,external_payment_reference,external_payment_amount,external_payment_currency,external_payment_paid_at,external_payment_method,external_customer_name,external_customer_phone,external_customer_email,external_payment_notes"
-        )
-        .eq("id", selected.id)
-        .maybeSingle();
-
-      if (refreshError) throw refreshError;
+      const refreshed = sessions.find((item) => item.id === selected.id);
 
       if (refreshed) {
-        openSession(refreshed as Session);
+        openSession(refreshed);
       }
 
       const result = Array.isArray(data) ? data[0] : data;
@@ -160,7 +215,7 @@ export default function AdminCheckoutSessionsPage() {
   }
 
   async function updateStatus(sessionId: string, status: string) {
-    setError(null);
+    setError("");
 
     try {
       const {
@@ -171,45 +226,33 @@ export default function AdminCheckoutSessionsPage() {
         throw new Error("Session expired. Please sign in again.");
       }
 
-      if (status === "approved") {
-        const response = await fetch("/api/admin/checkout-sessions/approve", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ session_id: sessionId }),
-        });
+      const endpoint =
+        status === "approved"
+          ? "/api/admin/checkout-sessions/approve"
+          : "/api/admin/checkout-sessions/status";
 
-        const result = await response.json();
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(
+          status === "approved"
+            ? { session_id: sessionId }
+            : { session_id: sessionId, status }
+        ),
+      });
 
-        if (!response.ok) {
-          throw new Error(
-            result?.error || "Failed to approve checkout session."
-          );
-        }
-      } else {
-        const response = await fetch("/api/admin/checkout-sessions/status", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            session_id: sessionId,
-            status,
-          }),
-        });
+      const result = await response.json();
 
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            result?.error || "Failed to update checkout session."
-          );
-        }
+      if (!response.ok) {
+        throw new Error(
+          result?.error || "Failed to update checkout session."
+        );
       }
 
+      setSelected(null);
       await loadSessions();
     } catch (e) {
       setError(
@@ -220,21 +263,56 @@ export default function AdminCheckoutSessionsPage() {
     }
   }
 
+  const pending = sessions.filter(
+    (session) => session.status === "pending"
+  ).length;
+
+  const paidReview = sessions.filter(
+    (session) => session.status === "paid_pending_review"
+  ).length;
+
+  const approved = sessions.filter(
+    (session) => session.status === "approved"
+  ).length;
+
   return (
-    <main className="min-h-screen bg-slate-50 p-6">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8">
+    <AppShell area="admin">
+      <div className="space-y-6">
+        <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-            Administration
+            Commerce
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
             Checkout sessions
           </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Customer delivery information and affiliate attribution collected
-            before external payment.
+          <p className="mt-1 text-sm text-slate-500">
+            Customer information captured before the external checkout.
           </p>
         </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            ["Pending", pending],
+            ["Paid / Review", paidReview],
+            ["Approved", approved],
+          ].map(([label, value]) => (
+            <div
+              key={label}
+              className="rounded-xl border border-slate-200 bg-white p-5"
+            >
+              <p className="text-sm text-slate-500">{label}</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-950">
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           {loading ? (
@@ -243,16 +321,16 @@ export default function AdminCheckoutSessionsPage() {
             </div>
           ) : sessions.length === 0 ? (
             <div className="p-10 text-center">
-              <p className="text-sm font-medium text-slate-700">
+              <p className="text-sm font-semibold text-slate-800">
                 No checkout sessions yet.
               </p>
               <p className="mt-1 text-sm text-slate-500">
-                Customer submissions will appear here.
+                Customer submissions will appear here automatically.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left text-sm">
+              <table className="w-full min-w-[1050px] text-left text-sm">
                 <thead className="border-b border-slate-200 bg-slate-50">
                   <tr>
                     <th className="px-5 py-4 font-semibold text-slate-700">
@@ -262,13 +340,16 @@ export default function AdminCheckoutSessionsPage() {
                       Product
                     </th>
                     <th className="px-5 py-4 font-semibold text-slate-700">
-                      Amount
+                      Order value
+                    </th>
+                    <th className="px-5 py-4 font-semibold text-slate-700">
+                      Payment
                     </th>
                     <th className="px-5 py-4 font-semibold text-slate-700">
                       Status
                     </th>
                     <th className="px-5 py-4 font-semibold text-slate-700">
-                      Date
+                      Created
                     </th>
                     <th className="px-5 py-4" />
                   </tr>
@@ -276,30 +357,52 @@ export default function AdminCheckoutSessionsPage() {
 
                 <tbody className="divide-y divide-slate-100">
                   {sessions.map((session) => (
-                    <tr key={session.id} className="hover:bg-slate-50">
+                    <tr
+                      key={session.id}
+                      className="hover:bg-slate-50"
+                    >
                       <td className="px-5 py-4">
                         <div className="font-medium text-slate-900">
                           {session.full_name}
                         </div>
                         <div className="mt-1 text-xs text-slate-500">
-                          {session.phone}
+                          {session.email || session.phone}
                         </div>
                       </td>
 
                       <td className="px-5 py-4">
-                        <div className="font-mono text-xs text-slate-500">
-                          {session.product_id.slice(0, 8)}...
+                        <div className="font-medium text-slate-900">
+                          {session.product?.nome || "Product"}
                         </div>
                         <div className="mt-1 text-xs text-slate-500">
-                          Affiliate: {session.affiliate_link}
+                          {session.affiliate_link}
                         </div>
                       </td>
 
                       <td className="px-5 py-4 font-semibold text-slate-900">
-                        {Number(session.amount).toLocaleString("pt-MZ", {
-                          minimumFractionDigits: 2,
-                        })}{" "}
-                        {session.currency}
+                        {money(Number(session.amount), session.currency)}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                            session.payment_comparison_status === "matched"
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                              : session.payment_comparison_status === "mismatch"
+                                ? "border-red-200 bg-red-50 text-red-700"
+                                : session.payment_comparison_status === "review"
+                                  ? "border-amber-200 bg-amber-50 text-amber-700"
+                                  : "border-slate-200 bg-slate-50 text-slate-600"
+                          }`}
+                        >
+                          {session.payment_comparison_status === "matched"
+                            ? "Matched"
+                            : session.payment_comparison_status === "mismatch"
+                              ? "Mismatch"
+                              : session.payment_comparison_status === "review"
+                                ? "Review"
+                                : "Not checked"}
+                        </span>
                       </td>
 
                       <td className="px-5 py-4">
@@ -318,7 +421,7 @@ export default function AdminCheckoutSessionsPage() {
                           onClick={() => openSession(session)}
                           className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
                         >
-                          Review
+                          View details
                         </button>
                       </td>
                     </tr>
@@ -332,29 +435,80 @@ export default function AdminCheckoutSessionsPage() {
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white">
-            <div className="flex items-center justify-between border-b border-slate-200 p-6">
+          <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-slate-200 bg-white">
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
               <div>
-                <h2 className="text-xl font-semibold text-slate-950">
-                  Customer details
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  Checkout session
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-slate-950">
+                  {selected.product?.nome || "Product"}
                 </h2>
-                <p className="mt-1 text-xs text-slate-500">
-                  Session {selected.id}
+                <p className="mt-1 break-all text-xs text-slate-500">
+                  {selected.id}
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700"
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
               >
                 Close
               </button>
             </div>
 
-            <div className="grid gap-6 p-6 sm:grid-cols-2">
-              <div className="sm:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="space-y-6 p-6">
+              <section>
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold text-slate-950">
+                    Customer information
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Information submitted on the NewVelion product page.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {[
+                    ["Full name", selected.full_name],
+                    ["Email", selected.email || "—"],
+                    ["Phone", selected.phone],
+                    ["WhatsApp", selected.whatsapp || "—"],
+                    ["Country", selected.country],
+                    ["Province / State", selected.province],
+                    ["City", selected.city],
+                    ["Postal code", selected.postal_code || "—"],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="rounded-lg border border-slate-200 p-4"
+                    >
+                      <p className="text-xs text-slate-500">{label}</p>
+                      <p className="mt-1 break-words text-sm font-medium text-slate-900">
+                        {value}
+                      </p>
+                    </div>
+                  ))}
+
+                  <div className="rounded-lg border border-slate-200 p-4 sm:col-span-2 lg:col-span-3">
+                    <p className="text-xs text-slate-500">
+                      Delivery address
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-slate-900">
+                      {selected.address}
+                    </p>
+                    {selected.address_reference && (
+                      <p className="mt-2 text-xs text-slate-500">
+                        Reference: {selected.address_reference}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+                <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Payment verification
@@ -362,10 +516,12 @@ export default function AdminCheckoutSessionsPage() {
                     <h3 className="mt-1 text-lg font-semibold text-slate-950">
                       Compare external payment
                     </h3>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Compare the payment received from PayJSR or another external checkout with the order captured by NewVelion.
+                    <p className="mt-1 max-w-2xl text-sm text-slate-500">
+                      Enter the payment information from the external checkout.
+                      NewVelion compares it with the customer/order data.
                     </p>
                   </div>
+
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
                     {selected.payment_comparison_status === "matched"
                       ? "Matched"
@@ -377,78 +533,81 @@ export default function AdminCheckoutSessionsPage() {
                   </span>
                 </div>
 
-                <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-5 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-lg border border-slate-200 bg-white p-4">
-                    <p className="text-xs text-slate-500">NewVelion amount</p>
+                    <p className="text-xs text-slate-500">
+                      NewVelion order
+                    </p>
                     <p className="mt-1 text-lg font-semibold text-slate-950">
-                      {Number(selected.amount).toLocaleString("pt-MZ", {
-                        minimumFractionDigits: 2,
-                      })}{" "}
-                      {selected.currency}
+                      {money(Number(selected.amount), selected.currency)}
                     </p>
                   </div>
 
                   <div className="rounded-lg border border-slate-200 bg-white p-4">
-                    <p className="text-xs text-slate-500">External amount</p>
+                    <p className="text-xs text-slate-500">
+                      External payment
+                    </p>
                     <p className="mt-1 text-lg font-semibold text-slate-950">
                       {selected.external_payment_amount == null
                         ? "Not registered"
-                        : `${Number(
-                            selected.external_payment_amount
-                          ).toLocaleString("pt-MZ", {
-                            minimumFractionDigits: 2,
-                          })} ${selected.external_payment_currency || ""}`}
+                        : money(
+                            Number(selected.external_payment_amount),
+                            selected.external_payment_currency ||
+                              selected.currency
+                          )}
                     </p>
                   </div>
 
                   <div className="rounded-lg border border-slate-200 bg-white p-4">
-                    <p className="text-xs text-slate-500">Payment reference</p>
+                    <p className="text-xs text-slate-500">
+                      Payment reference
+                    </p>
                     <p className="mt-1 break-all text-sm font-semibold text-slate-950">
-                      {selected.external_payment_reference || "Not registered"}
+                      {selected.external_payment_reference ||
+                        "Not registered"}
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <label className="text-xs font-semibold text-slate-600">
-                    External payment reference *
-                    <input
-                      value={payment.reference}
-                      onChange={(e) =>
-                        setPayment({ ...payment, reference: e.target.value })
-                      }
-                      placeholder="Transaction ID / payment reference"
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
-                    />
-                  </label>
-
-                  <label className="text-xs font-semibold text-slate-600">
-                    External amount *
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={payment.amount}
-                      onChange={(e) =>
-                        setPayment({ ...payment, amount: e.target.value })
-                      }
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
-                    />
-                  </label>
-
-                  <label className="text-xs font-semibold text-slate-600">
-                    External currency *
-                    <input
-                      value={payment.currency}
-                      onChange={(e) =>
-                        setPayment({
-                          ...payment,
-                          currency: e.target.value.toUpperCase(),
-                        })
-                      }
-                      placeholder="ZAR"
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm uppercase outline-none focus:border-slate-500"
-                    />
-                  </label>
+                  {[
+                    ["External payment reference *", "reference", "text"],
+                    ["External amount *", "amount", "number"],
+                    ["External currency *", "currency", "text"],
+                    ["Payment method", "method", "text"],
+                    ["External customer name", "customerName", "text"],
+                    ["External customer phone", "customerPhone", "text"],
+                    ["External customer email", "customerEmail", "email"],
+                  ].map(([label, key, type]) => (
+                    <label
+                      key={key}
+                      className="text-xs font-semibold text-slate-600"
+                    >
+                      {label}
+                      <input
+                        type={type}
+                        value={payment[key as keyof typeof payment]}
+                        onChange={(e) =>
+                          setPayment({
+                            ...payment,
+                            [key]: e.target.value,
+                          })
+                        }
+                        placeholder={
+                          key === "customerName"
+                            ? selected.full_name
+                            : key === "customerPhone"
+                              ? selected.phone
+                              : key === "customerEmail"
+                                ? selected.email || "Customer email"
+                                : key === "currency"
+                                  ? selected.currency
+                                  : undefined
+                        }
+                        className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                      />
+                    </label>
+                  ))}
 
                   <label className="text-xs font-semibold text-slate-600">
                     Payment date
@@ -456,66 +615,11 @@ export default function AdminCheckoutSessionsPage() {
                       type="datetime-local"
                       value={payment.paidAt}
                       onChange={(e) =>
-                        setPayment({ ...payment, paidAt: e.target.value })
-                      }
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
-                    />
-                  </label>
-
-                  <label className="text-xs font-semibold text-slate-600">
-                    Payment method
-                    <input
-                      value={payment.method}
-                      onChange={(e) =>
-                        setPayment({ ...payment, method: e.target.value })
-                      }
-                      placeholder="PayJSR / M-Pesa / Card"
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
-                    />
-                  </label>
-
-                  <label className="text-xs font-semibold text-slate-600">
-                    External customer name
-                    <input
-                      value={payment.customerName}
-                      onChange={(e) =>
                         setPayment({
                           ...payment,
-                          customerName: e.target.value,
+                          paidAt: e.target.value,
                         })
                       }
-                      placeholder={selected.full_name}
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
-                    />
-                  </label>
-
-                  <label className="text-xs font-semibold text-slate-600">
-                    External customer phone
-                    <input
-                      value={payment.customerPhone}
-                      onChange={(e) =>
-                        setPayment({
-                          ...payment,
-                          customerPhone: e.target.value,
-                        })
-                      }
-                      placeholder={selected.phone}
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
-                    />
-                  </label>
-
-                  <label className="text-xs font-semibold text-slate-600">
-                    External customer email
-                    <input
-                      type="email"
-                      value={payment.customerEmail}
-                      onChange={(e) =>
-                        setPayment({
-                          ...payment,
-                          customerEmail: e.target.value,
-                        })
-                      }
-                      placeholder={selected.email || "Customer email"}
                       className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
                     />
                   </label>
@@ -526,9 +630,12 @@ export default function AdminCheckoutSessionsPage() {
                       rows={3}
                       value={payment.notes}
                       onChange={(e) =>
-                        setPayment({ ...payment, notes: e.target.value })
+                        setPayment({
+                          ...payment,
+                          notes: e.target.value,
+                        })
                       }
-                      placeholder="Optional notes about the external payment verification"
+                      placeholder="Optional payment verification notes"
                       className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
                     />
                   </label>
@@ -544,114 +651,43 @@ export default function AdminCheckoutSessionsPage() {
                     ? "Comparing payment..."
                     : "Register payment & compare"}
                 </button>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Full name</p>
-                <p className="mt-1 text-sm font-medium text-slate-900">
-                  {selected.full_name}
-                </p>
-              </div>
+              </section>
 
-              <div>
-                <p className="text-xs font-medium text-slate-500">Phone</p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.phone}
-                </p>
-              </div>
+              <section className="border-t border-slate-200 pt-6">
+                <h3 className="text-sm font-semibold text-slate-950">
+                  Attribution & order
+                </h3>
 
-              <div>
-                <p className="text-xs font-medium text-slate-500">WhatsApp</p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.whatsapp || "—"}
-                </p>
-              </div>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p className="text-xs text-slate-500">Seller ID</p>
+                    <p className="mt-1 break-all font-mono text-xs text-slate-700">
+                      {selected.seller_id}
+                    </p>
+                  </div>
 
-              <div>
-                <p className="text-xs font-medium text-slate-500">Email</p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.email || "—"}
-                </p>
-              </div>
+                  <div>
+                    <p className="text-xs text-slate-500">Affiliate link</p>
+                    <p className="mt-1 break-all font-mono text-xs text-slate-700">
+                      {selected.affiliate_link}
+                    </p>
+                  </div>
 
-              <div>
-                <p className="text-xs font-medium text-slate-500">Country</p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.country}
-                </p>
-              </div>
+                  <div>
+                    <p className="text-xs text-slate-500">Checkout URL</p>
+                    <p className="mt-1 break-all text-xs text-slate-700">
+                      {selected.checkout_url}
+                    </p>
+                  </div>
 
-              <div>
-                <p className="text-xs font-medium text-slate-500">
-                  Province / State
-                </p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.province}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium text-slate-500">City</p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.city}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium text-slate-500">
-                  Postal code
-                </p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.postal_code || "—"}
-                </p>
-              </div>
-
-              <div className="sm:col-span-2">
-                <p className="text-xs font-medium text-slate-500">
-                  Delivery address
-                </p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.address}
-                </p>
-              </div>
-
-              <div className="sm:col-span-2">
-                <p className="text-xs font-medium text-slate-500">
-                  Address reference
-                </p>
-                <p className="mt-1 text-sm text-slate-900">
-                  {selected.address_reference || "—"}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium text-slate-500">
-                  Seller ID
-                </p>
-                <p className="mt-1 break-all font-mono text-xs text-slate-700">
-                  {selected.seller_id}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium text-slate-500">
-                  Affiliate link
-                </p>
-                <p className="mt-1 break-all font-mono text-xs text-slate-700">
-                  {selected.affiliate_link}
-                </p>
-              </div>
-
-              <div className="sm:col-span-2">
-                <p className="text-xs font-medium text-slate-500">
-                  Expected order value
-                </p>
-                <p className="mt-1 text-lg font-semibold text-slate-950">
-                  {Number(selected.amount).toLocaleString("pt-MZ", {
-                    minimumFractionDigits: 2,
-                  })}{" "}
-                  {selected.currency}
-                </p>
-              </div>
+                  <div>
+                    <p className="text-xs text-slate-500">Session created</p>
+                    <p className="mt-1 text-sm text-slate-900">
+                      {new Date(selected.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </section>
             </div>
 
             <div className="flex flex-wrap gap-3 border-t border-slate-200 p-6">
@@ -662,7 +698,7 @@ export default function AdminCheckoutSessionsPage() {
                   selected.status !== "paid_pending_review"
                 }
                 onClick={() => updateStatus(selected.id, "approved")}
-                className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Approve sale
               </button>
@@ -670,7 +706,7 @@ export default function AdminCheckoutSessionsPage() {
               <button
                 type="button"
                 onClick={() => updateStatus(selected.id, "rejected")}
-                className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700"
+                className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50"
               >
                 Reject
               </button>
@@ -678,6 +714,6 @@ export default function AdminCheckoutSessionsPage() {
           </div>
         </div>
       )}
-    </main>
+    </AppShell>
   );
 }
