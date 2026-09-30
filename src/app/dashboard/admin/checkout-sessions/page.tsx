@@ -28,6 +28,7 @@ export default function AdminCheckoutSessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Session | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function loadSessions() {
     setLoading(true);
@@ -50,24 +51,64 @@ export default function AdminCheckoutSessionsPage() {
     loadSessions();
   }, []);
 
-  async function updateStatus(
-    session: Session,
-    status: "paid_pending_review" | "approved" | "rejected"
-  ) {
-    const { error } = await supabase
-      .from("checkout_sessions")
-      .update({
-        status,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", session.id);
+  async function updateStatus(sessionId: string, status: string) {
+    setError(null);
 
-    if (!error) {
-      await loadSessions();
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (selected?.id === session.id) {
-        setSelected({ ...session, status });
+      if (!session?.access_token) {
+        throw new Error("Session expired. Please sign in again.");
       }
+
+      if (status === "approved") {
+        const response = await fetch("/api/admin/checkout-sessions/approve", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ session_id: sessionId }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result?.error || "Failed to approve checkout session."
+          );
+        }
+      } else {
+        const response = await fetch("/api/admin/checkout-sessions/status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            session_id: sessionId,
+            status,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result?.error || "Failed to update checkout session."
+          );
+        }
+      }
+
+      await loadSessions();
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Failed to update checkout session."
+      );
     }
   }
 
@@ -317,7 +358,7 @@ export default function AdminCheckoutSessionsPage() {
               <button
                 type="button"
                 onClick={() =>
-                  updateStatus(selected, "paid_pending_review")
+                  updateStatus(selected.id, "paid_pending_review")
                 }
                 className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-800"
               >
@@ -326,7 +367,7 @@ export default function AdminCheckoutSessionsPage() {
 
               <button
                 type="button"
-                onClick={() => updateStatus(selected, "approved")}
+                onClick={() => updateStatus(selected.id, "approved")}
                 className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white"
               >
                 Approve
@@ -334,7 +375,7 @@ export default function AdminCheckoutSessionsPage() {
 
               <button
                 type="button"
-                onClick={() => updateStatus(selected, "rejected")}
+                onClick={() => updateStatus(selected.id, "rejected")}
                 className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700"
               >
                 Reject
