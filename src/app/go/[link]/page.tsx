@@ -36,10 +36,10 @@ export default async function AffiliateProductPage({
     notFound();
   }
 
-  const productId = String(product.product_id);
-
-  await supabase.from("affiliate_clicks").insert({
-    affiliation_id: String(product.affiliate_id),
+  await supabase.rpc("record_affiliate_click", {
+    p_link_unico: `go/${link}`,
+    p_user_agent: undefined,
+    p_referrer: undefined,
   });
 
   return (
