@@ -57,48 +57,18 @@ export async function POST(request: Request) {
       ? normalizedLink
       : `go/${normalizedLink}`;
 
-    const { data: resolved, error: resolveError } = await supabase.rpc(
-      "resolve_affiliate_product",
-      { p_link_unico: canonicalLink }
-    );
-
-    const resolvedProduct = Array.isArray(resolved) ? resolved[0] : resolved;
-
-    if (
-      resolveError ||
-      !resolvedProduct?.product_id ||
-      !resolvedProduct?.affiliate_id
-    ) {
-      console.error("Affiliate resolution failed:", {
-        affiliateLink,
-        normalizedLink,
-        canonicalLink,
-        resolveError,
-        resolved,
-      });
-
-      return NextResponse.json(
-        {
-          error: "Invalid affiliate link.",
-          debug: process.env.NODE_ENV === "development"
-            ? { canonicalLink, resolveError: resolveError?.message }
-            : undefined,
-        },
-        { status: 404 }
-      );
-    }
-
     const { data: affiliation, error: affiliationError } = await supabase
       .from("affiliations")
       .select("id, vendedor_id, product_id, link_unico, ativo")
-      .eq("id", resolvedProduct.affiliate_id)
+      .eq("link_unico", canonicalLink)
       .eq("ativo", true)
       .maybeSingle();
 
     if (affiliationError || !affiliation) {
-      console.error("Resolved affiliation could not be loaded:", {
+      console.error("Affiliate lookup failed:", {
+        affiliateLink,
+        normalizedLink,
         canonicalLink,
-        affiliateId: resolvedProduct.affiliate_id,
         affiliationError,
       });
 
@@ -111,7 +81,7 @@ export async function POST(request: Request) {
     const { data: product, error: productError } = await supabase
       .from("products")
       .select("id, preco, preco_promocional, moeda, checkout_url, ativo")
-      .eq("id", resolvedProduct.product_id)
+      .eq("id", affiliation.product_id)
       .eq("ativo", true)
       .maybeSingle();
 
@@ -122,7 +92,7 @@ export async function POST(request: Request) {
       !/^https?:\/\//i.test(product.checkout_url)
     ) {
       console.error("Product checkout unavailable:", {
-        productId: resolvedProduct.product_id,
+        productId: affiliation.product_id,
         productError,
         checkoutUrl: product?.checkout_url,
       });
