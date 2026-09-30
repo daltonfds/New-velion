@@ -16,7 +16,11 @@ interface Affiliation {
     nome: string;
     slug: string;
     preco: number;
+    preco_promocional: number | null;
     moeda: string;
+    comissao_tipo: string;
+    comissao_valor: number;
+    checkout_url: string | null;
     fotos: string[];
   } | null;
 }
@@ -54,7 +58,11 @@ export default function SellerLinksPage() {
               nome,
               slug,
               preco,
+              preco_promocional,
               moeda,
+              comissao_tipo,
+              comissao_valor,
+              checkout_url,
               fotos
             )
           `,
@@ -235,6 +243,32 @@ export default function SellerLinksPage() {
               const image =
                 item.product?.fotos?.[0] || "";
 
+              const price = item.product
+                ? Number(
+                    item.product.preco_promocional ??
+                      item.product.preco,
+                  )
+                : 0;
+
+              const commission = item.product
+                ? item.product.comissao_tipo === "percentual"
+                  ? `${Number(item.product.comissao_valor).toFixed(2)}%`
+                  : formatMoney(
+                      Number(item.product.comissao_valor),
+                      item.product.moeda,
+                    )
+                : "—";
+
+              const commissionAmount =
+                item.product &&
+                item.product.comissao_tipo === "percentual"
+                  ? (price *
+                      Number(item.product.comissao_valor)) /
+                    100
+                  : Number(
+                      item.product?.comissao_valor || 0,
+                    );
+
               return (
                 <Card key={item.id}>
                   <div className="flex gap-4">
@@ -262,7 +296,7 @@ export default function SellerLinksPage() {
                           <p className="mt-1 text-sm text-slate-500">
                             {item.product
                               ? formatMoney(
-                                  Number(item.product.preco),
+                                  price,
                                   item.product.moeda,
                                 )
                               : "Price unavailable"}
@@ -280,7 +314,41 @@ export default function SellerLinksPage() {
                         </span>
                       </div>
 
-                      <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                      <div className="mt-4 grid grid-cols-2 gap-2">
+                        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                            Commission
+                          </p>
+                          <p className="mt-1 text-sm font-semibold text-slate-900">
+                            {commission}
+                          </p>
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            ≈ {item.product
+                              ? formatMoney(
+                                  commissionAmount,
+                                  item.product.moeda,
+                                )
+                              : "—"} / sale
+                          </p>
+                        </div>
+
+                        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                            Attribution
+                          </p>
+                          <p className="mt-1 text-sm font-semibold text-slate-900">
+                            Locked
+                          </p>
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            This link identifies you
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                        <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                          Affiliate Link
+                        </p>
                         <p className="break-all text-xs text-slate-600">
                           {item.affiliateUrl}
                         </p>
