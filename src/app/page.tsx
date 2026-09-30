@@ -161,7 +161,7 @@ export default function HomePage() {
               href="/register"
               className="rounded-lg bg-[#16294F] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#223b69]"
             >
-              Sign up free
+              Create account
             </Link>
           </nav>
         </div>
@@ -170,8 +170,12 @@ export default function HomePage() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-14 px-5 py-16 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-24">
           <div className="flex flex-col justify-center">
+            <div className="mb-8">
+              <NewvelionBrand size="lg" />
+            </div>
+
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#8A8570]">
-              Commission-based sales platform
+              Dropshipping for Mozambique & South Africa
             </p>
 
             <h1 className="mt-5 max-w-3xl text-5xl font-bold leading-[1.02] tracking-[-0.045em] text-[#16294F] sm:text-6xl lg:text-7xl">
@@ -191,7 +195,7 @@ export default function HomePage() {
                 href="/register"
                 className="inline-flex items-center justify-center rounded-lg bg-[#16294F] px-6 py-3.5 text-sm font-bold text-white hover:bg-[#223b69]"
               >
-                Start selling free
+                Start selling for free
               </Link>
               <a
                 href="#how-it-works"
@@ -608,10 +612,10 @@ export default function HomePage() {
             Start selling
           </p>
           <h2 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Your first commission is one click away
+            Your first commission is one link away.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl leading-7 text-slate-300">
-            Free sign-up, no credit card. Pick a product now and start sharing
+            Free registration, no card required. Pick a product now and start sharing
             today.
           </p>
           <Link
