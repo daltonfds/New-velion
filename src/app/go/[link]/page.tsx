@@ -117,7 +117,7 @@ export default async function AffiliateProductPage({
               <input
                 type="hidden"
                 name="affiliate_link"
-                value={link}
+                value={`go/${link}`}
               />
 
               <div>

@@ -48,14 +48,19 @@ export async function POST(request: Request) {
       auth: { persistSession: false },
     });
 
-    const normalizedLink = affiliateLink.startsWith("go/")
-      ? affiliateLink
-      : `go/${affiliateLink}`;
+    const normalizedLink = affiliateLink
+      .trim()
+      .replace(/^\/+/, "")
+      .replace(/^go\//i, "go/");
+
+    const canonicalLink = normalizedLink.startsWith("go/")
+      ? normalizedLink
+      : `go/${normalizedLink}`;
 
     const { data: affiliation, error: affiliationError } = await supabase
       .from("affiliations")
       .select("id, vendedor_id, product_id, link_unico, ativo")
-      .eq("link_unico", normalizedLink)
+      .eq("link_unico", canonicalLink)
       .eq("ativo", true)
       .maybeSingle();
 
