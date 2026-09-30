@@ -1,0 +1,85 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+export async function POST(request: Request) {
+  try {
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(
+        { error: "Server is not configured." },
+        { status: 500 }
+      );
+    }
+
+    const authorization = request.headers.get("authorization");
+
+    if (!authorization?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const token = authorization.slice(7).trim();
+
+    const admin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
+    });
+
+    const {
+      data: { user },
+      error: userError,
+    } = await admin.auth.getUser(token);
+
+    if (userError || !user) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const { data: profile, error: profileError } = await admin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError || profile?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const sessionId = String(body?.session_id || "").trim();
+
+    if (!sessionId) {
+      return NextResponse.json(
+        { error: "session_id is required." },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await admin.rpc(
+      "approve_checkout_session",
+      {
+        p_session_id: sessionId,
+      }
+    );
+
+    if (error) {
+      console.error("Checkout approval failed:", error);
+
+      return NextResponse.json(
+        { error: error.message || "Could not approve checkout session." },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      sale_id: Array.isArray(data) ? data[0]?.sale_id : data?.sale_id,
+    });
+  } catch (error) {
+    console.error("Admin checkout approval error:", error);
+
+    return NextResponse.json(
+      { error: "Unexpected server error." },
+      { status: 500 }
+    );
+  }
+}
