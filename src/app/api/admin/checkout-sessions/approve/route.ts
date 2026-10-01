@@ -6,11 +6,12 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export async function POST(request: Request) {
   try {
-    if (!supabaseUrl || !serviceRoleKey) {
+    if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
       return NextResponse.json(
         { error: "Server is not configured." },
         { status: 500 }
@@ -77,7 +78,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data, error } = await admin.rpc(
+    const authenticatedClient = createClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        auth: { persistSession: false },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    );
+
+    const { data, error } = await authenticatedClient.rpc(
       "approve_checkout_session",
       {
         p_session_id: sessionId,
