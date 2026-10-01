@@ -244,7 +244,28 @@ export default function AdminCheckoutSessionsPage() {
         ),
       });
 
-      const result = await response.json();
+      const responseText = await response.text();
+
+      let result: {
+        error?: string;
+        success?: boolean;
+        sale_id?: string;
+      } = {};
+
+      try {
+        result = responseText
+          ? JSON.parse(responseText)
+          : {};
+      } catch {
+        console.error(
+          "Checkout API returned non-JSON response:",
+          responseText.slice(0, 1000)
+        );
+
+        throw new Error(
+          `Checkout API returned an invalid response (${response.status}).`
+        );
+      }
 
       if (!response.ok) {
         throw new Error(
