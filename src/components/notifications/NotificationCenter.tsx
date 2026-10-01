@@ -45,6 +45,72 @@ function relativeTime(value: string) {
   return `${Math.floor(seconds / 86400)}d`;
 }
 
+function detailLabel(value: unknown) {
+  return typeof value === "string" || typeof value === "number"
+    ? String(value)
+    : "—";
+}
+
+function NotificationDetails({ item }: { item: NotificationItem }) {
+  const data = item.data || {};
+  const isWithdrawal =
+    item.type === "withdrawal_approved" ||
+    item.type === "withdrawal_rejected";
+  const isSale = item.type === "sale_confirmed";
+
+  if (!isWithdrawal && !isSale) return null;
+
+  const details = isWithdrawal
+    ? [
+        ["Requested amount", data.requested_amount ?? data.amount, data.wallet_currency],
+        ["Net amount received", data.net_amount, data.wallet_currency],
+        ["Wallet currency", data.wallet_currency],
+        ["Payment currency", data.payout_currency],
+        ["Exchange rate", data.exchange_rate],
+        ["Converted amount", data.converted_amount, data.payout_currency],
+        [
+          "Sent to wallet",
+          data.wallet_provider
+            ? `${data.wallet_provider}${data.wallet_phone ? ` — ${data.wallet_phone}` : ""}`
+            : null,
+        ],
+        ["Withdrawal ID", data.withdrawal_id],
+        ["Date", data.processed_at],
+      ]
+    : [
+        ["Product", data.product_name ?? data.product],
+        ["Sale amount", data.amount],
+        ["Commission", data.commission],
+        ["Status", data.status ?? "Paid"],
+        ["Sale ID", data.sale_id],
+      ];
+
+  return (
+    <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#16294F]">
+        {isWithdrawal ? "Withdrawal details" : "Sale details"}
+      </p>
+
+      <div className="space-y-1.5">
+        {details.map(([label, value, currency]) => (
+          <div
+            key={String(label)}
+            className="flex items-start justify-between gap-3 text-[11px] leading-4"
+          >
+            <span className="text-slate-500">{String(label)}</span>
+            <span className="max-w-[62%] break-words text-right font-medium text-slate-700">
+              {detailLabel(value)}
+              {currency && value !== null && value !== undefined
+                ? ` ${detailLabel(currency)}`
+                : ""}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function base64ToUint8Array(value: string) {
   const padding = "=".repeat(
     (4 - (value.length % 4)) % 4,
@@ -267,7 +333,7 @@ export default function NotificationCenter() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 z-[80] w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+        <div className="absolute right-0 top-12 z-[80] w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
             <div>
               <p className="text-sm font-bold text-[#16294F]">
@@ -299,7 +365,7 @@ export default function NotificationCenter() {
             </button>
           )}
 
-          <div className="max-h-[420px] overflow-y-auto">
+          <div className="max-h-[500px] overflow-y-auto">
             {items.length === 0 ? (
               <div className="px-5 py-10 text-center text-sm text-slate-500">
                 No notifications yet.
@@ -333,6 +399,8 @@ export default function NotificationCenter() {
                       <p className="mt-1 text-xs leading-5 text-slate-500">
                         {item.message}
                       </p>
+
+                      <NotificationDetails item={item} />
 
                       <p className="mt-2 text-[10px] text-slate-400">
                         {relativeTime(item.created_at)} ago
