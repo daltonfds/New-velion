@@ -12,6 +12,7 @@ import type { Product } from "@/types";
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   async function loadProducts() {
     setLoading(true);
@@ -31,6 +32,24 @@ export default function AdminProductsPage() {
   useEffect(() => {
     void loadProducts();
   }, []);
+
+  const categories = Array.from(
+    new Map(
+      products
+        .filter((product) => product.categoria_id)
+        .map((product) => [
+          product.categoria_id,
+          product.categoria_id,
+        ]),
+    ).entries(),
+  );
+
+  const filteredProducts =
+    selectedCategory === "all"
+      ? products
+      : products.filter(
+          (product) => product.categoria_id === selectedCategory,
+        );
 
   return (
     <AppShell area="admin">
@@ -56,8 +75,30 @@ export default function AdminProductsPage() {
             <div>
               <h2 className="font-semibold text-slate-900">Product Catalog</h2>
               <p className="text-sm text-slate-500">
-                {products.length} product{products.length === 1 ? "" : "s"}
+                {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"}
               </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <label
+                htmlFor="product-category"
+                className="text-sm font-medium text-slate-600"
+              >
+                Category
+              </label>
+              <select
+                id="product-category"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              >
+                <option value="all">All Categories</option>
+                {categories.map(([id, name]) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -65,7 +106,7 @@ export default function AdminProductsPage() {
             <div className="px-6 py-12 text-center text-sm text-slate-500">
               Loading products...
             </div>
-          ) : products.length === 0 ? (
+          ) : filteredProducts.length === 0 ? (
             <div className="px-6 py-16 text-center">
               <h3 className="font-semibold text-slate-900">
                 No products yet
@@ -94,7 +135,7 @@ export default function AdminProductsPage() {
                 </thead>
 
                 <tbody className="divide-y divide-slate-100">
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <tr key={product.id} className="hover:bg-slate-50">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
