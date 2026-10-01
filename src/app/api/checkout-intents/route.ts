@@ -110,7 +110,29 @@ export async function POST(request: Request) {
     const checkoutUrl = new URL(session.checkout_url);
     checkoutUrl.searchParams.set("newvelion_session", session.session_id);
 
-    return NextResponse.redirect(checkoutUrl.toString(), 303);
+    return new NextResponse(
+      `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Redirecting to checkout...</title>
+</head>
+<body>
+  <p>Redirecting to secure checkout...</p>
+  <script>
+    window.location.replace(${JSON.stringify(checkoutUrl.toString())});
+  </script>
+</body>
+</html>`,
+      {
+        status: 200,
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "no-store",
+        },
+      },
+    );
   } catch (error) {
     console.error("Checkout intent error:", error);
 
