@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { dispatchNotification } from "@/lib/notifications/server";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -21,6 +24,10 @@ export async function POST(request: Request) {
     }
 
     const token = authorization.slice(7).trim();
+
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
 
     const admin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false },
@@ -45,8 +52,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Forbidden." }, { status: 403 });
     }
 
-    const body = await request.json();
-    const sessionId = String(body?.session_id || "").trim();
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON request body." },
+        { status: 400 }
+      );
+    }
+
+    const sessionId =
+      typeof body === "object" &&
+      body !== null &&
+      "session_id" in body
+        ? String((body as { session_id?: unknown }).session_id || "").trim()
+        : "";
 
     if (!sessionId) {
       return NextResponse.json(
@@ -83,7 +105,14 @@ export async function POST(request: Request) {
         .maybeSingle();
 
       if (notification?.id) {
-        await dispatchNotification(notification.id);
+        try {
+          await dispatchNotification(notification.id);
+        } catch (notificationError) {
+          console.error(
+            "Sale notification dispatch failed:",
+            notificationError
+          );
+        }
       }
     }
 
