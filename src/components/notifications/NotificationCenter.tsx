@@ -197,6 +197,7 @@ export default function NotificationCenter() {
         window.Notification.permission === "granted"
       ) {
         setPushEnabled(true);
+        void enablePush();
       }
     }
 
