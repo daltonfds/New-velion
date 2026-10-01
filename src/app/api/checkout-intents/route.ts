@@ -2,21 +2,20 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export async function POST(request: Request) {
   try {
-    if (!supabaseUrl || !serviceRoleKey) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       return NextResponse.json(
         { error: "Checkout service is not configured." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const form = await request.formData();
 
     const affiliateLink = String(form.get("affiliate_link") || "").trim();
-
     const fullName = String(form.get("full_name") || "").trim();
     const phone = String(form.get("phone") || "").trim();
     const whatsapp = String(form.get("whatsapp") || "").trim() || null;
@@ -40,178 +39,76 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: "Please complete all required fields." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false },
     });
 
-    /*
-     * The affiliate link is the attribution key.
-     * Accept:
-     *   go/xxxxxxxx
-     *   /go/xxxxxxxx
-     *   xxxxxxxx
-     */
-    const rawLink = affiliateLink
-      .replace(/^https?:\/\/[^/]+/i, "")
-      .split("?")[0]
-      .split("#")[0]
-      .replace(/^\/+/, "")
-      .trim();
-
-    const linkCode = rawLink
-      .replace(/^go\//i, "")
-      .replace(/\/+$/, "")
-      .trim();
-
-    if (!linkCode) {
-      return NextResponse.json(
-        { error: "Invalid affiliate link." },
-        { status: 404 }
-      );
-    }
-
-    const canonicalLink = `go/${linkCode}`;
-
-    /*
-     * Resolve the affiliate directly from the database.
-     * No client-provided seller/product IDs are trusted.
-     */
-    const { data: affiliation, error: affiliationError } = await supabase
-      .from("affiliations")
-      .select("id,vendedor_id,product_id,link_unico,ativo")
-      .eq("link_unico", canonicalLink)
-      .eq("ativo", true)
-      .maybeSingle();
-
-    if (affiliationError) {
-      console.error("Affiliate database lookup failed:", affiliationError);
-
-      return NextResponse.json(
-        { error: "Could not validate affiliate link." },
-        { status: 500 }
-      );
-    }
-
-    if (!affiliation) {
-      console.error("Affiliate not found:", {
-        affiliateLink,
-        rawLink,
-        linkCode,
-        canonicalLink,
-      });
-
-      return NextResponse.json(
-        { error: "Invalid affiliate link." },
-        { status: 404 }
-      );
-    }
-
-    /*
-     * Product controls the checkout URL.
-     * The customer never supplies this URL.
-     */
-    const { data: product, error: productError } = await supabase
-      .from("products")
-      .select(
-        "id,nome,preco,preco_promocional,moeda,checkout_url,ativo"
-      )
-      .eq("id", affiliation.product_id)
-      .eq("ativo", true)
-      .maybeSingle();
-
-    if (productError) {
-      console.error("Product lookup failed:", productError);
-
-      return NextResponse.json(
-        { error: "Could not load product checkout." },
-        { status: 500 }
-      );
-    }
-
-    if (!product) {
-      return NextResponse.json(
-        { error: "Product is unavailable." },
-        { status: 409 }
-      );
-    }
-
-    if (
-      !product.checkout_url ||
-      !/^https?:\/\//i.test(product.checkout_url)
-    ) {
-      return NextResponse.json(
-        { error: "This product does not have a valid checkout link." },
-        { status: 409 }
-      );
-    }
-
-    const amount =
-      product.preco_promocional !== null &&
-      Number(product.preco_promocional) > 0
-        ? Number(product.preco_promocional)
-        : Number(product.preco);
-
-    /*
-     * FIRST:
-     * Save everything the customer entered.
-     *
-     * This creates the administrative record BEFORE redirecting
-     * the customer to the external checkout.
-     */
-    const { data: checkoutSession, error: sessionError } = await supabase
-      .from("checkout_sessions")
-      .insert({
-        affiliation_id: affiliation.id,
-        product_id: product.id,
-        seller_id: affiliation.vendedor_id,
-        affiliate_link: affiliation.link_unico,
-
-        full_name: fullName,
-        email,
-        phone,
-        whatsapp,
-
-        country,
-        province,
-        city,
-        postal_code: postalCode,
-        address,
-        address_reference: addressReference,
-
-        amount,
-        currency: product.moeda,
-        checkout_url: product.checkout_url,
-        status: "pending",
-      })
-      .select("id")
-      .single();
-
-    if (sessionError || !checkoutSession) {
-      console.error("Checkout session creation failed:", sessionError);
-
-      return NextResponse.json(
-        { error: "Could not save customer delivery information." },
-        { status: 500 }
-      );
-    }
-
-    /*
-     * SECOND:
-     * Open the checkout URL configured on the product.
-     *
-     * NewVelion session ID is appended only as attribution/reference.
-     * The destination itself always comes from products.checkout_url.
-     */
-    const checkoutUrl = new URL(product.checkout_url);
-
-    checkoutUrl.searchParams.set(
-      "newvelion_session",
-      checkoutSession.id
+    const { data, error } = await supabase.rpc(
+      "create_public_checkout_session",
+      {
+        p_affiliate_link: affiliateLink,
+        p_full_name: fullName,
+        p_phone: phone,
+        p_whatsapp: whatsapp,
+        p_email: email,
+        p_country: country,
+        p_province: province,
+        p_city: city,
+        p_postal_code: postalCode,
+        p_address: address,
+        p_address_reference: addressReference,
+      },
     );
+
+    if (error) {
+      console.error("Public checkout session RPC failed:", error);
+
+      const message = error.message || "";
+
+      if (/invalid affiliate link/i.test(message)) {
+        return NextResponse.json(
+          { error: "Invalid affiliate link." },
+          { status: 404 },
+        );
+      }
+
+      if (/product is unavailable/i.test(message)) {
+        return NextResponse.json(
+          { error: "Product is unavailable." },
+          { status: 409 },
+        );
+      }
+
+      if (/required customer delivery fields/i.test(message)) {
+        return NextResponse.json(
+          { error: "Please complete all required fields." },
+          { status: 400 },
+        );
+      }
+
+      return NextResponse.json(
+        { error: "Could not create checkout session." },
+        { status: 500 },
+      );
+    }
+
+    const session = Array.isArray(data) ? data[0] : data;
+
+    if (!session?.session_id || !session?.checkout_url) {
+      console.error("Checkout RPC returned an invalid result:", data);
+
+      return NextResponse.json(
+        { error: "Could not create checkout session." },
+        { status: 500 },
+      );
+    }
+
+    const checkoutUrl = new URL(session.checkout_url);
+    checkoutUrl.searchParams.set("newvelion_session", session.session_id);
 
     return NextResponse.redirect(checkoutUrl.toString(), 303);
   } catch (error) {
@@ -219,7 +116,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { error: "Unexpected checkout error." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
