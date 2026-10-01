@@ -4,6 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Newvelion",
   description: "Commerce infrastructure",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
