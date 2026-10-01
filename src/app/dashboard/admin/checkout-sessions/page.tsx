@@ -226,51 +226,65 @@ export default function AdminCheckoutSessionsPage() {
         throw new Error("Session expired. Please sign in again.");
       }
 
-      const endpoint =
-        status === "approved"
-          ? "/api/admin/checkout-sessions/approve"
-          : "/api/admin/checkout-sessions/status";
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify(
-          status === "approved"
-            ? { session_id: sessionId }
-            : { session_id: sessionId, status }
-        ),
-      });
-
-      const responseText = await response.text();
-
-      let result: {
-        error?: string;
-        success?: boolean;
-        sale_id?: string;
-      } = {};
-
-      try {
-        result = responseText
-          ? JSON.parse(responseText)
-          : {};
-      } catch {
-        console.error(
-          "Checkout API returned non-JSON response:",
-          responseText.slice(0, 1000)
+      if (status === "approved") {
+        const { data, error } = await supabase.rpc(
+          "approve_checkout_session",
+          {
+            p_session_id: sessionId,
+          }
         );
 
-        throw new Error(
-          `Checkout API returned an invalid response (${response.status}).`
-        );
-      }
+        if (error) {
+          console.error("Checkout approval RPC failed:", error);
+          throw new Error(
+            error.message || "Failed to approve checkout session."
+          );
+        }
 
-      if (!response.ok) {
-        throw new Error(
-          result?.error || "Failed to update checkout session."
+        const saleId = Array.isArray(data)
+          ? data[0]?.sale_id
+          : data?.sale_id;
+
+        if (!saleId) {
+          throw new Error(
+            "Checkout was approved but no sale was created."
+          );
+        }
+      } else {
+        const response = await fetch(
+          "/api/admin/checkout-sessions/status",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              session_id: sessionId,
+              status,
+            }),
+          }
         );
+
+        const responseText = await response.text();
+
+        let result: { error?: string } = {};
+
+        try {
+          result = responseText
+            ? JSON.parse(responseText)
+            : {};
+        } catch {
+          throw new Error(
+            `Checkout API returned an invalid response (${response.status}).`
+          );
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            result?.error || "Failed to update checkout session."
+          );
+        }
       }
 
       setSelected(null);
