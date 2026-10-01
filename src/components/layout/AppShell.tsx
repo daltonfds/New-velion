@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
+import { supabase } from "@/lib/supabase";
 
 export type AppArea = "seller" | "admin";
 
@@ -19,7 +20,8 @@ type IconName =
   | "download"
   | "users"
   | "bell"
-  | "menu";
+  | "menu"
+  | "logout";
 
 interface NavItem {
   label: string;
@@ -100,6 +102,11 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
       <path d="M4 12h16" />
       <path d="M4 18h16" />
     </>,
+    logout: <>
+      <path d="M10 5H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5" />
+      <path d="M14 8l4 4-4 4" />
+      <path d="M18 12H9" />
+    </>,
   };
 
   return <svg {...props}>{icons[name]}</svg>;
@@ -148,7 +155,24 @@ export default function AppShell({
   subtitle,
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    setLoggingOut(true);
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Logout failed:", error);
+      setLoggingOut(false);
+      return;
+    }
+
+    router.replace("/login");
+  }
 
   const items = navigation[area];
 
@@ -231,8 +255,65 @@ export default function AppShell({
               </p>
             </div>
           </Link>
+
+          <button
+            type="button"
+            onClick={() => setLogoutOpen(true)}
+            className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center">
+              <Icon name="logout" size={18} />
+            </span>
+            <span>Log out</span>
+          </button>
         </div>
       </aside>
+
+      {logoutOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logout-title"
+            className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-xl"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
+              <Icon name="logout" size={20} />
+            </div>
+
+            <h2
+              id="logout-title"
+              className="mt-4 text-lg font-bold text-slate-900"
+            >
+              Log out?
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Are you sure you want to log out of your NewVelion account?
+            </p>
+
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                disabled={loggingOut}
+                onClick={() => setLogoutOpen(false)}
+                className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                disabled={loggingOut}
+                onClick={handleLogout}
+                className="flex-1 rounded-lg bg-[#16294F] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0f1e3a] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loggingOut ? "Logging out..." : "Log out"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="lg:pl-[252px]">
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-8">
