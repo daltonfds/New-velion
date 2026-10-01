@@ -14,19 +14,34 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [categoryNames, setCategoryNames] = useState<Record<string, string>>({});
 
   async function loadProducts() {
     setLoading(true);
 
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const [{ data, error }, { data: categoryData }] = await Promise.all([
+      supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false }),
+
+      supabase
+        .from("categories")
+        .select("id, nome")
+        .order("nome", { ascending: true }),
+    ]);
 
     if (!error) {
       setProducts((data ?? []) as Product[]);
     }
 
+    const names: Record<string, string> = {};
+
+    for (const category of categoryData ?? []) {
+      names[category.id] = category.nome;
+    }
+
+    setCategoryNames(names);
     setLoading(false);
   }
 
@@ -56,7 +71,7 @@ export default function AdminProductsPage() {
         .filter((product) => product.categoria_id)
         .map((product) => [
           product.categoria_id,
-          product.categoria_id,
+          categoryNames[product.categoria_id] ?? product.categoria_id,
         ]),
     ).entries(),
   );
@@ -284,6 +299,9 @@ export default function AdminProductsPage() {
                   <div className="space-y-4 p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
+                        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-indigo-600">
+                          {categoryNames[product.categoria_id] ?? "Uncategorized"}
+                        </p>
                         <h3 className="font-semibold text-slate-900">
                           {product.nome}
                         </h3>

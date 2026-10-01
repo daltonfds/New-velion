@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@shopify/app-bridge": "^3.7.11",
     "@shopify/app-bridge-react": "^4.2.13",
     "@supabase/ssr": "^0.12.4",
