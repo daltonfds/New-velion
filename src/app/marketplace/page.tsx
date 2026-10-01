@@ -41,6 +41,7 @@ export default function MarketplacePage() {
   const [categoryId, setCategoryId] = useState("all");
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [newOnly, setNewOnly] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const [affiliating, setAffiliating] = useState<string | null>(null);
   const [affiliateLinks, setAffiliateLinks] = useState<Record<string, string>>(
@@ -50,6 +51,14 @@ export default function MarketplacePage() {
   const [imageIndexes, setImageIndexes] = useState<Record<string, number>>({});
 
   useEffect(() => {
+    const savedView = window.localStorage.getItem(
+      "newvelion-seller-marketplace-view",
+    );
+
+    if (savedView === "grid" || savedView === "list") {
+      setViewMode(savedView);
+    }
+
     async function loadMarketplace() {
       try {
         setLoading(true);
@@ -360,10 +369,64 @@ export default function MarketplacePage() {
             )}
           </div>
 
-          <div className="border-t border-slate-100 px-5 py-3">
+          <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3">
             <p className="text-xs font-medium text-slate-500">
               {loading ? "Loading products..." : `${filteredProducts.length} products`}
             </p>
+
+            <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50 p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode("grid");
+                  window.localStorage.setItem(
+                    "newvelion-seller-marketplace-view",
+                    "grid",
+                  );
+                }}
+                aria-label="Grid view"
+                className={`flex h-8 items-center gap-2 rounded-md px-3 text-xs font-medium transition ${
+                  viewMode === "grid"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                  <rect x="4" y="4" width="6" height="6" rx="1" />
+                  <rect x="14" y="4" width="6" height="6" rx="1" />
+                  <rect x="4" y="14" width="6" height="6" rx="1" />
+                  <rect x="14" y="14" width="6" height="6" rx="1" />
+                </svg>
+                Grid
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode("list");
+                  window.localStorage.setItem(
+                    "newvelion-seller-marketplace-view",
+                    "list",
+                  );
+                }}
+                aria-label="List view"
+                className={`flex h-8 items-center gap-2 rounded-md px-3 text-xs font-medium transition ${
+                  viewMode === "list"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                  <path d="M8 6h13" />
+                  <path d="M8 12h13" />
+                  <path d="M8 18h13" />
+                  <path d="M3 6h.01" />
+                  <path d="M3 12h.01" />
+                  <path d="M3 18h.01" />
+                </svg>
+                List
+              </button>
+            </div>
           </div>
 
           <div className="hidden">
@@ -515,7 +578,13 @@ export default function MarketplacePage() {
             </div>
           </Card>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+                : "space-y-4"
+            }
+          >
             {filteredProducts.map((product) => {
               const price =
                 product.preco_promocional ?? product.preco;
@@ -529,8 +598,21 @@ export default function MarketplacePage() {
               const isAffiliating = affiliating === product.id;
 
               return (
-                <Card key={product.id} className="overflow-hidden border-slate-200 bg-white p-0 shadow-none transition hover:border-slate-300">
-                  <div className="relative h-56 overflow-hidden border-b border-slate-100 bg-slate-50">
+                <Card
+                  key={product.id}
+                  className={
+                    viewMode === "grid"
+                      ? "overflow-hidden border-slate-200 bg-white p-0 shadow-none transition hover:border-slate-300"
+                      : "overflow-hidden border-slate-200 bg-white p-0 shadow-none transition hover:border-slate-300 md:flex"
+                  }
+                >
+                  <div
+                    className={
+                      viewMode === "grid"
+                        ? "relative h-56 overflow-hidden border-b border-slate-100 bg-slate-50"
+                        : "relative h-56 overflow-hidden border-b border-slate-100 bg-slate-50 md:h-auto md:w-64 md:shrink-0 md:border-b-0 md:border-r"
+                    }
+                  >
                     {product.fotos?.length > 0 ? (
                       <>
                         <div
@@ -677,7 +759,13 @@ export default function MarketplacePage() {
                     )}
                   </div>
 
-                  <div className="p-5">
+                  <div
+                    className={
+                      viewMode === "grid"
+                        ? "p-5"
+                        : "flex-1 p-5"
+                    }
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="mb-1 text-xs font-medium uppercase tracking-wide text-indigo-600">

@@ -13,6 +13,7 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
   async function loadProducts() {
     setLoading(true);
@@ -31,7 +32,23 @@ export default function AdminProductsPage() {
 
   useEffect(() => {
     void loadProducts();
+
+    const savedView = window.localStorage.getItem(
+      "newvelion-admin-products-view",
+    );
+
+    if (savedView === "grid" || savedView === "list") {
+      setViewMode(savedView);
+    }
   }, []);
+
+  function changeView(mode: "list" | "grid") {
+    setViewMode(mode);
+    window.localStorage.setItem(
+      "newvelion-admin-products-view",
+      mode,
+    );
+  }
 
   const categories = Array.from(
     new Map(
@@ -79,13 +96,14 @@ export default function AdminProductsPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <label
                 htmlFor="product-category"
                 className="text-sm font-medium text-slate-600"
               >
                 Category
               </label>
+
               <select
                 id="product-category"
                 value={selectedCategory}
@@ -99,6 +117,48 @@ export default function AdminProductsPage() {
                   </option>
                 ))}
               </select>
+
+              <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50 p-1">
+                <button
+                  type="button"
+                  onClick={() => changeView("list")}
+                  aria-label="List view"
+                  className={`flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition ${
+                    viewMode === "list"
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                    <path d="M8 6h13" />
+                    <path d="M8 12h13" />
+                    <path d="M8 18h13" />
+                    <path d="M3 6h.01" />
+                    <path d="M3 12h.01" />
+                    <path d="M3 18h.01" />
+                  </svg>
+                  List
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => changeView("grid")}
+                  aria-label="Grid view"
+                  className={`flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition ${
+                    viewMode === "grid"
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                    <rect x="4" y="4" width="6" height="6" rx="1" />
+                    <rect x="14" y="4" width="6" height="6" rx="1" />
+                    <rect x="4" y="14" width="6" height="6" rx="1" />
+                    <rect x="14" y="14" width="6" height="6" rx="1" />
+                  </svg>
+                  Grid
+                </button>
+              </div>
             </div>
           </div>
 
@@ -120,7 +180,7 @@ export default function AdminProductsPage() {
                 </Link>
               </div>
             </div>
-          ) : (
+          ) : viewMode === "list" ? (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[900px]">
                 <thead>
@@ -199,6 +259,82 @@ export default function AdminProductsPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          ) : (
+            <div className="grid gap-5 p-5 sm:grid-cols-2 xl:grid-cols-3">
+              {filteredProducts.map((product) => (
+                <Card
+                  key={product.id}
+                  className="overflow-hidden border-slate-200 bg-white p-0 shadow-none transition hover:border-slate-300"
+                >
+                  <div className="aspect-[4/3] overflow-hidden bg-slate-100">
+                    {product.fotos?.[0] ? (
+                      <img
+                        src={product.fotos[0]}
+                        alt={product.nome}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-slate-400">
+                        No image
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-slate-900">
+                          {product.nome}
+                        </h3>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {product.id.slice(0, 8)}
+                        </p>
+                      </div>
+
+                      <Badge variant={product.ativo ? "success" : "default"}>
+                        {product.ativo ? "Active" : "Inactive"}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-lg bg-slate-50 p-3">
+                        <p className="text-xs text-slate-500">Price</p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {product.moeda}{" "}
+                          {Number(
+                            product.preco_promocional ?? product.preco,
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+
+                      <div className="rounded-lg bg-slate-50 p-3">
+                        <p className="text-xs text-slate-500">Commission</p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {product.comissao_tipo === "percentual"
+                            ? `${product.comissao_valor}%`
+                            : `${product.moeda} ${Number(
+                                product.comissao_valor,
+                              ).toFixed(2)}`}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-slate-100 pt-4">
+                      <span className="text-sm text-slate-500">
+                        Stock: {product.estoque ?? 0}
+                      </span>
+
+                      <Link
+                        href={`/dashboard/admin/products/${product.id}`}
+                        className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                      >
+                        Manage
+                      </Link>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           )}
         </Card>
