@@ -56,11 +56,24 @@ export async function POST(request: Request) {
      *   xxxxxxxx
      */
     const rawLink = affiliateLink
-      .replace(/^https?:\/\/[^/]+\/?/i, "")
+      .replace(/^https?:\/\/[^/]+/i, "")
+      .split("?")[0]
+      .split("#")[0]
       .replace(/^\/+/, "")
       .trim();
 
-    const linkCode = rawLink.replace(/^go\//i, "").replace(/\/+$/, "");
+    const linkCode = rawLink
+      .replace(/^go\//i, "")
+      .replace(/\/+$/, "")
+      .trim();
+
+    if (!linkCode) {
+      return NextResponse.json(
+        { error: "Invalid affiliate link." },
+        { status: 404 }
+      );
+    }
+
     const canonicalLink = `go/${linkCode}`;
 
     /*
