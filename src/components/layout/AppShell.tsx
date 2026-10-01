@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
@@ -155,6 +155,7 @@ export default function AppShell({
   subtitle,
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileInitial, setProfileInitial] = useState("U");
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const pathname = usePathname();
@@ -175,6 +176,43 @@ export default function AppShell({
   }
 
   const items = navigation[area];
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadProfileInitial() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user || !active) return;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name,nome_completo")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      const name = String(
+        profile?.full_name ||
+        profile?.nome_completo ||
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email ||
+        ""
+      ).trim();
+
+      if (active && name) {
+        setProfileInitial(name.charAt(0).toUpperCase());
+      }
+    }
+
+    loadProfileInitial();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f7f8fb] text-slate-900">
