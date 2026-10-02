@@ -13,12 +13,15 @@ import { supabase } from "@/lib/supabase";
 interface Category {
   id: string;
   nome: string;
+  parent_id: string | null;
+  ordem: number;
 }
 
 export default function NewProductPage() {
   const router = useRouter();
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategoriaId, setSubcategoriaId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,7 +48,7 @@ export default function NewProductPage() {
     async function loadCategories() {
       const { data } = await supabase
         .from("categories")
-        .select("id, nome")
+        .select("id, nome, parent_id, ordem")
         .order("ordem", { ascending: true });
 
       setCategories(data ?? []);
@@ -119,6 +122,7 @@ export default function NewProductPage() {
       slug: form.slug.trim() || generateSlug(form.nome),
       descricao: form.descricao.trim(),
       categoria_id: form.categoria_id || null,
+        subcategoria_id: subcategoriaId || null,
       preco: Number(form.preco),
       preco_promocional: form.preco_promocional
         ? Number(form.preco_promocional)

@@ -19,6 +19,14 @@ interface Product {
   comissao_valor: number;
   fotos: string[];
   ativo: boolean;
+  categoria_id: string | null;
+  subcategoria_id: string | null;
+}
+
+interface Category {
+  id: string;
+  nome: string;
+  parent_id: string | null;
 }
 
 interface Affiliation {
@@ -32,9 +40,12 @@ interface Affiliation {
 
 export default function SellerProductsPage() {
   const [affiliations, setAffiliations] = useState<Affiliation[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
+  const [categoryId, setCategoryId] = useState("all");
+  const [subcategoryId, setSubcategoryId] = useState("all");
 
   useEffect(() => {
     async function load() {
@@ -49,8 +60,10 @@ export default function SellerProductsPage() {
         return;
       }
 
-      const { data, error: queryError } = await supabase
-        .from("affiliations")
+      const [{ data, error: queryError }, { data: categoryData, error: categoryError }] =
+        await Promise.all([
+          supabase
+            .from("affiliations")
         .select(
           `
             id,
@@ -68,12 +81,21 @@ export default function SellerProductsPage() {
               comissao_tipo,
               comissao_valor,
               fotos,
-              ativo
+              ativo,
+              categoria_id,
+              subcategoria_id
             )
           `,
         )
-        .eq("vendedor_id", user.id)
-        .order("created_at", { ascending: false });
+            .eq("vendedor_id", user.id)
+            .eq("ativo", true)
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("categories")
+            .select("id, nome, parent_id")
+            .order("ordem", { ascending: true })
+            .order("nome", { ascending: true }),
+        ]);
 
       if (queryError) {
         setError(queryError.message);
@@ -81,6 +103,13 @@ export default function SellerProductsPage() {
         return;
       }
 
+      if (categoryError) {
+        setError(categoryError.message);
+        setLoading(false);
+        return;
+      }
+
+      setCategories((categoryData ?? []) as Category[]);
       setAffiliations(
         ((data ?? []) as unknown) as Affiliation[],
       );
@@ -109,6 +138,42 @@ export default function SellerProductsPage() {
       window.location.origin;
 
     return `${siteUrl}/${linkUnico}`;
+  }
+
+  const parentCategories = categories
+    .filter((category) => !category.parent_id)
+    .sort((a, b) => a.nome.localeCompare(b.nome));
+
+  const visibleSubcategories = categories
+    .filter((category) => category.parent_id === categoryId)
+    .sort((a, b) => a.nome.localeCompare(b.nome));
+
+  const filteredAffiliations = affiliations.filter((affiliation) => {
+    if (categoryId === "all") return true;
+
+    const product = affiliation.product;
+    if (!product) return false;
+
+    if (product.categoria_id !== categoryId) return false;
+
+    if (
+      subcategoryId !== "all" &&
+      product.subcategoria_id !== subcategoryId
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  function getCategoryName(id: string | null) {
+    if (!id) return "Uncategorized";
+    return categories.find((category) => category.id === id)?.nome ?? "Uncategorized";
+  }
+
+  function getSubcategoryName(id: string | null) {
+    if (!id) return "No subcategory";
+    return categories.find((category) => category.id === id)?.nome ?? "No subcategory";
   }
 
   function formatMoney(
@@ -155,6 +220,56 @@ export default function SellerProductsPage() {
           </Link>
         </div>
 
+        <Card>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                Category
+              </label>
+              <select
+                value={categoryId}
+                onChange={(event) => {
+                  setCategoryId(event.target.value);
+                  setSubcategoryId("all");
+                }}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600"
+              >
+                <option value="all">All categories</option>
+                {parentCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                Subcategory
+              </label>
+              <select
+                value={subcategoryId}
+                onChange={(event) => setSubcategoryId(event.target.value)}
+                disabled={categoryId === "all" || visibleSubcategories.length === 0}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600 disabled:bg-slate-50 disabled:text-slate-400"
+              >
+                <option value="all">
+                  {categoryId === "all"
+                    ? "Select a category first"
+                    : visibleSubcategories.length
+                      ? "All subcategories"
+                      : "No subcategories"}
+                </option>
+                {visibleSubcategories.map((subcategory) => (
+                  <option key={subcategory.id} value={subcategory.id}>
+                    {subcategory.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </Card>
+
         {error && (
           <Card>
             <p className="text-sm text-red-600">{error}</p>
@@ -167,16 +282,19 @@ export default function SellerProductsPage() {
               Loading your products...
             </div>
           </Card>
-        ) : affiliations.length === 0 ? (
+        ) : filteredAffiliations.length === 0 ? (
           <Card>
             <div className="py-14 text-center">
               <h2 className="text-lg font-semibold text-slate-900">
-                No products yet
+                {affiliations.length === 0
+                  ? "No products yet"
+                  : "No products match these filters"}
               </h2>
 
               <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
-                Browse the marketplace and select products
-                you want to promote.
+                {affiliations.length === 0
+                  ? "Browse the marketplace and select products you want to promote."
+                  : "Try another category or subcategory."}
               </p>
 
               <Link
@@ -189,7 +307,7 @@ export default function SellerProductsPage() {
           </Card>
         ) : (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {affiliations.map((affiliation) => {
+            {filteredAffiliations.map((affiliation) => {
               const product = affiliation.product;
 
               if (!product) {
@@ -239,6 +357,18 @@ export default function SellerProductsPage() {
                           {product.descricao ||
                             "No description available."}
                         </p>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600">
+                          {getCategoryName(product.categoria_id)}
+                        </span>
+
+                        {product.subcategoria_id && (
+                          <span className="rounded-md border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                            {getSubcategoryName(product.subcategoria_id)}
+                          </span>
+                        )}
                       </div>
 
                       <Badge>

@@ -32,6 +32,8 @@ interface ProductForm {
 interface Category {
   id: string;
   nome: string;
+  parent_id: string | null;
+  ordem: number;
 }
 
 export default function AdminProductPage() {
@@ -40,6 +42,7 @@ export default function AdminProductPage() {
   const productId = params.id as string;
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategoriaId, setSubcategoriaId] = useState("");
   const [form, setForm] = useState<ProductForm | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -56,7 +59,7 @@ export default function AdminProductPage() {
         supabase.from("products").select("*").eq("id", productId).single(),
         supabase
           .from("categories")
-          .select("id, nome")
+          .select("id, nome, parent_id, ordem")
           .order("ordem", { ascending: true }),
       ]);
 
@@ -157,6 +160,7 @@ export default function AdminProductPage() {
         slug: form.slug.trim(),
         descricao: form.descricao.trim(),
         categoria_id: form.categoria_id || null,
+        subcategoria_id: subcategoriaId || null,
         preco: Number(form.preco),
         preco_promocional: form.preco_promocional
           ? Number(form.preco_promocional)

@@ -22,6 +22,7 @@ export interface Product {
   nome: string;
   descricao: string | null;
   categoria_id: string | null;
+  subcategoria_id: string | null;
   preco: number;
   preco_promocional: number | null;
   moeda: Currency;

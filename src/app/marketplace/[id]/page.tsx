@@ -8,10 +8,13 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser } from "@/lib/auth";
+import { createAffiliation } from "@/lib/services/affiliations";
 
 interface Product {
   id: string;
   nome: string;
+  categoria_id: string | null;
+  subcategoria_id: string | null;
   descricao: string | null;
   preco: number;
   preco_promocional: number | null;
@@ -28,8 +31,12 @@ export default function SellerProductPage() {
   const productId = params.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<
+    { id: string; nome: string; parent_id: string | null }[]
+  >([]);
   const [affiliateLink, setAffiliateLink] = useState("");
   const [currentPhoto, setCurrentPhoto] = useState(0);
+  const [affiliating, setAffiliating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -40,12 +47,16 @@ export default function SellerProductPage() {
 
       const user = await getCurrentUser();
 
-      const { data, error: queryError } = await supabase
-        .from("products")
+      const [{ data, error: queryError }, { data: categoryData }] =
+        await Promise.all([
+          supabase
+            .from("products")
         .select(
           `
             id,
             nome,
+            categoria_id,
+            subcategoria_id,
             descricao,
             preco,
             preco_promocional,
@@ -58,7 +69,16 @@ export default function SellerProductPage() {
           `,
         )
         .eq("id", productId)
-        .maybeSingle();
+        .maybeSingle(),
+          supabase
+            .from("categories")
+            .select("id, nome, parent_id")
+            .order("ordem", { ascending: true }),
+        ]);
+
+      if (categoryData) {
+        setCategories(categoryData);
+      }
 
       if (queryError) {
         setError(queryError.message);
@@ -77,9 +97,10 @@ export default function SellerProductPage() {
       if (user) {
         const { data: affiliation } = await supabase
           .from("affiliations")
-          .select("link_unico")
+          .select("link_unico, ativo")
           .eq("product_id", productId)
           .eq("vendedor_id", user.id)
+          .eq("ativo", true)
           .maybeSingle();
 
         if (affiliation?.link_unico) {
@@ -255,6 +276,30 @@ export default function SellerProductPage() {
                 {product.nome}
               </h1>
 
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Category
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-slate-900">
+                    {categories.find(
+                      (category) => category.id === product.categoria_id,
+                    )?.nome || "Uncategorized"}
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Subcategory
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-slate-900">
+                    {categories.find(
+                      (category) => category.id === product.subcategoria_id,
+                    )?.nome || "No subcategory"}
+                  </p>
+                </div>
+              </div>
+
               <p className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-600">
                 {product.descricao || "No description available."}
               </p>
@@ -310,14 +355,128 @@ export default function SellerProductPage() {
                   }}
                   className="flex h-12 items-center justify-center rounded-lg border border-[#16294F] bg-white px-6 text-sm font-semibold text-[#16294F] transition hover:bg-slate-50"
                 >
-                  {copied ? "Copied!" : "Affiliate Link"}
+                  {copied ? "Copied!" : "Copy Affiliate Link"}
                 </button>
               ) : (
-                <div className="flex h-12 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-6 text-sm font-medium text-slate-400">
-                  Affiliate Link unavailable
-                </div>
+                <button
+                  type="button"
+                  disabled={affiliating}
+                  onClick={async () => {
+                    try {
+                      setError("");
+                      setAffiliating(true);
+
+                      const result = await createAffiliation(product.id);
+
+                      setAffiliateLink(result.affiliate_link);
+                    } catch (err) {
+                      setError(
+                        err instanceof Error
+                          ? err.message
+                          : "Failed to create affiliate link.",
+                      );
+                    } finally {
+                      setAffiliating(false);
+                    }
+                  }}
+                  className="flex h-12 items-center justify-center rounded-lg bg-[#16294F] px-6 text-sm font-semibold text-white transition hover:bg-[#10203d] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {affiliating ? "Creating affiliate link..." : "Sell This Product"}
+                </button>
               )}
             </div>
+
+            {affiliateLink && (
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Promotion Links
+                    </h2>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Use these links to promote this product.
+                    </p>
+                  </div>
+                  <Badge>Affiliate Ready</Badge>
+                </div>
+
+                <div className="mt-5 space-y-3">
+                  <div className="rounded-lg border border-slate-200 p-3">
+                    <p className="text-xs font-semibold text-slate-700">
+                      Affiliate Link
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        readOnly
+                        value={affiliateLink}
+                        className="min-w-0 flex-1 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await navigator.clipboard.writeText(affiliateLink);
+                          setCopied(true);
+                          window.setTimeout(() => setCopied(false), 1800);
+                        }}
+                        className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                      >
+                        {copied ? "Copied!" : "Copy"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-200 p-3">
+                    <p className="text-xs font-semibold text-slate-700">
+                      Product Page
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        readOnly
+                        value={`${window.location.origin}/marketplace/${product.id}`}
+                        className="min-w-0 flex-1 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await navigator.clipboard.writeText(
+                            `${window.location.origin}/marketplace/${product.id}`,
+                          );
+                        }}
+                        className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-200 p-3">
+                    <p className="text-xs font-semibold text-slate-700">
+                      Checkout
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        readOnly
+                        value={product.checkout_url || "Checkout unavailable"}
+                        className="min-w-0 flex-1 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 outline-none"
+                      />
+                      {product.checkout_url && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(
+                              product.checkout_url || "",
+                            );
+                          }}
+                          className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                          Copy
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
 
           </div>

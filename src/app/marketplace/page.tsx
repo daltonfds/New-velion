@@ -16,6 +16,7 @@ interface Category {
   icone: string | null;
   ordem: number;
   created_at: string;
+  parent_id: string | null;
 }
 
 function money(value: number, currency: string) {
@@ -39,6 +40,7 @@ export default function MarketplacePage() {
 
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState("all");
+  const [subcategoryId, setSubcategoryId] = useState("all");
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [newOnly, setNewOnly] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -92,7 +94,7 @@ export default function MarketplacePage() {
           getActiveProducts(),
           supabase
             .from("categories")
-            .select("id, nome, slug, icone, ordem, created_at")
+            .select("id, nome, slug, icone, ordem, created_at, parent_id")
             .order("ordem", { ascending: true })
             .order("nome", { ascending: true }),
         ]);
@@ -141,7 +143,20 @@ export default function MarketplacePage() {
     void loadMarketplace();
   }, [router]);
 
-  const filteredProducts = useMemo(() => {
+  const parentCategories = categories
+    .filter((category) => !category.parent_id)
+    .sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0));
+
+  const visibleSubcategories = categories
+    .filter(
+      (category) =>
+        category.parent_id === categoryId &&
+        category.parent_id !== null
+    )
+    .sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0));
+
+
+const filteredProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
     return products.filter((product) => {
@@ -153,17 +168,29 @@ export default function MarketplacePage() {
       const matchesCategory =
         categoryId === "all" || product.categoria_id === categoryId;
 
+      const matchesSubcategory =
+        subcategoryId === "all" ||
+        product.subcategoria_id === subcategoryId;
+
       const matchesFeatured = !featuredOnly || product.destaque;
       const matchesNew = !newOnly || product.novo;
 
       return (
         matchesSearch &&
         matchesCategory &&
+        matchesSubcategory &&
         matchesFeatured &&
         matchesNew
       );
     });
-  }, [products, search, categoryId, featuredOnly, newOnly]);
+  }, [
+    products,
+    search,
+    categoryId,
+    subcategoryId,
+    featuredOnly,
+    newOnly,
+  ]);
 
   async function handleAffiliate(productId: string) {
     try {
@@ -341,7 +368,10 @@ export default function MarketplacePage() {
               <select
                 id="marketplace-category"
                 value={categoryId}
-                onChange={(event) => setCategoryId(event.target.value)}
+                onChange={(event) => {
+                  setCategoryId(event.target.value);
+                  setSubcategoryId("all");
+                }}
                 className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 lg:w-56"
               >
                 <option value="all">All categories</option>
@@ -349,6 +379,21 @@ export default function MarketplacePage() {
                   <option key={category.id} value={category.id}>{category.nome}</option>
                 ))}
               </select>
+          {categoryId !== "all" && visibleSubcategories.length > 0 && (
+            <select
+              value={subcategoryId}
+              onChange={(event) => setSubcategoryId(event.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600"
+            >
+              <option value="all">All subcategories</option>
+              {visibleSubcategories.map((subcategory) => (
+                <option key={subcategory.id} value={subcategory.id}>
+                  {subcategory.nome}
+                </option>
+              ))}
+            </select>
+          )}
+
             </div>
           </div>
 
@@ -362,7 +407,7 @@ export default function MarketplacePage() {
               New
             </button>
             {(search || categoryId !== "all" || featuredOnly || newOnly) && (
-              <button type="button" onClick={() => { setSearch(""); setCategoryId("all"); setFeaturedOnly(false); setNewOnly(false); }}
+              <button type="button" onClick={() => { setSearch(""); setCategoryId("all"); setSubcategoryId("all"); setFeaturedOnly(false); setNewOnly(false); }}
                 className="ml-auto px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700">
                 Clear filters
               </button>
@@ -460,7 +505,10 @@ export default function MarketplacePage() {
               <select
                 id="marketplace-category"
                 value={categoryId}
-                onChange={(event) => setCategoryId(event.target.value)}
+                onChange={(event) => {
+                  setCategoryId(event.target.value);
+                  setSubcategoryId("all");
+                }}
                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               >
                 <option value="all">All categories</option>
@@ -471,6 +519,21 @@ export default function MarketplacePage() {
                   </option>
                 ))}
               </select>
+          {categoryId !== "all" && visibleSubcategories.length > 0 && (
+            <select
+              value={subcategoryId}
+              onChange={(event) => setSubcategoryId(event.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600"
+            >
+              <option value="all">All subcategories</option>
+              {visibleSubcategories.map((subcategory) => (
+                <option key={subcategory.id} value={subcategory.id}>
+                  {subcategory.nome}
+                </option>
+              ))}
+            </select>
+          )}
+
             </div>
 
             <button
@@ -512,7 +575,7 @@ export default function MarketplacePage() {
                 type="button"
                 onClick={() => {
                   setSearch("");
-                  setCategoryId("all");
+                  setCategoryId("all"); setSubcategoryId("all");
                   setFeaturedOnly(false);
                   setNewOnly(false);
                 }}
@@ -567,7 +630,7 @@ export default function MarketplacePage() {
                 type="button"
                 onClick={() => {
                   setSearch("");
-                  setCategoryId("all");
+                  setCategoryId("all"); setSubcategoryId("all");
                   setFeaturedOnly(false);
                   setNewOnly(false);
                 }}
