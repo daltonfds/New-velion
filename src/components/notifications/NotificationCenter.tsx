@@ -214,12 +214,26 @@ export default function NotificationCenter() {
   async function enablePush() {
     console.log("[NewVelion Push] 1. Starting");
 
-    if (
-      !("Notification" in window) ||
-      !("serviceWorker" in navigator) ||
-      !("PushManager" in window)
-    ) {
-      console.error("[NewVelion Push] 2. Push APIs unavailable");
+    const hasNotification = "Notification" in window;
+    const hasServiceWorker = "serviceWorker" in navigator;
+    const hasPushManager = "PushManager" in window;
+
+    console.log("[NewVelion Push] 2. API availability:", {
+      Notification: hasNotification,
+      ServiceWorker: hasServiceWorker,
+      PushManager: hasPushManager,
+      userAgent: navigator.userAgent,
+      protocol: window.location.protocol,
+      standalone:
+        window.matchMedia?.("(display-mode: standalone)")?.matches ?? false,
+    });
+
+    if (!hasNotification || !hasServiceWorker || !hasPushManager) {
+      console.error("[NewVelion Push] 2. Push APIs unavailable", {
+        Notification: hasNotification,
+        ServiceWorker: hasServiceWorker,
+        PushManager: hasPushManager,
+      });
       return;
     }
 
