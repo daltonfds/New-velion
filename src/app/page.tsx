@@ -179,12 +179,63 @@ export default function HomePage() {
                   </a>
                 </div>
 
-                <a
-                  href="mailto:contact@newvelion.com"
-                  className="mt-2 block rounded-lg px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50"
-                >
-                  Support
-                </a>
+                <div className="mt-3 border-t border-slate-100 pt-3">
+                  <p className="px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#8A8570]">
+                    Support
+                  </p>
+
+                  <a
+                    href="https://instagram.com/newvelion"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                      <rect x="3" y="3" width="18" height="18" rx="5" />
+                      <circle cx="12" cy="12" r="4" />
+                      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                    </svg>
+                    <span>Instagram</span>
+                    <span className="ml-auto text-xs text-slate-400">newvelion</span>
+                  </a>
+
+                  <a
+                    href="https://wa.me/27722958915"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                      <path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4A8 8 0 1 1 20 11.5Z" />
+                      <path d="M8.5 8.5c.3 1.8 2 3.7 3.8 4.5.5.2 1 .1 1.4-.2l.7-.6c.2-.2.5-.2.8 0l1.2.6c.3.2.4.5.3.8-.3 1-1.2 1.5-2.1 1.4-3.1-.3-5.6-3.5-6.2-5.5-.2-.8.2-1.7 1-2.1.3-.2.6-.1.8.2l.7 1.2c.2.3.1.6-.1.8l-.6.6c-.3.3-.4.7-.2 1.1Z" />
+                    </svg>
+                    <span>WhatsApp</span>
+                    <span className="ml-auto text-xs text-slate-400">+27 72 295 8915</span>
+                  </a>
+
+                  <a
+                    href="tel:+27722958915"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                      <path d="M6.6 3.5 9.2 3c.6-.1 1.1.2 1.3.8l1.2 3c.2.5.1 1-.3 1.3L9.8 9.4a14.5 14.5 0 0 0 4.8 4.8l1.3-1.6c.3-.4.8-.5 1.3-.3l3 1.2c.6.2.9.7.8 1.3l-.5 2.6c-.1.6-.6 1-1.2 1C11.5 18.4 5.6 12.5 5.6 5c0-.6.4-1.4 1-1.5Z" />
+                    </svg>
+                    <span>Call</span>
+                    <span className="ml-auto text-xs text-slate-400">+27 72 295 8915</span>
+                  </a>
+
+                  <a
+                    href="mailto:contact@newvelion.com"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                      <rect x="3" y="5" width="18" height="14" rx="2" />
+                      <path d="m4 7 8 6 8-6" />
+                    </svg>
+                    <span>Email</span>
+                    <span className="ml-auto text-xs text-slate-400">Contact</span>
+                  </a>
+                </div>
               </div>
             </details>
 
