@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import ProductImageUploader from "@/components/products/ProductImageUploader";
 import { supabase } from "@/lib/supabase";
+import { notify } from "@/lib/notify";
 
 interface ProductForm {
   nome: string;
@@ -181,9 +182,15 @@ export default function AdminProductPage() {
 
     if (updateError) {
       setError(updateError.message);
+      notify.error("Falha ao atualizar produto", updateError.message);
       setSaving(false);
       return;
     }
+
+    notify.success(
+      "Produto atualizado",
+      "As alterações foram salvas com sucesso."
+    );
 
     setSuccess("Product updated successfully.");
     setSaving(false);
@@ -204,9 +211,15 @@ export default function AdminProductPage() {
 
     if (deleteError) {
       setError(deleteError.message);
+      notify.error("Falha ao excluir produto", deleteError.message);
       setDeleting(false);
       return;
     }
+
+    notify.success(
+      "Produto excluído",
+      "O produto foi excluído com sucesso."
+    );
 
     router.push("/dashboard/admin/products");
     router.refresh();

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import { supabase } from "@/lib/supabase";
+import { notify } from "@/lib/notify";
 
 type Session = {
   id: string;
@@ -182,7 +183,32 @@ export default function AdminCheckoutSessionsPage() {
         }
       );
 
-      if (rpcError) throw rpcError;
+      if (rpcError) {
+        notify.error(
+          "Falha ao registrar pagamento",
+          rpcError.message
+        );
+        throw rpcError;
+      }
+
+      const result = Array.isArray(data) ? data[0] : data;
+
+      if (result?.comparison_status === "mismatch") {
+        notify.warning(
+          "Pagamento registrado com divergência",
+          "O valor ou a moeda do pagamento não corresponde ao pedido NewVelion."
+        );
+      } else if (result?.comparison_status === "review") {
+        notify.warning(
+          "Pagamento requer revisão",
+          "O pagamento foi registrado, mas os dados do cliente precisam ser revisados."
+        );
+      } else {
+        notify.success(
+          "Pagamento registrado",
+          "O pagamento externo foi registrado com sucesso."
+        );
+      }
 
       await loadSessions();
 
@@ -191,8 +217,6 @@ export default function AdminCheckoutSessionsPage() {
       if (refreshed) {
         openSession(refreshed);
       }
-
-      const result = Array.isArray(data) ? data[0] : data;
 
       if (result?.comparison_status === "mismatch") {
         setError(
@@ -236,6 +260,10 @@ export default function AdminCheckoutSessionsPage() {
 
         if (error) {
           console.error("Checkout approval RPC failed:", error);
+          notify.error(
+            "Falha ao aprovar checkout",
+            error.message || "Failed to approve checkout session."
+          );
           throw new Error(
             error.message || "Failed to approve checkout session."
           );
@@ -246,10 +274,19 @@ export default function AdminCheckoutSessionsPage() {
           : data?.sale_id;
 
         if (!saleId) {
+          notify.error(
+            "Falha ao aprovar checkout",
+            "O checkout foi processado, mas nenhuma venda foi criada."
+          );
           throw new Error(
             "Checkout was approved but no sale was created."
           );
         }
+
+        notify.success(
+          "Checkout aprovado",
+          "O checkout foi aprovado e a venda foi criada com sucesso."
+        );
       } else {
         const response = await fetch(
           "/api/admin/checkout-sessions/status",
@@ -281,10 +318,25 @@ export default function AdminCheckoutSessionsPage() {
         }
 
         if (!response.ok) {
+          notify.error(
+            status === "rejected"
+              ? "Falha ao rejeitar checkout"
+              : "Falha ao atualizar checkout",
+            result?.error || "Failed to update checkout session."
+          );
           throw new Error(
             result?.error || "Failed to update checkout session."
           );
         }
+
+        notify.success(
+          status === "rejected"
+            ? "Checkout rejeitado"
+            : "Checkout atualizado",
+          status === "rejected"
+            ? "O checkout foi rejeitado com sucesso."
+            : "O status do checkout foi atualizado com sucesso."
+        );
       }
 
       setSelected(null);

@@ -6,6 +6,7 @@ import AppShell from "@/components/layout/AppShell";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser } from "@/lib/auth";
 import { COUNTRIES } from "@/lib/countries";
+import { notify } from "@/lib/notify";
 
 type Method = "bank_transfer"|"mpesa"|"emola";
 type Details = Record<string,string>;
@@ -95,8 +96,25 @@ export default function SellerSettingsPage(){
       payout_methods:payoutMethods,
       updated_at:new Date().toISOString()
     },{onConflict:"user_id"});
-    if(error){setError(error.message);setSaving(false);return}
+    if(error){
+      setError(error.message);
+
+      notify.error(
+        "Falha ao salvar configurações",
+        error.message
+      );
+
+      setSaving(false);
+      return;
+    }
+
     setMessage("Settings saved successfully.");
+
+    notify.success(
+      "Configurações salvas",
+      "As suas configurações foram salvas com sucesso."
+    );
+
     setSaving(false);
   }
 
@@ -175,11 +193,23 @@ export default function SellerSettingsPage(){
       setKycStatus("pending");
       setKycRejectionReason("");
       setKycMessage("KYC submitted successfully. Your documents are now under review.");
+
+      notify.success(
+        "KYC enviado",
+        "Os seus documentos foram enviados e estão agora em análise."
+      );
+
       setDocumentFront(null);
       setDocumentBack(null);
       setSelfie(null);
     }catch(e){
-      setKycError(e instanceof Error ? e.message : "Unable to submit KYC.");
+      const message = e instanceof Error ? e.message : "Unable to submit KYC.";
+      setKycError(message);
+
+      notify.error(
+        "Falha no envio do KYC",
+        message
+      );
     }finally{
       setKycSubmitting(false);
     }

@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Badge from "@/components/ui/Badge";
 import { supabase } from "@/lib/supabase";
+import { notify } from "@/lib/notify";
 
 interface Withdrawal {
   id: string;
@@ -366,13 +367,35 @@ export default function AdminWithdrawalsPage() {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      setActionError(
+      const message =
         result?.error ||
-          "Failed to update withdrawal.",
+        "Failed to update withdrawal.";
+
+      setActionError(message);
+      notify.error(
+        status === "rejeitado"
+          ? "Não foi possível rejeitar o saque"
+          : status === "pago"
+            ? "Não foi possível marcar o saque como pago"
+            : "Não foi possível atualizar o saque",
+        message,
       );
       setActionLoading(false);
       return;
     }
+
+    notify.success(
+      status === "rejeitado"
+        ? "Saque rejeitado"
+        : status === "pago"
+          ? "Saque marcado como pago"
+          : "Saque atualizado",
+      status === "rejeitado"
+        ? "O saque foi rejeitado e o saldo foi tratado pelo sistema."
+        : status === "pago"
+          ? "O pagamento do saque foi registrado com sucesso."
+          : "O status do saque foi atualizado com sucesso.",
+    );
 
     await load();
 

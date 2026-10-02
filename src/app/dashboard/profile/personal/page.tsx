@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser } from "@/lib/auth";
+import { notify } from "@/lib/notify";
 
 export default function PersonalProfilePage() {
   const [firstName,setFirstName]=useState("");
@@ -52,12 +53,37 @@ export default function PersonalProfilePage() {
       telefone:phone.trim()||null,
       updated_at:new Date().toISOString()
     }).eq("id",user.id);
-    if(error){setError(error.message);setSaving(false);return}
+    if(error){
+      setError(error.message);
+      notify.error("Falha ao salvar perfil", error.message);
+      setSaving(false);
+      return;
+    }
+
     if(email.trim()!==String(user.email??"")){
       const {error:emailError}=await supabase.auth.updateUser({email:email.trim()});
-      if(emailError){setError(emailError.message);setSaving(false);return}
+
+      if(emailError){
+        setError(emailError.message);
+        notify.error("Falha ao alterar email", emailError.message);
+        setSaving(false);
+        return;
+      }
+
       setMessage("Profile saved. Confirm the new email from your inbox.");
-    }else setMessage("Profile saved successfully.");
+
+      notify.success(
+        "Perfil atualizado",
+        "Os dados foram salvos. Confirme o novo email na sua caixa de entrada."
+      );
+    }else{
+      setMessage("Profile saved successfully.");
+
+      notify.success(
+        "Perfil atualizado",
+        "As suas informações foram salvas com sucesso."
+      );
+    }
     setSaving(false);
   }
 

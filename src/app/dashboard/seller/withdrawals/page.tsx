@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import { getCurrentUser } from "@/lib/auth";
 import { getWalletSummary } from "@/lib/services/wallet";
 import { supabase } from "@/lib/supabase";
+import { notify } from "@/lib/notify";
 
 type Method = "bank_transfer" | "mpesa" | "emola";
 
@@ -316,6 +317,12 @@ export default function SellerWithdrawalsPage() {
       if (error) throw new Error(error.message);
 
       setSuccess("Withdrawal request submitted successfully.");
+
+      notify.success(
+        "Saque solicitado",
+        "O seu pedido de saque foi enviado com sucesso."
+      );
+
       setAmount("");
 
       const [nw, nwd] = await Promise.all([
@@ -335,8 +342,14 @@ export default function SellerWithdrawalsPage() {
         setWithdrawals((nwd.data ?? []) as Withdrawal[]);
       }
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Unable to submit withdrawal."
+      const message =
+        e instanceof Error ? e.message : "Unable to submit withdrawal.";
+
+      setError(message);
+
+      notify.error(
+        "Falha ao solicitar saque",
+        message
       );
     } finally {
       setSubmitting(false);

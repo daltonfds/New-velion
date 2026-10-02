@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import ProductImageUploader from "@/components/products/ProductImageUploader";
 import { supabase } from "@/lib/supabase";
+import { notify } from "@/lib/notify";
 
 interface Category {
   id: string;
@@ -142,9 +143,15 @@ export default function NewProductPage() {
 
     if (insertError) {
       setError(insertError.message);
+      notify.error("Falha ao criar produto", insertError.message);
       setSaving(false);
       return;
     }
+
+    notify.success(
+      "Produto criado",
+      "O produto foi criado com sucesso."
+    );
 
     router.push("/dashboard/admin/products");
     router.refresh();

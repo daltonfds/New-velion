@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { supabase } from "@/lib/supabase";
+import { notify } from "@/lib/notify";
 
 interface Category {
   id: string;
@@ -84,9 +85,15 @@ export default function AdminCategoriesPage() {
 
     if (insertError) {
       setError(insertError.message);
+      notify.error("Falha ao criar categoria", insertError.message);
       setSaving(false);
       return;
     }
+
+    notify.success(
+      "Categoria criada",
+      "A categoria foi criada com sucesso."
+    );
 
     setName("");
     setSlug("");
@@ -117,8 +124,14 @@ export default function AdminCategoriesPage() {
 
     if (deleteError) {
       setError(deleteError.message);
+      notify.error("Falha ao excluir categoria", deleteError.message);
       return;
     }
+
+    notify.success(
+      "Categoria excluída",
+      "A categoria foi excluída com sucesso."
+    );
 
     setSuccess("Category deleted successfully.");
     await loadCategories();
