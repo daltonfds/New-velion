@@ -23,30 +23,32 @@ function LoginPageContent() {
     setSuccess("");
     setLoading(true);
 
-    const { data, error: loginError } =
-      await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
       });
 
-    setLoading(false);
+      const result = await response.json();
 
-    if (loginError) {
-      setError(loginError.message);
-      return;
+      if (!response.ok) {
+        setError(result?.error || "Unable to sign in.");
+        return;
+      }
+
+      router.push(searchParams.get("redirect") || "/dashboard");
+      router.refresh();
+    } catch {
+      setError("Unable to sign in right now. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    if (!data.user?.email_confirmed_at) {
-      await supabase.auth.signOut();
-
-      setError(
-        "Please confirm your email address before signing in. Check your inbox and spam folder."
-      );
-
-      return;
-    }
-
-    router.push(searchParams.get("redirect") || "/dashboard");
     router.refresh();
   }
 
