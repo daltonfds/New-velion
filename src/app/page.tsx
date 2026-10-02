@@ -127,148 +127,76 @@ export default function HomePage() {
     <main className="min-h-screen bg-white text-slate-900">
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-          <Link href="/" aria-label="Newvelion home" className="shrink-0">
-            <NewvelionBrand size="sm" />
-          </Link>
-
-          <details className="relative lg:hidden">
-      <summary className="flex cursor-pointer list-none items-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700">
-        Menu
-      </summary>
-
-      <div className="absolute right-0 top-full z-50 mt-2 w-72 border border-slate-200 bg-white p-3">
-        <div className="border-b border-slate-100 pb-3">
-          <p className="px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#8A8570]">
-            Platform
-          </p>
-
-          <Link href="#how-it-works" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            How it works
-          </Link>
-          <Link href="/marketplace" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            Marketplace
-          </Link>
-          <Link href="#seller" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            For Sellers
-          </Link>
-          <Link href="#supplier" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            For Suppliers
-          </Link>
-          <Link href="#earnings" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            Earnings
-          </Link>
-        </div>
-
-        <div className="border-b border-slate-100 py-3">
-          <p className="px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#8A8570]">
-            Resources
-          </p>
-
-          <Link href="#faq" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            FAQ
-          </Link>
-          <Link href="#payouts" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            Payouts
-          </Link>
-          <a href="mailto:contact@newvelion.com" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            Help Center
-          </a>
-        </div>
-
-        <a
-          href="mailto:contact@newvelion.com"
-          className="mt-2 block rounded-lg px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50"
-        >
-          Support
-        </a>
-      </div>
-    </details>
-
-    <nav className="hidden items-center gap-1 lg:flex">
-            <details className="group relative">
-              <summary className="flex cursor-pointer list-none items-center gap-1 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                Platform
-                <span className="text-slate-400 transition-transform group-open:rotate-180">
-                  ↓
+          <div className="flex items-center gap-3">
+            <details className="relative">
+              <summary
+                className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
+                aria-label="Open menu"
+              >
+                <span className="flex flex-col gap-1.5">
+                  <span className="block h-0.5 w-5 bg-slate-700"></span>
+                  <span className="block h-0.5 w-5 bg-slate-700"></span>
+                  <span className="block h-0.5 w-5 bg-slate-700"></span>
                 </span>
               </summary>
 
-              <div className="absolute left-0 top-full mt-2 w-64 border border-slate-200 bg-white p-2">
-                <Link
-                  href="#how-it-works"
-                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
-                >
-                  How it works
-                </Link>
-                <Link
-                  href="/marketplace"
-                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
-                >
-                  Marketplace
-                </Link>
-                <Link
-                  href="#seller"
-                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
-                >
-                  For Sellers
-                </Link>
-                <Link
-                  href="#supplier"
-                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
-                >
-                  For Suppliers
-                </Link>
-                <Link
-                  href="#earnings"
-                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
-                >
-                  Earnings
-                </Link>
-              </div>
-            </details>
+              <div className="absolute left-0 top-full z-50 mt-2 w-72 border border-slate-200 bg-white p-3">
+                <div className="border-b border-slate-100 pb-3">
+                  <p className="px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#8A8570]">
+                    Platform
+                  </p>
 
-            <details className="group relative">
-              <summary className="flex cursor-pointer list-none items-center gap-1 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                Resources
-                <span className="text-slate-400 transition-transform group-open:rotate-180">
-                  ↓
-                </span>
-              </summary>
+                  <Link href="#how-it-works" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    How it works
+                  </Link>
+                  <Link href="/marketplace" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    Marketplace
+                  </Link>
+                  <Link href="#seller" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    For Sellers
+                  </Link>
+                  <Link href="#supplier" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    For Suppliers
+                  </Link>
+                  <Link href="#earnings" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    Earnings
+                  </Link>
+                </div>
 
-              <div className="absolute left-0 top-full mt-2 w-56 border border-slate-200 bg-white p-2">
-                <Link
-                  href="#faq"
-                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
-                >
-                  FAQ
-                </Link>
-                <Link
-                  href="#payouts"
-                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
-                >
-                  Payouts
-                </Link>
+                <div className="border-b border-slate-100 py-3">
+                  <p className="px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#8A8570]">
+                    Resources
+                  </p>
+
+                  <Link href="#faq" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    FAQ
+                  </Link>
+                  <Link href="#payouts" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    Payouts
+                  </Link>
+                  <a href="mailto:contact@newvelion.com" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    Help Center
+                  </a>
+                </div>
+
                 <a
                   href="mailto:contact@newvelion.com"
-                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                  className="mt-2 block rounded-lg px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50"
                 >
-                  Help Center
+                  Support
                 </a>
               </div>
             </details>
 
-            <a
-              href="mailto:contact@newvelion.com"
-              className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              Support
-            </a>
-          </nav>
+            <Link href="/" aria-label="Newvelion home" className="shrink-0">
+              <NewvelionBrand size="sm" />
+            </Link>
+          </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
               Log in
             </Link>
