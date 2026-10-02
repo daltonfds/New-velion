@@ -3,9 +3,9 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
-const WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
-const BLOCK_MS = 15 * 60 * 1000;
+const WINDOW_SECONDS = 15 * 60;
+const BLOCK_SECONDS = 15 * 60;
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -26,10 +26,14 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const email =
-      typeof body?.email === "string" ? normalizeEmail(body.email) : "";
+      typeof body?.email === "string"
+        ? normalizeEmail(body.email)
+        : "";
 
     const password =
-      typeof body?.password === "string" ? body.password : "";
+      typeof body?.password === "string"
+        ? body.password
+        : "";
 
     if (!email || !password) {
       return NextResponse.json(
@@ -43,6 +47,8 @@ export async function POST(request: Request) {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
+      console.error("Missing Supabase authentication environment variables.");
+
       return NextResponse.json(
         { error: "Authentication service is not configured." },
         { status: 500 },
@@ -52,26 +58,24 @@ export async function POST(request: Request) {
     const ip = getClientIp(request);
     const rateKey = `${ip}:${email}`;
 
-    const admin = createClient(supabaseUrl, serviceRoleKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
+    const admin = createClient(
+      supabaseUrl,
+      serviceRoleKey,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
       },
-    });
+    );
 
-    const now = Date.now();
+    const { data: rateData, error: rateCheckError } =
+      await admin.rpc("login_rate_limit_check", {
+        p_rate_key: rateKey,
+      });
 
-    const { data: existing, error: rateReadError } = await admin
-      .schema("private")
-      .from("login_rate_limits")
-      .select(
-        "id, rate_key, window_started_at, attempt_count, blocked_until",
-      )
-      .eq("rate_key", rateKey)
-      .maybeSingle();
-
-    if (rateReadError) {
-      console.error("Login rate-limit read failed:", rateReadError);
+    if (rateCheckError) {
+      console.error("Login rate-limit check failed:", rateCheckError);
 
       return NextResponse.json(
         { error: "Authentication service temporarily unavailable." },
@@ -79,70 +83,20 @@ export async function POST(request: Request) {
       );
     }
 
-    if (existing?.blocked_until) {
-      const blockedUntil = new Date(existing.blocked_until).getTime();
+    const rateStatus = Array.isArray(rateData)
+      ? rateData[0]
+      : rateData;
 
-      if (blockedUntil > now) {
-        return NextResponse.json(
-          {
-            error:
-              "Too many login attempts. Please try again later.",
-          },
-          {
-            status: 429,
-            headers: {
-              "Retry-After": String(
-                Math.ceil((blockedUntil - now) / 1000),
-              ),
-            },
-          },
-        );
-      }
-    }
+    if (!rateStatus?.allowed) {
+      const blockedUntil = rateStatus?.blocked_until
+        ? new Date(rateStatus.blocked_until).getTime()
+        : Date.now() + BLOCK_SECONDS * 1000;
 
-    let attemptCount = existing?.attempt_count ?? 0;
-    let windowStartedAt = existing?.window_started_at
-      ? new Date(existing.window_started_at).getTime()
-      : now;
-
-    if (now - windowStartedAt >= WINDOW_MS) {
-      attemptCount = 0;
-      windowStartedAt = now;
-    }
-
-    attemptCount += 1;
-
-    const blockedUntil =
-      attemptCount >= MAX_ATTEMPTS
-        ? new Date(now + BLOCK_MS).toISOString()
-        : null;
-
-    const { error: rateWriteError } = await admin
-      .schema("private")
-      .from("login_rate_limits")
-      .upsert(
-        {
-          rate_key: rateKey,
-          window_started_at: new Date(windowStartedAt).toISOString(),
-          attempt_count: attemptCount,
-          blocked_until: blockedUntil,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "rate_key",
-        },
+      const retryAfter = Math.max(
+        1,
+        Math.ceil((blockedUntil - Date.now()) / 1000),
       );
 
-    if (rateWriteError) {
-      console.error("Login rate-limit write failed:", rateWriteError);
-
-      return NextResponse.json(
-        { error: "Authentication service temporarily unavailable." },
-        { status: 503 },
-      );
-    }
-
-    if (attemptCount >= MAX_ATTEMPTS) {
       return NextResponse.json(
         {
           error:
@@ -151,7 +105,7 @@ export async function POST(request: Request) {
         {
           status: 429,
           headers: {
-            "Retry-After": String(Math.ceil(BLOCK_MS / 1000)),
+            "Retry-After": String(retryAfter),
           },
         },
       );
@@ -176,12 +130,47 @@ export async function POST(request: Request) {
       },
     );
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (error) {
+      const { data: failureData, error: failureError } =
+        await admin.rpc("login_rate_limit_record_failure", {
+          p_rate_key: rateKey,
+          p_max_attempts: MAX_ATTEMPTS,
+          p_window_seconds: WINDOW_SECONDS,
+          p_block_seconds: BLOCK_SECONDS,
+        });
+
+      if (failureError) {
+        console.error(
+          "Login rate-limit record failed:",
+          failureError,
+        );
+      }
+
+      const failureStatus = Array.isArray(failureData)
+        ? failureData[0]
+        : failureData;
+
+      if (failureStatus?.blocked_until) {
+        return NextResponse.json(
+          {
+            error:
+              "Too many login attempts. Please try again later.",
+          },
+          {
+            status: 429,
+            headers: {
+              "Retry-After": String(BLOCK_SECONDS),
+            },
+          },
+        );
+      }
+
       return NextResponse.json(
         { error: "Invalid email or password." },
         { status: 401 },
@@ -190,6 +179,13 @@ export async function POST(request: Request) {
 
     if (!data.user?.email_confirmed_at) {
       await supabase.auth.signOut();
+
+      await admin.rpc("login_rate_limit_record_failure", {
+        p_rate_key: rateKey,
+        p_max_attempts: MAX_ATTEMPTS,
+        p_window_seconds: WINDOW_SECONDS,
+        p_block_seconds: BLOCK_SECONDS,
+      });
 
       return NextResponse.json(
         {
@@ -200,11 +196,17 @@ export async function POST(request: Request) {
       );
     }
 
-    await admin
-      .schema("private")
-      .from("login_rate_limits")
-      .delete()
-      .eq("rate_key", rateKey);
+    const { error: resetError } =
+      await admin.rpc("login_rate_limit_reset", {
+        p_rate_key: rateKey,
+      });
+
+    if (resetError) {
+      console.error(
+        "Login rate-limit reset failed:",
+        resetError,
+      );
+    }
 
     return NextResponse.json({
       user: data.user,
