@@ -243,7 +243,7 @@ export default function SellerSalesPage() {
 
           <Link
             href="/marketplace"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#16294F] px-5 text-sm font-semibold text-white transition hover:bg-[#10203d]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700"
           >
             Find products
           </Link>

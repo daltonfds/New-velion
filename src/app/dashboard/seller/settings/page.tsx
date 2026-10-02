@@ -188,7 +188,7 @@ export default function SellerSettingsPage(){
   const showMZ=country==="MZ";
   return <AppShell area="seller" title="Settings" subtitle="Manage your account and payout preferences.">
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-[#16294F]">← Account</Link>
+      <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-blue-600">← Account</Link>
       <div><h2 className="mt-3 text-2xl font-bold text-[#16294F]">Settings</h2><p className="mt-1 text-sm text-slate-500">Payout methods and account preferences are stored securely in NewVelion.</p></div>
       {error&&<div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
       {message&&<div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</div>}
@@ -309,7 +309,7 @@ export default function SellerSettingsPage(){
                   <button
                     onClick={submitKyc}
                     disabled={kycSubmitting||kycLoading}
-                    className="rounded-lg bg-[#16294F] px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {kycSubmitting ? "Submitting KYC..." : "Submit KYC"}
                   </button>
@@ -351,7 +351,7 @@ export default function SellerSettingsPage(){
             <label className="flex items-center justify-between"><span><b className="block text-sm">Sales notifications</b><small className="text-slate-500">Notifications when affiliate sales are recorded.</small></span><input type="checkbox" checked={salesNotifications} onChange={e=>setSalesNotifications(e.target.checked)}/></label>
           </div>
         </section>
-        <div className="flex justify-end"><button onClick={save} disabled={saving} className="rounded-lg bg-[#16294F] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving?"Saving...":"Save settings"}</button></div>
+        <div className="flex justify-end"><button onClick={save} disabled={saving} className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving?"Saving...":"Save settings"}</button></div>
       </>}
     </div>
   </AppShell>

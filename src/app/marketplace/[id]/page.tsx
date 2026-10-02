@@ -158,7 +158,7 @@ export default function SellerProductPage() {
             </p>
             <Link
               href="/dashboard/seller/products"
-              className="mt-6 inline-flex rounded-lg bg-[#16294F] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#10203d]"
+              className="mt-6 inline-flex rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
             >
               Back to My Products
             </Link>
@@ -175,7 +175,7 @@ export default function SellerProductPage() {
       <div className="mx-auto max-w-6xl space-y-6">
         <Link
           href="/dashboard/seller/products"
-          className="inline-flex text-sm font-medium text-slate-500 hover:text-[#16294F]"
+          className="inline-flex text-sm font-medium text-slate-500 hover:text-blue-600"
         >
           ← Back to My Products
         </Link>
@@ -335,7 +335,7 @@ export default function SellerProductPage() {
                   href={product.checkout_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-12 items-center justify-center rounded-lg bg-[#16294F] px-6 text-sm font-semibold text-white transition hover:bg-[#10203d]"
+                  className="flex h-12 items-center justify-center rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white transition hover:bg-blue-700"
                 >
                   Open Checkout
                 </a>
@@ -379,7 +379,7 @@ export default function SellerProductPage() {
                       setAffiliating(false);
                     }
                   }}
-                  className="flex h-12 items-center justify-center rounded-lg bg-[#16294F] px-6 text-sm font-semibold text-white transition hover:bg-[#10203d] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex h-12 items-center justify-center rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {affiliating ? "Creating affiliate link..." : "Sell This Product"}
                 </button>

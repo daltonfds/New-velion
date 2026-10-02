@@ -245,7 +245,7 @@ export default function SellerWalletPage() {
 
             <Link
               href="/dashboard/seller/withdrawals"
-              className="inline-flex h-10 items-center rounded-lg bg-[#16294F] px-4 text-sm font-semibold text-white hover:bg-[#10213f]"
+              className="inline-flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700"
             >
               Withdraw funds
             </Link>
@@ -352,12 +352,12 @@ export default function SellerWalletPage() {
                           className="flex h-full flex-1 flex-col justify-end"
                         >
                           <div className="group relative flex h-full items-end">
-                            <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-[#16294F] px-2 py-1 text-[10px] font-semibold text-white group-hover:block">
+                            <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-blue-600 px-2 py-1 text-[10px] font-semibold text-white group-hover:block">
                               {money(month.value)}
                             </span>
 
                             <div
-                              className="w-full rounded-t-md bg-[#16294F] transition hover:bg-[#29436f]"
+                              className="w-full rounded-t-md bg-blue-600 transition hover:bg-blue-700"
                               style={{ height: `${height}%` }}
                             />
                           </div>

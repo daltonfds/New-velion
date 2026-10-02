@@ -159,7 +159,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/register"
-              className="rounded-lg bg-[#16294F] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#223b69]"
+              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
             >
               Sign up free
             </Link>
@@ -189,7 +189,7 @@ export default function HomePage() {
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center rounded-lg bg-[#16294F] px-6 py-3.5 text-sm font-bold text-white hover:bg-[#223b69]"
+                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-700"
               >
                 Start selling free
               </Link>
@@ -273,7 +273,7 @@ export default function HomePage() {
                         (height, i) => (
                           <div
                             key={i}
-                            className="flex-1 rounded-t-sm bg-[#16294F]"
+                            className="flex-1 rounded-t-sm bg-blue-600"
                             style={{ height: `${height}%` }}
                           />
                         ),
@@ -304,7 +304,7 @@ export default function HomePage() {
                 key={step.number}
                 className="border border-slate-200 bg-white p-7"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#16294F] text-sm font-bold text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
                   {step.number}
                 </div>
                 <h3 className="mt-7 text-xl font-bold text-[#16294F]">
@@ -562,7 +562,7 @@ export default function HomePage() {
                   “{item.text}”
                 </p>
                 <div className="mt-7 flex items-center gap-3 border-t border-slate-100 pt-5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#16294F] text-xs font-bold text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
                     {item.initials}
                   </div>
                   <div>
@@ -602,7 +602,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#16294F]">
+      <section className="bg-blue-600">
         <div className="mx-auto max-w-4xl px-5 py-20 text-center lg:px-8">
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#C99A2E]">
             Start selling
@@ -637,16 +637,16 @@ export default function HomePage() {
             <div>
               <h3 className="text-sm font-bold text-[#16294F]">Platform</h3>
               <div className="mt-4 flex flex-col gap-3 text-sm text-slate-500">
-                <a href="#how-it-works" className="hover:text-[#16294F]">
+                <a href="#how-it-works" className="hover:text-blue-600">
                   How it works
                 </a>
-                <a href="#how-it-works" className="hover:text-[#16294F]">
+                <a href="#how-it-works" className="hover:text-blue-600">
                   Earnings simulator
                 </a>
-                <a href="#how-it-works" className="hover:text-[#16294F]">
+                <a href="#how-it-works" className="hover:text-blue-600">
                   Payout methods
                 </a>
-                <a href="#how-it-works" className="hover:text-[#16294F]">
+                <a href="#how-it-works" className="hover:text-blue-600">
                   FAQ
                 </a>
               </div>
@@ -655,18 +655,18 @@ export default function HomePage() {
             <div>
               <h3 className="text-sm font-bold text-[#16294F]">Contact</h3>
               <div className="mt-4 flex flex-col gap-3 text-sm text-slate-500">
-                <a href="mailto:contact@newvelion.com" className="hover:text-[#16294F]">
+                <a href="mailto:contact@newvelion.com" className="hover:text-blue-600">
                   ✉ contact@newvelion.com
                 </a>
                 <a
                   href="https://instagram.com/newvelion"
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-[#16294F]"
+                  className="hover:text-blue-600"
                 >
                   ◈ Instagram @newvelion
                 </a>
-                <a href="tel:+27722958915" className="hover:text-[#16294F]">
+                <a href="tel:+27722958915" className="hover:text-blue-600">
                   ☏ +27 72 295 8915
                 </a>
               </div>
@@ -676,13 +676,13 @@ export default function HomePage() {
           <div className="mt-10 flex flex-col gap-3 border-t border-slate-200 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
             <span>© {new Date().getFullYear()} Newvelion · Commerce Infrastructure</span>
             <div className="flex gap-5">
-              <Link href="/terms" className="hover:text-[#16294F]">
+              <Link href="/terms" className="hover:text-blue-600">
                 Terms
               </Link>
-              <Link href="/privacy" className="hover:text-[#16294F]">
+              <Link href="/privacy" className="hover:text-blue-600">
                 Privacy
               </Link>
-              <a href="mailto:contact@newvelion.com" className="hover:text-[#16294F]">
+              <a href="mailto:contact@newvelion.com" className="hover:text-blue-600">
                 Support
               </a>
             </div>

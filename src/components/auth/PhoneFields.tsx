@@ -114,7 +114,7 @@ export default function PhoneFields({
               onClick={() => onLanguageChange(value)}
               className={
                 language === value
-                  ? "rounded-xl border border-[#16294F] bg-[#16294F] px-4 py-3 text-sm font-semibold text-white"
+                  ? "rounded-xl border border-[#16294F] bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
                   : "rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#16294F]"
               }
             >

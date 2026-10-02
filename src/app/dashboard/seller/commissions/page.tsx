@@ -272,7 +272,7 @@ export default function SellerCommissionsPage() {
 
           <Link
             href="/dashboard/seller/withdrawals"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#16294F] px-5 text-sm font-semibold text-white transition hover:bg-[#10203d]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700"
           >
             View withdrawals
           </Link>
@@ -337,7 +337,7 @@ export default function SellerCommissionsPage() {
 
                       <div className="flex h-[190px] items-end">
                         <div
-                          className="w-full rounded-t-md bg-[#16294F] transition-all"
+                          className="w-full rounded-t-md bg-blue-600 transition-all"
                           style={{ height: `${height}%` }}
                           title={`${item.label}: ${formatMoney(item.commission)}`}
                         />
@@ -373,7 +373,7 @@ export default function SellerCommissionsPage() {
                 </div>
                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-[#16294F]"
+                    className="h-full rounded-full bg-blue-600"
                     style={{
                       width: `${Math.min(
                         100,

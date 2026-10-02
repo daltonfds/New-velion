@@ -627,7 +627,7 @@ export default function SellerWithdrawalsPage() {
                             <span
                               className={`flex h-5 w-5 items-center justify-center rounded-full border ${
                                 method === m
-                                  ? "border-[#16294F] bg-[#16294F] text-white"
+                                  ? "border-[#16294F] bg-blue-600 text-white"
                                   : "border-slate-300"
                               }`}
                             >
@@ -662,7 +662,7 @@ export default function SellerWithdrawalsPage() {
                         !available.length ||
                         (country === "MZ" && !exchangeRate)
                       }
-                      className="h-11 w-full rounded-md bg-[#16294F] px-4 text-sm font-semibold text-white transition hover:bg-[#203960] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="h-11 w-full rounded-md bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {submitting ? "Submitting..." : "Request Withdrawal"}
                     </button>

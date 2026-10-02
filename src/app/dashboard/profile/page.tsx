@@ -48,7 +48,7 @@ export default function ProfilePage() {
                   <path d="M5 20a7 7 0 0 1 14 0" />
                 </Icon>
               </div>
-              <span className="text-slate-400 group-hover:text-[#16294F]">→</span>
+              <span className="text-slate-400 group-hover:text-blue-600">→</span>
             </div>
             <h3 className="mt-5 text-base font-semibold text-slate-900">
               Personal profile
@@ -76,7 +76,7 @@ export default function ProfilePage() {
                   <path d="m7.7 16.3-2.1 2.1" />
                 </Icon>
               </div>
-              <span className="text-slate-400 group-hover:text-[#16294F]">→</span>
+              <span className="text-slate-400 group-hover:text-blue-600">→</span>
             </div>
             <h3 className="mt-5 text-base font-semibold text-slate-900">
               Settings

@@ -63,7 +63,7 @@ export default function PersonalProfilePage() {
 
   return <AppShell area="seller" title="Personal Profile" subtitle="Manage your personal information.">
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-[#16294F]">← Account</Link>
+      <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-blue-600">← Account</Link>
       <div><h2 className="mt-3 text-2xl font-bold text-[#16294F]">Personal information</h2><p className="mt-1 text-sm text-slate-500">Changes are saved directly to your NewVelion account.</p></div>
       {error&&<div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
       {message&&<div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</div>}
@@ -82,7 +82,7 @@ export default function PersonalProfilePage() {
             </label>
           </div>
           <div className="flex justify-end border-t border-slate-100 px-6 py-4">
-            <button disabled={saving} className="rounded-lg bg-[#16294F] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving?"Saving...":"Save changes"}</button>
+            <button disabled={saving} className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving?"Saving...":"Save changes"}</button>
           </div>
         </>}
       </form>

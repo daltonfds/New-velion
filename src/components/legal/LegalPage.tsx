@@ -31,7 +31,7 @@ export default function LegalPage({
             </Link>
             <Link
               href="/register"
-              className="rounded-lg bg-[#16294F] px-4 py-2.5 text-sm font-semibold text-white"
+              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
             >
               Create account
             </Link>

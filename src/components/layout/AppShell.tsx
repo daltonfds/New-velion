@@ -251,7 +251,7 @@ export default function AppShell({
                   "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   pathname === item.href
                     ? "bg-[#eef4fb] text-[#16294F]"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-[#16294F]",
+                    : "text-slate-600 hover:bg-slate-50 hover:text-blue-600",
                 ].join(" ")}
               >
                 {pathname === item.href && (
@@ -263,7 +263,7 @@ export default function AppShell({
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
                     pathname === item.href
                       ? "text-[#16294F]"
-                      : "text-slate-500 group-hover:text-[#16294F]",
+                      : "text-slate-500 group-hover:text-blue-600",
                   ].join(" ")}
                 >
                   <Icon name={item.icon} />
@@ -344,7 +344,7 @@ export default function AppShell({
                 type="button"
                 disabled={loggingOut}
                 onClick={handleLogout}
-                className="flex-1 rounded-lg bg-[#16294F] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0f1e3a] disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loggingOut ? "Logging out..." : "Log out"}
               </button>
