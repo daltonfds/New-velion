@@ -125,13 +125,147 @@ function Icon({ type }: { type: string }) {
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-          <Link href="/" aria-label="Newvelion home">
+          <Link href="/" aria-label="Newvelion home" className="shrink-0">
             <NewvelionBrand size="sm" />
           </Link>
 
-          <nav className="flex items-center gap-2">
+          <details className="relative lg:hidden">
+      <summary className="flex cursor-pointer list-none items-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700">
+        Menu
+      </summary>
+
+      <div className="absolute right-0 top-full z-50 mt-2 w-72 border border-slate-200 bg-white p-3">
+        <div className="border-b border-slate-100 pb-3">
+          <p className="px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#8A8570]">
+            Platform
+          </p>
+
+          <Link href="#how-it-works" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            How it works
+          </Link>
+          <Link href="/marketplace" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            Marketplace
+          </Link>
+          <Link href="#seller" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            For Sellers
+          </Link>
+          <Link href="#supplier" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            For Suppliers
+          </Link>
+          <Link href="#earnings" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            Earnings
+          </Link>
+        </div>
+
+        <div className="border-b border-slate-100 py-3">
+          <p className="px-3 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#8A8570]">
+            Resources
+          </p>
+
+          <Link href="#faq" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            FAQ
+          </Link>
+          <Link href="#payouts" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            Payouts
+          </Link>
+          <a href="mailto:contact@newvelion.com" className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            Help Center
+          </a>
+        </div>
+
+        <a
+          href="mailto:contact@newvelion.com"
+          className="mt-2 block rounded-lg px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50"
+        >
+          Support
+        </a>
+      </div>
+    </details>
+
+    <nav className="hidden items-center gap-1 lg:flex">
+            <details className="group relative">
+              <summary className="flex cursor-pointer list-none items-center gap-1 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                Platform
+                <span className="text-slate-400 transition-transform group-open:rotate-180">
+                  ↓
+                </span>
+              </summary>
+
+              <div className="absolute left-0 top-full mt-2 w-64 border border-slate-200 bg-white p-2">
+                <Link
+                  href="#how-it-works"
+                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  How it works
+                </Link>
+                <Link
+                  href="/marketplace"
+                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  Marketplace
+                </Link>
+                <Link
+                  href="#seller"
+                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  For Sellers
+                </Link>
+                <Link
+                  href="#supplier"
+                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  For Suppliers
+                </Link>
+                <Link
+                  href="#earnings"
+                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  Earnings
+                </Link>
+              </div>
+            </details>
+
+            <details className="group relative">
+              <summary className="flex cursor-pointer list-none items-center gap-1 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                Resources
+                <span className="text-slate-400 transition-transform group-open:rotate-180">
+                  ↓
+                </span>
+              </summary>
+
+              <div className="absolute left-0 top-full mt-2 w-56 border border-slate-200 bg-white p-2">
+                <Link
+                  href="#faq"
+                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  FAQ
+                </Link>
+                <Link
+                  href="#payouts"
+                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  Payouts
+                </Link>
+                <a
+                  href="mailto:contact@newvelion.com"
+                  className="block rounded-lg px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  Help Center
+                </a>
+              </div>
+            </details>
+
+            <a
+              href="mailto:contact@newvelion.com"
+              className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Support
+            </a>
+          </nav>
+
+          <div className="flex items-center gap-2">
             <Link
               href="/login"
               className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -144,11 +278,11 @@ export default function HomePage() {
             >
               Sign up free
             </Link>
-          </nav>
+          </div>
         </div>
       </header>
 
-      <section className="border-b border-slate-200 bg-white">
+      <section id="earnings" className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-14 px-5 py-16 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-24">
           <div className="flex flex-col justify-center">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#8A8570]">
@@ -389,7 +523,81 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-[#f7f8fa]">
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#8A8570]">
+              Built for commerce
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#16294F] sm:text-4xl">
+              One platform. Two ways to grow.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-600">
+              NewVelion brings sellers and suppliers together in one connected
+              commerce ecosystem.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            <div id="seller" className="border border-slate-200 bg-[#f7f8fa] p-8">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
+                For Sellers
+              </p>
+              <h3 className="mt-4 text-2xl font-bold text-[#16294F]">
+                Sell without holding stock.
+              </h3>
+              <p className="mt-4 leading-7 text-slate-600">
+                Browse products, choose what you want to promote, get your
+                personal affiliate link and earn a commission when customers
+                buy through you.
+              </p>
+
+              <ul className="mt-7 space-y-3 text-sm text-slate-600">
+                <li>✓ Product marketplace with transparent commissions</li>
+                <li>✓ Personal tracking and sales links</li>
+                <li>✓ Sales, clicks and conversion analytics</li>
+                <li>✓ Wallet and withdrawal management</li>
+              </ul>
+
+              <Link
+                href="/register"
+                className="mt-8 inline-flex items-center rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700"
+              >
+                Start selling
+              </Link>
+            </div>
+
+            <div id="supplier" className="border border-slate-200 bg-white p-8">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
+                For Suppliers
+              </p>
+              <h3 className="mt-4 text-2xl font-bold text-[#16294F]">
+                Turn products into a sales network.
+              </h3>
+              <p className="mt-4 leading-7 text-slate-600">
+                Add your products, define pricing and commissions, provide
+                checkout information and let sellers promote your catalog.
+              </p>
+
+              <ul className="mt-7 space-y-3 text-sm text-slate-600">
+                <li>✓ Manage products, prices and stock</li>
+                <li>✓ Set commissions for sellers</li>
+                <li>✓ Track orders and product performance</li>
+                <li>✓ Manage settlements and withdrawals</li>
+              </ul>
+
+              <a
+                href="mailto:contact@newvelion.com"
+                className="mt-8 inline-flex items-center rounded-lg border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 hover:border-blue-600 hover:text-blue-600"
+              >
+                Talk to NewVelion
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="payouts" className="border-b border-slate-200 bg-[#f7f8fa]">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <div className="max-w-2xl">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#8A8570]">
@@ -585,7 +793,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-white">
+      <section id="faq" className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-4xl px-5 py-20 lg:px-8">
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#8A8570]">
             Frequently asked questions
