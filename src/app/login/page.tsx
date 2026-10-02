@@ -42,6 +42,21 @@ function LoginPageContent() {
         return;
       }
 
+      if (!result?.session?.access_token || !result?.session?.refresh_token) {
+        setError("Unable to establish your session. Please try again.");
+        return;
+      }
+
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+      });
+
+      if (sessionError) {
+        setError("Unable to establish your session. Please try again.");
+        return;
+      }
+
       router.push(searchParams.get("redirect") || "/dashboard");
       router.refresh();
     } catch {
