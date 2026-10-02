@@ -105,7 +105,33 @@ export async function dispatchNotification(notificationId: string) {
           {
             from,
             to: [user.email],
-            subject: notification.title,
+            subject:
+      notification.type === "sale_confirmed"
+        ? `Confirmed R${Number(
+            notification.data?.amount ?? 0
+          ).toLocaleString("en-ZA", { maximumFractionDigits: 2 })} sale`
+        : notification.type === "withdrawal_approved"
+          ? `Approved R${Number(
+              notification.data?.requested_amount ??
+              notification.data?.amount ??
+              notification.data?.net_amount ??
+              0
+            ).toLocaleString("en-ZA", { maximumFractionDigits: 2 })} withdrawal`
+          : notification.type === "withdrawal_rejected"
+            ? `Rejected R${Number(
+                notification.data?.requested_amount ??
+                notification.data?.amount ??
+                notification.data?.net_amount ??
+                0
+              ).toLocaleString("en-ZA", { maximumFractionDigits: 2 })} withdrawal`
+            : notification.type === "withdrawal_paid"
+              ? `Paid R${Number(
+                  notification.data?.requested_amount ??
+                  notification.data?.amount ??
+                  notification.data?.net_amount ??
+                  0
+                ).toLocaleString("en-ZA", { maximumFractionDigits: 2 })} withdrawal`
+              : notification.title,
             html: `
               <!doctype html>
               <html lang="en">
@@ -122,12 +148,62 @@ export async function dispatchNotification(notificationId: string) {
 
                       <div style="margin-top:32px">
                         <h1 style="margin:0;font-size:24px;color:#16294F">
-                          ${escapeHtml(notification.title)}
+                          ${escapeHtml(
+                            notification.type === "sale_confirmed"
+                              ? `Confirmed R${Number(notification.data?.amount ?? 0).toLocaleString("en-ZA", { maximumFractionDigits: 2 })} sale`
+                              : notification.type === "withdrawal_approved"
+                                ? `Approved R${Number(notification.data?.requested_amount ?? notification.data?.amount ?? notification.data?.net_amount ?? 0).toLocaleString("en-ZA", { maximumFractionDigits: 2 })} withdrawal`
+                                : notification.type === "withdrawal_rejected"
+                                  ? `Rejected R${Number(notification.data?.requested_amount ?? notification.data?.amount ?? notification.data?.net_amount ?? 0).toLocaleString("en-ZA", { maximumFractionDigits: 2 })} withdrawal`
+                                  : notification.type === "withdrawal_paid"
+                                    ? `Paid R${Number(notification.data?.requested_amount ?? notification.data?.amount ?? notification.data?.net_amount ?? 0).toLocaleString("en-ZA", { maximumFractionDigits: 2 })} withdrawal`
+                                    : notification.title
+                          )}
                         </h1>
 
                         <p style="margin-top:16px;font-size:15px;line-height:1.7;color:#475569">
                           ${escapeHtml(notification.message)}
                         </p>
+
+                        ${
+                          notification.type === "sale_confirmed"
+                            ? `
+                        <div style="margin-top:24px;border:1px solid #e2e8f0;padding:20px">
+                          <div style="font-size:14px;font-weight:700;color:#16294F;margin-bottom:14px">
+                            Sale details
+                          </div>
+                          <div style="font-size:14px;line-height:1.9;color:#475569">
+                            <div><strong>Product</strong> — ${escapeHtml(notification.data?.product_name ?? notification.data?.product ?? "Product")}</div>
+                            <div><strong>Sale amount</strong> — R${Number(notification.data?.amount ?? 0).toLocaleString("en-ZA", { maximumFractionDigits: 2 })}</div>
+                            <div><strong>Commission</strong> — R${Number(notification.data?.commission ?? 0).toLocaleString("en-ZA", { maximumFractionDigits: 2 })}</div>
+                            <div><strong>Status</strong> — ${escapeHtml(notification.data?.status ?? "Paid")}</div>
+                            <div><strong>Sale ID</strong> — ${escapeHtml(notification.data?.sale_id ?? "")}</div>
+                          </div>
+                        </div>
+                        `
+                            : notification.type === "withdrawal_approved" ||
+                                notification.type === "withdrawal_rejected" ||
+                                notification.type === "withdrawal_paid"
+                              ? `
+                        <div style="margin-top:24px;border:1px solid #e2e8f0;padding:20px">
+                          <div style="font-size:14px;font-weight:700;color:#16294F;margin-bottom:14px">
+                            Withdrawal details
+                          </div>
+                          <div style="font-size:14px;line-height:1.9;color:#475569">
+                            <div><strong>Amount</strong> — R${Number(notification.data?.requested_amount ?? notification.data?.amount ?? notification.data?.net_amount ?? 0).toLocaleString("en-ZA", { maximumFractionDigits: 2 })}</div>
+                            <div><strong>Status</strong> — ${escapeHtml(
+                              notification.type === "withdrawal_approved"
+                                ? "Approved"
+                                : notification.type === "withdrawal_rejected"
+                                  ? "Rejected"
+                                  : "Paid"
+                            )}</div>
+                            <div><strong>Withdrawal ID</strong> — ${escapeHtml(notification.data?.withdrawal_id ?? "")}</div>
+                          </div>
+                        </div>
+                        `
+                              : ""
+                        }
                       </div>
 
                       <div style="margin-top:32px;border-top:1px solid #e2e8f0;padding-top:20px;font-size:12px;color:#94a3b8">
