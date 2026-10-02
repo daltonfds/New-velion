@@ -196,7 +196,6 @@ export default function NotificationCenter() {
         "Notification" in window &&
         window.Notification.permission === "granted"
       ) {
-        setPushEnabled(true);
         void enablePush();
       }
     }
@@ -213,49 +212,102 @@ export default function NotificationCenter() {
   }, []);
 
   async function enablePush() {
+    console.log("[NewVelion Push] 1. Starting");
+
     if (
       !("Notification" in window) ||
       !("serviceWorker" in navigator) ||
       !("PushManager" in window)
     ) {
+      console.error("[NewVelion Push] 2. Push APIs unavailable");
       return;
     }
 
-    const publicKey =
-      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    console.log("[NewVelion Push] 2. Push APIs available");
+
+    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
     if (!publicKey) {
       console.error(
-        "NEXT_PUBLIC_VAPID_PUBLIC_KEY is missing.",
+        "[NewVelion Push] 3. NEXT_PUBLIC_VAPID_PUBLIC_KEY is missing",
       );
       return;
     }
 
-    const permission =
-      await window.Notification.requestPermission();
+    console.log(
+      "[NewVelion Push] 3. VAPID public key exists",
+      publicKey.slice(0, 12) + "...",
+    );
 
-    if (permission !== "granted") return;
+    let permission = window.Notification.permission;
+    console.log(
+      "[NewVelion Push] 4. Notification permission:",
+      permission,
+    );
+
+    if (permission !== "granted") {
+      permission = await window.Notification.requestPermission();
+      console.log(
+        "[NewVelion Push] 5. Permission result:",
+        permission,
+      );
+    }
+
+    if (permission !== "granted") {
+      console.error(
+        "[NewVelion Push] 6. Permission was not granted",
+      );
+      return;
+    }
+
+    console.log("[NewVelion Push] 6. Permission granted");
 
     const registration =
       await navigator.serviceWorker.register("/sw.js");
 
+    console.log(
+      "[NewVelion Push] 7. Service worker registered:",
+      registration.scope,
+    );
+
     let subscription =
       await registration.pushManager.getSubscription();
 
-    if (!subscription) {
+    if (subscription) {
+      console.log(
+        "[NewVelion Push] 8. Existing push subscription found",
+      );
+    } else {
+      console.log(
+        "[NewVelion Push] 8. Creating new push subscription",
+      );
+
       subscription =
         await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey:
             base64ToUint8Array(publicKey),
         });
+
+      console.log(
+        "[NewVelion Push] 9. New push subscription created",
+      );
     }
 
     const {
       data: { session },
     } = await supabase.auth.getSession();
 
-    if (!session?.access_token) return;
+    if (!session?.access_token) {
+      console.error(
+        "[NewVelion Push] 10. No authenticated session",
+      );
+      return;
+    }
+
+    console.log(
+      "[NewVelion Push] 10. Authenticated session exists",
+    );
 
     const response = await fetch(
       "/api/notifications/push/subscribe",
@@ -269,9 +321,28 @@ export default function NotificationCenter() {
       },
     );
 
-    if (response.ok) {
-      setPushEnabled(true);
+    const responseText =
+      await response.text().catch(() => "");
+
+    console.log(
+      "[NewVelion Push] 11. Subscribe API response:",
+      response.status,
+      responseText,
+    );
+
+    if (!response.ok) {
+      console.error(
+        "[NewVelion Push] 12. Failed to save subscription",
+      );
+      setPushEnabled(false);
+      return;
     }
+
+    setPushEnabled(true);
+
+    console.log(
+      "[NewVelion Push] 12. Push subscription saved successfully",
+    );
   }
 
   async function markRead(id: string) {
