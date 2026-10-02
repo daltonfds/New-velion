@@ -375,24 +375,33 @@ const filteredProducts = useMemo(() => {
                 className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 lg:w-56"
               >
                 <option value="all">All categories</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>{category.nome}</option>
+                {parentCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.nome}
+                  </option>
                 ))}
               </select>
-          {categoryId !== "all" && visibleSubcategories.length > 0 && (
-            <select
-              value={subcategoryId}
-              onChange={(event) => setSubcategoryId(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600"
-            >
-              <option value="all">All subcategories</option>
-              {visibleSubcategories.map((subcategory) => (
-                <option key={subcategory.id} value={subcategory.id}>
-                  {subcategory.nome}
+              <select
+                id="marketplace-subcategory"
+                value={subcategoryId}
+                onChange={(event) => setSubcategoryId(event.target.value)}
+                disabled={categoryId === "all" || visibleSubcategories.length === 0}
+                className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 lg:w-64"
+              >
+                <option value="all">
+                  {categoryId === "all"
+                    ? "Select a category first"
+                    : visibleSubcategories.length === 0
+                      ? "No subcategories"
+                      : "All subcategories"}
                 </option>
-              ))}
-            </select>
-          )}
+
+                {visibleSubcategories.map((subcategory) => (
+                  <option key={subcategory.id} value={subcategory.id}>
+                    {subcategory.nome}
+                  </option>
+                ))}
+              </select>
 
             </div>
           </div>
@@ -519,20 +528,7 @@ const filteredProducts = useMemo(() => {
                   </option>
                 ))}
               </select>
-          {categoryId !== "all" && visibleSubcategories.length > 0 && (
-            <select
-              value={subcategoryId}
-              onChange={(event) => setSubcategoryId(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600"
-            >
-              <option value="all">All subcategories</option>
-              {visibleSubcategories.map((subcategory) => (
-                <option key={subcategory.id} value={subcategory.id}>
-                  {subcategory.nome}
-                </option>
-              ))}
-            </select>
-          )}
+
 
             </div>
 
