@@ -34,26 +34,7 @@ const tools = [
   ["◉", "Real-time notifications", "Know the moment you sell, when a commission is released and when a payout lands."],
 ];
 
-const testimonials = [
-  {
-    initials: "AM",
-    name: "Amélia Machava",
-    place: "Maputo, Mozambique",
-    text: "I started on WhatsApp with two products. Within the first month I was already withdrawing via M-Pesa. The dashboard shows everything — nothing is left in doubt.",
-  },
-  {
-    initials: "SN",
-    name: "Sipho Nkosi",
-    place: "Johannesburg, South Africa",
-    text: "I sell in my spare time. I picked 4 trending products, shared them in groups and commission comes straight in. Bank withdrawals with no issues.",
-  },
-  {
-    initials: "LT",
-    name: "Laura Tembe",
-    place: "Beira, Mozambique",
-    text: "What I like most is buyer protection: the customer gets 7 days of cover and I know exactly when my balance becomes available. Full transparency.",
-  },
-];
+
 
 const faqs = [
   [
@@ -410,6 +391,71 @@ export default function HomePage() {
 
       <section className="border-b border-slate-200 bg-[#f7f8fa]">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#8A8570]">
+              How NewVelion works
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#16294F] sm:text-4xl">
+              One platform. The entire commerce flow.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-slate-600">
+              NewVelion connects products, sellers, suppliers and customers in
+              one simple system — from discovery to payout.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-px overflow-hidden border border-slate-200 bg-slate-200 md:grid-cols-4">
+            {[
+              ["01", "Discover", "Find products with clear pricing, offers and affiliate commissions."],
+              ["02", "Promote", "Choose products and get your unique sales links and promotional assets."],
+              ["03", "Sell", "Share your links and turn your audience into measurable customers."],
+              ["04", "Earn", "Track clicks, conversions, sales and commissions from your dashboard."],
+            ].map(([number, title, text]) => (
+              <div
+                key={number}
+                className="group bg-white p-7 transition-colors hover:bg-blue-50"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-blue-600">{number}</span>
+                  {number !== "04" && (
+                    <span className="hidden text-xl text-slate-300 md:block">→</span>
+                  )}
+                </div>
+
+                <h3 className="mt-12 text-xl font-bold text-[#16294F]">
+                  {title}
+                </h3>
+
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  {text}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col justify-between gap-5 border border-slate-200 bg-white p-6 sm:flex-row sm:items-center">
+            <div>
+              <p className="text-sm font-bold text-[#16294F]">
+                Built for the whole commerce ecosystem.
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Suppliers provide the products. Sellers create demand.
+                NewVelion connects the two.
+              </p>
+            </div>
+
+            <Link
+              href="/marketplace"
+              className="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700"
+            >
+              Explore marketplace →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 bg-[#f7f8fa]">
+        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#8A8570]">
             Withdraw your way, in your country
           </p>
@@ -429,9 +475,7 @@ export default function HomePage() {
                 <div className="flex gap-4">
                   <span className="text-xs font-bold text-[#8A8570]">BANK</span>
                   <div>
-                    <p className="font-semibold text-slate-800">
-                      Bank transfer
-                    </p>
+                    <p className="font-semibold text-slate-800">Bank transfer</p>
                     <p className="mt-1 text-sm text-slate-500">
                       All major banks, credited within 30 days
                     </p>
@@ -470,9 +514,7 @@ export default function HomePage() {
                 <div className="flex gap-4">
                   <span className="text-xs font-bold text-[#8A8570]">BANK</span>
                   <div>
-                    <p className="font-semibold text-slate-800">
-                      Bank transfer
-                    </p>
+                    <p className="font-semibold text-slate-800">Bank transfer</p>
                     <p className="mt-1 text-sm text-slate-500">
                       NIB, credited within 30 days
                     </p>
@@ -538,41 +580,6 @@ export default function HomePage() {
                 </h3>
                 <p className="mt-2 leading-7 text-slate-600">{text}</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-slate-200 bg-[#f7f8fa]">
-        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#8A8570]">
-            Sellers recommend us
-          </p>
-
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {testimonials.map((item) => (
-              <article
-                key={item.name}
-                className="border border-slate-200 bg-white p-7"
-              >
-                <p className="text-lg tracking-[0.12em] text-[#C99A2E]">
-                  ★★★★★
-                </p>
-                <p className="mt-5 text-sm leading-7 text-slate-600">
-                  “{item.text}”
-                </p>
-                <div className="mt-7 flex items-center gap-3 border-t border-slate-100 pt-5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
-                    {item.initials}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-[#16294F]">
-                      {item.name}
-                    </p>
-                    <p className="text-xs text-slate-500">{item.place}</p>
-                  </div>
-                </div>
-              </article>
             ))}
           </div>
         </div>
