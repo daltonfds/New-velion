@@ -121,6 +121,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Commissions", href: "/dashboard/seller/commissions", icon: "wallet" },
     { label: "Wallet", href: "/dashboard/seller/wallet", icon: "wallet" },
     { label: "Analytics", href: "/dashboard/seller/performance", icon: "chart" },
+    { label: "Integrations", href: "/dashboard/seller/integrations", icon: "link" },
     { label: "Links", href: "/dashboard/seller/links", icon: "sales" },
     { label: "Withdrawals", href: "/dashboard/seller/withdrawals", icon: "download" },
   ],
