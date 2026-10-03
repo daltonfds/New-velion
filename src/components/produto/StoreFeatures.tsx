@@ -3,42 +3,53 @@ export default function StoreFeatures() {
     {
       number: "01",
       title: "Secure checkout",
-      text: "Each product uses its configured checkout flow.",
+      text: "Your order is processed through the secure checkout configured for this product.",
     },
     {
       number: "02",
-      title: "Product information",
-      text: "Product details are displayed directly from the supplier catalog.",
+      title: "Verified product information",
+      text: "Product information is provided through the Newvelion marketplace catalog.",
     },
     {
       number: "03",
-      title: "Newvelion marketplace",
-      text: "Customers, sellers and suppliers are connected in one platform.",
+      title: "Reliable support",
+      text: "Get support throughout your purchase experience through the Newvelion marketplace.",
     },
   ];
 
   return (
-    <section className="border-y border-slate-100 bg-white">
-      <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
-        <h2 className="text-center text-2xl font-black">
-          Why shop through Newvelion?
-        </h2>
+    <section className="border-b border-slate-100 bg-white">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#16294F]">
+            The Newvelion experience
+          </p>
 
-        <div className="mt-9 grid gap-4 md:grid-cols-3">
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+            Shop with confidence
+          </h2>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            Everything you need for a simple and reliable product purchase,
+            from product information to checkout.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
           {features.map((feature) => (
             <div
               key={feature.number}
-              className="border border-slate-200 p-6"
+              className="border border-slate-200 bg-white p-7"
             >
-              <div className="font-black text-[#C99A2E]">
+              <span className="text-sm font-bold text-[#C99A2E]">
                 {feature.number}
-              </div>
+              </span>
 
-              <h3 className="mt-5 font-black">
+              <h3 className="mt-5 text-lg font-bold text-slate-950">
                 {feature.title}
               </h3>
 
-              <p className="mt-2 text-sm leading-6 text-slate-500">
+              <p className="mt-3 text-sm leading-7 text-slate-600">
                 {feature.text}
               </p>
             </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-type Product = {
+type RelatedProduct = {
   id: string;
   slug: string;
   nome: string;
@@ -12,63 +12,115 @@ type Product = {
   total_avaliacoes: number;
 };
 
+function formatPrice(value: number, currency: string) {
+  if (currency === "ZAR") {
+    return `R${Math.round(value).toLocaleString("en-ZA")}`;
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 export default function RelatedProducts({
   products,
 }: {
-  products: Product[];
+  products: RelatedProduct[];
 }) {
-  if (!products.length) return null;
+  if (!products.length) {
+    return null;
+  }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-      <h2 className="text-2xl font-black">
-        You may also like
-      </h2>
+    <section className="border-t border-slate-100 bg-slate-50">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#16294F]">
+              More products
+            </p>
 
-      <div className="mt-7 grid grid-cols-2 gap-5 md:grid-cols-4">
-        {products.map((product) => {
-          const price =
-            product.preco_promocional ?? product.preco;
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
+              You may also like
+            </h2>
+          </div>
 
-          return (
-            <Link
-              key={product.id}
-              href={`/produto/${product.slug}`}
-              className="group"
-            >
-              <div className="aspect-square overflow-hidden border border-slate-200 bg-slate-50">
-                {product.fotos?.[0] && (
-                  <img
-                    src={product.fotos[0]}
-                    alt={product.nome}
-                    className="h-full w-full object-contain transition group-hover:scale-105"
-                  />
-                )}
-              </div>
+          <Link
+            href="/marketplace"
+            className="text-sm font-bold text-[#16294F] hover:underline"
+          >
+            View marketplace →
+          </Link>
+        </div>
 
-              <h3 className="mt-3 text-sm font-bold">
-                {product.nome}
-              </h3>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((product) => {
+            const image = product.fotos?.find(Boolean);
+            const price =
+              product.preco_promocional ?? product.preco;
+            const hasDiscount =
+              product.preco_promocional !== null &&
+              product.preco_promocional < product.preco;
 
-              <div className="mt-1 text-xs tracking-widest text-[#C99A2E]">
-                {"★".repeat(
-                  Math.round(product.avaliacao_media || 0),
-                )}
+            const rating = Math.max(
+              0,
+              Math.min(5, Math.round(product.avaliacao_media || 0)),
+            );
 
-                <span className="ml-1 tracking-normal text-slate-400">
-                  ({product.total_avaliacoes || 0})
-                </span>
-              </div>
+            return (
+              <Link
+                key={product.id}
+                href={`/produto/${product.slug}`}
+                className="group border border-slate-200 bg-white"
+              >
+                <div className="aspect-square overflow-hidden bg-white">
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={product.nome}
+                      className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-sm text-slate-400">
+                      No image
+                    </div>
+                  )}
+                </div>
 
-              <p className="mt-1 font-black">
-                {new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: product.moeda,
-                }).format(price)}
-              </p>
-            </Link>
-          );
-        })}
+                <div className="p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs tracking-widest text-[#C99A2E]">
+                      {"★".repeat(rating)}
+                      {"☆".repeat(5 - rating)}
+                    </span>
+
+                    <span className="text-[11px] text-slate-400">
+                      ({product.total_avaliacoes || 0})
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3 line-clamp-2 min-h-10 text-sm font-bold text-slate-950">
+                    {product.nome}
+                  </h3>
+
+                  <div className="mt-4 flex items-center gap-2">
+                    {hasDiscount && (
+                      <span className="text-xs text-slate-400 line-through">
+                        {formatPrice(product.preco, product.moeda)}
+                      </span>
+                    )}
+
+                    <span className="font-bold text-slate-950">
+                      {formatPrice(price, product.moeda)}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

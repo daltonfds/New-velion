@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+
 import AnnouncementBar from "@/components/produto/AnnouncementBar";
 import Header from "@/components/produto/Header";
 import ProductInfo from "@/components/produto/ProductInfo";
@@ -71,10 +72,17 @@ export default function ProdutoPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadProduct() {
-      if (!slug) return;
+      if (!slug) {
+        setError("Product not found.");
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
+      setError("");
 
       const { data, error: productError } = await supabase
         .from("products")
@@ -104,6 +112,8 @@ export default function ProdutoPage() {
         .eq("ativo", true)
         .maybeSingle();
 
+      if (cancelled) return;
+
       if (productError) {
         setError(productError.message);
         setLoading(false);
@@ -117,6 +127,7 @@ export default function ProdutoPage() {
       }
 
       const currentProduct = data as unknown as Product;
+
       setProduct(currentProduct);
 
       const reviewsQuery = supabase
@@ -140,12 +151,15 @@ export default function ProdutoPage() {
             .neq("id", currentProduct.id)
             .order("destaque", { ascending: false })
             .limit(4)
-        : Promise.resolve({ data: [] as Related[] });
+        : Promise.resolve({
+            data: [] as Related[],
+            error: null,
+          });
 
-      const [{ data: reviewData }, { data: relatedData }] = await Promise.all([
-        reviewsQuery,
-        relatedQuery,
-      ]);
+      const [{ data: reviewData }, { data: relatedData }] =
+        await Promise.all([reviewsQuery, relatedQuery]);
+
+      if (cancelled) return;
 
       setReviews((reviewData || []) as Review[]);
       setRelated((relatedData || []) as Related[]);
@@ -153,6 +167,10 @@ export default function ProdutoPage() {
     }
 
     loadProduct();
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   if (loading) {
