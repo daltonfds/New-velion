@@ -35,46 +35,28 @@ const cleanText = (value: unknown) =>
     .trim();
 
 function getImages(product: Product | null) {
-  const values = [
-    product?.imagem_url,
-    product?.image_url,
-    product?.image,
-    product?.foto_url,
-    product?.main_image,
-    product?.thumbnail_url,
-    product?.capa_url,
-    product?.imagem,
-    product?.images,
-    product?.fotos,
-    product?.galeria,
-  ];
-
+  const value = product?.fotos;
   const images: string[] = [];
 
-  for (const value of values) {
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        if (typeof item === "string") images.push(item);
-        else if (item?.url) images.push(item.url);
-      }
-    } else if (typeof value === "string") {
-      try {
-        const parsed = JSON.parse(value);
-        if (Array.isArray(parsed)) {
-          for (const item of parsed) {
-            if (typeof item === "string") images.push(item);
-            else if (item?.url) images.push(item.url);
-          }
-        } else {
-          images.push(value);
-        }
-      } catch {
-        images.push(value);
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      if (
+        typeof item === "string" &&
+        (item.startsWith("http://") || item.startsWith("https://"))
+      ) {
+        images.push(item);
+      } else if (
+        item &&
+        typeof item === "object" &&
+        typeof item.url === "string" &&
+        (item.url.startsWith("http://") || item.url.startsWith("https://"))
+      ) {
+        images.push(item.url);
       }
     }
   }
 
-  return [...new Set(images.filter(Boolean))].slice(0, 6);
+  return [...new Set(images)].slice(0, 6);
 }
 
 function Icon({
