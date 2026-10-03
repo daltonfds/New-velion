@@ -1,4 +1,5 @@
 "use client";
+import { formatCurrency } from "@/lib/currency";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";

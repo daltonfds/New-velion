@@ -212,9 +212,11 @@ export default function AdminProductPage() {
       fornecedor_pais: form.fornecedor_pais.trim() || null,
         categoria_id: form.categoria_id || null,
         subcategoria_id: subcategoriaId || null,
-        preco: Number(form.preco),
+        preco: form.moeda === "ZAR" ? Math.round(Number(form.preco)) : Number(form.preco),
         preco_promocional: form.preco_promocional
-          ? Number(form.preco_promocional)
+          ? form.moeda === "ZAR"
+            ? Math.round(Number(form.preco_promocional))
+            : Number(form.preco_promocional)
           : null,
         moeda: form.moeda,
         comissao_tipo: form.comissao_tipo,
