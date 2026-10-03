@@ -8,6 +8,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import ProductImageUploader from "@/components/products/ProductImageUploader";
+import ProductSalesContentEditor from "@/components/products/ProductSalesContentEditor";
 import { supabase } from "@/lib/supabase";
 import { notify } from "@/lib/notify";
 
@@ -30,6 +31,14 @@ export default function NewProductPage() {
     nome: "",
     slug: "",
     descricao: "",
+    beneficios: "",
+    ingredientes: "",
+    modo_uso: "",
+    garantia_texto: "",
+    faq: "",
+    fornecedor_nome: "",
+    fornecedor_descricao: "",
+    fornecedor_pais: "",
     categoria_id: "",
     preco: "",
     preco_promocional: "",
@@ -122,6 +131,32 @@ export default function NewProductPage() {
       nome: form.nome.trim(),
       slug: form.slug.trim() || generateSlug(form.nome),
       descricao: form.descricao.trim(),
+      beneficios: form.beneficios
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean),
+      ingredientes: form.ingredientes.trim() || null,
+      modo_uso: form.modo_uso.trim() || null,
+      garantia_texto: form.garantia_texto.trim() || null,
+      faq: form.faq
+        .split(/\n\s*\n/)
+        .map((block) => {
+          const lines = block
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean);
+
+          if (lines.length < 2) return null;
+
+          return {
+            question: lines[0],
+            answer: lines.slice(1).join(" "),
+          };
+        })
+        .filter(Boolean),
+      fornecedor_nome: form.fornecedor_nome.trim() || null,
+      fornecedor_descricao: form.fornecedor_descricao.trim() || null,
+      fornecedor_pais: form.fornecedor_pais.trim() || null,
       categoria_id: form.categoria_id || null,
         subcategoria_id: subcategoriaId || null,
       preco: Number(form.preco),
@@ -257,6 +292,66 @@ export default function NewProductPage() {
               </div>
             </div>
           </Card>
+
+          <ProductSalesContentEditor
+            beneficios={form.beneficios
+              .split("\n")
+              .map((item) => item.trim())
+              .filter(Boolean)}
+            onBeneficiosChange={(items) =>
+              updateField("beneficios", items.join("\n"))
+            }
+            ingredientes={form.ingredientes}
+            onIngredientesChange={(value) =>
+              updateField("ingredientes", value)
+            }
+            modoUso={form.modo_uso}
+            onModoUsoChange={(value) =>
+              updateField("modo_uso", value)
+            }
+            garantia={form.garantia_texto}
+            onGarantiaChange={(value) =>
+              updateField("garantia_texto", value)
+            }
+            faq={form.faq
+              .split(/\n\s*\n/)
+              .map((block) => {
+                const lines = block
+                  .split("\n")
+                  .map((line) => line.trim())
+                  .filter(Boolean);
+
+                return {
+                  question: lines[0] || "",
+                  answer: lines.slice(1).join(" "),
+                };
+              })
+              .filter((item) => item.question || item.answer)}
+            onFaqChange={(items) =>
+              updateField(
+                "faq",
+                items
+                  .map(
+                    (item) =>
+                      `${item.question}\n${item.answer}`,
+                  )
+                  .join("\n\n"),
+              )
+            }
+            fornecedorNome={form.fornecedor_nome}
+            onFornecedorNomeChange={(value) =>
+              updateField("fornecedor_nome", value)
+            }
+            fornecedorPais={form.fornecedor_pais}
+            onFornecedorPaisChange={(value) =>
+              updateField("fornecedor_pais", value)
+            }
+            fornecedorDescricao={form.fornecedor_descricao}
+            onFornecedorDescricaoChange={(value) =>
+              updateField("fornecedor_descricao", value)
+            }
+          />
+
 
           <Card>
             <div className="border-b border-slate-100 px-6 py-4">
