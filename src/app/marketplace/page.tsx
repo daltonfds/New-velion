@@ -879,6 +879,13 @@ const filteredProducts = useMemo(() => {
                       </p>
                     </div>
 
+                    <a
+                      href={`/produto/${encodeURIComponent(product.slug)}`}
+                      className="mt-4 flex w-full items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                    >
+                      View Product
+                    </a>
+
                     {!affiliateLink ? (
                       <button
                         type="button"

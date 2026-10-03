@@ -20,6 +20,7 @@ export interface Profile {
 export interface Product {
   id: string;
   nome: string;
+  slug: string;
   descricao: string | null;
   categoria_id: string | null;
   subcategoria_id: string | null;
