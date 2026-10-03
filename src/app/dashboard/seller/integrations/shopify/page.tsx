@@ -30,7 +30,7 @@ export default function ShopifyIntegrationPage() {
       } = await supabase.auth.getSession();
 
       if (!session?.access_token) {
-        throw new Error("Sessão não encontrada.");
+        throw new Error("Session not found.");
       }
 
       const response = await fetch(`${SHOPIFY_API}/api/stores`, {
@@ -42,12 +42,12 @@ export default function ShopifyIntegrationPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || "Não foi possível carregar as lojas.");
+        throw new Error(data?.error || "Unable to load stores.");
       }
 
       setStores(Array.isArray(data?.stores) ? data.stores : []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao carregar integração.");
+      setError(err instanceof Error ? err.message : "Error loading integration.");
     } finally {
       setLoading(false);
     }
@@ -63,7 +63,7 @@ export default function ShopifyIntegrationPage() {
       } = await supabase.auth.getSession();
 
       if (!session?.access_token) {
-        throw new Error("Sessão não encontrada.");
+        throw new Error("Session not found.");
       }
 
       const normalizedShop = shop
@@ -72,7 +72,7 @@ export default function ShopifyIntegrationPage() {
         .replace(/\/.*$/, "");
 
       if (!normalizedShop) {
-        throw new Error("Digite o domínio da sua loja Shopify.");
+        throw new Error("Enter your Shopify store domain.");
       }
 
       const response = await fetch(`${SHOPIFY_API}/api/connect`, {
@@ -89,16 +89,16 @@ export default function ShopifyIntegrationPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || "Não foi possível iniciar a conexão.");
+        throw new Error(data?.error || "Unable to start the connection.");
       }
 
       if (!data?.authUrl) {
-        throw new Error("URL de autorização Shopify não recebida.");
+        throw new Error("Shopify authorization URL was not received.");
       }
 
       window.location.href = data.authUrl;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao conectar Shopify.");
+      setError(err instanceof Error ? err.message : "Error connecting Shopify.");
       setConnecting(false);
     }
   }
@@ -112,7 +112,7 @@ export default function ShopifyIntegrationPage() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">
-            Seller · Integrações
+            Seller · Integrations
           </p>
 
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
@@ -135,11 +135,11 @@ export default function ShopifyIntegrationPage() {
           <div className="flex flex-col gap-6">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
-                Conectar uma loja
+                Connect a store
               </h2>
 
               <p className="mt-1 text-sm text-slate-500">
-                Informe o domínio da loja Shopify que deseja conectar.
+                Enter the domain of the Shopify store you want to connect.
               </p>
             </div>
 
@@ -158,7 +158,7 @@ export default function ShopifyIntegrationPage() {
                 disabled={connecting}
                 className="h-11 rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {connecting ? "Conectando..." : "Conectar Shopify"}
+                {connecting ? "Connecting..." : "Connect Shopify"}
               </button>
             </div>
           </div>
@@ -167,25 +167,25 @@ export default function ShopifyIntegrationPage() {
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
           <div className="mb-5">
             <h2 className="text-lg font-semibold text-slate-900">
-              Lojas conectadas
+              Connected stores
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Suas integrações Shopify ativas aparecerão aqui.
+              Your active Shopify integrations will appear here.
             </p>
           </div>
 
           {loading ? (
             <div className="py-8 text-center text-sm text-slate-500">
-              Carregando integrações...
+              Loading integrations...
             </div>
           ) : stores.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-300 px-5 py-10 text-center">
               <p className="text-sm font-medium text-slate-700">
-                Nenhuma loja Shopify conectada
+                No Shopify stores Connected
               </p>
               <p className="mt-1 text-sm text-slate-500">
-                Conecte sua primeira loja acima.
+                Connect your first store above.
               </p>
             </div>
           ) : (
@@ -205,7 +205,7 @@ export default function ShopifyIntegrationPage() {
                   </div>
 
                   <span className="inline-flex w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                    {store.status || "connected"}
+                    {store.status || "Connected"}
                   </span>
                 </div>
               ))}
