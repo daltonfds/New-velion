@@ -1293,11 +1293,10 @@ export default function ProdutoPage() {
             </a>
           </p>
 
-          <div className="nv-social">
-            <span>f</span>
-            <span>ig</span>
-            <span>tt</span>
-            <span>wa</span>
+          <div className="nv-social" aria-label="Social media">
+            <a href="https://www.instagram.com/newvelion" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+            <a href="https://www.tiktok.com/@newvelion" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4c.4 2.1 1.7 3.5 4 3.8v3a8.2 8.2 0 0 1-4-1.2v5.1a5.3 5.3 0 1 1-4.5-5.2v3a2.3 2.3 0 1 0 1.5 2.2V4H15Z" fill="currentColor"/></svg></a>
+            <a href="https://wa.me/27722958915" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.6 0 .4 5.2.4 11.6c0 2 .5 4 1.5 5.7L.3 23.9l6.8-1.7a11.7 11.7 0 0 0 5 1.1h.1c6.4 0 11.6-5.2 11.6-11.6 0-3.1-1.2-6-3.3-8.2Z" fill="currentColor"/></svg></a>
           </div>
 
           <h3>Quick links</h3>
