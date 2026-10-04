@@ -47,7 +47,7 @@ type RelatedProduct = {
 
 const formatPrice = (value: number, currency: string) => {
   try {
-    return new Intl.NumberFormat("pt-BR", {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency || "BRL",
     }).format(value);
@@ -210,7 +210,7 @@ export default function ProdutoPage() {
 
   function addToCart() {
     setCartCount((current) => current + bundle * quantity);
-    showToast("Adicionado ao carrinho");
+    showToast("Added to cart");
   }
 
   if (loading) {
@@ -238,9 +238,9 @@ export default function ProdutoPage() {
     product.beneficios?.length > 0
       ? product.beneficios
       : [
-          "Produto de qualidade premium",
-          "Prático para o uso diário",
-          "Compra segura e conveniente",
+          "Premium quality product",
+          "Practical for everyday use",
+          "Safe and convenient purchase",
         ];
 
   const photos =
@@ -249,7 +249,7 @@ export default function ProdutoPage() {
       : [];
 
   const guarantee =
-    product.garantia_texto || "Garantia de satisfação";
+    product.garantia_texto || "Satisfaction guarantee";
 
   return (
     <>
@@ -813,7 +813,7 @@ export default function ProdutoPage() {
       `}</style>
 
       <div className="nv-bar">
-        Precisa de ajuda? Fale no WhatsApp · Compra segura
+        Need help? Chat with us on WhatsApp · Secure checkout
       </div>
 
       <header className="nv-header">
@@ -828,7 +828,7 @@ export default function ProdutoPage() {
             ⌕
           </button>
 
-          <button className="nv-icon" aria-label="Carrinho">
+          <button className="nv-icon" aria-label="Cart">
             🛍
             <span className="nv-badge">{cartCount}</span>
           </button>
@@ -836,7 +836,7 @@ export default function ProdutoPage() {
       </header>
 
       <main>
-        <div className="nv-gallery" aria-label="Fotos do produto">
+        <div className="nv-gallery" aria-label="Product photos">
           {photos.length > 0 ? (
             photos.map((photo, index) => (
               <div className="nv-slide" key={`${photo}-${index}`}>
@@ -849,7 +849,7 @@ export default function ProdutoPage() {
           ) : (
             <div className="nv-slide">
               <span className="nv-placeholder">
-                Foto do produto
+                Product photo
               </span>
             </div>
           )}
@@ -861,7 +861,7 @@ export default function ProdutoPage() {
 
             <p className="nv-muted" style={{ marginTop: 0 }}>
               <em>
-                Qualidade, praticidade e confiança em um só produto.
+                Quality, convenience, and confidence in one product.
               </em>
             </p>
 
@@ -870,7 +870,7 @@ export default function ProdutoPage() {
                 {stars(product.avaliacao_media || 5)}
               </span>{" "}
               <span className="nv-muted">
-                ({product.total_avaliacoes || reviews.length} avaliações)
+                ({product.total_avaliacoes || reviews.length} reviews)
               </span>
             </div>
 
@@ -878,7 +878,7 @@ export default function ProdutoPage() {
               {formatPrice(unitPrice, product.moeda)}
             </div>
 
-            <p style={{ margin: "0 0 6px" }}>Ajuda a</p>
+            <p style={{ margin: "0 0 6px" }}>Helps you</p>
 
             <ul className="nv-checks">
               {benefits.slice(0, 6).map((benefit, index) => (
@@ -886,14 +886,14 @@ export default function ProdutoPage() {
               ))}
             </ul>
 
-            <div className="nv-pills" role="group" aria-label="Tamanho">
+            <div className="nv-pills" role="group" aria-label="Size">
               <button
                 className={`nv-pill ${
                   size === "default" ? "active" : ""
                 }`}
                 onClick={() => setSize("default")}
               >
-                Opção padrão
+                Standard option
               </button>
 
               <button
@@ -902,12 +902,12 @@ export default function ProdutoPage() {
                 }`}
                 onClick={() => setSize("large")}
               >
-                Pacote maior
+                Larger package
               </button>
             </div>
 
             <div className="nv-divider">
-              COMPRE MAIS E ECONOMIZE
+              BUY MORE & SAVE
             </div>
 
             <div className="nv-bundles" role="group">
@@ -926,14 +926,14 @@ export default function ProdutoPage() {
                   >
                     {number === 1
                       ? ""
-                      : `Economize ${number === 3 ? "5%" : "10%"}`}
+                      : `Save ${number === 3 ? "5%" : "10%"}`}
                   </span>
 
                   <span className="nv-dot" />
 
                   <b>
                     {number}{" "}
-                    {number === 1 ? "unidade" : "unidades"}
+                    {number === 1 ? "unit" : "units"}
                   </b>
                 </button>
               ))}
@@ -957,7 +957,7 @@ export default function ProdutoPage() {
                   onClick={() =>
                     setQuantity((value) => Math.max(1, value - 1))
                   }
-                  aria-label="Diminuir"
+                  aria-label="Decrease quantity"
                 >
                   −
                 </button>
@@ -969,7 +969,7 @@ export default function ProdutoPage() {
                   onClick={() =>
                     setQuantity((value) => value + 1)
                   }
-                  aria-label="Aumentar"
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
@@ -979,7 +979,7 @@ export default function ProdutoPage() {
                 className="nv-btn nv-btn-cta"
                 onClick={addToCart}
               >
-                🛒 ADICIONAR AO CARRINHO
+                🛒 ADD TO CART
               </button>
             </div>
 
@@ -1000,7 +1000,7 @@ export default function ProdutoPage() {
                 className="nv-btn nv-btn-brand"
                 style={{ marginTop: 20 }}
               >
-                COMPRAR AGORA
+                BUY NOW
               </a>
             )}
           </div>
@@ -1009,7 +1009,7 @@ export default function ProdutoPage() {
         <section className="nv-section nv-soft">
           <div className="nv-wrap">
             <h2 className="nv-h2">
-              Por que {product.nome}?
+              Why {product.nome}?
             </h2>
 
             <div style={{ lineHeight: 1.7 }}>
@@ -1022,21 +1022,21 @@ export default function ProdutoPage() {
                   ))
               ) : (
                 <p>
-                  Conheça todos os detalhes deste produto,
-                  desenvolvido para oferecer qualidade e praticidade.
+                  Discover all the details of this product,
+                  designed to deliver quality and convenience.
                 </p>
               )}
             </div>
 
             {product.modo_uso && (
               <div className="nv-detail">
-                <b>Modo de uso:</b> {product.modo_uso}
+                <b>How to use:</b> {product.modo_uso}
               </div>
             )}
 
             {product.ingredientes && (
               <div className="nv-detail">
-                <b>Detalhes do produto:</b>{" "}
+                <b>Product details:</b>{" "}
                 {product.ingredientes}
               </div>
             )}
@@ -1046,28 +1046,28 @@ export default function ProdutoPage() {
         <section className="nv-section">
           <div className="nv-wrap">
             <h2 className="nv-h2">
-              Qualidade em cada detalhe
+              Quality in every detail
             </h2>
 
             <div className="nv-facts">
               <div className="nv-fact">
                 <strong>✓</strong>
-                <span>Produto selecionado para o marketplace NewVelion.</span>
+                <span>A product selected for the NewVelion marketplace.</span>
               </div>
 
               <div className="nv-fact">
                 <strong>★</strong>
-                <span>Avaliações e experiências de clientes.</span>
+                <span>Customer reviews and experiences.</span>
               </div>
 
               <div className="nv-fact">
                 <strong>✓</strong>
-                <span>Processo de compra simples e seguro.</span>
+                <span>A simple and secure purchasing process.</span>
               </div>
 
               <div className="nv-fact">
                 <strong>24/7</strong>
-                <span>Suporte e informações disponíveis online.</span>
+                <span>Support and information available online.</span>
               </div>
             </div>
           </div>
@@ -1076,31 +1076,31 @@ export default function ProdutoPage() {
         <section className="nv-section nv-soft">
           <div className="nv-wrap">
             <h2 className="nv-h2">
-              Por que clientes escolhem a NewVelion
+              Why customers choose NewVelion
             </h2>
 
             <div className="nv-trust">
               <div className="nv-trust-item">
                 <div className="nv-ico">🚚</div>
-                <h3 className="nv-h3">Entrega</h3>
+                <h3 className="nv-h3">Delivery</h3>
                 <span className="nv-muted">
-                  Acompanhe as informações do seu pedido.
+                  Track your order information.
                 </span>
               </div>
 
               <div className="nv-trust-item">
                 <div className="nv-ico">🔒</div>
-                <h3 className="nv-h3">Pagamento seguro</h3>
+                <h3 className="nv-h3">Secure payment</h3>
                 <span className="nv-muted">
-                  Checkout direcionado pelo fornecedor.
+                  Checkout securely provided by the supplier.
                 </span>
               </div>
 
               <div className="nv-trust-item">
                 <div className="nv-ico">💬</div>
-                <h3 className="nv-h3">Suporte humano</h3>
+                <h3 className="nv-h3">Human support</h3>
                 <span className="nv-muted">
-                  Entre em contato para obter ajuda.
+                  Contact us whenever you need help.
                 </span>
               </div>
             </div>
@@ -1110,12 +1110,12 @@ export default function ProdutoPage() {
         <section className="nv-section">
           <div className="nv-wrap">
             <h2 className="nv-h2">
-              O que nossos clientes dizem
+              What our customers say
             </h2>
 
             {reviews.slice(0, 3).map((review) => (
               <div className="nv-quote" key={review.id}>
-                <b>{review.reviewer_name || "Cliente verificado"}</b>
+                <b>{review.reviewer_name || "Verified customer"}</b>
 
                 <div className="nv-stars">
                   {stars(review.rating)}
@@ -1125,7 +1125,7 @@ export default function ProdutoPage() {
 
                 {review.verified_buyer && (
                   <small className="nv-muted">
-                    ✓ Compra verificada
+                    ✓ Verified purchase
                   </small>
                 )}
               </div>
@@ -1133,10 +1133,10 @@ export default function ProdutoPage() {
 
             {reviews.length === 0 && (
               <div className="nv-quote">
-                <b>Clientes NewVelion</b>
+                <b>NewVelion customers</b>
                 <div className="nv-stars">★★★★★</div>
                 <p>
-                  As avaliações dos clientes aparecerão aqui.
+                  Customer reviews will appear here.
                 </p>
               </div>
             )}
@@ -1158,7 +1158,7 @@ export default function ProdutoPage() {
                   {stars(product.avaliacao_media || 5)}
                 </span>{" "}
                 <b>
-                  {product.total_avaliacoes || reviews.length} avaliações
+                  {product.total_avaliacoes || reviews.length} reviews
                 </b>
               </div>
             </div>
@@ -1167,13 +1167,13 @@ export default function ProdutoPage() {
               {reviews.map((review) => (
                 <article className="nv-rev" key={review.id}>
                   <b>
-                    {review.reviewer_name || "Cliente"}{" "}
+                    {review.reviewer_name || "Customer"}{" "}
                     {review.verified_buyer ? "✔" : ""}
                   </b>
 
                   <small>
                     {new Date(review.created_at).toLocaleDateString(
-                      "pt-BR",
+                      "en-US",
                     )}
                   </small>
 
@@ -1184,7 +1184,7 @@ export default function ProdutoPage() {
                   <p>{review.review_text}</p>
 
                   <small>
-                    Tipo: compra verificada
+                    Verified purchase
                   </small>
                 </article>
               ))}
@@ -1196,7 +1196,7 @@ export default function ProdutoPage() {
           <section className="nv-section nv-soft">
             <div className="nv-wrap">
               <h2 className="nv-h2">
-                Quem comprou este item também comprou:
+                Customers who bought this item also bought:
               </h2>
 
               <div className="nv-carousel">
@@ -1224,7 +1224,7 @@ export default function ProdutoPage() {
                       </div>
 
                       <div className="nv-muted">
-                        ({item.total_avaliacoes || 0} avaliações)
+                        ({item.total_avaliacoes || 0} reviews)
                       </div>
 
                       <div>
@@ -1242,7 +1242,7 @@ export default function ProdutoPage() {
                         className="nv-btn nv-btn-brand"
                         style={{ marginTop: 8 }}
                       >
-                        Ver produto
+                        View product
                       </a>
                     </div>
                   );
@@ -1259,26 +1259,26 @@ export default function ProdutoPage() {
             className="nv-h2"
             style={{ color: "white" }}
           >
-            Quer saber mais?
+            Want to learn more?
           </h2>
 
           <p>
-            Receba novidades e ofertas da NewVelion.
+            Get NewVelion news and special offers.
           </p>
 
           <input
             type="email"
-            placeholder="Digite seu e-mail"
-            aria-label="E-mail"
+            placeholder="Enter your email"
+            aria-label="Email"
           />
 
           <button
             className="nv-btn nv-danger"
             onClick={() =>
-              showToast("Obrigado! Em breve teremos novidades.")
+              showToast("Thank you! We will be in touch soon.")
             }
           >
-            Enviar
+            Subscribe
           </button>
         </div>
       </section>
@@ -1300,31 +1300,31 @@ export default function ProdutoPage() {
             <span>wa</span>
           </div>
 
-          <h3>Links rápidos</h3>
+          <h3>Quick links</h3>
 
           <ul style={{ listStyle: "none", padding: 0 }}>
             <li>
-              <a href="/marketplace">Todos os produtos</a>
+              <a href="/marketplace">All products</a>
             </li>
             <li>
               <a href="/marketplace">Marketplace</a>
             </li>
             <li>
-              <a href="/dashboard">Minha conta</a>
+              <a href="/dashboard">My account</a>
             </li>
           </ul>
 
-          <h3>Saiba mais</h3>
+          <h3>Learn more</h3>
 
           <ul style={{ listStyle: "none", padding: 0 }}>
             <li>
-              <a href="/contact">Contato</a>
+              <a href="/contact">Contact</a>
             </li>
             <li>
-              <a href="/terms">Termos e condições</a>
+              <a href="/terms">Terms & Conditions</a>
             </li>
             <li>
-              <a href="/privacy">Política de privacidade</a>
+              <a href="/privacy">Privacy Policy</a>
             </li>
           </ul>
 
@@ -1332,17 +1332,16 @@ export default function ProdutoPage() {
             className="nv-muted"
             style={{ fontSize: "0.85rem" }}
           >
-            As informações apresentadas nesta página são
-            disponibilizadas para fins informativos. Consulte as
-            informações oficiais do fabricante antes da compra.
+            The information presented on this page is provided for informational
+            purposes only. Please refer to the manufacturer's official
+            information before purchasing.
           </p>
 
           <p
             className="nv-muted"
             style={{ fontSize: "0.85rem" }}
           >
-            © {new Date().getFullYear()} NewVelion. Todos os
-            direitos reservados.
+            © {new Date().getFullYear()} NewVelion. All rights reserved.
           </p>
         </div>
       </footer>
@@ -1351,7 +1350,7 @@ export default function ProdutoPage() {
         <a
           className="nv-wa"
           href={checkoutUrl(bundle * quantity)}
-          aria-label="Comprar produto"
+          aria-label="Buy product"
           style={{
             left: "auto",
             right: 16,
