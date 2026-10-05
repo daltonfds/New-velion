@@ -11,7 +11,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON body." }, { status: 400 }); }
 
   const status = String(body.status ?? "").trim();
+  const kycStatus = body.kyc_status == null ? null : String(body.kyc_status).trim();
   if (!statuses.has(status)) return Response.json({ error: "Invalid supplier status." }, { status: 400 });
+  if (kycStatus && !["pending","under_review","approved","rejected"].includes(kycStatus)) return Response.json({ error: "Invalid KYC status." }, { status: 400 });
 
   const { data, error } = await auth.client.from("supplier_profiles").update({
     approval_status: status,
@@ -22,6 +24,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   }).eq("user_id", id).select("*").single();
 
   if (error) return Response.json({ error: error.message }, { status: 400 });
+
+  if (kycStatus) await auth.client.from("profiles").update({ kyc_status: kycStatus }).eq("id", id);
 
   if (status === "approved") {
     await auth.client.from("profiles").update({ status: "active" }).eq("id", id);
