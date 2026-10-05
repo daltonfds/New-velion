@@ -7,6 +7,7 @@ export async function getActiveProducts(): Promise<Product[]> {
     .select("*")
     .eq("ativo", true)
     .eq("supplier_status", "approved")
+    .gt("estoque", 0)
     .order("destaque", { ascending: false })
     .order("novo", { ascending: false })
     .order("created_at", { ascending: false });
