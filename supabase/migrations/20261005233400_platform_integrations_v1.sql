@@ -148,6 +148,15 @@ alter table public.integration_webhook_events enable row level security;
 alter table public.integration_api_logs enable row level security;
 alter table public.integration_rate_limit_buckets enable row level security;
 
+grant select, insert, update, delete on public.integration_platforms to service_role;
+grant select, insert, update, delete on public.integration_external_sellers to service_role;
+grant select, insert, update, delete on public.integration_product_mappings to service_role;
+grant select, insert, update, delete on public.integration_orders to service_role;
+grant select, insert, update, delete on public.integration_order_items to service_role;
+grant select, insert, update, delete on public.integration_webhook_events to service_role;
+grant select, insert, update, delete on public.integration_api_logs to service_role;
+grant select, insert, update, delete on public.integration_rate_limit_buckets to service_role;
+
 create or replace function public.consume_integration_rate_limit(
   p_platform_id uuid,
   p_limit integer default 120,
