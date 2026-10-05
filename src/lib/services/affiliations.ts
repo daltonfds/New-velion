@@ -8,6 +8,7 @@ export interface CreateAffiliationResult {
     link_unico: string;
     ativo: boolean;
     created_at: string;
+    sale_price: number;
   };
   affiliate_link: string;
   created: boolean;
@@ -15,12 +16,14 @@ export interface CreateAffiliationResult {
 
 export async function createAffiliation(
   productId: string,
+  salePrice?: number,
 ): Promise<CreateAffiliationResult> {
   const { data, error } = await supabase.functions.invoke(
     "create-affiliation",
     {
       body: {
         product_id: productId,
+        sale_price: salePrice,
       },
     },
   );
