@@ -5,7 +5,8 @@ export async function getActiveProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("ativo", true)\n    .eq("supplier_status", "approved")
+    .eq("ativo", true)
+    .eq("supplier_status", "approved")
     .order("destaque", { ascending: false })
     .order("novo", { ascending: false })
     .order("created_at", { ascending: false });
