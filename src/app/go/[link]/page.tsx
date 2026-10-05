@@ -24,9 +24,12 @@ export default async function AffiliateProductPage({
     auth: { persistSession: false },
   });
 
-  const { data, error } = await supabase.rpc("resolve_affiliate_product", {
-    p_link_unico: affiliateLink,
-  });
+  const { data, error } = await supabase.rpc(
+    "resolve_affiliate_product_with_slug",
+    {
+      p_link_unico: affiliateLink,
+    },
+  );
 
   if (error) {
     console.error("Failed to resolve affiliate product:", error);
@@ -54,20 +57,13 @@ export default async function AffiliateProductPage({
     console.error("Failed to record affiliate click:", clickError);
   }
 
-  const { data: productRecord, error: productError } = await supabase
-    .from("products")
-    .select("slug")
-    .eq("id", product.product_id)
-    .eq("ativo", true)
-    .maybeSingle();
-
-  if (productError || !productRecord?.slug) {
-    console.error("Failed to resolve product slug:", productError);
+  if (!product.slug) {
+    console.error("Failed to resolve product slug from affiliate RPC.");
     notFound();
   }
 
   const productUrl =
-    `/produto/${encodeURIComponent(String(productRecord.slug))}` +
+    `/produto/${encodeURIComponent(String(product.slug))}` +
     `?ref=${encodeURIComponent(affiliateLink)}`;
 
   redirect(productUrl);
