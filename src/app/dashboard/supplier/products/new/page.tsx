@@ -1,0 +1,75 @@
+"use client";
+
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import { supplierFetch } from "@/lib/supplier-client";
+import { supabase } from "@/lib/supabase";
+
+export default function NewSupplierProductPage() {
+  const router = useRouter();
+  const [categories, setCategories] = useState<Array<{id:string;nome:string}>>([]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    nome:"", slug:"", descricao:"", categoria_id:"", preco:"", preco_custo:"", moeda:"ZAR",
+    preco_promocional:"", comissao_afiliado:"", estoque:"0", low_stock_threshold:"5",
+    supplier_min_selling_price:"", supplier_suggested_price:"", checkout_url:"", fotos:"",
+    fornecedor_nome:"", fornecedor_pais:"", modo_uso:"", garantia_texto:""
+  });
+
+  useEffect(() => {
+    supabase.from("categories").select("id,nome").order("ordem").order("nome").then(({data}) => setCategories(data ?? []));
+  }, []);
+
+  function field(key: keyof typeof form, value: string) { setForm((current) => ({...current, [key]: value})); }
+
+  async function save(event: FormEvent) {
+    event.preventDefault(); setSaving(true); setError("");
+    try {
+      const result = await supplierFetch<{data:{id:string}}>("/api/supplier/products", {
+        method:"POST",
+        body:JSON.stringify({
+          ...form,
+          preco:Number(form.preco),
+          preco_custo:Number(form.preco_custo),
+          preco_promocional:form.preco_promocional || null,
+          comissao_afiliado:Number(form.comissao_afiliado || 0),
+          estoque:Number(form.estoque || 0),
+          low_stock_threshold:Number(form.low_stock_threshold || 5),
+          supplier_min_selling_price:Number(form.supplier_min_selling_price || form.preco),
+          supplier_suggested_price:Number(form.supplier_suggested_price || form.preco),
+          fotos:form.fotos.split("\n").map((v)=>v.trim()).filter(Boolean)
+        })
+      });
+      router.push("/dashboard/supplier/products/" + result.data.id);
+    } catch(e) { setError(e instanceof Error ? e.message : "Could not create product."); }
+    finally { setSaving(false); }
+  }
+
+  const inputs: Array<[keyof typeof form,string,string]> = [
+    ["nome","Product name","text"],["slug","Slug","text"],["preco","Base price","number"],["preco_custo","Cost price","number"],
+    ["preco_promocional","Promotional price","number"],["comissao_afiliado","Seller commission %","number"],["estoque","Stock","number"],
+    ["low_stock_threshold","Low-stock threshold","number"],["supplier_min_selling_price","Minimum seller price","number"],
+    ["supplier_suggested_price","Suggested seller price","number"],["checkout_url","Checkout URL","url"],["fornecedor_nome","Brand / supplier name","text"],
+    ["fornecedor_pais","Supplier country","text"]
+  ];
+
+  return <AppShell area="supplier"><div className="mx-auto max-w-5xl space-y-6">
+    <div><Link href="/dashboard/supplier/products" className="text-sm font-semibold text-blue-600">← Products</Link><h1 className="mt-3 text-2xl font-bold text-[#16294F]">Add product</h1><p className="mt-1 text-sm text-slate-500">Create a draft. Approved products become available to sellers in the marketplace.</p></div>
+    {error && <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+    <form onSubmit={save} className="space-y-5">
+      <Card><div className="grid gap-4 p-6 sm:grid-cols-2">{inputs.map(([key,label,type])=><label key={key} className="text-sm font-medium text-slate-700">{label}<input required={["nome","preco","preco_custo","checkout_url"].includes(key)} type={type} min={type==="number"?"0":undefined} step={type==="number"?"0.01":undefined} value={form[key]} onChange={(e)=>field(key,e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-blue-500"/></label>)}
+        <label className="text-sm font-medium text-slate-700">Currency<select value={form.moeda} onChange={(e)=>field("moeda",e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5"><option>ZAR</option><option>MZN</option></select></label>
+        <label className="text-sm font-medium text-slate-700">Category<select required value={form.categoria_id} onChange={(e)=>field("categoria_id",e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5"><option value="">Select category</option>{categories.map((c)=><option key={c.id} value={c.id}>{c.nome}</option>)}</select></label>
+        <label className="sm:col-span-2 text-sm font-medium text-slate-700">Description<textarea value={form.descricao} onChange={(e)=>field("descricao",e.target.value)} rows={5} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5"/></label>
+        <label className="sm:col-span-2 text-sm font-medium text-slate-700">Image URLs <span className="font-normal text-slate-400">(one per line)</span><textarea value={form.fotos} onChange={(e)=>field("fotos",e.target.value)} rows={4} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5"/></label>
+        <label className="sm:col-span-2 text-sm font-medium text-slate-700">How to use<textarea value={form.modo_uso} onChange={(e)=>field("modo_uso",e.target.value)} rows={4} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5"/></label>
+        <label className="sm:col-span-2 text-sm font-medium text-slate-700">Guarantee<textarea value={form.garantia_texto} onChange={(e)=>field("garantia_texto",e.target.value)} rows={3} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5"/></label>
+      </div></Card>
+      <div className="flex justify-end gap-3"><Link href="/dashboard/supplier/products" className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700">Cancel</Link><button disabled={saving} className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Creating..." : "Create draft"}</button></div>
+    </form>
+  </div></AppShell>;
+}
