@@ -24,7 +24,7 @@ export default function DashboardPage() {
         .eq("id", user.id)
         .maybeSingle();
 
-      if (profile?.role === "admin") {
+      if (profile?.role === "supplier") {\n        router.replace("/dashboard/supplier");\n        return;\n      }\n\n      if (profile?.role === "admin") {
         router.replace("/dashboard/admin");
         return;
       }
