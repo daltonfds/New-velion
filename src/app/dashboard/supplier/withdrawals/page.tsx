@@ -5,7 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { getCurrentUser } from "@/lib/auth";
-import { getWalletSummary } from "@/lib/services/wallet";
+import { supplierFetch } from "@/lib/supplier-client";
 import { supabase } from "@/lib/supabase";
 
 type Method = "bank_transfer" | "mpesa" | "emola";
@@ -24,31 +24,13 @@ export default function SupplierWithdrawalsPage() {
   const [message, setMessage] = useState("");
 
   async function load() {
-    const user = await getCurrentUser();
-    if (!user) { setMessage("You must be signed in."); setLoading(false); return; }
-
-    const [w, p, s, wd] = await Promise.all([
-      getWalletSummary(user.id),
-      supabase.from("profiles").select("country_code,pais").eq("id", user.id).single(),
-      supabase.from("account_settings").select("payout_methods").eq("user_id", user.id).maybeSingle(),
-      supabase.from("withdrawals").select("id,valor_solicitado,valor_liquido,metodo,dados_pagamento,status,created_at,payout_currency,valor_convertido").eq("vendedor_id", user.id).order("created_at", { ascending: false }).limit(30),
+    const [financeResult, profileResult] = await Promise.all([
+      supplierFetch<{ data: { available: number; retained: number; total: number; withdrawals: any[] } }>("/api/supplier/finance"),
+      supplierFetch<{ data: { country_code?: string; approval_status?: string } }>("/api/supplier/profile"),
     ]);
-
-    setWallet({ disponivel: w.disponivel, retido: w.retido, saldo_total: w.saldo_total });
-    const detected = String(p.data?.country_code ?? p.data?.pais ?? "").toUpperCase();
-    setCountry(detected);
-
-    const { data: cfg } = await supabase.from("payout_methods").select("valor_minimo_saque").eq("pais", detected).maybeSingle();
-    if (cfg?.valor_minimo_saque) setMinimum(Number(cfg.valor_minimo_saque));
-
-    const pm = s.data?.payout_methods ?? {};
-    const next = { bank_transfer: null, mpesa: null, emola: null } as Record<Method, Details | null>;
-    (Object.keys(next) as Method[]).forEach((m) => { if (pm[m]?.enabled) next[m] = pm[m]; });
-    setMethods(next);
-    const first = (Object.keys(next) as Method[]).find((m) => next[m]);
-    if (first) setMethod(first);
-    if (!wd.error) setWithdrawals(wd.data ?? []);
-    if (p.error) setMessage(p.error.message);
+    setWallet({ disponivel: financeResult.data.available, retido: financeResult.data.retained, saldo_total: financeResult.data.total });
+    setWithdrawals(financeResult.data.withdrawals ?? []);
+    setCountry(String(profileResult.data.country_code ?? "").toUpperCase());
     setLoading(false);
   }
 
@@ -56,25 +38,15 @@ export default function SupplierWithdrawalsPage() {
 
   async function request() {
     setMessage("");
-    const user = await getCurrentUser();
     const value = Number(amount);
-    if (!user) return setMessage("You must be signed in.");
     if (!methods[method]) return setMessage("Configure this payout method in Settings first.");
     if (!Number.isFinite(value) || value < minimum) return setMessage(`Minimum withdrawal is ${minimum}.`);
     if (value > wallet.disponivel) return setMessage("The withdrawal amount exceeds your available balance.");
-
     setBusy(true);
     try {
-      const details = methods[method]!;
       const rpcMethod = method === "bank_transfer" ? "bank_transfer" : "mobile_wallet";
       const provider = method === "mpesa" ? "m-pesa" : method === "emola" ? "e-mola" : undefined;
-      const { error } = await supabase.rpc("server_request_withdrawal", {
-        p_user_id: user.id,
-        p_amount: value,
-        p_method: rpcMethod,
-        p_data: { ...details, provider },
-      });
-      if (error) throw new Error(error.message);
+      await supplierFetch("/api/supplier/withdrawals", { method: "POST", body: JSON.stringify({ amount: value, method: rpcMethod, provider }) });
       setAmount("");
       setMessage("Withdrawal request submitted.");
       await load();
