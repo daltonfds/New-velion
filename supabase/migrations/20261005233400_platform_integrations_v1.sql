@@ -220,6 +220,11 @@ declare
   v_base_price numeric;
   v_effective_currency text;
 begin
+  if not exists (
+    select 1 from public.integration_platforms
+    where id = p_platform_id and status = 'active'
+  ) then raise exception 'INVALID_PLATFORM'; end if;
+
   if nullif(trim(p_external_order_id), '') is null then raise exception 'INVALID_ORDER'; end if;
   if p_currency not in ('ZAR','MZN') then raise exception 'INVALID_CURRENCY'; end if;
   if jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then raise exception 'INVALID_ORDER'; end if;
