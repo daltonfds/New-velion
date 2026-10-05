@@ -1,4 +1,5 @@
 import { adminClient } from "@/lib/integrations/server";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 export async function requireSupplier(request: Request) {
   const authorization = request.headers.get("authorization") || "";
@@ -13,6 +14,11 @@ export async function requireSupplier(request: Request) {
   }
 
   const client = adminClient();
+  const userClient: SupabaseClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${token}` } }, auth: { persistSession: false, autoRefreshToken: false } },
+  );
   const { data, error } = await client.auth.getUser(token);
 
   if (error || !data.user) {
@@ -51,5 +57,6 @@ export async function requireSupplier(request: Request) {
     user: data.user,
     profile,
     client,
+    userClient,
   };
 }
