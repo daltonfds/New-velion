@@ -9,7 +9,7 @@ import {
 
 function mapOrderError(message: string) {
   const code = message.match(
-    /INVALID_ORDER|INVALID_SELLER|PRODUCT_NOT_MAPPED|PRODUCT_NOT_FOUND|PRODUCT_OUT_OF_STOCK|INVALID_QUANTITY|INVALID_CURRENCY/,
+    /INVALID_ORDER|INVALID_SELLER|PRODUCT_NOT_MAPPED|PRODUCT_NOT_FOUND|PRODUCT_OUT_OF_STOCK|INVALID_QUANTITY|INVALID_CURRENCY|SALE_PRICE_BELOW_MINIMUM/,
   )?.[0];
 
   switch (code) {
@@ -25,6 +25,8 @@ function mapOrderError(message: string) {
       return ["INVALID_QUANTITY", "Every order quantity must be greater than zero.", 400] as const;
     case "INVALID_CURRENCY":
       return ["INVALID_CURRENCY", "The order currency is not supported for the mapped product.", 409] as const;
+    case "SALE_PRICE_BELOW_MINIMUM":
+      return ["SALE_PRICE_BELOW_MINIMUM", "The seller price is below the supplier minimum.", 409] as const;
     default:
       return ["INVALID_ORDER", "The order payload is invalid.", 400] as const;
   }
