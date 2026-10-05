@@ -4,9 +4,12 @@ export async function GET(request: Request) {
   const auth = await requireSupplier(request);
   if (!auth.ok) return Response.json({ error: auth.message }, { status: auth.status });
 
-  const { data, error } = await auth.client.from("supplier_profiles").select("*").eq("user_id", auth.userId).maybeSingle();
+  const [{ data, error }, { data: profile }] = await Promise.all([
+    auth.client.from("supplier_profiles").select("*").eq("user_id", auth.userId).maybeSingle(),
+    auth.client.from("profiles").select("kyc_status,status").eq("id", auth.userId).maybeSingle(),
+  ]);
   if (error) return Response.json({ error: error.message }, { status: 500 });
-  return Response.json({ data });
+  return Response.json({ data: data ? { ...data, kyc_status: profile?.kyc_status ?? null, account_status: profile?.status ?? null } : null });
 }
 
 export async function PUT(request: Request) {
