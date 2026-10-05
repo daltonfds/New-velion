@@ -22,6 +22,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON body." }, { status: 400 }); }
 
   if (String(body.action ?? "") === "submit") {
+    const { data: supplierProfile } = await auth.client.from("supplier_profiles").select("approval_status").eq("user_id", auth.userId).maybeSingle();
+    if (supplierProfile?.approval_status !== "approved") return Response.json({ error: "Your supplier account must be approved before submitting products." }, { status: 403 });
     if (!["draft", "rejected"].includes(existing.supplier_status)) return Response.json({ error: "Only draft or rejected products can be submitted." }, { status: 409 });
     const { data, error } = await auth.client.from("products").update({
       supplier_status: "pending_review", supplier_rejection_reason: null, supplier_reviewed_at: null,
