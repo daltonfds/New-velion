@@ -13,6 +13,8 @@ interface Sale {
   taxa_gateway: number;
   valor_garantia: number;
   comissao_vendedor: number;
+  taxa_plataforma: number;
+  ganho_plataforma: number;
   status: string;
   vendido_em: string;
 }
@@ -46,7 +48,7 @@ export default function AdminAnalyticsPage() {
           supabase
             .from("sales")
             .select(
-              "id, vendedor_id, product_id, valor_venda, taxa_gateway, valor_garantia, comissao_vendedor, status, vendido_em",
+              "id, vendedor_id, product_id, valor_venda, taxa_gateway, valor_garantia, comissao_vendedor, taxa_plataforma, ganho_plataforma, status, vendido_em",
             )
             .order("vendido_em", { ascending: false }),
 
@@ -132,6 +134,8 @@ export default function AdminAnalyticsPage() {
       0,
     );
 
+    const platformRevenue = paid.reduce((total, sale) => total + Number(sale.ganho_plataforma || 0), 0);
+
     const commissions = paid.reduce(
       (total, sale) =>
         total + Number(sale.comissao_vendedor || 0),
@@ -155,6 +159,7 @@ export default function AdminAnalyticsPage() {
       gatewayFees,
       guarantees,
       commissions,
+      platformRevenue,
       averageOrder,
       uniqueSellers,
       uniqueProducts,
@@ -318,7 +323,7 @@ export default function AdminAnalyticsPage() {
               </Card>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               <Card>
                 <p className="text-sm text-slate-500">
                   Gateway Fees
@@ -335,6 +340,11 @@ export default function AdminAnalyticsPage() {
                 <p className="mt-2 text-xl font-semibold text-slate-900">
                   {formatMoney(metrics.guarantees)}
                 </p>
+              </Card>
+
+              <Card>
+                <p className="text-sm text-slate-500">Platform Revenue</p>
+                <p className="mt-2 text-xl font-semibold text-slate-900">{formatMoney(metrics.platformRevenue)}</p>
               </Card>
 
               <Card>
