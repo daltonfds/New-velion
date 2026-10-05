@@ -7,7 +7,7 @@ import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
 import { supabase } from "@/lib/supabase";
 
-export type AppArea = "seller" | "admin";
+export type AppArea = "seller" | "supplier" | "admin";
 
 type IconName =
   | "home"
@@ -124,6 +124,13 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Integrations", href: "/dashboard/seller/integrations", icon: "link" },
     { label: "Links", href: "/dashboard/seller/links", icon: "sales" },
     { label: "Withdrawals", href: "/dashboard/seller/withdrawals", icon: "download" },
+  ],
+
+  supplier: [
+    { label: "Dashboard", href: "/dashboard/supplier", icon: "home" },
+    { label: "Products", href: "/dashboard/supplier/products", icon: "box" },
+    { label: "Orders & Fulfillment", href: "/dashboard/supplier/orders", icon: "sales" },
+    { label: "Profile", href: "/dashboard/supplier/profile", icon: "users" },
   ],
 
   admin: [
