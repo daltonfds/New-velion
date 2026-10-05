@@ -33,6 +33,8 @@ export async function PATCH(request: Request) {
 
   const { data: product } = await auth.client.from("products").select("id,created_by").eq("id", id).maybeSingle();
   if (!product) return Response.json({ error: "Product not found." }, { status: 404 });
+  const { data: supplierProfile } = await auth.client.from("supplier_profiles").select("approval_status").eq("user_id", product.created_by).maybeSingle();
+  if (status === "approved" && supplierProfile?.approval_status !== "approved") return Response.json({ error: "The supplier account must be approved before its product can be published." }, { status: 409 });
 
   const { data, error } = await auth.client.from("products").update({
     supplier_status: status,
