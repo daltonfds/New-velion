@@ -69,6 +69,7 @@ export default function ProdutoPage() {
   const affiliateRef = searchParams.get("ref") || "";
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [affiliatePrice, setAffiliatePrice] = useState<number | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [related, setRelated] = useState<RelatedProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,6 +135,12 @@ export default function ProdutoPage() {
 
       setProduct(current);
 
+      if (affiliateRef) {
+        const { data: affiliateData } = await supabase.rpc("resolve_affiliate_product_with_slug", { p_link_unico: affiliateRef.replace(/^https?:\/\/[^/]+\//, "").replace(/^\//, "") });
+        const resolved = Array.isArray(affiliateData) ? affiliateData[0] : affiliateData;
+        if (resolved?.product_id === current.id && Number.isFinite(Number(resolved.sale_price))) setAffiliatePrice(Number(resolved.sale_price));
+      }
+
       const reviewsPromise = supabase
         .from("product_reviews")
         .select(
@@ -181,7 +188,7 @@ export default function ProdutoPage() {
 
   const basePrice = useMemo(() => {
     if (!product) return 0;
-    return product.preco_promocional ?? product.preco;
+    return affiliatePrice ?? product.preco_promocional ?? product.preco;
   }, [product]);
 
   const discount = bundle === 3 ? 0.05 : bundle === 6 ? 0.1 : 0;
