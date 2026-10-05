@@ -1,0 +1,1 @@
+-- Permissions are finalized after the fulfillment-aware v2 function is created in the following bridge migration.
