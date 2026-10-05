@@ -1,0 +1,14 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import AppShell from "@/components/layout/AppShell";
+import Card from "@/components/ui/Card";
+import { supabase } from "@/lib/supabase";
+
+type Product={id:string;nome:string;preco:number;preco_custo:number|null;moeda:string;estoque:number;created_by:string;supplier_status:string;descricao:string;created_at:string};
+
+async function api(path:string,init:RequestInit={}){const{data:{session}}=await supabase.auth.getSession();const response=await fetch(path,{...init,headers:{Authorization:"Bearer "+(session?.access_token||""),"Content-Type":"application/json",...(init.headers||{})}});const body=await response.json().catch(()=>({}));if(!response.ok)throw new Error(body.error||"Request failed.");return body;}
+
+export default function ProductReviewPage(){const[items,setItems]=useState<Product[]>([]);const[error,setError]=useState("");const load=()=>api("/api/admin/products/review").then(r=>setItems(r.data||[])).catch(e=>setError(e.message));useEffect(()=>{void load()},[]);
+async function review(id:string,status:string){setError("");try{await api("/api/admin/products/review",{method:"PATCH",body:JSON.stringify({id,status,reason:status==="rejected"?"Product information needs changes before publication.":""})});await load()}catch(e){setError(e instanceof Error?e.message:"Could not review product.")}}
+return <AppShell area="admin"><div className="space-y-6"><div><h1 className="text-2xl font-bold text-[#16294F]">Product review</h1><p className="mt-1 text-sm text-slate-500">Approve supplier products before they enter the seller marketplace.</p></div>{error&&<div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}<div className="space-y-4">{items.map(item=><Card key={item.id} className="p-5"><div className="flex flex-col gap-5 lg:flex-row lg:justify-between"><div className="max-w-2xl"><p className="text-xs font-semibold uppercase tracking-wide text-blue-600">Pending review</p><h2 className="mt-1 text-xl font-bold text-slate-900">{item.nome}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{item.descricao}</p><div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-500"><span>Price: {Number(item.preco)} {item.moeda}</span><span>Cost: {item.preco_custo==null?"—":Number(item.preco_custo)+" "+item.moeda}</span><span>Stock: {item.estoque}</span></div></div><div className="flex shrink-0 items-start gap-2"><button onClick={()=>void review(item.id,"approved")} className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white">Approve</button><button onClick={()=>void review(item.id,"rejected")} className="rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600">Reject</button></div></div></Card>)}{items.length===0&&<Card><div className="py-16 text-center text-sm text-slate-500">No supplier products waiting for review.</div></Card>}</div></div></AppShell>}
