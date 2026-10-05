@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function CheckoutPage() {
+function DeliveryForm() {
   const searchParams = useSearchParams();
 
   const affiliateLink = searchParams.get("ref") || "";
@@ -230,5 +230,26 @@ export default function CheckoutPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-slate-50 px-4 py-10">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="text-3xl font-black text-[#16294F]">
+              New<span className="text-[#C99A2E]">velion</span>
+            </div>
+            <p className="mt-6 text-slate-500">
+              Loading delivery information...
+            </p>
+          </div>
+        </main>
+      }
+    >
+      <DeliveryForm />
+    </Suspense>
   );
 }
