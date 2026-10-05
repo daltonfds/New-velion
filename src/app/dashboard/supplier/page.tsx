@@ -14,6 +14,7 @@ export default function SupplierDashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [finance, setFinance] = useState<Finance>({ available: 0, retained: 0, total: 0 });
+  const [supplierStatus, setSupplierStatus] = useState("pending");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -26,6 +27,8 @@ export default function SupplierDashboardPage() {
       setProducts(productResult.data);
       setOrders(orderResult.data);
       setFinance(financeResult.data);
+      const profileResult = await supplierFetch<{ data: { approval_status?: string } }>("/api/supplier/profile");
+      setSupplierStatus(profileResult.data?.approval_status ?? "pending");
     }).catch((err) => setError(err instanceof Error ? err.message : "Could not load dashboard."))
       .finally(() => setLoading(false));
   }, []);
@@ -39,6 +42,8 @@ export default function SupplierDashboardPage() {
   return (
     <AppShell area="supplier">
       <div className="space-y-7">
+        {supplierStatus !== "approved" && <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"><b>Supplier status:</b> {supplierStatus}. Your products cannot enter the marketplace until your supplier account is approved.</div>}
+
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-600">Supplier Center</p>
