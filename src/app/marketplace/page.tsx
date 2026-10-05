@@ -47,6 +47,8 @@ export default function MarketplacePage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const [affiliating, setAffiliating] = useState<string | null>(null);
+  const [pricingProduct, setPricingProduct] = useState<Product | null>(null);
+  const [salePrice, setSalePrice] = useState("");
   const [affiliateLinks, setAffiliateLinks] = useState<Record<string, string>>(
     {}
   );
@@ -198,8 +200,11 @@ const filteredProducts = useMemo(() => {
       setError(null);
       setAffiliating(productId);
 
-      const result = await createAffiliation(productId);
+      const { data, error } = await supabase.rpc("create_affiliation_with_price", { p_product_id: productId, p_sale_price: Number(salePrice) });
+      if (error) throw new Error(error.message);
+      const result = { affiliate_link: data?.affiliate_link ?? data?.[0]?.affiliate_link };
 
+      if (!result.affiliate_link) throw new Error("Affiliate link was not returned.");
       setAffiliateLinks((current) => ({
         ...current,
         [productId]: result.affiliate_link,
@@ -213,6 +218,8 @@ const filteredProducts = useMemo(() => {
       );
     } finally {
       setAffiliating(null);
+      setPricingProduct(null);
+      setSalePrice("");
     }
   }
 
@@ -891,7 +898,7 @@ const filteredProducts = useMemo(() => {
                       <button
                         type="button"
                         disabled={isAffiliating}
-                        onClick={() => handleAffiliate(product.id)}
+                        onClick={() => { setPricingProduct(product); setSalePrice(String(product.supplier_suggested_price ?? price)); }}
                         className="mt-4 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {isAffiliating
