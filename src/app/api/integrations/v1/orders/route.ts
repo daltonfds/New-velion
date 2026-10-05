@@ -52,11 +52,11 @@ export async function POST(request: Request) {
     body.customer && typeof body.customer === "object" && !Array.isArray(body.customer)
       ? body.customer
       : {};
-  const shippingAddress =
+  const shippingAddress: Record<string, unknown> =
     body.shipping_address &&
     typeof body.shipping_address === "object" &&
     !Array.isArray(body.shipping_address)
-      ? body.shipping_address
+      ? (body.shipping_address as Record<string, unknown>)
       : {};
   const shippingAmount =
     body.shipping_amount == null ? 0 : Number(body.shipping_amount);
