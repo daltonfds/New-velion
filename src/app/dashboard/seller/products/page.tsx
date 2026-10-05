@@ -35,6 +35,7 @@ interface Affiliation {
   link_unico: string;
   ativo: boolean;
   created_at: string;
+  sale_price: number;
   product: Product | null;
 }
 
