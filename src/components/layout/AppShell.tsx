@@ -140,6 +140,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Users", href: "/dashboard/admin/users", icon: "users" },
     { label: "Sellers", href: "/dashboard/admin/sellers", icon: "users" },
     { label: "Suppliers", href: "/dashboard/admin/suppliers", icon: "users" },
+    { label: "Business Settings", href: "/dashboard/admin/platform-settings", icon: "settings" },
     { label: "Products", href: "/dashboard/admin/products", icon: "box" },
     { label: "Product Review", href: "/dashboard/admin/products/review", icon: "box" },
     { label: "Categories", href: "/dashboard/admin/categories", icon: "grid" },
