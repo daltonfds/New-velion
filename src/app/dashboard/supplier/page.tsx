@@ -8,10 +8,12 @@ import { supplierFetch } from "@/lib/supplier-client";
 
 type Product = { id: string; nome: string; estoque: number; reserved_estoque: number; supplier_status: string; created_at: string };
 type Order = { id: string; status: string; total: number; currency: string; created_at: string };
+type Finance = { available: number; retained: number; total: number };
 
 export default function SupplierDashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [finance, setFinance] = useState<Finance>({ available: 0, retained: 0, total: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -19,9 +21,11 @@ export default function SupplierDashboardPage() {
     Promise.all([
       supplierFetch<{ data: Product[] }>("/api/supplier/products"),
       supplierFetch<{ data: Order[] }>("/api/supplier/orders?limit=100"),
-    ]).then(([productResult, orderResult]) => {
+      supplierFetch<{ data: Finance }>("/api/supplier/finance"),
+    ]).then(([productResult, orderResult, financeResult]) => {
       setProducts(productResult.data);
       setOrders(orderResult.data);
+      setFinance(financeResult.data);
     }).catch((err) => setError(err instanceof Error ? err.message : "Could not load dashboard."))
       .finally(() => setLoading(false));
   }, []);
@@ -39,20 +43,24 @@ export default function SupplierDashboardPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-600">Supplier Center</p>
             <h1 className="mt-2 text-3xl font-bold text-[#16294F]">Your commerce operation</h1>
-            <p className="mt-2 text-sm text-slate-500">Manage products, inventory and fulfillment from one place.</p>
+            <p className="mt-2 text-sm text-slate-500">Manage products, inventory, fulfillment and earnings from one place.</p>
           </div>
-          <Link href="/dashboard/supplier/products/new" className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">Add product</Link>
+          <div className="flex gap-2">
+            <Link href="/dashboard/supplier/withdrawals" className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Withdrawals</Link>
+            <Link href="/dashboard/supplier/products/new" className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">Add product</Link>
+          </div>
         </div>
 
         {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
           {[
             ["Products", products.length],
             ["Approved", approved],
             ["Pending review", pending],
             ["Open orders", openOrders],
-            ["Order value", revenue.toLocaleString()],
+            ["Available earnings", finance.available.toLocaleString()],
+            ["Retained earnings", finance.retained.toLocaleString()],
           ].map(([label, value]) => (
             <Card key={String(label)} className="p-5">
               <p className="text-sm text-slate-500">{label}</p>
@@ -60,6 +68,17 @@ export default function SupplierDashboardPage() {
             </Card>
           ))}
         </div>
+
+        <Card className="border-blue-100 bg-blue-50/40 p-5">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">Supplier balance</p>
+              <p className="mt-1 text-3xl font-bold text-[#16294F]">{loading ? "—" : finance.total.toLocaleString()}</p>
+              <p className="mt-1 text-sm text-slate-500">Available funds can be withdrawn after KYC approval and the configured hold period.</p>
+            </div>
+            <Link href="/dashboard/supplier/withdrawals" className="rounded-lg bg-[#16294F] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">Manage withdrawals</Link>
+          </div>
+        </Card>
 
         <div className="grid gap-5 lg:grid-cols-2">
           <Card className="p-0">
