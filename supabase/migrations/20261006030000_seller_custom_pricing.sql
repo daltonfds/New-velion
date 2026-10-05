@@ -1,6 +1,7 @@
 alter table public.affiliations add column if not exists sale_price numeric;
 update public.affiliations a set sale_price=coalesce(p.preco_promocional,p.preco) from public.products p where p.id=a.product_id and a.sale_price is null;
 alter table public.affiliations alter column sale_price set not null;
+alter table public.affiliations drop constraint if exists affiliations_sale_price_check;
 alter table public.affiliations add constraint affiliations_sale_price_check check(sale_price>0);
 
 create or replace function public.create_affiliation_with_price(p_product_id uuid,p_sale_price numeric)
