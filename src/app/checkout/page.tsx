@@ -218,7 +218,7 @@ export default function CheckoutPage() {
             disabled={loading || !affiliateLink || !checkoutUrl}
             className="mt-7 w-full rounded-xl bg-[#16294F] px-5 py-4 text-sm font-black text-white transition hover:bg-[#0e1d38] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "CONTINUING..." : "CONTINUE TO CHECKOUT"}
+            {loading ? "CONTINUING..." : "SECURE PAYMENT"}
           </button>
 
           {!affiliateLink && (
