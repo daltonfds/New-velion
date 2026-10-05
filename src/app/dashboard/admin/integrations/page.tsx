@@ -185,11 +185,11 @@ export default function AdminIntegrationsPage() {
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            ["Connected platforms",platforms.length,Icon,"layers"],
-            ["External sellers",stats.sellers,Icon,"store"],
-            ["Mapped products",stats.products,Icon,"box"],
-            ["Integration orders",stats.orders,Icon,"orders"],
-          ].map(([label,value,,icon])=><div key={String(label)} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center justify-between"><span className="text-sm text-slate-500">{label}</span><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#eef4fb] text-[#16294F]"><Icon name={icon as "layers"} size={17}/></span></div><p className="mt-4 text-2xl font-bold text-slate-950">{loading?"—":Number(value).toLocaleString()}</p></div>)}
+            {label:"Connected platforms",value:platforms.length,icon:"layers" as const},
+            {label:"External sellers",value:stats.sellers,icon:"store" as const},
+            {label:"Mapped products",value:stats.products,icon:"box" as const},
+            {label:"Integration orders",value:stats.orders,icon:"orders" as const},
+          ].map(({label,value,icon})=><div key={label} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center justify-between"><span className="text-sm text-slate-500">{label}</span><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#eef4fb] text-[#16294F]"><Icon name={icon} size={17}/></span></div><p className="mt-4 text-2xl font-bold text-slate-950">{loading?"—":Number(value).toLocaleString()}</p></div>)}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200">
