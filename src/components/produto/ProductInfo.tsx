@@ -268,35 +268,15 @@ export default function ProductInfo({
           </div>
 
           {affiliateLink ? (
-            <form
-              action="/api/checkout-intents"
-              method="POST"
-              className="flex-1"
+            <a
+              href={`/entrega?qty=${encodeURIComponent(String(checkoutQuantity))}&checkout_url=${encodeURIComponent(product.checkout_url || "")}&ref=${encodeURIComponent(affiliateLink)}`}
+              className="flex flex-1 items-center justify-center rounded-lg bg-[#16294F] px-5 py-4 text-sm font-bold text-white transition hover:bg-[#0e1d38]"
             >
-              <input
-                type="hidden"
-                name="affiliate_link"
-                value={affiliateLink}
-              />
-
-              <input
-                type="hidden"
-                name="quantity"
-                value={checkoutQuantity}
-              />
-
-              <button
-                type="submit"
-                className="flex w-full items-center justify-center rounded-lg bg-[#16294F] px-5 py-4 text-sm font-bold text-white transition hover:bg-[#0e1d38]"
-              >
-                BUY NOW
-              </button>
-            </form>
+              BUY NOW
+            </a>
           ) : product.checkout_url ? (
             <a
-              href={product.checkout_url}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={`/entrega?qty=${encodeURIComponent(String(checkoutQuantity))}&checkout_url=${encodeURIComponent(product.checkout_url)}`}
               className="flex flex-1 items-center justify-center rounded-lg bg-[#16294F] px-5 py-4 text-sm font-bold text-white transition hover:bg-[#0e1d38]"
             >
               BUY NOW
