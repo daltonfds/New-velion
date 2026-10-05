@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { getActiveProducts } from "@/lib/services/products";
-import { createAffiliation } from "@/lib/services/affiliations";
 import { supabase } from "@/lib/supabase";
 import type { Product } from "@/types";
 
