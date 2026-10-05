@@ -29,6 +29,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
   if (status === "approved") {
     await auth.client.from("profiles").update({ status: "active" }).eq("id", id);
+    await auth.client.from("supplier_shipping_profiles").upsert({ user_id: id, enabled: true, processing_days: 1, default_rate: 0, currency: "ZAR", updated_at: new Date().toISOString() }, { onConflict: "user_id" });
   }
 
   return Response.json({ data });
