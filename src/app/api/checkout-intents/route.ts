@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     const city = String(form.get("city") || "").trim();
     const postalCode = String(form.get("postal_code") || "").trim() || null;
     const address = String(form.get("address") || "").trim();
+    const quantity = Math.max(1, Math.min(50, Number(form.get("quantity") || "1")));
     const addressReference =
       String(form.get("address_reference") || "").trim() || null;
 
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
         p_postal_code: postalCode,
         p_address: address,
         p_address_reference: addressReference,
+        p_quantity: quantity,
       },
     );
 
