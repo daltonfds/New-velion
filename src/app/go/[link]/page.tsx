@@ -54,9 +54,21 @@ export default async function AffiliateProductPage({
     console.error("Failed to record affiliate click:", clickError);
   }
 
-  const salesUrl =
-    `/sales/${encodeURIComponent(String(product.product_id))}` +
+  const { data: productRecord, error: productError } = await supabase
+    .from("products")
+    .select("slug")
+    .eq("id", product.product_id)
+    .eq("ativo", true)
+    .maybeSingle();
+
+  if (productError || !productRecord?.slug) {
+    console.error("Failed to resolve product slug:", productError);
+    notFound();
+  }
+
+  const productUrl =
+    `/produto/${encodeURIComponent(String(productRecord.slug))}` +
     `?ref=${encodeURIComponent(affiliateLink)}`;
 
-  redirect(salesUrl);
+  redirect(productUrl);
 }
