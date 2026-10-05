@@ -57,7 +57,7 @@ export default function Footer() {
                 </Link>
 
                 <Link
-                  href="/apply/producer"
+                  href="/register/supplier"
                   className="block text-slate-500 hover:text-[#16294F]"
                 >
                   Become a supplier
