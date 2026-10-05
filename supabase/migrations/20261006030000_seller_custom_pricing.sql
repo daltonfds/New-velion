@@ -52,3 +52,5 @@ begin
  return query select v_session,v_product.checkout_url;
 end;
 $function$;
+revoke execute on function public.create_affiliation_with_price(uuid,numeric) from public,anon;
+grant execute on function public.create_affiliation_with_price(uuid,numeric) to authenticated;
