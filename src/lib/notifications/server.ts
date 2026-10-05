@@ -293,7 +293,7 @@ export async function dispatchNotification(notificationId: string) {
             JSON.stringify({
               title: notification.title,
               body: notification.message,
-              url: "/dashboard/seller",
+              url: ["supplier_approved","supplier_rejected","supplier_suspended","supplier_status","product_approved","product_rejected","product_suspended","product_review_status","supplier_order_created","supplier_order_status"].includes(notification.type) ? "/dashboard/supplier" : "/dashboard/seller",
               notificationId: notification.id,
             }),
             {
