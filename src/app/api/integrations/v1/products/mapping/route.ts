@@ -1,0 +1,134 @@
+import {
+  apiError,
+  apiOk,
+  authenticateIntegrationRequest,
+  logIntegrationRequest,
+} from "@/lib/integrations/server";
+
+export async function POST(request: Request) {
+  const started = Date.now();
+  const auth = await authenticateIntegrationRequest(request);
+  const path = new URL(request.url).pathname;
+
+  if (!auth.ok) return auth.error;
+
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return apiError("INVALID_ORDER", "Request body must be valid JSON.", 400, auth.id);
+  }
+
+  const externalProductId = String(body.external_product_id ?? "").trim();
+  const newvelionProductId = String(body.newvelion_product_id ?? "").trim();
+  const externalSellerId = String(body.external_seller_id ?? "").trim() || null;
+  const salePrice =
+    body.sale_price == null ? null : Number(body.sale_price);
+  const saleCurrency = String(body.sale_currency ?? "").trim() || null;
+
+  if (!externalProductId || !newvelionProductId) {
+    return apiError(
+      "PRODUCT_NOT_FOUND",
+      "external_product_id and newvelion_product_id are required.",
+      400,
+      auth.id,
+    );
+  }
+
+  if (salePrice != null && (!Number.isFinite(salePrice) || salePrice < 0)) {
+    return apiError("INVALID_ORDER", "sale_price must be a non-negative number.", 400, auth.id);
+  }
+
+  if (saleCurrency && !["ZAR", "MZN"].includes(saleCurrency)) {
+    return apiError("INVALID_CURRENCY", "sale_currency must be ZAR or MZN.", 400, auth.id);
+  }
+
+  const { data: product, error: productError } = await auth.client
+    .from("products")
+    .select("id,ativo,moeda")
+    .eq("id", newvelionProductId)
+    .maybeSingle();
+
+  if (productError || !product) {
+    return apiError("PRODUCT_NOT_FOUND", "NewVelion product not found.", 404, auth.id);
+  }
+
+  if (!product.ativo) {
+    return apiError("PRODUCT_NOT_FOUND", "NewVelion product is not available for integration.", 409, auth.id);
+  }
+
+  if (saleCurrency && saleCurrency !== product.moeda) {
+    return apiError("INVALID_CURRENCY", "sale_currency must match the NewVelion product currency.", 409, auth.id);
+  }
+
+  let sellerUuid: string | null = null;
+  if (externalSellerId) {
+    const { data: seller } = await auth.client
+      .from("integration_external_sellers")
+      .select("id,status")
+      .eq("platform_id", auth.platform.id)
+      .eq("external_seller_id", externalSellerId)
+      .maybeSingle();
+
+    if (!seller || seller.status !== "active") {
+      return apiError("INVALID_SELLER", "External seller is not registered or active.", 404, auth.id);
+    }
+
+    sellerUuid = seller.id;
+  }
+
+  let duplicateQuery = auth.client
+    .from("integration_product_mappings")
+    .select("id")
+    .eq("platform_id", auth.platform.id)
+    .eq("external_product_id", externalProductId);
+
+  duplicateQuery = sellerUuid
+    ? duplicateQuery.eq("external_seller_id", sellerUuid)
+    : duplicateQuery.is("external_seller_id", null);
+
+  const { data: duplicate } = await duplicateQuery.maybeSingle();
+  if (duplicate) {
+    return apiError("PRODUCT_NOT_MAPPED", "This product mapping already exists.", 409, auth.id);
+  }
+
+  const { data, error } = await auth.client
+    .from("integration_product_mappings")
+    .insert({
+      platform_id: auth.platform.id,
+      external_product_id: externalProductId,
+      newvelion_product_id: product.id,
+      external_seller_id: sellerUuid,
+      sale_price: salePrice,
+      sale_currency: saleCurrency ?? product.moeda,
+      metadata: body.metadata ?? {},
+    })
+    .select(
+      "id,external_product_id,newvelion_product_id,external_seller_id,sale_price,sale_currency,status,metadata,created_at,updated_at",
+    )
+    .single();
+
+  if (error) {
+    console.error("Integration product mapping failed:", error);
+    await logIntegrationRequest({
+      platformId: auth.platform.id,
+      requestId: auth.id,
+      method: "POST",
+      path,
+      statusCode: 500,
+      durationMs: Date.now() - started,
+    });
+    return apiError("INTERNAL_ERROR", "Could not create the product mapping.", 500, auth.id);
+  }
+
+  await logIntegrationRequest({
+    platformId: auth.platform.id,
+    requestId: auth.id,
+    method: "POST",
+    path,
+    statusCode: 201,
+    durationMs: Date.now() - started,
+  });
+
+  return apiOk({ data }, 201, auth.id);
+}
