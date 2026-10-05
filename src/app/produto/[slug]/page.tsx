@@ -197,15 +197,16 @@ export default function ProdutoPage() {
   function checkoutUrl(qty: number) {
     if (!product?.checkout_url) return "#";
 
-    const url = new URL(product.checkout_url, window.location.origin);
-
-    url.searchParams.set("qty", String(qty));
+    const params = new URLSearchParams();
+    params.set("product", product.slug);
+    params.set("qty", String(qty));
+    params.set("checkout_url", product.checkout_url);
 
     if (affiliateRef) {
-      url.searchParams.set("ref", affiliateRef);
+      params.set("ref", affiliateRef);
     }
 
-    return url.toString();
+    return `/checkout?${params.toString()}`;
   }
 
   function addToCart() {
