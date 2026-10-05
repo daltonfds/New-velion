@@ -29,6 +29,8 @@ begin
 end;
 $function$;
 
+drop function if exists public.create_public_checkout_session(text,text,text,text,text,text,text,text,text,text,text);
+
 create or replace function public.create_public_checkout_session(p_affiliate_link text,p_full_name text,p_phone text,p_whatsapp text,p_email text,p_country text,p_province text,p_city text,p_postal_code text,p_address text,p_address_reference text,p_quantity integer default 1)
 returns table(session_id uuid,checkout_url text)
 language plpgsql security definer set search_path=''
