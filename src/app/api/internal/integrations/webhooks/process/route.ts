@@ -1,6 +1,6 @@
 import { deliverPendingIntegrationWebhooks } from "@/lib/integrations/server";
 
-export async function GET(request: Request) {
+async function processWebhookQueue(request: Request) {
   const cronSecret = process.env.CRON_SECRET?.trim();
   const authorization = request.headers.get("authorization") || "";
   const provided = authorization.replace(/^Bearer\s+/i, "").trim();
@@ -19,4 +19,13 @@ export async function GET(request: Request) {
     console.error("Integration webhook worker failed:", error);
     return Response.json({ error: "Webhook worker failed." }, { status: 500 });
   }
+}
+
+
+export async function GET(request: Request) {
+  return processWebhookQueue(request);
+}
+
+export async function POST(request: Request) {
+  return processWebhookQueue(request);
 }
