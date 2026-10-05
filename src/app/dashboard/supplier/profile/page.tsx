@@ -15,7 +15,7 @@ export default function SupplierProfilePage() {
 
   async function save(event: FormEvent) {
     event.preventDefault(); setSaving(true); setMessage("");
-    try { const r = await supplierFetch<{data: typeof form & {approval_status:string}>}("/api/supplier/profile", { method:"PUT", body:JSON.stringify(form) }); setStatus(r.data.approval_status); setMessage("Supplier profile saved. Your application remains subject to admin approval."); }
+    try { const r = await supplierFetch<{data: typeof form & {approval_status:string}}>("/api/supplier/profile", { method:"PUT", body:JSON.stringify(form) }); setStatus(r.data.approval_status); setMessage("Supplier profile saved. Your application remains subject to admin approval."); }
     catch (e) { setMessage(e instanceof Error ? e.message : "Could not save profile."); }
     finally { setSaving(false); }
   }
