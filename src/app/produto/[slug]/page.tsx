@@ -206,7 +206,7 @@ export default function ProdutoPage() {
       params.set("ref", affiliateRef);
     }
 
-    return `/checkout?${params.toString()}`;
+    return `/entrega?${params.toString()}`;
   }
 
   function addToCart() {
