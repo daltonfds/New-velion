@@ -352,7 +352,7 @@ export async function deliverPendingIntegrationWebhooks(limit = 25) {
   const { data: events, error } = await client
     .from("integration_webhook_events")
     .select("id")
-    .in("status", ["pending", "failed"])
+    .eq("status", "pending")
     .lte("next_attempt_at", new Date().toISOString())
     .order("next_attempt_at", { ascending: true })
     .limit(limit);
