@@ -862,7 +862,7 @@ export default function ProdutoPage() {
 
             <p className="nv-muted" style={{ marginTop: 0 }}>
               <em>
-                Quality, convenience, and confidence in one product.
+                Quality, convenience, and confidence in every purchase.
               </em>
             </p>
 
@@ -1264,12 +1264,12 @@ export default function ProdutoPage() {
           </h2>
 
           <p>
-            Get NewVelion news and special offers.
+            Get product updates, new offers and marketplace news from NewVelion.
           </p>
 
           <input
             type="email"
-            placeholder="Enter your email"
+            placeholder="Your email address"
             aria-label="Email"
           />
 
