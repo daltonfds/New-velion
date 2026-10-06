@@ -45,6 +45,8 @@ export default function NewProductPage() {
     moeda: "ZAR",
     comissao_tipo: "percentual",
     comissao_valor: "",
+    pricing_mode: "fixed",
+    custom_pricing_floor_zar: "",
     fotos: [] as string[],
     video_url: "",
     checkout_url: "",
@@ -132,17 +134,21 @@ export default function NewProductPage() {
       slug: form.slug.trim() || generateSlug(form.nome),
       descricao: form.descricao.trim(),
       beneficios: form.beneficios
-        .split("\n")
+        .split("
+")
         .map((item) => item.trim())
         .filter(Boolean),
       ingredientes: form.ingredientes.trim() || null,
       modo_uso: form.modo_uso.trim() || null,
       garantia_texto: form.garantia_texto.trim() || null,
       faq: form.faq
-        .split(/\n\s*\n/)
+        .split(/
+\s*
+/)
         .map((block) => {
           const lines = block
-            .split("\n")
+            .split("
+")
             .map((line) => line.trim())
             .filter(Boolean);
 
@@ -295,11 +301,13 @@ export default function NewProductPage() {
 
           <ProductSalesContentEditor
             beneficios={form.beneficios
-              .split("\n")
+              .split("
+")
               .map((item) => item.trim())
               .filter(Boolean)}
             onBeneficiosChange={(items) =>
-              updateField("beneficios", items.join("\n"))
+              updateField("beneficios", items.join("
+"))
             }
             ingredientes={form.ingredientes}
             onIngredientesChange={(value) =>
@@ -314,10 +322,13 @@ export default function NewProductPage() {
               updateField("garantia_texto", value)
             }
             faq={form.faq
-              .split(/\n\s*\n/)
+              .split(/
+\s*
+/)
               .map((block) => {
                 const lines = block
-                  .split("\n")
+                  .split("
+")
                   .map((line) => line.trim())
                   .filter(Boolean);
 
@@ -333,9 +344,12 @@ export default function NewProductPage() {
                 items
                   .map(
                     (item) =>
-                      `${item.question}\n${item.answer}`,
+                      `${item.question}
+${item.answer}`,
                   )
-                  .join("\n\n"),
+                  .join("
+
+"),
               )
             }
             fornecedorNome={form.fornecedor_nome}
@@ -401,6 +415,32 @@ export default function NewProductPage() {
                 }
                 placeholder="Optional"
               />
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Seller Pricing Model
+                </label>
+                <select
+                  value={form.pricing_mode}
+                  onChange={(event) => updateField("pricing_mode", event.target.value)}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none"
+                >
+                  <option value="fixed">Fixed Offer — Admin/Supplier controls price</option>
+                  <option value="custom">Custom Pricing — Seller/Platform controls price</option>
+                </select>
+              </div>
+
+              {form.pricing_mode === "custom" && (
+                <Input
+                  label="Custom Pricing Base (ZAR)"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={form.custom_pricing_floor_zar}
+                  onChange={(event) => updateField("custom_pricing_floor_zar", event.target.value)}
+                  placeholder="Minimum allowed selling price"
+                />
+              )}
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">
