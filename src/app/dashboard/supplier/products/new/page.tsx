@@ -26,6 +26,17 @@ export default function NewSupplierProductPage() {
 
   function field(key: keyof typeof form, value: string) { setForm((current) => ({...current, [key]: value})); }
 
+  useEffect(() => {
+    if (form.fornecedor_pais !== "CN") { field("supplier_fx_rate_to_zar", "1"); return; }
+    fetch("/api/exchange-rate", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        const rate = Number(data?.rate);
+        if (Number.isFinite(rate) && rate > 0) field("supplier_fx_rate_to_zar", String(rate));
+      })
+      .catch(() => undefined);
+  }, [form.fornecedor_pais]);
+
   async function save(event: FormEvent) {
     event.preventDefault(); setSaving(true); setError("");
     try {
