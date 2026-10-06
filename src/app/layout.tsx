@@ -5,14 +5,14 @@ import { ThemeLanguageProvider } from "@/components/layout/ThemeLanguageProvider
 
 export const metadata: Metadata = {
   title: "Newvelion",
-  description: "Infraestrutura de comércio",
+  description: "Commerce infrastructure",
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeLanguageProvider>
           <ToastProvider>{children}</ToastProvider>
