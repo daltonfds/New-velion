@@ -37,7 +37,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     return Response.json({ error: "This product cannot be edited in its current state." }, { status: 409 });
   }
 
-  const price = Number(body.preco);
+  const price = Number(body.preco);\n  const pricingMode = String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed";
   const cost = Number(body.preco_custo);
   const supplierCountry = String(body.supplier_country_code ?? body.fornecedor_pais ?? existing.supplier_country_code ?? "").trim().toUpperCase();
   const supplierCostCurrency = supplierCountry === "CN" ? "CNY" : "ZAR";
@@ -52,7 +52,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     preco: Math.round(price),
     preco_promocional: body.preco_promocional == null || body.preco_promocional === "" ? null : Number(body.preco_promocional),
     moeda: "ZAR", preco_custo: supplierCountry === "ZA" ? supplierCostAmount : cost, supplier_country_code: supplierCountry, supplier_cost_currency: supplierCostCurrency, supplier_cost_amount: supplierCostAmount, supplier_fx_rate_to_zar: supplierCostCurrency === "ZAR" ? 1 : (Number(body.supplier_fx_rate_to_zar) || null), supplier_fx_rate_captured_at: supplierCostCurrency === "ZAR" ? new Date().toISOString() : (Number(body.supplier_fx_rate_to_zar) > 0 ? new Date().toISOString() : null), supplier_fx_source: supplierCostCurrency === "CNY" ? "exchangerate-api.com" : "same_currency", comissao_afiliado: Number(body.comissao_afiliado ?? 0),
-    supplier_min_selling_price: Number(body.supplier_min_selling_price ?? price), supplier_suggested_price: Number(body.supplier_suggested_price ?? price),
+    supplier_min_selling_price: pricingMode === "custom" ? Number(body.supplier_min_selling_price ?? body.custom_pricing_floor_zar ?? price) : Number(body.supplier_min_selling_price ?? price), supplier_suggested_price: Number(body.supplier_suggested_price ?? price), custom_pricing_floor_zar: pricingMode === "custom" ? Number(body.custom_pricing_floor_zar ?? body.supplier_min_selling_price ?? price) : null, pricing_mode: pricingMode,
     supplier_commission_rate: Number(body.supplier_commission_rate ?? 0), estoque: Math.max(0, Math.floor(Number(body.estoque ?? 0))),
     low_stock_threshold: Math.max(0, Math.floor(Number(body.low_stock_threshold ?? 5))),
     beneficios: Array.isArray(body.beneficios) ? body.beneficios.map(String).map((item) => item.trim()).filter(Boolean) : [],
