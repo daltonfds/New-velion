@@ -67,7 +67,7 @@ begin
     end if;
   end if;
 
-  if tg_op='INSERT' and new.moeda <> 'ZAR' then
+  if new.moeda <> 'ZAR' then
     raise exception 'PRODUCT_SALE_CURRENCY_MUST_BE_ZAR';
   end if;
 
