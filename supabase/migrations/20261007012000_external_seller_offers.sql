@@ -110,7 +110,7 @@ begin
  end loop;
  select * into v_result from public.create_integration_order(p_platform_id,p_external_order_id,p_external_seller_id,p_currency,p_items,p_customer,p_shipping_address,p_shipping_amount,p_metadata,p_idempotency_key);
  update public.integration_orders set external_offer_id=o.id,customer_country_code='ZA' where id=v_result.order_id;
- update public.integration_order_items set external_offer_id=o.id where order_id=v_result.order_id;
+ update public.integration_order_items ioi set external_offer_id=o.id where ioi.order_id=v_result.order_id;
  return query select v_result.order_id,v_result.order_status,v_result.order_total,v_result.order_currency;
 end;
 $function$;
