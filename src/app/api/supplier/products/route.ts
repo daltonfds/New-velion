@@ -44,7 +44,6 @@ export async function POST(request: Request) {
   if (requestedSupplierCountry && !["ZA", "CN"].includes(requestedSupplierCountry)) return Response.json({ error: "Supplier country must be South Africa (ZA) or China (CN)." }, { status: 400 });
   if (!Number.isFinite(supplierCostAmount) || supplierCostAmount < 0) return Response.json({ error: "Invalid supplier cost." }, { status: 400 });
   if (pricingMode === "custom" && (!Number.isFinite(Number(body.custom_pricing_floor_zar)) || Number(body.custom_pricing_floor_zar) <= 0)) return Response.json({ error: "A positive custom pricing base is required." }, { status: 400 });
-  if (supplierCountry === "CN" && (!Number.isFinite(Number(body.supplier_fx_rate_to_zar)) || Number(body.supplier_fx_rate_to_zar) <= 0)) return Response.json({ error: "A valid CNY to ZAR FX rate is required for China suppliers." }, { status: 400 });
   if (!/^https?:\/\//i.test(checkoutUrl)) return Response.json({ error: "A valid checkout URL is required." }, { status: 400 });
 
   const slug = cleanString(body.slug) || slugify(name) || "product-" + crypto.randomUUID().slice(0, 8);
@@ -53,6 +52,7 @@ export async function POST(request: Request) {
   if (!["ZA","CN"].includes(supplierCountry)) return Response.json({ error: "Supplier country must be South Africa (ZA) or China (CN)." }, { status: 400 });
   if (requestedSupplierCountry && requestedSupplierCountry !== supplierCountry) return Response.json({ error: "Supplier country does not match the approved supplier profile." }, { status: 400 });
   const supplierCostCurrency = supplierCountry === "CN" ? "CNY" : "ZAR";
+  if (supplierCountry === "CN" && (!Number.isFinite(Number(body.supplier_fx_rate_to_zar)) || Number(body.supplier_fx_rate_to_zar) <= 0)) return Response.json({ error: "A valid CNY to ZAR FX rate is required for China suppliers." }, { status: 400 });
   const initialStatus = supplierProfile?.approval_status === "approved" ? "pending_review" : "draft";
 
   const { data, error } = await auth.client.from("products").insert({
