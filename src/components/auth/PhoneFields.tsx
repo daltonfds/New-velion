@@ -11,6 +11,7 @@ type Props = {
   onPhoneChange: (value: string) => void;
   onWhatsappChange: (value: string) => void;
   onLanguageChange: (value: "en" | "pt") => void;
+  allowedCountries?: string[];
 };
 
 export default function PhoneFields({
@@ -22,6 +23,7 @@ export default function PhoneFields({
   onPhoneChange,
   onWhatsappChange,
   onLanguageChange,
+  allowedCountries,
 }: Props) {
   const country = getCountry(countryCode);
 
@@ -47,7 +49,7 @@ export default function PhoneFields({
         >
           <option value="">Select your country</option>
 
-          {COUNTRIES.map((item) => (
+          {COUNTRIES.filter((item) => !allowedCountries || allowedCountries.includes(item.code)).map((item) => (
             <option key={item.code} value={item.code}>
               {item.name} ({item.callingCode})
             </option>
