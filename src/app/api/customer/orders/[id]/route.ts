@@ -13,17 +13,30 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 
   const { id } = await context.params;
   const { data: sale, error } = await admin.from("sales")
-    .select("id,product_id,quantity,product_amount,shipping_amount,valor_venda,currency,status,vendido_em,gateway_ref,fulfillment_orders(id,status,tracking_number,carrier,tracking_url,public_tracking_token,updated_at)")
+    .select("id,product_id,quantity,product_amount,shipping_amount,valor_venda,currency,status,vendido_em,gateway_ref")
     .eq("id", id).eq("customer_id", user.id).maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!sale) return NextResponse.json({ error: "Order not found." }, { status: 404 });
 
-  const { data: product } = await admin.from("products").select("id,nome,slug,fotos,descricao").eq("id", sale.product_id).maybeSingle();
+  const purchaseSessionId = typeof sale.gateway_ref === "string" && sale.gateway_ref.startsWith("newvelion_checkout:")
+    ? sale.gateway_ref.slice("newvelion_checkout:".length)
+    : null;
+
+  const [{ data: product }, { data: fulfillment }, { data: reviews }] = await Promise.all([
+    admin.from("products").select("id,nome,slug,fotos,descricao,garantia_texto").eq("id", sale.product_id).maybeSingle(),
+    admin.from("fulfillment_orders").select("id,status,tracking_number,carrier,tracking_url,public_tracking_token,shipping_address,shipping_city,shipping_province,estimated_delivery_at,updated_at").eq("sale_id", sale.id).maybeSingle(),
+    purchaseSessionId
+      ? admin.from("product_reviews").select("id,rating,review_text,status,verified_buyer,created_at").eq("purchase_session_id", purchaseSessionId).eq("reviewer_id", user.id)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
   return NextResponse.json({
     order: {
       ...sale,
-      purchase_session_id: typeof sale.gateway_ref === "string" && sale.gateway_ref.startsWith("newvelion_checkout:") ? sale.gateway_ref.slice("newvelion_checkout:".length) : null,
+      purchase_session_id: purchaseSessionId,
       product: product ?? null,
+      fulfillment: fulfillment ?? null,
+      reviews: reviews ?? [],
     },
   });
 }
