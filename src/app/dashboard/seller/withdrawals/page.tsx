@@ -561,7 +561,7 @@ export default function SellerWithdrawalsPage() {
                               Estimated local payout
                             </p>
                             <p className="mt-1 text-lg font-semibold text-[#16294F]">
-                              {exchangeRate ? mzn(convertedNet) : "—"}
+                              {exchangeRate ? money(convertedNet) : "—"}
                             </p>
                           </div>
                         </div>
@@ -714,7 +714,7 @@ export default function SellerWithdrawalsPage() {
                               <td className="px-4 py-4 text-slate-700">
                                 {w.payout_currency === walletCurrency &&
                                 w.valor_convertido != null
-                                  ? mzn(Number(w.valor_convertido))
+                                  ? money(Number(w.valor_convertido))
                                   : money(Number(w.valor_liquido))}
                               </td>
                               <td className="px-4 py-4 text-slate-600">
