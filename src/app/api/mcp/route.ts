@@ -78,10 +78,91 @@ const handler = createMcpHandler(() => {
     return result({ data: data ?? [] });
   });
 
+  server.registerTool("list_fulfillment_orders", {
+    title: "List Fulfillment Orders",
+    description: "Inspect the supplier fulfillment queue without exposing customer contact details in list results.",
+    inputSchema: z.object({ status: z.string().max(40).optional(), limit: z.number().int().min(1).max(100).default(50) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ status, limit }) => {
+    let q = supabase.from("fulfillment_orders")
+      .select("id,source_type,source_id,sale_id,integration_order_id,status,supplier_id,currency,subtotal,shipping_amount,total,tracking_number,carrier,tracking_url,fulfilled_at,public_tracking_token,created_at,updated_at")
+      .order("created_at", { ascending: false }).limit(limit);
+    if (status?.trim()) q = q.eq("status", status.trim());
+    const { data, error } = await q;
+    if (error) return result({ error: error.message });
+    return result({ data: data ?? [] });
+  });
+
+  server.registerTool("get_fulfillment_order", {
+    title: "Get Fulfillment Order",
+    description: "Inspect one fulfillment order including customer shipping data when needed for fulfillment.",
+    inputSchema: z.object({ fulfillment_order_id: z.string().uuid() }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ fulfillment_order_id }) => {
+    const { data: order, error } = await supabase.from("fulfillment_orders")
+      .select("id,source_type,source_id,sale_id,integration_order_id,status,supplier_id,currency,subtotal,shipping_amount,total,customer,shipping_address,tracking_number,carrier,tracking_url,fulfilled_at,public_tracking_token,created_at,updated_at,supplier_cost_currency,supplier_cost_total,supplier_origin_shipping_cost,supplier_origin_shipping_currency,supplier_fx_rate_to_zar,supplier_fx_rate_captured_at")
+      .eq("id", fulfillment_order_id).maybeSingle();
+    if (error) return result({ error: error.message });
+    if (!order) return result({ error: "FULFILLMENT_NOT_FOUND" });
+    const { data: items, error: itemError } = await supabase.from("fulfillment_order_items")
+      .select("id,product_id,supplier_id,quantity,unit_sale_price,unit_cost,product_name,supplier_cost_currency,supplier_fx_rate_to_zar,supplier_cost_zar")
+      .eq("fulfillment_order_id", fulfillment_order_id);
+    if (itemError) return result({ error: itemError.message });
+    return result({ order, items: items ?? [] });
+  });
+
+  server.registerTool("get_public_tracking", {
+    title: "Get Customer Tracking",
+    description: "Resolve a public NewVelion tracking token into customer-safe tracking information.",
+    inputSchema: z.object({ tracking_token: z.string().min(16).max(128) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ tracking_token }) => {
+    const { data, error } = await supabase.rpc("get_public_fulfillment_tracking", { p_token: tracking_token.trim() });
+    if (error) return result({ error: error.message });
+    return result({ data: Array.isArray(data) ? data[0] ?? null : data });
+  });
+
+  server.registerTool("update_fulfillment_order", {
+    title: "Update Fulfillment Order",
+    description: "Change a fulfillment status and optionally set carrier/tracking data. This is a write action.",
+    inputSchema: z.object({
+      fulfillment_order_id: z.string().uuid(),
+      status: z.enum(["pending","confirmed","processing","packed","shipped","in_transit","delivered","cancelled","failed","returned"]),
+      tracking_number: z.string().max(200).optional(),
+      carrier: z.string().max(100).optional(),
+      tracking_url: z.string().url().max(500).optional(),
+      note: z.string().max(1000).optional(),
+    }),
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  }, async ({ fulfillment_order_id, status, tracking_number, carrier, tracking_url, note }) => {
+    const allowed: Record<string,string[]> = {
+      pending:["confirmed","cancelled"], confirmed:["processing","cancelled"], processing:["packed","cancelled"],
+      packed:["shipped"], shipped:["in_transit"], in_transit:["delivered","failed"], failed:["processing"],
+    };
+    const { data: current, error: currentError } = await supabase.from("fulfillment_orders")
+      .select("id,status").eq("id", fulfillment_order_id).maybeSingle();
+    if (currentError) return result({ error: currentError.message });
+    if (!current) return result({ error: "FULFILLMENT_NOT_FOUND" });
+    if (current.status !== status && !allowed[current.status]?.includes(status)) {
+      return result({ error: "INVALID_FULFILLMENT_STATUS_TRANSITION", from: current.status, to: status });
+    }
+    const { data, error } = await supabase.rpc("set_fulfillment_status", {
+      p_fulfillment_order_id: fulfillment_order_id,
+      p_status: status,
+      p_tracking_number: tracking_number?.trim() || null,
+      p_carrier: carrier?.trim() || null,
+      p_tracking_url: tracking_url?.trim() || null,
+      p_note: note?.trim() || null,
+      p_actor_id: process.env.NEWVELION_MCP_ACTOR_ID?.trim() || null,
+    });
+    if (error) return result({ error: error.message });
+    return result({ data: Array.isArray(data) ? data[0] ?? null : data });
+  });
+
   return server;
 });
 
-async function handle(request: Request) {
+async function handle\n\nasync function handle(request: Request) {
   const expected = process.env.NEWVELION_MCP_TOKEN?.trim();
   const received = request.headers.get("authorization") || "";
   if (!expected || received !== `Bearer ${expected}`) {
