@@ -144,6 +144,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Business Settings", href: "/dashboard/admin/platform-settings", icon: "chart" },
     { label: "Products", href: "/dashboard/admin/products", icon: "box" },
     { label: "Product Review", href: "/dashboard/admin/products/review", icon: "box" },
+    { label: "Customer Reviews", href: "/dashboard/admin/product-reviews", icon: "box" },
     { label: "Categories", href: "/dashboard/admin/categories", icon: "grid" },
     { label: "Orders", href: "/dashboard/admin/checkout-sessions", icon: "box" },
     { label: "Transactions", href: "/dashboard/admin/transactions", icon: "sales" },
