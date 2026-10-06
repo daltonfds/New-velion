@@ -91,6 +91,8 @@ before insert or update of moeda,created_by,supplier_country_code,supplier_cost_
 on public.products for each row execute function public.enforce_newvelion_product_geo_currency();
 
 alter table public.checkout_sessions add column if not exists customer_country_code text;
+alter table public.sales add column if not exists currency text not null default 'ZAR';
+alter table public.sales add column if not exists customer_country_code text;
 alter table public.integration_orders add column if not exists customer_country_code text;
 
 create or replace function public.enforce_checkout_za_zar()
