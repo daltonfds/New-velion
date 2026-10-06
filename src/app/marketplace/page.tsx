@@ -78,7 +78,10 @@ export default function PublicMarketplacePage() {
           <nav className="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
             <Link href="/marketplace" className="text-[#16294F]">Marketplace</Link>
             <Link href="/fornecedores" className="hover:text-[#16294F]">Suppliers</Link>
+            <Link href="/account" className="hover:text-[#16294F]">My account</Link>
+            <Link href="/cart" className="hover:text-[#16294F]">Cart</Link>
             <Link href="/login" className="hover:text-[#16294F]">Sign in</Link>
+            <Link href="/register/customer" className="rounded-lg border border-blue-200 px-4 py-2.5 text-[#16294F] hover:bg-blue-50">Create account</Link>
             <Link href="/register" className="rounded-lg bg-[#16294F] px-4 py-2.5 text-white hover:bg-blue-900">Start selling</Link>
           </nav>
         </div>
