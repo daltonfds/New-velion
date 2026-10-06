@@ -859,7 +859,7 @@ const filteredProducts = useMemo(() => {
 
                     <div className="mt-4">
                       <p className="text-lg font-semibold text-gray-900">
-                        {money(price, product.moeda)}
+                        {money(price)}
                       </p>
 
                       {product.preco_promocional !== null && (
@@ -875,7 +875,7 @@ const filteredProducts = useMemo(() => {
                       </p>
 
                       <p className="mt-1 font-semibold text-indigo-700">
-                        {money(commission, product.moeda)}
+                        {money(commission)}
                       </p>
                     </div>
 
