@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   const externalSellerId = String(body.external_seller_id ?? "").trim() || null;
   const salePrice =
     body.sale_price == null ? null : Number(body.sale_price);
-  const saleCurrency = String(body.sale_currency ?? "").trim() || null;
+  const saleCurrency = String(body.sale_currency ?? "").trim() || null;\n  const pricingMode = String(body.pricing_mode ?? "inherit").trim();
 
   if (!externalProductId || !newvelionProductId) {
     return apiError(
