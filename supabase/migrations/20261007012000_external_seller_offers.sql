@@ -11,7 +11,7 @@ create table if not exists public.integration_external_offers (
   seller_margin_zar numeric not null default 0 check (seller_margin_zar >= 0),
   commission_snapshot_zar numeric not null default 0 check (commission_snapshot_zar >= 0),
   currency text not null default 'ZAR' check (currency = 'ZAR'),
-  offer_token text not null unique default encode(gen_random_bytes(18),'base64url'),
+  offer_token text not null unique default encode(gen_random_bytes(18),'hex'),
   status text not null default 'active' check (status in ('active','paused','revoked')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
