@@ -6,7 +6,8 @@ export const dynamic = "force-dynamic";
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await context.params;
-    const result = await getPublicProduct(slug);
+    const affiliateRef = new URL(request.url).searchParams.get("ref") || undefined;
+    const result = await getPublicProduct(slug, affiliateRef);
     if (!result) return NextResponse.json({ error: "Product not found." }, { status: 404 });
     return NextResponse.json(result);
   } catch (error) {
