@@ -23,7 +23,7 @@ export default function SupplierDashboardPage() {
       supplierFetch<{ data: Product[] }>("/api/supplier/products"),
       supplierFetch<{ data: Order[] }>("/api/supplier/orders?limit=100"),
       supplierFetch<{ data: Finance }>("/api/supplier/finance"),
-    ]).then(([productResult, orderResult, financeResult]) => {
+    ]).then(async ([productResult, orderResult, financeResult]) => {
       setProducts(productResult.data);
       setOrders(orderResult.data);
       setFinance(financeResult.data);
