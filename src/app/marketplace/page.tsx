@@ -897,7 +897,7 @@ const filteredProducts = useMemo(() => {
                       <button
                         type="button"
                         disabled={isAffiliating}
-                        onClick={() => { setPricingProduct(product); setSalePrice(String(product.(supplier_suggested_price as any) ?? price)); }}
+                        onClick={() => { setPricingProduct(product); setSalePrice(String((product as any).supplier_suggested_price ?? price)); }}
                         className="mt-4 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {isAffiliating
