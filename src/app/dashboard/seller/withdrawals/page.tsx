@@ -100,46 +100,10 @@ export default function SellerWithdrawalsPage() {
   });
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<Method>("bank_transfer");
-  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
-  const [rateLoading, setRateLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  async function loadExchangeRate(targetCountry: string) {
-    if (targetCountry !== "MZ") {
-      setExchangeRate(1);
-      return;
-    }
-
-    setRateLoading(true);
-
-    try {
-      const response = await fetch("/api/exchange-rate?from=ZAR&to=MZN", {
-        cache: "no-store",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.error || "Unable to load the current ZAR to MZN exchange rate.");
-      }
-
-      const rate = Number(data?.rate);
-
-      if (!Number.isFinite(rate) || rate <= 0) {
-        throw new Error("Invalid ZAR to MZN exchange rate.");
-      }
-
-      setExchangeRate(rate);
-    } catch (e) {
-      setExchangeRate(null);
-      setError(e instanceof Error ? e.message : "Unable to load exchange rate.");
-    } finally {
-      setRateLoading(false);
-    }
-  }
 
   useEffect(() => {
     (async () => {
@@ -195,7 +159,6 @@ export default function SellerWithdrawalsPage() {
           setMinimumWithdrawal(minimum);
         }
 
-        await loadExchangeRate(detected);
       }
 
       if (s.error) {
@@ -236,8 +199,7 @@ export default function SellerWithdrawalsPage() {
   );
 
   const net = Math.max(numeric - fee, 0);
-  const convertedNet =
-    country === "MZ" && exchangeRate ? net * exchangeRate : net;
+  const convertedNet = net;
 
   const available = (Object.keys(configured) as Method[]).filter(
     (m) => configured[m]
@@ -361,14 +323,6 @@ export default function SellerWithdrawalsPage() {
       style: "currency",
       currency: "ZAR",
     }).format(v);
-
-  const mzn = (v: number) =>
-    new Intl.NumberFormat("pt-MZ", {
-      style: "currency",
-      currency: "MZN",
-    })
-      .format(v)
-      .replace("MT", "MZN");
 
   const methodLabel = (m: string) =>
     m === "mobile_wallet" ? "Mobile Wallet" : "Bank Transfer";
