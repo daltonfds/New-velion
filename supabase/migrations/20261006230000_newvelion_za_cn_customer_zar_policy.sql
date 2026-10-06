@@ -272,3 +272,54 @@ revoke execute on function public.enforce_checkout_za_zar() from public,anon,aut
 revoke execute on function public.enforce_integration_za_zar() from public,anon,authenticated;
 revoke execute on function public.enforce_customer_shipping_currency() from public,anon,authenticated;
 revoke execute on function public.capture_supplier_fx_for_integration_item() from public,anon,authenticated;
+
+
+create or replace function public.create_affiliate_checkout_intent(p_link_unico text,p_customer_full_name text,p_customer_phone text,p_customer_whatsapp text,p_country text,p_province text,p_city text,p_address text,p_address_reference text)
+returns table(intent_id uuid,checkout_url text,product_id uuid,vendedor_id uuid)
+language plpgsql security definer set search_path=''
+as $function$
+declare v_link text:=regexp_replace(coalesce(p_link_unico,''),'^/+',''); v_affiliation public.affiliations%rowtype; v_product public.products%rowtype; v_intent uuid;
+begin
+ select a.* into v_affiliation from public.affiliations a where a.link_unico=v_link and a.ativo=true limit 1;
+ if v_affiliation.id is null then raise exception 'Invalid affiliate link'; end if;
+ select p.* into v_product from public.products p where p.id=v_affiliation.product_id and p.ativo=true and p.moeda='ZAR' and p.checkout_url is not null and p.checkout_url ~ '^https?://' limit 1;
+ if v_product.id is null then raise exception 'Product is unavailable for checkout'; end if;
+ if upper(trim(coalesce(p_country,''))) not in ('ZA','SOUTH AFRICA','ZAF') then raise exception 'CUSTOMER_COUNTRY_MUST_BE_ZA'; end if;
+ if nullif(trim(p_customer_full_name),'') is null or nullif(trim(p_customer_phone),'') is null or nullif(trim(p_city),'') is null or nullif(trim(p_address),'') is null then raise exception 'Required customer delivery fields are missing'; end if;
+ insert into public.affiliate_checkout_intents(affiliation_id,vendedor_id,product_id,customer_full_name,customer_phone,customer_whatsapp,country,province,city,address,address_reference,checkout_url)
+ values(v_affiliation.id,v_affiliation.vendedor_id,v_affiliation.product_id,trim(p_customer_full_name),trim(p_customer_phone),nullif(trim(coalesce(p_customer_whatsapp,'')),''),'ZA',nullif(trim(coalesce(p_province,'')),''),trim(p_city),trim(p_address),nullif(trim(coalesce(p_address_reference,'')),''),v_product.checkout_url)
+ returning id into v_intent;
+ return query select v_intent,v_product.checkout_url,v_product.id,v_affiliation.vendedor_id;
+end; $function$;
+
+create or replace function public.get_affiliate_product_public(p_link_unico text)
+returns table(product_id uuid,vendedor_id uuid,nome text,descricao text,preco numeric,preco_promocional numeric,moeda text,fotos text[],video_url text,checkout_url text)
+language sql stable security definer set search_path=''
+as $function$
+select p.id,a.vendedor_id,p.nome,p.descricao,p.preco,p.preco_promocional,p.moeda,p.fotos,p.video_url,p.checkout_url from public.affiliations a join public.products p on p.id=a.product_id
+where a.link_unico=regexp_replace(coalesce(p_link_unico,''),'^/+','') and a.ativo=true and p.ativo=true and p.moeda='ZAR' limit 1;
+$function$;
+
+create or replace function public.resolve_affiliate_checkout(p_link_unico text)
+returns table(checkout_url text)
+language sql stable security definer set search_path=''
+as $function$
+select p.checkout_url from public.affiliations a join public.products p on p.id=a.product_id
+where a.link_unico=regexp_replace(coalesce(p_link_unico,''),'^/+','') and a.ativo=true and p.ativo=true and p.moeda='ZAR' and p.checkout_url is not null and p.checkout_url ~ '^https?://' limit 1;
+$function$;
+
+create or replace function public.resolve_affiliate_product(p_link_unico text)
+returns table(product_id uuid,affiliate_id uuid,nome text,descricao text,categoria text,preco numeric,preco_promocional numeric,moeda text,imagem_url text,checkout_url text)
+language sql stable security definer set search_path=''
+as $function$
+select p.id,a.id,p.nome,p.descricao,c.nome,p.preco,p.preco_promocional,p.moeda,p.fotos[1],p.checkout_url from public.affiliations a join public.products p on p.id=a.product_id left join public.categories c on c.id=p.categoria_id
+where a.link_unico=regexp_replace(coalesce(p_link_unico,''),'^/+','') and a.ativo=true and p.ativo=true and p.moeda='ZAR' limit 1;
+$function$;
+
+create or replace function public.resolve_affiliate_product_with_slug(p_link_unico text)
+returns table(product_id uuid,affiliate_id uuid,slug text,sale_price numeric)
+language sql security definer set search_path='public'
+as $function$
+select a.product_id,a.id,p.slug,a.sale_price from public.affiliations a join public.products p on p.id=a.product_id
+where a.link_unico=p_link_unico and a.ativo=true and p.ativo=true and p.supplier_status='approved' and p.moeda='ZAR' limit 1;
+$function$;
