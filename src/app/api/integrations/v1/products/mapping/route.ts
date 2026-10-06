@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
   const { data: product, error: productError } = await auth.client
     .from("products")
-    .select("id,ativo,moeda,pricing_mode")
+    .select("id,ativo,moeda,pricing_mode,preco,preco_promocional,custom_pricing_floor_zar,supplier_min_selling_price,supplier_cost_currency,supplier_cost_amount,supplier_fx_rate_to_zar,supplier_origin_shipping_cost,supplier_origin_shipping_currency")
     .eq("id", newvelionProductId)
     .maybeSingle();
 
@@ -57,7 +57,34 @@ export async function POST(request: Request) {
     return apiError("PRODUCT_NOT_FOUND", "NewVelion product is not available for integration.", 409, auth.id);
   }
 
-  if (pricingMode === "fixed" && salePrice == null) {\n    return apiError("INVALID_ORDER", "A fixed mapping requires sale_price.", 400, auth.id);\n  }\n\n  if (pricingMode === "custom" && salePrice != null && salePrice <= 0) {\n    return apiError("INVALID_ORDER", "A custom mapping sale_price must be positive when supplied.", 400, auth.id);\n  }\n\n  if (saleCurrency && saleCurrency !== product.moeda) {
+  if (pricingMode === "fixed" && salePrice == null) {
+    return apiError("INVALID_ORDER", "A fixed mapping requires sale_price.", 400, auth.id);
+  }
+
+  const fixedPrice = Number(
+    Number(product.preco_promocional ?? 0) > 0 ? product.preco_promocional : product.preco,
+  );
+  const basePrice = Number(
+    product.custom_pricing_floor_zar ??
+      product.supplier_min_selling_price ??
+      (
+        (product.supplier_cost_currency === "CNY" && Number(product.supplier_fx_rate_to_zar ?? 0) > 0
+          ? Number(product.supplier_cost_amount ?? 0) * Number(product.supplier_fx_rate_to_zar)
+          : Number(product.supplier_cost_amount ?? 0)) +
+        Number(product.supplier_origin_shipping_cost ?? 0) *
+          (product.supplier_origin_shipping_currency === "CNY" && Number(product.supplier_fx_rate_to_zar ?? 0) > 0
+            ? Number(product.supplier_fx_rate_to_zar)
+            : 1)
+      )
+  );
+
+  if (pricingMode === "fixed" && salePrice != null && Math.abs(salePrice - fixedPrice) > 0.01) {
+    return apiError("FIXED_PRICE_MISMATCH", "sale_price must match the NewVelion fixed price.", 409, auth.id);
+  }
+
+  if (pricingMode === "custom" && salePrice != null && salePrice < basePrice) {
+    return apiError("SALE_PRICE_BELOW_BASE_PRICE", "sale_price is below the NewVelion base price.", 409, auth.id);
+  }\n\n  if (pricingMode === "custom" && salePrice != null && salePrice <= 0) {\n    return apiError("INVALID_ORDER", "A custom mapping sale_price must be positive when supplied.", 400, auth.id);\n  }\n\n  if (saleCurrency && saleCurrency !== product.moeda) {
     return apiError("INVALID_CURRENCY", "sale_currency must match the NewVelion product currency.", 409, auth.id);
   }
 
