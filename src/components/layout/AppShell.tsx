@@ -132,6 +132,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Orders & Fulfillment", href: "/dashboard/supplier/orders", icon: "sales" },
     { label: "Shipping", href: "/dashboard/supplier/shipping", icon: "box" },
     { label: "Withdrawals", href: "/dashboard/supplier/withdrawals", icon: "download" },
+    { label: "Settings", href: "/dashboard/supplier/settings", icon: "chart" },
     { label: "Profile", href: "/dashboard/supplier/profile", icon: "users" },
   ],
 
