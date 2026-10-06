@@ -21,6 +21,15 @@ export async function GET(
     return NextResponse.json({ error: { code: "OFFER_NOT_FOUND", message: "Offer not found." } }, { status: 404 });
   }
 
+  const [{ data: platform }, { data: seller }] = await Promise.all([
+    client.from("integration_platforms").select("status").eq("id", offer.platform_id).maybeSingle(),
+    client.from("integration_external_sellers").select("status").eq("id", offer.external_seller_id).maybeSingle(),
+  ]);
+
+  if (platform?.status !== "active" || seller?.status !== "active") {
+    return NextResponse.json({ error: { code: "OFFER_NOT_FOUND", message: "Offer not found." } }, { status: 404 });
+  }
+
   const { data: product } = await client
     .from("products")
     .select("id,nome,slug,descricao,fotos,moeda,pricing_mode")
