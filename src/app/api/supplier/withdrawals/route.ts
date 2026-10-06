@@ -7,15 +7,15 @@ export async function POST(request: Request) {
   try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON." }, { status: 400 }); }
   const amount = Number(body.amount);
   const method = String(body.method ?? "");
-  const provider = body.provider ? String(body.provider) : undefined;
+  const payoutData = body.data && typeof body.data === "object" ? body.data : {};
   if (!Number.isFinite(amount) || amount <= 0) return Response.json({ error: "Invalid withdrawal amount." }, { status: 400 });
-  if (!["bank_transfer","mobile_wallet"].includes(method)) return Response.json({ error: "Unsupported payout method." }, { status: 400 });
+  if (!["bank_transfer","alipay","wechat_pay","unionpay","ecny"].includes(method)) return Response.json({ error: "Unsupported payout method." }, { status: 400 });
 
   const { data, error } = await auth.userClient.rpc("server_request_withdrawal", {
     p_user_id: auth.userId,
     p_amount: amount,
     p_method: method,
-    p_data: provider ? { provider } : {},
+    p_data: payoutData,
   });
   if (error) return Response.json({ error: error.message }, { status: 400 });
   return Response.json({ data });
