@@ -24,22 +24,34 @@ export default function SupplierWithdrawalsPage() {
   const [message, setMessage] = useState("");
 
   async function load() {
-    const user = await getCurrentUser();\n    const [financeResult, profileResult, settingsResult] = await Promise.all([
+    const user = await getCurrentUser();
+    const [financeResult, profileResult, settingsResult] = await Promise.all([
       supplierFetch<{ data: { available: number; retained: number; total: number; withdrawals: any[] } }>("/api/supplier/finance"),
-      supplierFetch<{ data: { country_code?: string; approval_status?: string; kyc_status?: string } }>("/api/supplier/profile"),\n      supabase.from("account_settings").select("payout_methods").eq("user_id", user?.id ?? "").maybeSingle(),
+      supplierFetch<{ data: { country_code?: string; approval_status?: string; kyc_status?: string } }>("/api/supplier/profile"),
+      supabase.from("account_settings").select("payout_methods").eq("user_id", user?.id ?? "").maybeSingle(),
     ]);
     setWallet({ disponivel: financeResult.data.available, retido: financeResult.data.retained, saldo_total: financeResult.data.total });
     setWithdrawals(financeResult.data.withdrawals ?? []);
-    setCountry(String(profileResult.data.country_code ?? "").toUpperCase());\n    const saved = (settingsResult.data?.payout_methods ?? {}) as Record<string, Details>;\n    setMethods({\n      bank_transfer: saved.bank_transfer?.enabled === true ? saved.bank_transfer : null,\n      mpesa: saved.mpesa?.enabled === true ? saved.mpesa : null,\n      emola: saved.emola?.enabled === true ? saved.emola : null,\n    });\n    if (profileResult.data.kyc_status !== "approved") setMessage("KYC approval is required before you can withdraw.");
-    const { data: payoutConfig } = await supabase.from("payout_methods").select("valor_minimo_saque").eq("pais", String(profileResult.data.country_code ?? "").toUpperCase()).maybeSingle();\n    if (payoutConfig?.valor_minimo_saque != null) setMinimum(Number(payoutConfig.valor_minimo_saque));\n    setLoading(false);
+    setCountry(String(profileResult.data.country_code ?? "").toUpperCase());
+    const saved = (settingsResult.data?.payout_methods ?? {}) as Record<string, Details>;
+    setMethods({
+      bank_transfer: saved.bank_transfer?.enabled === true ? saved.bank_transfer : null,
+      mpesa: saved.mpesa?.enabled === true ? saved.mpesa : null,
+      emola: saved.emola?.enabled === true ? saved.emola : null,
+    });
+    if (profileResult.data.kyc_status !== "approved") setMessage("KYC approval is required before you can withdraw.");
+    const { data: payoutConfig } = await supabase.from("payout_methods").select("valor_minimo_saque").eq("pais", String(profileResult.data.country_code ?? "").toUpperCase()).maybeSingle();
+    if (payoutConfig?.valor_minimo_saque != null) setMinimum(Number(payoutConfig.valor_minimo_saque));
+    setLoading(false);
   }
 
   useEffect(() => { load().catch((e) => { setMessage(e instanceof Error ? e.message : "Failed to load."); setLoading(false); }); }, []);
 
-  const profileResultUnavailable = false;\n\n  async function request() {
+  async function request() {
     setMessage("");
     const value = Number(amount);
-    if (!methods[method]) return setMessage("Configure this payout method in Settings first.");\n    if (!Number.isFinite(value) || value < minimum) return setMessage(`Minimum withdrawal is ${minimum}.`);
+    if (!methods[method]) return setMessage("Configure this payout method in Settings first.");
+    if (!Number.isFinite(value) || value < minimum) return setMessage(`Minimum withdrawal is ${minimum}.`);
     if (value > wallet.disponivel) return setMessage("The withdrawal amount exceeds your available balance.");
     setBusy(true);
     try {
