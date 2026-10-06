@@ -39,8 +39,8 @@ export async function POST(request: Request) {
     return apiError("INVALID_ORDER", "sale_price must be a non-negative number.", 400, auth.id);
   }
 
-  if (saleCurrency && !["ZAR", "MZN"].includes(saleCurrency)) {
-    return apiError("INVALID_CURRENCY", "sale_currency must be ZAR or MZN.", 400, auth.id);
+  if (saleCurrency && saleCurrency !== "ZAR") {
+    return apiError("INVALID_CURRENCY", "sale_currency must be ZAR.", 400, auth.id);
   }
 
   const { data: product, error: productError } = await auth.client
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
       newvelion_product_id: product.id,
       external_seller_id: sellerUuid,
       sale_price: salePrice,
-      sale_currency: saleCurrency ?? product.moeda,
+      sale_currency: "ZAR",
       metadata: body.metadata ?? {},
     })
     .select(
