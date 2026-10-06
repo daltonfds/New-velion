@@ -81,7 +81,7 @@ export default function IntegrationDocsPage() {
   external_seller_id: "seller_123",
   external_product_id: "prod_123",
   newvelion_product_id: "product-uuid",
-  pricing_mode: "custom",
+  pricing_mode: "custom", // or "fixed" / "inherit"
   sale_price: 299
 }, null, 2)}
             </pre>
@@ -113,9 +113,9 @@ export default function IntegrationDocsPage() {
   shipping_address: {
     country: "ZA",
     province: "Gauteng",
-    city: "Maputo",
+    city: "Johannesburg",
     address: "Street 1",
-    postal_code: "1100",
+    postal_code: "2000",
     phone: "+27..."
   }
 }, null, 2)}
