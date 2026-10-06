@@ -30,6 +30,8 @@ interface ProductForm {
   moeda: string;
   comissao_tipo: string;
   comissao_valor: string;
+  pricing_mode: string;
+  custom_pricing_floor_zar: string;
   fotos: string[];
   video_url: string;
   checkout_url: string;
@@ -112,7 +114,8 @@ export default function AdminProductPage() {
             : String(product.preco_promocional),
         moeda: product.moeda ?? "ZAR",
         comissao_tipo: product.comissao_tipo ?? "percentual",
-        comissao_valor: String(product.comissao_valor ?? ""),\n        pricing_mode: product.pricing_mode ?? "fixed",\n        custom_pricing_floor_zar: product.custom_pricing_floor_zar == null ? "" : String(product.custom_pricing_floor_zar),
+        comissao_valor: String(product.comissao_valor ?? ""),
+        pricing_mode: product.pricing_mode ?? "fixed",\n        custom_pricing_floor_zar: product.custom_pricing_floor_zar == null ? "" : String(product.custom_pricing_floor_zar),
         fotos: Array.isArray(product.fotos) ? product.fotos : [],
         video_url: product.video_url ?? "",
         checkout_url: product.checkout_url ?? "",
@@ -221,6 +224,8 @@ export default function AdminProductPage() {
         moeda: form.moeda,
         comissao_tipo: form.comissao_tipo,
         comissao_valor: Number(form.comissao_valor || 0),
+        pricing_mode: form.pricing_mode === "custom" ? "custom" : "fixed",
+        custom_pricing_floor_zar: form.pricing_mode === "custom" && form.custom_pricing_floor_zar ? Number(form.custom_pricing_floor_zar) : null,
         fotos: form.fotos,
         video_url: form.video_url.trim() || null,
         checkout_url: form.checkout_url.trim(),
@@ -546,7 +551,19 @@ export default function AdminProductPage() {
                 }
                 required
               />
-            </div>
+ 
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Seller Pricing Model</label>
+                <select value={form.pricing_mode} onChange={(event) => updateField("pricing_mode", event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                  <option value="fixed">Fixed Offer — supplier controls price</option>
+                  <option value="custom">Custom Pricing — seller chooses price</option>
+                </select>
+              </div>
+
+              {form.pricing_mode === "custom" && (
+                <Input label="Custom Pricing Base (ZAR)" type="number" min="0" step="0.01" value={form.custom_pricing_floor_zar} onChange={(event) => updateField("custom_pricing_floor_zar", event.target.value)} required />
+              )}           </div>
           </Card>
 
           <Card>
