@@ -41,12 +41,12 @@ export default function PersonalProfilePage() {
     const fullName=[firstName.trim(),lastName.trim()].filter(Boolean).join(" ");
     if(!fullName){setError("Enter your name.");setSaving(false);return}
     const cc=country.trim().toUpperCase();
-    const pais=cc==="MZ"||cc==="ZA"?cc:null;
+    const pais=cc==="ZA"?"ZA":null;
     const {error}=await supabase.from("profiles").update({
       full_name:fullName,
       nome_completo:fullName,
-      country:cc||null,
-      country_code:cc||null,
+      country:"ZA",
+      country_code:"ZA",
       pais,
       phone_number:phone.trim()||null,
       phone_e164:phone.trim()||null,
@@ -103,7 +103,7 @@ export default function PersonalProfilePage() {
             <label className="text-sm font-medium text-slate-700">Phone<input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-[#16294F]"/></label>
             <label className="text-sm font-medium text-slate-700 md:col-span-2">Country
               <select value={country} onChange={e=>setCountry(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-[#16294F]">
-                <option value="">Select country</option><option value="MZ">Mozambique</option><option value="ZA">South Africa</option><option value="FR">France</option><option value="AO">Angola</option><option value="PT">Portugal</option>
+                <option value="ZA">South Africa</option>
               </select>
             </label>
           </div>
