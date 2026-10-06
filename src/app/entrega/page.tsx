@@ -8,7 +8,6 @@ function DeliveryForm() {
 
   const affiliateLink = searchParams.get("ref") || "";
   const quantity = searchParams.get("qty") || "1";
-  const checkoutUrl = searchParams.get("checkout_url") || "";
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -220,7 +219,7 @@ function DeliveryForm() {
 
           <button
             type="submit"
-            disabled={loading || !affiliateLink || !checkoutUrl}
+            disabled={loading || !affiliateLink}
             className="mt-7 w-full rounded-xl bg-[#16294F] px-5 py-4 text-sm font-black text-white transition hover:bg-[#0e1d38] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "CONTINUING..." : "SECURE PAYMENT"}
@@ -228,8 +227,8 @@ function DeliveryForm() {
 
           {!affiliateLink && (
             <p className="mt-3 text-center text-xs font-medium text-red-600">
-              Invalid seller link. Please return to the product page and try
-              again.
+              This seller link is invalid or has expired. Please return to the
+              product page and try again.
             </p>
           )}
         </form>
