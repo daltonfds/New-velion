@@ -23,6 +23,11 @@ function DeliveryForm() {
 
     form.set("affiliate_link", affiliateLink);
     form.set("quantity", quantity);
+    form.set("country", "ZA");
+    const rawPhone = String(form.get("phone") || "").trim();
+    const rawWhatsApp = String(form.get("whatsapp") || "").trim();
+    if (rawPhone.startsWith("0")) form.set("phone", "+27" + rawPhone.slice(1));
+    if (rawWhatsApp.startsWith("0")) form.set("whatsapp", "+27" + rawWhatsApp.slice(1));
 
     try {
       const response = await fetch("/api/checkout-intents", {
