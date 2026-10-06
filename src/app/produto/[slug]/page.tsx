@@ -191,9 +191,9 @@ export default function ProdutoPage() {
     return affiliatePrice ?? product.preco_promocional ?? product.preco;
   }, [product]);
 
-  const discount = bundle === 3 ? 0.05 : bundle === 6 ? 0.1 : 0;
-
-  const unitPrice = basePrice * (1 - discount);
+  // The checkout engine charges the seller-defined unit price for every unit.
+  // Do not display client-only bundle discounts that are not persisted server-side.
+  const unitPrice = basePrice;
   const totalPrice = unitPrice * bundle * quantity;
 
   function showToast(message: string) {
@@ -915,7 +915,7 @@ export default function ProdutoPage() {
             </div>
 
             <div className="nv-divider">
-              BUY MORE & SAVE
+              SELECT QUANTITY
             </div>
 
             <div className="nv-bundles" role="group">
@@ -932,9 +932,7 @@ export default function ProdutoPage() {
                       number === 1 ? "empty" : ""
                     }`}
                   >
-                    {number === 1
-                      ? ""
-                      : `Save ${number === 3 ? "5%" : "10%"}`}
+                    {number === 1 ? "" : "Bundle"}
                   </span>
 
                   <span className="nv-dot" />
