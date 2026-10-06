@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const phone = String(form.get("phone") || "").trim();
     const whatsapp = String(form.get("whatsapp") || "").trim() || null;
     const email = String(form.get("email") || "").trim() || null;
-    const country = String(form.get("country") || "").trim();
+    const country = String(form.get("country") || "").trim().toUpperCase();
     const province = String(form.get("province") || "").trim();
     const city = String(form.get("city") || "").trim();
     const postalCode = String(form.get("postal_code") || "").trim() || null;
@@ -28,6 +28,10 @@ export async function POST(request: Request) {
     const quantity = Math.max(1, Math.min(50, Number(form.get("quantity") || "1")));
     const addressReference =
       String(form.get("address_reference") || "").trim() || null;
+
+    if (country !== "ZA" && country !== "SOUTH AFRICA" && country !== "ZAF") {
+      return NextResponse.json({ error: "Delivery is available only in South Africa." }, { status: 400 });
+    }
 
     if (
       !affiliateLink ||
