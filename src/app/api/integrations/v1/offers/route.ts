@@ -50,7 +50,18 @@ export async function POST(request: Request) {
   const externalProductId = String(body.external_product_id ?? "").trim();
   const newvelionProductId = String(body.newvelion_product_id ?? "").trim();
   const pricingMode = String(body.pricing_mode ?? "").trim();
-  const salePrice = body.sale_price == null ? null : Number(body.sale_price);\n\n  const { data: seller } = await auth.client\n    .from("integration_external_sellers")\n    .select("id,status")\n    .eq("platform_id", auth.platform.id)\n    .eq("external_seller_id", externalSellerId)\n    .maybeSingle();\n\n  if (!seller || seller.status !== "active") {\n    return apiError("INVALID_SELLER", "External seller is not registered or active.", 404, auth.id);\n  }
+  const salePrice = body.sale_price == null ? null : Number(body.sale_price);
+
+  const { data: seller } = await auth.client
+    .from("integration_external_sellers")
+    .select("id,status")
+    .eq("platform_id", auth.platform.id)
+    .eq("external_seller_id", externalSellerId)
+    .maybeSingle();
+
+  if (!seller || seller.status !== "active") {
+    return apiError("INVALID_SELLER", "External seller is not registered or active.", 404, auth.id);
+  }
 
   if (!externalSellerId || !newvelionProductId || !pricingMode) {
     return apiError(
