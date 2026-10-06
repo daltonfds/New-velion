@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     await Promise.all([
       auth.client
         .from("wallet_entries")
-        .select("id,sale_id,tipo,valor,estado,created_at,withdrawal_id")
+        .select("id,sale_id,tipo,valor,estado,created_at,withdrawal_id,currency")
         .eq("vendedor_id", auth.userId)
         .order("created_at", { ascending: false }),
       auth.client
@@ -23,6 +23,7 @@ export async function GET(request: Request) {
   if (withdrawalsError) return Response.json({ error: withdrawalsError.message }, { status: 500 });
 
   const rows = entries ?? [];
+  const currency = rows.find((e) => e.currency)?.currency ?? "ZAR";
   const available = rows
     .filter((e) => e.estado === "disponivel" && ["supplier_earning", "estorno", "garantia_liberada"].includes(e.tipo))
     .reduce((sum, e) => sum + Number(e.valor || 0), 0);
@@ -41,6 +42,7 @@ export async function GET(request: Request) {
       available: Math.max(available - reserved - withdrawn, 0),
       retained: Math.max(retained, 0),
       total: Math.max(available - reserved - withdrawn, 0) + Math.max(retained, 0),
+      currency,
       withdrawals: withdrawals ?? [],
     },
   });
