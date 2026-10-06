@@ -7,6 +7,7 @@ import Card from "@/components/ui/Card";
 import { getCurrentUser } from "@/lib/auth";
 import { getWalletSummary } from "@/lib/services/wallet";
 import { supabase } from "@/lib/supabase";
+import { currencyForCountry, formatCurrency } from "@/lib/currency";
 
 type Entry = {
   id: string;
@@ -89,6 +90,9 @@ export default function SellerWalletPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [period, setPeriod] = useState<"30" | "90" | "all">("30");
+  const [country, setCountry] = useState("ZA");
+  const [walletCurrency, setWalletCurrency] = useState("ZAR");
+  const [exchangeRate, setExchangeRate] = useState(1);
 
   async function load() {
     setLoading(true);
@@ -103,19 +107,28 @@ export default function SellerWalletPage() {
     }
 
     try {
-      const [summary, result] = await Promise.all([
+      const [summary, result, profile] = await Promise.all([
         getWalletSummary(user.id),
         supabase
           .from("wallet_entries_canonical")
           .select("id,tipo,valor,estado,created_at,sale_id")
           .eq("vendedor_id", user.id)
           .order("created_at", { ascending: false }),
+        supabase.from("profiles").select("country_code,pais,wallet_currency").eq("id", user.id).single(),
       ]);
 
       if (result.error) throw result.error;
 
       setWallet(summary);
       setEntries((result.data ?? []) as Entry[]);
+      const detected = String(profile.data?.country_code ?? profile.data?.pais ?? "ZA").toUpperCase();
+      const localCurrency = String(profile.data?.wallet_currency ?? currencyForCountry(detected)).toUpperCase();
+      setCountry(detected);
+      setWalletCurrency(localCurrency);
+      if (localCurrency !== "ZAR") {
+        const fx = await fetch(`/api/currency/rate?base=ZAR&quote=${encodeURIComponent(localCurrency)}`).then((r) => r.json());
+        if (Number.isFinite(Number(fx?.rate)) && Number(fx.rate) > 0) setExchangeRate(Number(fx.rate));
+      }
     } catch (e) {
       setError(
         e instanceof Error ? e.message : "Unable to load your wallet.",
@@ -129,14 +142,7 @@ export default function SellerWalletPage() {
     void load();
   }, []);
 
-  const money = (value: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "ZAR",
-
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value).replace("ZAR", "R").replace("R ", "R");
+  const money = (value: number) => formatCurrency(value * exchangeRate, walletCurrency);
 
   const date = (value: string) =>
     new Intl.DateTimeFormat("en-US", {
