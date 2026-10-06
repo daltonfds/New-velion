@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
   const name = cleanString(body.nome);
   const categoryId = cleanString(body.categoria_id);
-  const price = Number(body.preco);
+  const price = Number(body.preco);\n  const pricingMode = String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed";
   const cost = Number(body.preco_custo);
   const requestedSupplierCountry = cleanString(body.supplier_country_code || body.fornecedor_pais).toUpperCase();
   const supplierCostCurrency = requestedSupplierCountry === "CN" ? "CNY" : "ZAR";
