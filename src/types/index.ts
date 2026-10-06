@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "seller";
+export type UserRole = "admin" | "seller" | "supplier";
 
 export type ProductStatus = "draft" | "active" | "inactive";
 
@@ -41,4 +41,9 @@ export interface Product {
   created_by: string;
   created_at: string;
   updated_at: string;
+  supplier_status?: string | null;
+  supplier_min_selling_price?: number | null;
+  supplier_suggested_price?: number | null;
+  supplier_commission_rate?: number | null;
+  reserved_estoque?: number | null;
 }
