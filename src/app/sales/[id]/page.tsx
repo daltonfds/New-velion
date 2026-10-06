@@ -165,6 +165,7 @@ export default function SalesPage() {
       const { data, error: queryError } = await supabase
         .from("products")
         .select("*")
+        .eq("moeda", "ZAR")
         .eq("id", productId)
         .eq("ativo", true)
         .maybeSingle();
