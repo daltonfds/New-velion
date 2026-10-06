@@ -182,7 +182,7 @@ function translatePage(toPortuguese: boolean) {
     if (next !== value) text.textContent = next;
   }
 
-  const attrs = ["placeholder","aria-label","title","alt"];
+  const attrs = ["placeholder","aria-label","title","alt","value"];
   document.querySelectorAll<HTMLElement>("[" + attrs.join("],[") + "]").forEach((el) => {
     for (const attr of attrs) {
       const value = el.getAttribute(attr);
