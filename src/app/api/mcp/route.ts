@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { createMcpHandler, McpServer } from "@modelcontextprotocol/server";
+import { fromSupabaseUrl, withOAuthProtectedResource, withSupabase } from "@supabase/server";
 import * as z from "zod/v4";
 
 function db() {
@@ -162,14 +163,33 @@ const handler = createMcpHandler(() => {
   return server;
 });
 
-async function handle\n\nasync function handle(request: Request) {
-  const expected = process.env.NEWVELION_MCP_TOKEN?.trim();
-  const received = request.headers.get("authorization") || "";
-  if (!expected || received !== `Bearer ${expected}`) {
-    return Response.json({ error: "Unauthorized MCP request." }, { status: 401, headers: { "WWW-Authenticate": "Bearer" } });
-  }
-  return handler.fetch(request);
-}
+const handle = withOAuthProtectedResource(
+  {
+    resourceServer: (request) => new URL("/mcp", request.url).toString(),
+    authorizationServer: fromSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL || ""),
+  },
+  withSupabase({ auth: "user" }, async (request, context) => {
+    const userId = context.userClaims?.id;
+    if (!userId) {
+      return Response.json({ error: "Unauthorized MCP request." }, { status: 401 });
+    }
+
+    const { data: profile, error } = await context.supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error || profile?.role !== "admin") {
+      return Response.json(
+        { error: "NewVelion administrator access is required." },
+        { status: 403 },
+      );
+    }
+
+    return handler.fetch(request);
+  }),
+);
 
 export const GET = handle;
 export const POST = handle;
