@@ -340,9 +340,7 @@ export default function NewProductPage() {
                       `${item.question}
 ${item.answer}`,
                   )
-                  .join("
-
-"),
+                  .join("\n\n"),
               )
             }
             fornecedorNome={form.fornecedor_nome}
