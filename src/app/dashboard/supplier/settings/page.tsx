@@ -9,7 +9,7 @@ import { supplierFetch } from "@/lib/supplier-client";
 
 type Country = "ZA" | "CN";
 type Method = "bank_transfer" | "alipay" | "wechat_pay" | "unionpay" | "ecny";
-type Details = Record<string, string>;
+type Details = Record<string, string | boolean>;
 
 const definitions: Record<Country, Array<{ key: Method; label: string; description: string; fields: Array<[string,string]> }>> = {
   ZA: [
@@ -117,7 +117,7 @@ export default function SupplierSettingsPage() {
                       {option.fields.map(([field,label]) => (
                         <label key={field} className="grid gap-1.5 text-sm font-medium text-slate-700">
                           {label}
-                          <input value={value[field] ?? ""} onChange={(e) => update(option.key, field, e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2.5" />
+                          <input value={String(value[field] ?? "")} onChange={(e) => update(option.key, field, e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2.5" />
                         </label>
                       ))}
                     </div>}
