@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 type Product = {
   id: string; slug: string; name: string; description: string | null;
@@ -160,6 +161,49 @@ function ProductGrid({ products }: { products: Product[] }) {
 
 function ProductCard({ product }: { product: Product }) {
   const image = product.images[0];
+  const [favorite, setFavorite] = useState(false);
+  const [adding, setAdding] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase.from("customer_favorites").select("id").eq("user_id", user.id).eq("product_id", product.id).maybeSingle();
+      if (active) setFavorite(Boolean(data));
+    })();
+    return () => { active = false; };
+  }, [product.id]);
+
+  async function toggleFavorite() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { window.location.href = "/login"; return; }
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+    if (profile?.role !== "customer") { window.location.href = "/register/customer"; return; }
+    if (favorite) {
+      await supabase.from("customer_favorites").delete().eq("user_id", user.id).eq("product_id", product.id);
+      setFavorite(false);
+    } else {
+      const { error } = await supabase.from("customer_favorites").insert({ user_id: user.id, product_id: product.id });
+      if (!error) setFavorite(true);
+    }
+  }
+
+  async function addToCart() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { window.location.href = "/login"; return; }
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+    if (profile?.role !== "customer") { window.location.href = "/register/customer"; return; }
+    setAdding(true);
+    const { error } = await supabase.from("customer_cart_items").upsert(
+      { user_id: user.id, product_id: product.id, quantity: 1 },
+      { onConflict: "user_id,product_id" },
+    );
+    setAdding(false);
+    if (error) { window.alert(error.message); return; }
+    window.location.href = "/cart";
+  }
+
   return <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-blue-200">
     <Link href={"/produto/" + encodeURIComponent(product.slug)} className="block">
       <div className="relative aspect-square overflow-hidden bg-slate-50">
@@ -173,6 +217,14 @@ function ProductCard({ product }: { product: Product }) {
       <div className="mt-2 flex items-center gap-2 text-xs text-slate-500"><span className="text-[#C99A2E]">★</span>{product.rating.toFixed(1)} ({product.reviewCount})</div>
       <div className="mt-4"><span className="text-lg font-extrabold text-[#16294F]">{money(product.price)}</span>{product.compareAtPrice != null && <span className="ml-2 text-xs text-slate-400 line-through">{money(product.compareAtPrice)}</span>}</div>
       {product.supplier && <Link href={"/fornecedor/" + encodeURIComponent(product.supplier.slug)} className="mt-4 block border-t border-slate-100 pt-3 text-xs font-semibold text-slate-500 hover:text-blue-700">Sold by {product.supplier.name} · {product.supplier.countryName}</Link>}
+      <div className="mt-4 flex gap-2">
+        <button type="button" disabled={adding || product.stock <= 0} onClick={addToCart} className="flex-1 rounded-xl border border-[#16294F] px-3 py-2.5 text-xs font-extrabold text-[#16294F] disabled:cursor-not-allowed disabled:opacity-40">
+          {product.stock <= 0 ? "OUT OF STOCK" : adding ? "ADDING..." : "ADD TO CART"}
+        </button>
+        <Link href={"/produto/" + encodeURIComponent(product.slug)} className="flex-1 rounded-xl bg-[#16294F] px-3 py-2.5 text-center text-xs font-extrabold text-white hover:bg-blue-900">
+          VIEW
+        </Link>
+      </div>
     </div>
   </article>;
 }
