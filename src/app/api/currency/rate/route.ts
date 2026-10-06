@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 
-const SUPPORTED = new Set(["ZAR","AOA","MZN","CNY","USD","EUR","GBP"]);
+const SUPPORTED = /^[A-Z]{3}$/;
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const base = String(url.searchParams.get("base") || "ZAR").toUpperCase();
   const quote = String(url.searchParams.get("quote") || "").toUpperCase();
 
-  if (!SUPPORTED.has(base) || !SUPPORTED.has(quote)) {
+  if (!SUPPORTED.test(base) || !SUPPORTED.test(quote)) {
     return NextResponse.json({ error: "Unsupported currency." }, { status: 400 });
   }
 
