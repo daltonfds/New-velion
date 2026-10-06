@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 type Product = {
+  id: string;
   nome: string;
   descricao: string | null;
   preco: number;
@@ -59,10 +60,9 @@ export default function ProductInfo({
     Math.min(5, Math.round(product.avaliacao_media ?? 0)),
   );
 
-  const checkoutUrl =
-    product.checkout_url && affiliateLink
-      ? `/entrega?qty=${encodeURIComponent(String(quantity))}&ref=${encodeURIComponent(affiliateLink)}`
-      : null;
+  const checkoutUrl = affiliateLink
+    ? `/entrega?qty=${encodeURIComponent(String(quantity))}&ref=${encodeURIComponent(affiliateLink)}`
+    : `/checkout?product=${encodeURIComponent(product.id)}&qty=${encodeURIComponent(String(quantity))}`;
 
   return (
     <section className="border-b border-slate-100 bg-white">
@@ -197,19 +197,27 @@ export default function ProductInfo({
             </div>
           </div>
 
-          <div className="mt-6">
-            {checkoutUrl ? (
+          <div className="mt-6 space-y-3">
+            <div className="flex gap-3">
+              <button type="button" onClick={async () => {
+                const { supabase } = await import("@/lib/supabase");
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) { window.location.href = "/login"; return; }
+                const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+                if (profile?.role !== "customer") { window.location.href = "/register/customer"; return; }
+                const { error } = await supabase.from("customer_cart_items").upsert({ user_id: user.id, product_id: product.id, quantity }, { onConflict: "user_id,product_id" });
+                if (error) { window.alert(error.message); return; }
+                window.location.href = "/cart";
+              }} className="flex min-h-14 flex-1 items-center justify-center border border-[#16294F] px-5 text-sm font-extrabold text-[#16294F] hover:bg-slate-50">ADD TO CART</button>
+              {checkoutUrl ? (
               <a
                 href={checkoutUrl}
                 className="flex min-h-14 w-full items-center justify-center bg-[#16294F] px-6 text-base font-extrabold text-white transition hover:bg-[#0e1d38]"
               >
                 BUY NOW
               </a>
-            ) : (
-              <div className="flex min-h-14 items-center justify-center border border-slate-200 bg-slate-50 px-6 text-sm text-slate-400">
-                Checkout unavailable
-              </div>
-            )}
+              ) : null}
+            </div>
           </div>
 
           <div className="mt-5 grid grid-cols-3 gap-2 border-y border-slate-100 py-4 text-center text-[11px] font-bold uppercase tracking-wide text-slate-500">
