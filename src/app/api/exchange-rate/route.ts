@@ -12,7 +12,7 @@ export async function GET() {
     }
 
     const data = await response.json();
-    const rate = Number(data?.rates?.MZN);
+    const rate = Number(data?.rates?.CNY);
 
     if (!Number.isFinite(rate) || rate <= 0) {
       throw new Error("Invalid exchange rate");
@@ -20,7 +20,7 @@ export async function GET() {
 
     return NextResponse.json({
       from: "ZAR",
-      to: "MZN",
+      to: "CNY",
       rate,
       date: data?.date ?? null,
     });
