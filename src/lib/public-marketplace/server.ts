@@ -17,6 +17,10 @@ export type PublicMarketplaceProduct = {
   category: { id: string; name: string; slug: string } | null;
   subcategory: { id: string; name: string; slug: string } | null;
   supplier: PublicSupplierSummary | null;
+  benefits: string[];
+  ingredients: string | null;
+  usage: string | null;
+  guarantee: string | null;
 };
 
 export type PublicSupplierSummary = {
@@ -85,7 +89,7 @@ async function supplierSources(database: SupabaseClient) {
 async function productRows(database: SupabaseClient) {
   const { data, error } = await database
     .from("products")
-    .select("id,nome,slug,descricao,preco,preco_promocional,moeda,fotos,estoque,destaque,novo,avaliacao_media,total_avaliacoes,created_by,categoria_id,subcategoria_id,fornecedor_nome,fornecedor_descricao,fornecedor_pais")
+    .select("id,nome,slug,descricao,preco,preco_promocional,moeda,fotos,estoque,destaque,novo,avaliacao_media,total_avaliacoes,created_by,categoria_id,subcategoria_id,fornecedor_nome,fornecedor_descricao,fornecedor_pais,beneficios,ingredientes,modo_uso,garantia_texto")
     .eq("ativo", true)
     .eq("supplier_status", "approved")
     .eq("moeda", "ZAR")
@@ -169,6 +173,10 @@ export async function getPublicMarketplace() {
       ? { id: categoryMap.get(row.subcategoria_id).id, name: categoryMap.get(row.subcategoria_id).nome, slug: categoryMap.get(row.subcategoria_id).slug }
       : null,
     supplier: supplierFromProduct(row, suppliers.get(row.created_by), counts.get(row.created_by) ?? 0),
+    benefits: Array.isArray(row.beneficios) ? row.beneficios.filter(Boolean) : [],
+    ingredients: row.ingredientes ?? null,
+    usage: row.modo_uso ?? null,
+    guarantee: row.garantia_texto ?? null,
   }));
 
   const publicSuppliers = new Map<string, PublicSupplierSummary>();
@@ -201,12 +209,19 @@ export async function getPublicSupplier(slug: string) {
   };
 }
 
-export async function getPublicProduct(slug: string) {
+export async function getPublicProduct(slug: string, affiliateRef?: string) {
   const catalog = await getPublicMarketplace();
   const product = catalog.products.find((item) => item.slug === slug);
   if (!product) return null;
 
   const database = db();
+  let affiliatePrice: number | null = null;
+  if (affiliateRef) {
+    const { data: affiliateData } = await database.rpc("resolve_affiliate_product_with_slug", { p_link_unico: affiliateRef.replace(/^https?:\\/\\/[^/]+\\//, "").replace(/^\\//, "") });
+    const resolved = Array.isArray(affiliateData) ? affiliateData[0] : affiliateData;
+    if (resolved?.product_id === product.id && Number.isFinite(Number(resolved.sale_price))) affiliatePrice = Number(resolved.sale_price);
+  }
+
   const { data: reviews, error } = await database
     .from("product_reviews")
     .select("id,reviewer_name,rating,review_text,media_urls,verified_buyer,created_at")
@@ -219,6 +234,7 @@ export async function getPublicProduct(slug: string) {
 
   return {
     product,
+    affiliatePrice,
     reviews: reviews ?? [],
     related: catalog.products
       .filter((item) => item.id !== product.id && item.category?.id === product.category?.id)
