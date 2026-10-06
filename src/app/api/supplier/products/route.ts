@@ -30,7 +30,8 @@ export async function POST(request: Request) {
 
   const name = cleanString(body.nome);
   const categoryId = cleanString(body.categoria_id);
-  const price = Number(body.preco);\n  const pricingMode = String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed";
+  const price = Number(body.preco);
+  const pricingMode = String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed";
   const cost = Number(body.preco_custo);
   const requestedSupplierCountry = cleanString(body.supplier_country_code || body.fornecedor_pais).toUpperCase();
   const supplierCostCurrency = requestedSupplierCountry === "CN" ? "CNY" : "ZAR";
@@ -68,7 +69,9 @@ export async function POST(request: Request) {
     fotos: Array.isArray(body.fotos) ? body.fotos.map(String) : [], video_url: cleanString(body.video_url) || null,
     checkout_url: checkoutUrl, estoque: Math.max(0, Math.floor(Number(body.estoque ?? 0))), reserved_estoque: 0,
     low_stock_threshold: Math.max(0, Math.floor(Number(body.low_stock_threshold ?? 5))),
-    pricing_mode: String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed",\n    custom_pricing_floor_zar: String(body.pricing_mode ?? "fixed") === "custom" && body.custom_pricing_floor_zar != null ? Number(body.custom_pricing_floor_zar) : null,\n    supplier_min_selling_price: Number(body.supplier_min_selling_price ?? price),
+    pricing_mode: String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed",
+    custom_pricing_floor_zar: String(body.pricing_mode ?? "fixed") === "custom" && body.custom_pricing_floor_zar != null ? Number(body.custom_pricing_floor_zar) : null,
+    supplier_min_selling_price: Number(body.supplier_min_selling_price ?? price),
     supplier_suggested_price: Number(body.supplier_suggested_price ?? price),
     supplier_commission_rate: Number(body.supplier_commission_rate ?? body.comissao_afiliado ?? 0),
     ativo: false, destaque: false, novo: true, created_by: auth.userId, supplier_status: initialStatus,
