@@ -2,6 +2,9 @@
 alter table public.fulfillment_orders
   add column if not exists public_tracking_token text;
 
+alter table public.fulfillment_orders
+  alter column public_tracking_token set default replace(gen_random_uuid()::text, '-', '');
+
 update public.fulfillment_orders
 set public_tracking_token = replace(gen_random_uuid()::text, '-', '')
 where public_tracking_token is null;
