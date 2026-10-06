@@ -27,6 +27,7 @@ export interface Product {
   categoria_id: string | null;
   subcategoria_id: string | null;
   preco: number;
+  preco_custo?: number | null;
   preco_promocional: number | null;
   moeda: Currency;
   comissao_tipo: CommissionType;
