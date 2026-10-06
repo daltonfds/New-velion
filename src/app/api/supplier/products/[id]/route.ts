@@ -40,11 +40,16 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   const price = Number(body.preco);
   const pricingMode = String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed";
   const cost = Number(body.preco_custo);
-  const supplierCountry = String(body.supplier_country_code ?? body.fornecedor_pais ?? existing.supplier_country_code ?? "").trim().toUpperCase();
+  const requestedSupplierCountry = String(body.supplier_country_code ?? body.fornecedor_pais ?? "").trim().toUpperCase();
+  const { data: supplierProfile } = await auth.client.from("supplier_profiles").select("country_code,approval_status").eq("user_id", auth.userId).maybeSingle();
+  const supplierCountry = String(supplierProfile?.country_code ?? existing.supplier_country_code ?? "").trim().toUpperCase();
   const supplierCostCurrency = supplierCountry === "CN" ? "CNY" : "ZAR";
   const supplierCostAmount = Number(body.supplier_cost_amount ?? body.preco_custo);
   if (!Number.isFinite(price) || price < 0 || !Number.isFinite(cost) || cost < 0 || !Number.isFinite(supplierCostAmount) || supplierCostAmount < 0) return Response.json({ error: "Invalid price or cost." }, { status: 400 });
+  if (requestedSupplierCountry && requestedSupplierCountry !== supplierCountry) return Response.json({ error: "Supplier country does not match the approved supplier profile." }, { status: 400 });
   if (!["ZA", "CN"].includes(supplierCountry)) return Response.json({ error: "Supplier country must be South Africa (ZA) or China (CN)." }, { status: 400 });
+  if (pricingMode === "custom" && (!Number.isFinite(Number(body.custom_pricing_floor_zar ?? body.supplier_min_selling_price)) || Number(body.custom_pricing_floor_zar ?? body.supplier_min_selling_price) <= 0)) return Response.json({ error: "A positive custom pricing base is required." }, { status: 400 });
+  if (supplierCountry === "CN" && (!Number.isFinite(Number(body.supplier_fx_rate_to_zar)) || Number(body.supplier_fx_rate_to_zar) <= 0)) return Response.json({ error: "A valid CNY to ZAR FX rate is required for China suppliers." }, { status: 400 });
 
   const nextStatus = existing.supplier_status === "approved" ? "pending_review" : "draft";
   const { data, error } = await auth.client.from("products").update({
