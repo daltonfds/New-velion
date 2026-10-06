@@ -6,7 +6,6 @@ import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
 import { supabase } from "@/lib/supabase";
-import { useEffect as useThemeEffect } from "react";
 
 export type AppArea = "seller" | "supplier" | "admin";
 
@@ -177,7 +176,7 @@ export default function AppShell({
   const [loggingOut, setLoggingOut] = useState(false);
   const [pt, setPt] = useState(false);
 
-  useThemeEffect(() => {
+  useEffect(() => {
     const sync = () => setPt(localStorage.getItem("newvelion-language") === "pt");
     sync();
     window.addEventListener("storage", sync);
@@ -313,10 +312,10 @@ export default function AppShell({
 
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-gray-900">
-                Account
+                {t("Account","Conta")}
               </p>
               <p className="truncate text-xs text-gray-500">
-                Profile & settings
+                {t("Profile & settings","Perfil e definições")}
               </p>
             </div>
           </Link>
@@ -350,11 +349,11 @@ export default function AppShell({
               id="logout-title"
               className="mt-4 text-lg font-bold text-slate-900"
             >
-              Log out?
+              {t("Log out?","Sair?")}
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              Are you sure you want to log out of your NewVelion account?
+              {t("Are you sure you want to log out of your NewVelion account?","Tem a certeza de que pretende sair da sua conta NewVelion?")}
             </p>
 
             <div className="mt-6 flex gap-3">
@@ -364,7 +363,7 @@ export default function AppShell({
                 onClick={() => setLogoutOpen(false)}
                 className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
               >
-                Cancel
+                {t("Cancel","Cancelar")}
               </button>
 
               <button
