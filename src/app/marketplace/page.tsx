@@ -19,15 +19,8 @@ interface Category {
   parent_id: string | null;
 }
 
-function money(value: number, currency: string) {
-  return new Intl.NumberFormat(
-    currency === "MZN" ? "pt-MZ" : "en-ZA",
-    {
-      style: "currency",
-      currency,
-      minimumFractionDigits: 2,
-    }
-  ).format(value);
+function money(value: number) {
+  return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR", minimumFractionDigits: 2 }).format(value);
 }
 
 export default function MarketplacePage() {
@@ -871,7 +864,7 @@ const filteredProducts = useMemo(() => {
 
                       {product.preco_promocional !== null && (
                         <p className="text-sm text-gray-400 line-through">
-                          {money(product.preco, product.moeda)}
+                          {money(product.preco)}
                         </p>
                       )}
                     </div>
