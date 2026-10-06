@@ -22,7 +22,7 @@ export async function PUT(request: Request) {
     processing_days: Math.max(0, Math.floor(Number(body.processing_days ?? 1))),
     free_shipping_threshold: body.free_shipping_threshold == null || body.free_shipping_threshold === "" ? null : Math.max(0, Number(body.free_shipping_threshold)),
     default_rate: Math.max(0, Number(body.default_rate ?? 0)),
-    currency: String((await auth.client.from("supplier_profiles").select("country_code").eq("user_id", auth.userId).maybeSingle()).data?.country_code).toUpperCase() === "CN" ? "CNY" : "ZAR",
+    currency: "ZAR",
     updated_at: new Date().toISOString(),
   };
   const { data, error } = await auth.client.from("supplier_shipping_profiles").upsert(payload, { onConflict: "user_id" }).select("*").single();
