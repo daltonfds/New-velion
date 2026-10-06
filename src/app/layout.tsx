@@ -1,25 +1,23 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
+import { ThemeLanguageProvider } from "@/components/layout/ThemeLanguageProvider";
 
 export const metadata: Metadata = {
   title: "Newvelion",
-  description: "Commerce infrastructure",
+  description: "Infraestrutura de comércio",
   manifest: "/manifest.webmanifest",
-  icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
-  },
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body><ToastProvider>{children}</ToastProvider></body>
+    <html lang="pt" suppressHydrationWarning>
+      <body>
+        <ThemeLanguageProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </ThemeLanguageProvider>
+      </body>
     </html>
   );
 }
