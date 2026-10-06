@@ -3,7 +3,7 @@ import { getPublicProduct } from "@/lib/public-marketplace/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
+export async function GET(request: Request, context: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await context.params;
     const affiliateRef = new URL(request.url).searchParams.get("ref") || undefined;
