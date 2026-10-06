@@ -59,9 +59,10 @@ export default function ProductInfo({
     Math.min(5, Math.round(product.avaliacao_media ?? 0)),
   );
 
-  const checkoutUrl = product.checkout_url
-    ? `/entrega?qty=${encodeURIComponent(String(quantity))}&checkout_url=${encodeURIComponent(product.checkout_url)}${affiliateLink ? `&ref=${encodeURIComponent(affiliateLink)}` : ""}`
-    : null;
+  const checkoutUrl =
+    product.checkout_url && affiliateLink
+      ? `/entrega?qty=${encodeURIComponent(String(quantity))}&ref=${encodeURIComponent(affiliateLink)}`
+      : null;
 
   return (
     <section className="border-b border-slate-100 bg-white">
