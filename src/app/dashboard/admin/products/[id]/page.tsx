@@ -112,7 +112,7 @@ export default function AdminProductPage() {
             : String(product.preco_promocional),
         moeda: product.moeda ?? "ZAR",
         comissao_tipo: product.comissao_tipo ?? "percentual",
-        comissao_valor: String(product.comissao_valor ?? ""),
+        comissao_valor: String(product.comissao_valor ?? ""),\n        pricing_mode: product.pricing_mode ?? "fixed",\n        custom_pricing_floor_zar: product.custom_pricing_floor_zar == null ? "" : String(product.custom_pricing_floor_zar),
         fotos: Array.isArray(product.fotos) ? product.fotos : [],
         video_url: product.video_url ?? "",
         checkout_url: product.checkout_url ?? "",
