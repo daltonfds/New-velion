@@ -131,6 +131,7 @@ export default function RegisterPage() {
             </div>
 
             <PhoneFields
+              allowedCountries={["ZA", "AO"]}
               countryCode={form.country}
               phone={form.phone}
               whatsapp={form.whatsapp}
