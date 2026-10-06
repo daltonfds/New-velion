@@ -9,7 +9,7 @@ import {
 
 function mapOrderError(message: string) {
   const code = message.match(
-    /INVALID_ORDER|INVALID_SELLER|PRODUCT_NOT_MAPPED|PRODUCT_NOT_FOUND|PRODUCT_OUT_OF_STOCK|INVALID_QUANTITY|INVALID_CURRENCY|SALE_PRICE_BELOW_MINIMUM|PRODUCT_NOT_AVAILABLE|API_MONTHLY_ORDER_LIMIT/,
+    /INVALID_ORDER|INVALID_SELLER|PRODUCT_NOT_MAPPED|PRODUCT_NOT_FOUND|PRODUCT_OUT_OF_STOCK|INVALID_QUANTITY|INVALID_CURRENCY|SALE_PRICE_BELOW_MINIMUM|SALE_PRICE_BELOW_BASE_PRICE|FIXED_PRICE_MISMATCH|OFFER_NOT_FOUND|OFFER_PRICE_MISMATCH|PRODUCT_NOT_AVAILABLE|API_MONTHLY_ORDER_LIMIT/,
   )?.[0];
 
   switch (code) {
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     body.metadata && typeof body.metadata === "object" && !Array.isArray(body.metadata)
       ? body.metadata
       : {};
-  const idempotencyKey =
+  const offerToken = String(body.offer_token ?? "").trim() || null;\n\n  const idempotencyKey =
     request.headers.get("idempotency-key")?.trim() ||
     String(body.idempotency_key ?? "").trim() ||
     null;
@@ -170,18 +170,54 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: result, error } = await auth.client.rpc("create_integration_order", {
-    p_platform_id: auth.platform.id,
-    p_external_order_id: externalOrderId,
-    p_external_seller_id: seller.id,
-    p_currency: currency,
-    p_items: normalizedItems,
-    p_customer: customer,
-    p_shipping_address: shippingAddress,
-    p_shipping_amount: shippingAmount,
-    p_metadata: metadata,
-    p_idempotency_key: idempotencyKey,
-  });
+  let offerId: string | null = null;
+  if (offerToken) {
+    const { data: offer } = await auth.client
+      .from("integration_external_offers")
+      .select("id,external_seller_id,status")
+      .eq("platform_id", auth.platform.id)
+      .eq("offer_token", offerToken)
+      .maybeSingle();
+
+    if (!offer || offer.status !== "active" || offer.external_seller_id !== seller.id) {
+      return apiError("OFFER_NOT_FOUND", "The external seller offer is invalid or inactive.", 404, auth.id);
+    }
+
+    offerId = offer.id;
+  }
+
+  const rpcName = offerId
+    ? "create_integration_order_from_offer"
+    : "create_integration_order";
+
+  const rpcParams = offerId
+    ? {
+        p_platform_id: auth.platform.id,
+        p_external_order_id: externalOrderId,
+        p_external_seller_id: seller.id,
+        p_external_offer_id: offerId,
+        p_currency: currency,
+        p_items: normalizedItems,
+        p_customer: customer,
+        p_shipping_address: shippingAddress,
+        p_shipping_amount: shippingAmount,
+        p_metadata: metadata,
+        p_idempotency_key: idempotencyKey,
+      }
+    : {
+        p_platform_id: auth.platform.id,
+        p_external_order_id: externalOrderId,
+        p_external_seller_id: seller.id,
+        p_currency: currency,
+        p_items: normalizedItems,
+        p_customer: customer,
+        p_shipping_address: shippingAddress,
+        p_shipping_amount: shippingAmount,
+        p_metadata: metadata,
+        p_idempotency_key: idempotencyKey,
+      };
+
+  const { data: result, error } = await auth.client.rpc(rpcName, rpcParams);
 
   if (error) {
     console.error("Integration order creation failed:", error);
