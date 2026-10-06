@@ -462,19 +462,7 @@ ${item.answer}`,
                 placeholder="0"
                 required
               />
- 
-
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-700">Seller Pricing Model</label>
-                <select value={form.pricing_mode} onChange={(event) => updateField("pricing_mode", event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-                  <option value="fixed">Fixed Offer — supplier controls price</option>
-                  <option value="custom">Custom Pricing — seller chooses price</option>
-                </select>
-              </div>
-
-              {form.pricing_mode === "custom" && (
-                <Input label="Custom Pricing Base (ZAR)" type="number" min="0" step="0.01" value={form.custom_pricing_floor_zar} onChange={(event) => updateField("custom_pricing_floor_zar", event.target.value)} required />
-              )}           </div>
+            </div>
           </Card>
 
           <Card>
