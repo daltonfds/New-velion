@@ -44,6 +44,8 @@ export interface Product {
   created_at: string;
   updated_at: string;
   supplier_status?: string | null;
+  pricing_mode?: "fixed" | "custom";
+  custom_pricing_floor_zar?: number | null;
   supplier_min_selling_price?: number | null;
   supplier_suggested_price?: number | null;
   supplier_commission_rate?: number | null;
