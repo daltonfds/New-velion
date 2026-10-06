@@ -12,41 +12,6 @@ create unique index if not exists fulfillment_orders_public_tracking_token_idx
 alter table public.fulfillment_orders
   alter column public_tracking_token set not null;
 
-create or replace function public.get_public_fulfillment_tracking(p_token text)
-returns table(
-  fulfillment_order_id uuid,
-  status text,
-  tracking_number text,
-  carrier text,
-  tracking_url text,
-  created_at timestamptz,
-  fulfilled_at timestamptz,
-  product_name text,
-  quantity integer
-)
-language sql
-security definer
-set search_path=''
-as $function$
-  select
-    fo.id,
-    fo.status,
-    fo.tracking_number,
-    fo.carrier,
-    fo.tracking_url,
-    fo.created_at,
-    fo.fulfilled_at,
-    max(foi.product_name),
-    coalesce(sum(foi.quantity),0)::integer
-  from public.fulfillment_orders fo
-  left join public.fulfillment_order_items foi on foi.fulfillment_order_id=fo.id
-  where fo.public_tracking_token=trim(p_token)
-  group by fo.id,fo.status,fo.tracking_number,fo.carrier,fo.tracking_url,fo.created_at,fo.fulfilled_at;
-$function$;
-
-revoke all on function public.get_public_fulfillment_tracking(text) from public, authenticated;
-grant execute on function public.get_public_fulfillment_tracking(text) to anon;
-
 create or replace function private.notify_supplier_lifecycle()
 returns trigger
 language plpgsql
@@ -127,5 +92,3 @@ begin
 end;
 $function$;
 
-revoke all on function public.get_public_fulfillment_tracking(text) from public, authenticated;
-grant execute on function public.get_public_fulfillment_tracking(text) to anon;
