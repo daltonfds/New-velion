@@ -1,0 +1,20 @@
+-- Security hardening for privileged RPCs.
+revoke execute on function public.admin_approve_withdrawal(uuid,text,text) from public;
+revoke execute on function public.admin_reject_withdrawal(uuid,text) from public;
+revoke execute on function public.admin_update_withdrawal_status(uuid,text,text,text) from public;
+revoke execute on function public.admin_get_withdrawal_detail(uuid) from public;
+revoke execute on function public.admin_financial_reconciliation() from public;
+revoke execute on function public.get_admin_financial_summary(integer) from public;
+revoke execute on function public.approve_checkout_session(uuid) from public;
+grant execute on function public.admin_approve_withdrawal(uuid,text,text) to authenticated;
+grant execute on function public.admin_reject_withdrawal(uuid,text) to authenticated;
+grant execute on function public.admin_update_withdrawal_status(uuid,text,text,text) to authenticated;
+grant execute on function public.admin_get_withdrawal_detail(uuid) to authenticated;
+grant execute on function public.admin_financial_reconciliation() to authenticated;
+grant execute on function public.get_admin_financial_summary(integer) to authenticated;
+grant execute on function public.approve_checkout_session(uuid) to authenticated;
+revoke execute on function public.create_affiliate_checkout_intent(text,text,text,text,text,text,text,text,text) from public;
+grant execute on function public.create_affiliate_checkout_intent(text,text,text,text,text,text,text,text,text) to authenticated;
+alter function public.login_rate_limit_record_failure(text,integer,integer,integer) set search_path = public;
+alter function public.login_rate_limit_check(text) set search_path = public;
+alter function public.login_rate_limit_reset(text) set search_path = public;
