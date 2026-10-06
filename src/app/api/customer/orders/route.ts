@@ -20,5 +20,5 @@ export async function GET(request:Request){
   const ids=(sales||[]).map((s:any)=>s.product_id).filter(Boolean);
   const {data:products}=ids.length?await admin.from("products").select("id,nome,slug,fotos").in("id",ids):{data:[]};
   const map=new Map((products||[]).map((p:any)=>[p.id,p]));
-  return NextResponse.json({orders:(sales||[]).map((s:any)=>({...s,product:map.get(s.product_id)||null}))});
+  return NextResponse.json({orders:(sales||[]).map((s:any)=>({...s,purchase_session_id:typeof s.gateway_ref==="string"&&s.gateway_ref.startsWith("newvelion_checkout:")?s.gateway_ref.slice("newvelion_checkout:".length):null,product:map.get(s.product_id)||null}))});
 }
