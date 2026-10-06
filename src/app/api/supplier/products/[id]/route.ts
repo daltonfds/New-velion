@@ -37,7 +37,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     return Response.json({ error: "This product cannot be edited in its current state." }, { status: 409 });
   }
 
-  const price = Number(body.preco);\n  const pricingMode = String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed";
+  const price = Number(body.preco);
+  const pricingMode = String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed";
   const cost = Number(body.preco_custo);
   const supplierCountry = String(body.supplier_country_code ?? body.fornecedor_pais ?? existing.supplier_country_code ?? "").trim().toUpperCase();
   const supplierCostCurrency = supplierCountry === "CN" ? "CNY" : "ZAR";
