@@ -39,8 +39,7 @@ export default function SupplierWithdrawalsPage() {
   const profileResultUnavailable = false;\n\n  async function request() {
     setMessage("");
     const value = Number(amount);
-    if (!methods[method]) return setMessage("Configure this payout method in Settings first.");\n    if (profileResultUnavailable) return;
-    if (!Number.isFinite(value) || value < minimum) return setMessage(`Minimum withdrawal is ${minimum}.`);
+    if (!methods[method]) return setMessage("Configure this payout method in Settings first.");\n    if (!Number.isFinite(value) || value < minimum) return setMessage(`Minimum withdrawal is ${minimum}.`);
     if (value > wallet.disponivel) return setMessage("The withdrawal amount exceeds your available balance.");
     setBusy(true);
     try {
