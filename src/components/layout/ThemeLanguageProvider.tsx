@@ -120,14 +120,14 @@ function translatePage(toPortuguese: boolean) {
 
 export function ThemeLanguageProvider({ children }: { children: React.ReactNode }) {
   const [dark, setDark] = useState(false);
-  const [pt, setPt] = useState(true);
+  const [pt, setPt] = useState(false);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("newvelion-theme");
     const storedLanguage = localStorage.getItem("newvelion-language");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const nextDark = storedTheme ? storedTheme === "dark" : prefersDark;
-    const nextPt = storedLanguage ? storedLanguage === "pt" : true;
+    const nextPt = storedLanguage ? storedLanguage === "pt" : false;
     setDark(nextDark);
     setPt(nextPt);
     document.documentElement.classList.toggle("dark", nextDark);
