@@ -1,15 +1,139 @@
 "use client";
-import {useEffect,useState} from "react";
-import Link from "next/link";
-import {useParams,useRouter} from "next/navigation";
-import CustomerNav from "@/components/customer/CustomerNav";
-import {supabase} from "@/lib/supabase";
 
-export default function OrderDetailPage(){
- const {id}=useParams<{id:string}>(); const router=useRouter(); const [order,setOrder]=useState<any>(null); const [loading,setLoading]=useState(true); const [error,setError]=useState("");
- useEffect(()=>{(async()=>{const {data:{session}}=await supabase.auth.getSession(); if(!session)return router.replace("/login"); const r=await fetch("/api/customer/orders/"+id,{headers:{Authorization:"Bearer "+session.access_token},cache:"no-store"}); const b=await r.json(); if(!r.ok){setError(b.error||"Unable to load order.");setLoading(false);return} setOrder(b.order);setLoading(false)})()},[id,router]);
- if(loading)return <main className="min-h-screen bg-slate-50"><CustomerNav/><div className="mx-auto max-w-5xl px-5 py-10 text-slate-500">Loading order…</div></main>;
- if(error||!order)return <main className="min-h-screen bg-slate-50"><CustomerNav/><div className="mx-auto max-w-5xl px-5 py-10"><p className="text-red-600">{error||"Order not found."}</p></div></main>;
- const f=Array.isArray(order.fulfillment_orders)?order.fulfillment_orders[0]:order.fulfillment_orders;
- return <main className="min-h-screen bg-slate-50"><CustomerNav/><div className="mx-auto max-w-5xl px-5 py-10"><Link href="/account/orders" className="text-sm font-bold text-blue-600">← Back to orders</Link><div className="mt-5 rounded-2xl border border-slate-200 bg-white p-6"><div className="flex flex-col gap-5 sm:flex-row"><div className="h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-slate-100">{order.product?.fotos?.[0]&&<img src={order.product.fotos[0]} alt="" className="h-full w-full object-cover"/>}</div><div><h1 className="text-2xl font-extrabold text-[#16294F]">{order.product?.nome||"Order"}</h1><p className="mt-2 text-sm text-slate-500">Order placed {new Date(order.vendido_em).toLocaleString()}</p><p className="mt-2 font-bold">R {Number(order.valor_venda||0).toFixed(2)}</p></div></div><div className="mt-7 grid gap-4 sm:grid-cols-3"><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs font-bold uppercase text-slate-400">Payment</p><p className="mt-1 font-bold text-slate-900">{order.status||"Processing"}</p></div><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs font-bold uppercase text-slate-400">Delivery</p><p className="mt-1 font-bold text-slate-900">{f?.status||"Processing"}</p></div><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs font-bold uppercase text-slate-400">Quantity</p><p className="mt-1 font-bold text-slate-900">{order.quantity}</p></div></div>{f?.public_tracking_token&&<Link href={"/rastreio/"+f.public_tracking_token} className="mt-6 inline-flex rounded-xl bg-[#16294F] px-5 py-3 font-bold text-white">Track delivery</Link>}{f?.status==="delivered"&&<Link href={"/account/reviews"} className="ml-3 mt-6 inline-flex rounded-xl border border-[#16294F] px-5 py-3 font-bold text-[#16294F]">Review product</Link>}</div></div></main>;
+import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import CustomerNav from "@/components/customer/CustomerNav";
+import { supabase } from "@/lib/supabase";
+
+export default function OrderDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [rating, setRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [anonymous, setAnonymous] = useState(false);
+  const [reviewerName, setReviewerName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState("");
+
+  async function load() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { router.replace("/login"); return; }
+    const response = await fetch("/api/customer/orders/" + encodeURIComponent(id), {
+      headers: { Authorization: "Bearer " + session.access_token },
+      cache: "no-store",
+    });
+    const body = await response.json();
+    if (!response.ok) setError(body.error || "Unable to load order.");
+    else setOrder(body.order);
+    setLoading(false);
+  }
+
+  useEffect(() => { void load(); }, [id]);
+
+  async function submitReview(event: FormEvent) {
+    event.preventDefault();
+    if (!order?.product || !order.purchase_session_id || order.fulfillment?.status !== "delivered") return;
+    setSubmitting(true);
+    setReviewMessage("");
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { router.replace("/login"); return; }
+
+    const { error: insertError } = await supabase.from("product_reviews").insert({
+      product_id: order.product_id,
+      reviewer_id: user.id,
+      purchase_session_id: order.purchase_session_id,
+      verified_buyer: true,
+      rating,
+      review_text: reviewText.trim(),
+      is_anonymous: anonymous,
+      reviewer_name: anonymous ? null : reviewerName.trim(),
+      status: "pending",
+    });
+
+    setSubmitting(false);
+    if (insertError) {
+      setReviewMessage(insertError.message);
+      return;
+    }
+
+    setReviewText("");
+    setReviewerName("");
+    setReviewMessage("Review submitted. It will appear after admin approval.");
+    await load();
+  }
+
+  if (loading) return <main className="min-h-screen bg-slate-50"><CustomerNav /><div className="mx-auto max-w-5xl px-5 py-10 text-slate-500">Loading order…</div></main>;
+  if (error || !order) return <main className="min-h-screen bg-slate-50"><CustomerNav /><div className="mx-auto max-w-5xl px-5 py-10"><p className="text-red-600">{error || "Order not found."}</p></div></main>;
+
+  const f = order.fulfillment;
+  const delivered = f?.status === "delivered";
+  const existingReview = order.reviews?.[0];
+
+  return (
+    <main className="min-h-screen bg-slate-50">
+      <CustomerNav />
+      <div className="mx-auto max-w-5xl px-5 py-10">
+        <Link href="/account/orders" className="text-sm font-bold text-[#16294F]">← Back to orders</Link>
+
+        <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="flex flex-col gap-5 sm:flex-row">
+            {order.product?.fotos?.[0] && <img src={order.product.fotos[0]} alt="" className="h-28 w-28 rounded-xl object-cover" />}
+            <div className="flex-1">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Order</p>
+              <h1 className="mt-1 text-2xl font-extrabold text-[#16294F]">{order.product?.nome || "Product"}</h1>
+              <p className="mt-2 text-sm text-slate-500">Qty {order.quantity} · {new Date(order.vendido_em).toLocaleString()}</p>
+              <p className="mt-3 text-xl font-extrabold text-slate-950">R {Number(order.valor_venda || 0).toFixed(2)}</p>
+            </div>
+            <div className="text-left sm:text-right">
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{f?.status || order.status}</span>
+              {f?.public_tracking_token && <Link href={"/rastreio/" + f.public_tracking_token} className="mt-3 block text-sm font-bold text-blue-600">Track delivery</Link>}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-lg font-extrabold text-[#16294F]">Delivery</h2>
+          {f ? (
+            <div className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+              <p><strong>Status:</strong> {f.status}</p>
+              <p><strong>Carrier:</strong> {f.carrier || "—"}</p>
+              <p><strong>Tracking:</strong> {f.tracking_number || "—"}</p>
+              <p><strong>Estimated delivery:</strong> {f.estimated_delivery_at ? new Date(f.estimated_delivery_at).toLocaleDateString() : "—"}</p>
+              <p className="sm:col-span-2"><strong>Address:</strong> {f.shipping_address || "—"}, {f.shipping_city || "—"}, {f.shipping_province || "—"}</p>
+            </div>
+          ) : <p className="mt-3 text-sm text-slate-500">Fulfillment details will appear after payment is confirmed.</p>}
+        </section>
+
+        {delivered && !existingReview ? (
+          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-extrabold text-[#16294F]">Review your purchase</h2>
+            <p className="mt-1 text-sm text-slate-500">Only verified customers can submit reviews. Your review will remain pending until an admin approves it.</p>
+            <form onSubmit={submitReview} className="mt-5 space-y-4">
+              <div>
+                <label className="text-sm font-bold text-slate-700">Rating</label>
+                <div className="mt-2 flex gap-1">
+                  {[1,2,3,4,5].map(value => <button key={value} type="button" onClick={() => setRating(value)} className="text-2xl text-[#C99A2E]" aria-label={value + " stars"}>{value <= rating ? "★" : "☆"}</button>)}
+                </div>
+              </div>
+              <textarea required minLength={5} maxLength={2000} value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="Tell other customers about your experience" className="min-h-32 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-[#16294F]" />
+              {!anonymous && <input required minLength={2} maxLength={120} value={reviewerName} onChange={e => setReviewerName(e.target.value)} placeholder="Your name" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-[#16294F]" />}
+              <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={anonymous} onChange={e => setAnonymous(e.target.checked)} /> Post anonymously</label>
+              <button type="submit" disabled={submitting} className="rounded-xl bg-[#16294F] px-5 py-3 text-sm font-extrabold text-white disabled:opacity-50">{submitting ? "Submitting..." : "Submit review"}</button>
+              {reviewMessage && <p className="text-sm text-slate-600">{reviewMessage}</p>}
+            </form>
+          </section>
+        ) : existingReview ? (
+          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-extrabold text-[#16294F]">Your review</h2>
+            <p className="mt-2 text-sm text-slate-600">Status: <strong>{existingReview.status}</strong>. It will appear publicly when approved.</p>
+          </section>
+        ) : null}
+      </div>
+    </main>
+  );
 }
