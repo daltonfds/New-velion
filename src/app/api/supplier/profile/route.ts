@@ -20,6 +20,8 @@ export async function PUT(request: Request) {
   try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON body." }, { status: 400 }); }
 
   const companyName = String(body.company_name ?? "").trim();
+  const countryCode = String(body.country_code ?? "").trim().toUpperCase();
+  if (!["ZA", "CN"].includes(countryCode)) return Response.json({ error: "Supplier country must be South Africa (ZA) or China (CN)." }, { status: 400 });
   const responsibleName = String(body.responsible_name ?? "").trim();
   if (companyName.length < 2 || responsibleName.length < 2) {
     return Response.json({ error: "Company name and responsible person are required." }, { status: 400 });
@@ -30,9 +32,10 @@ export async function PUT(request: Request) {
     company_name: companyName,
     legal_name: String(body.legal_name ?? "").trim() || null,
     business_type: ["supplier", "producer", "producer_supplier"].includes(String(body.business_type)) ? String(body.business_type) : "supplier",
-    country_code: String(body.country_code ?? "").trim() || null,
-    country_name: String(body.country_name ?? "").trim() || null,
-    calling_code: String(body.calling_code ?? "").trim() || null,
+    country_code: countryCode,
+    country_name: countryCode === "CN" ? "China" : "South Africa", String(body.country_name ?? "").trim() || null,
+    calling_code: countryCode === "CN" ? "+86" : "+27",
+    payout_currency: countryCode === "CN" ? "CNY" : "ZAR",
     business_phone: String(body.business_phone ?? "").trim() || null,
     whatsapp: String(body.whatsapp ?? "").trim() || null,
     business_email: String(body.business_email ?? "").trim() || null,
