@@ -64,7 +64,7 @@ export default function IntegrationDocsPage() {
 {JSON.stringify({
   external_order_id: "ORDER-82931",
   external_seller_id: "seller_123",
-  currency: "MZN",
+  currency: "ZAR",
   items: [
     {
       external_product_id: "prod_123",
@@ -79,7 +79,7 @@ export default function IntegrationDocsPage() {
     email: "customer@example.com"
   },
   shipping_address: {
-    country: "MZ",
+    country: "ZA",
     province: "Maputo",
     city: "Maputo",
     address: "Street 1",
