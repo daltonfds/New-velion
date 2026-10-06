@@ -44,7 +44,7 @@ export default function CustomerRegisterPage() {
         <p className="mt-2 text-slate-500">Shop products, track orders and manage your purchases.</p>
         <form onSubmit={submit} className="mt-8 space-y-5">
           <input required placeholder="Full name" value={form.fullName} onChange={e=>setForm({...form,fullName:e.target.value})} className="w-full rounded-xl border border-slate-200 px-4 py-3.5 outline-none focus:border-blue-500"/>
-          <PhoneFields allowedCountries={["ZA","AO"]} countryCode={form.country} phone={form.phone} whatsapp={form.whatsapp} language={form.language}
+          <PhoneFields allowedCountries={["ZA"]} countryCode={form.country} phone={form.phone} whatsapp={form.whatsapp} language={form.language}
             onCountryChange={(country,callingCode)=>setForm({...form,country,callingCode})}
             onPhoneChange={phone=>setForm({...form,phone})}
             onWhatsappChange={whatsapp=>setForm({...form,whatsapp})}
