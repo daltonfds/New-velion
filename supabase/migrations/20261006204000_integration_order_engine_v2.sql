@@ -1,0 +1,6 @@
+-- Integration order engine is intentionally delegated to the existing V2 core engine.
+-- The live V2 function validates platform/seller/product approval, checks available
+-- stock as estoque - reserved_estoque, creates order items, and calls the central
+-- integration fulfillment creator. This migration marker keeps that production
+-- contract versioned alongside the application.
+-- Production definition was applied as integration_stock_reservation_fix_v1.
