@@ -15,8 +15,8 @@ type Preview = {
   };
   quantity: number;
   subtotal: number;
-  shipping: number | null;
-  total: number | null;
+  shipping: number;
+  total: number;
 };
 
 function formatZar(value: number) {
@@ -35,6 +35,7 @@ function DeliveryForm() {
     Math.min(50, Number(searchParams.get("qty") || "1")),
   );
 
+  const [city, setCity] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
   const [previewLoading, setPreviewLoading] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -54,10 +55,14 @@ function DeliveryForm() {
       }
 
       try {
+        const query = new URLSearchParams({
+          ref: affiliateLink,
+          qty: String(requestedQuantity),
+        });
+        if (city.trim()) query.set("city", city.trim());
+
         const response = await fetch(
-          `/api/checkout-preview?ref=${encodeURIComponent(
-            affiliateLink,
-          )}&qty=${requestedQuantity}`,
+          `/api/checkout-preview?${query.toString()}`,
           { cache: "no-store" },
         );
         const data = await response.json().catch(() => null);
@@ -81,18 +86,18 @@ function DeliveryForm() {
       }
     }
 
-    loadPreview();
+    const timer = window.setTimeout(loadPreview, city.trim() ? 350 : 0);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
-  }, [affiliateLink, requestedQuantity]);
+  }, [affiliateLink, requestedQuantity, city]);
 
-  const totalLabel = useMemo(() => {
-    if (!preview) return "Calculated at secure checkout";
-    if (preview.total !== null) return formatZar(preview.total);
-    return "Shipping calculated at checkout";
-  }, [preview]);
+  const totalLabel = useMemo(
+    () => (preview ? formatZar(preview.total) : "—"),
+    [preview],
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -137,7 +142,7 @@ function DeliveryForm() {
     }
   }
 
-  if (previewLoading) {
+  if (previewLoading && !preview) {
     return (
       <main className="min-h-screen bg-slate-50 px-4 py-10">
         <div className="mx-auto max-w-6xl">
@@ -203,100 +208,54 @@ function DeliveryForm() {
 
             <div className="grid gap-5">
               <Field label="Full name *">
-                <input
-                  name="full_name"
-                  required
-                  autoComplete="name"
-                  className={inputClass}
-                />
+                <input name="full_name" required autoComplete="name" className={inputClass} />
               </Field>
 
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Phone *" hint="+27 or local 0XXXXXXXXX">
-                  <input
-                    name="phone"
-                    type="tel"
-                    required
-                    autoComplete="tel"
-                    placeholder="+27 82 123 4567"
-                    className={inputClass}
-                  />
+                  <input name="phone" type="tel" required autoComplete="tel" placeholder="+27 82 123 4567" className={inputClass} />
                 </Field>
                 <Field label="WhatsApp">
-                  <input
-                    name="whatsapp"
-                    type="tel"
-                    autoComplete="tel"
-                    placeholder="+27 82 123 4567"
-                    className={inputClass}
-                  />
+                  <input name="whatsapp" type="tel" autoComplete="tel" placeholder="+27 82 123 4567" className={inputClass} />
                 </Field>
               </div>
 
               <Field label="Email">
-                <input
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  className={inputClass}
-                />
+                <input name="email" type="email" autoComplete="email" placeholder="you@example.com" className={inputClass} />
               </Field>
 
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Country">
-                  <input
-                    value="South Africa"
-                    readOnly
-                    className={`${inputClass} bg-slate-50 text-slate-500`}
-                  />
+                  <input value="South Africa" readOnly className={`${inputClass} bg-slate-50 text-slate-500`} />
                   <input type="hidden" name="country" value="ZA" />
                 </Field>
                 <Field label="Province / State *">
-                  <input
-                    name="province"
-                    required
-                    autoComplete="address-level1"
-                    className={inputClass}
-                  />
+                  <input name="province" required autoComplete="address-level1" className={inputClass} />
                 </Field>
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
-                <Field label="City *">
+                <Field label="City *" hint="Used to calculate delivery">
                   <input
                     name="city"
+                    value={city}
+                    onChange={(event) => setCity(event.target.value)}
                     required
                     autoComplete="address-level2"
                     className={inputClass}
                   />
                 </Field>
                 <Field label="Postal code">
-                  <input
-                    name="postal_code"
-                    autoComplete="postal-code"
-                    className={inputClass}
-                  />
+                  <input name="postal_code" autoComplete="postal-code" className={inputClass} />
                 </Field>
               </div>
 
               <Field label="Delivery address *">
-                <textarea
-                  name="address"
-                  required
-                  rows={4}
-                  autoComplete="street-address"
-                  placeholder="Street, house or unit number"
-                  className={`${inputClass} resize-none`}
-                />
+                <textarea name="address" required rows={4} autoComplete="street-address" placeholder="Street, house or unit number" className={`${inputClass} resize-none`} />
               </Field>
 
               <Field label="Address reference">
-                <input
-                  name="address_reference"
-                  placeholder="Landmark, building, gate, etc."
-                  className={inputClass}
-                />
+                <input name="address_reference" placeholder="Landmark, building, gate, etc." className={inputClass} />
               </Field>
             </div>
 
@@ -308,7 +267,7 @@ function DeliveryForm() {
 
             <button
               type="submit"
-              disabled={loading || !affiliateLink}
+              disabled={loading || !affiliateLink || previewLoading}
               className="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#16294F] px-5 py-4 text-sm font-black text-white transition hover:bg-[#0e1d38] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? "SECURING YOUR ORDER..." : "CONTINUE TO SECURE PAYMENT →"}
@@ -323,26 +282,19 @@ function DeliveryForm() {
           <aside className="rounded-3xl border border-slate-200 bg-white p-5 md:p-6 lg:sticky lg:top-6">
             <div className="mb-5 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C99A2E]">
               Order summary
+              {previewLoading ? <span className="text-slate-400">Updating…</span> : null}
             </div>
 
             <div className="flex gap-4 border-b border-slate-100 pb-5">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
                 {preview.product.image ? (
-                  <img
-                    src={preview.product.image}
-                    alt={preview.product.name}
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={preview.product.image} alt={preview.product.name} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-xs font-bold text-slate-400">
-                    Product
-                  </div>
+                  <div className="flex h-full items-center justify-center text-xs font-bold text-slate-400">Product</div>
                 )}
               </div>
               <div className="min-w-0">
-                <h2 className="line-clamp-2 font-black leading-5 text-[#16294F]">
-                  {preview.product.name}
-                </h2>
+                <h2 className="line-clamp-2 font-black leading-5 text-[#16294F]">{preview.product.name}</h2>
                 <p className="mt-2 text-sm text-slate-500">
                   Quantity: <span className="font-bold text-slate-700">{preview.quantity}</span>
                 </p>
@@ -352,58 +304,42 @@ function DeliveryForm() {
             <div className="space-y-3 border-b border-slate-100 py-5 text-sm">
               <div className="flex justify-between gap-4 text-slate-500">
                 <span>Unit price</span>
-                <span className="font-bold text-slate-900">
-                  {formatZar(preview.offer.unit_price)}
-                </span>
+                <span className="font-bold text-slate-900">{formatZar(preview.offer.unit_price)}</span>
               </div>
               <div className="flex justify-between gap-4 text-slate-500">
                 <span>Subtotal</span>
-                <span className="font-bold text-slate-900">
-                  {formatZar(preview.subtotal)}
-                </span>
+                <span className="font-bold text-slate-900">{formatZar(preview.subtotal)}</span>
               </div>
               <div className="flex justify-between gap-4 text-slate-500">
                 <span>Delivery</span>
                 <span className="font-bold text-[#16294F]">
-                  {preview.shipping === null
-                    ? "Calculated at checkout"
-                    : formatZar(preview.shipping)}
+                  {formatZar(preview.shipping)}
                 </span>
               </div>
             </div>
 
             <div className="flex items-end justify-between gap-4 pt-5">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Total
-                </p>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Total</p>
                 <p className="mt-1 text-xs text-slate-400">ZAR</p>
               </div>
               <p className="text-xl font-black text-[#16294F]">{totalLabel}</p>
             </div>
 
             <div className="mt-6 rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm font-black text-[#16294F]">
-                Secure checkout
-              </p>
+              <p className="text-sm font-black text-[#16294F]">Secure checkout</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
-                Your seller price is locked for this order. The final delivery
-                charge, if applicable, is calculated by NewVelion at checkout.
+                Your seller price is locked for this order. Delivery is
+                calculated from the NewVelion supplier shipping configuration.
               </p>
             </div>
           </aside>
         </div>
 
         <div className="mt-8 grid gap-3 text-center text-xs font-bold text-slate-500 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-            ✓ South African delivery
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-            ✓ Price protected for this offer
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-            ✓ Secure payment handoff
-          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">✓ South African delivery</div>
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">✓ Price protected for this offer</div>
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">✓ Secure payment handoff</div>
         </div>
       </div>
     </main>
@@ -413,15 +349,7 @@ function DeliveryForm() {
 const inputClass =
   "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#16294F] focus:ring-2 focus:ring-[#16294F]/10";
 
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="grid gap-2">
       <span className="flex items-center justify-between gap-3 text-sm font-bold text-slate-700">
@@ -442,12 +370,8 @@ function Brand() {
         <span className="h-6 w-1.5 rounded-full bg-[#C99A2E]" />
       </div>
       <div>
-        <div className="text-xl font-black tracking-tight text-[#16294F]">
-          Newvelion
-        </div>
-        <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A8570]">
-          Commerce infrastructure
-        </div>
+        <div className="text-xl font-black tracking-tight text-[#16294F]">Newvelion</div>
+        <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A8570]">Commerce infrastructure</div>
       </div>
     </div>
   );
