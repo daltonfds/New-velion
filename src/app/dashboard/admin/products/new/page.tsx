@@ -134,21 +134,17 @@ export default function NewProductPage() {
       slug: form.slug.trim() || generateSlug(form.nome),
       descricao: form.descricao.trim(),
       beneficios: form.beneficios
-        .split("
-")
+        .split("\n")
         .map((item) => item.trim())
         .filter(Boolean),
       ingredientes: form.ingredientes.trim() || null,
       modo_uso: form.modo_uso.trim() || null,
       garantia_texto: form.garantia_texto.trim() || null,
       faq: form.faq
-        .split(/
-\s*
-/)
+        .split(/\n\s*\n/)
         .map((block) => {
           const lines = block
-            .split("
-")
+            .split("\n")
             .map((line) => line.trim())
             .filter(Boolean);
 
@@ -172,6 +168,8 @@ export default function NewProductPage() {
       moeda: form.moeda,
       comissao_tipo: form.comissao_tipo,
       comissao_valor: Number(form.comissao_valor || 0),
+      pricing_mode: form.pricing_mode === "custom" ? "custom" : "fixed",
+      custom_pricing_floor_zar: form.pricing_mode === "custom" && form.custom_pricing_floor_zar ? Number(form.custom_pricing_floor_zar) : null,
       fotos: form.fotos,
       video_url: form.video_url.trim() || null,
       checkout_url: form.checkout_url.trim(),
@@ -301,13 +299,11 @@ export default function NewProductPage() {
 
           <ProductSalesContentEditor
             beneficios={form.beneficios
-              .split("
-")
+              .split("\n")
               .map((item) => item.trim())
               .filter(Boolean)}
             onBeneficiosChange={(items) =>
-              updateField("beneficios", items.join("
-"))
+              updateField("beneficios", items.join("\n"))
             }
             ingredientes={form.ingredientes}
             onIngredientesChange={(value) =>
@@ -322,13 +318,10 @@ export default function NewProductPage() {
               updateField("garantia_texto", value)
             }
             faq={form.faq
-              .split(/
-\s*
-/)
+              .split(/\n\s*\n/)
               .map((block) => {
                 const lines = block
-                  .split("
-")
+                  .split("\n")
                   .map((line) => line.trim())
                   .filter(Boolean);
 
@@ -471,7 +464,19 @@ ${item.answer}`,
                 placeholder="0"
                 required
               />
-            </div>
+ 
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Seller Pricing Model</label>
+                <select value={form.pricing_mode} onChange={(event) => updateField("pricing_mode", event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                  <option value="fixed">Fixed Offer — supplier controls price</option>
+                  <option value="custom">Custom Pricing — seller chooses price</option>
+                </select>
+              </div>
+
+              {form.pricing_mode === "custom" && (
+                <Input label="Custom Pricing Base (ZAR)" type="number" min="0" step="0.01" value={form.custom_pricing_floor_zar} onChange={(event) => updateField("custom_pricing_floor_zar", event.target.value)} required />
+              )}           </div>
           </Card>
 
           <Card>
