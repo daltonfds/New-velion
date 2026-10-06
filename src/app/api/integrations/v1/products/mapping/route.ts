@@ -24,7 +24,8 @@ export async function POST(request: Request) {
   const externalSellerId = String(body.external_seller_id ?? "").trim() || null;
   const salePrice =
     body.sale_price == null ? null : Number(body.sale_price);
-  const saleCurrency = String(body.sale_currency ?? "").trim() || null;\n  const pricingMode = String(body.pricing_mode ?? "inherit").trim();
+  const saleCurrency = String(body.sale_currency ?? "").trim() || null;
+  const pricingMode = String(body.pricing_mode ?? "inherit").trim();
 
   if (!externalProductId || !newvelionProductId) {
     return apiError(
@@ -39,7 +40,11 @@ export async function POST(request: Request) {
     return apiError("INVALID_ORDER", "sale_price must be a non-negative number.", 400, auth.id);
   }
 
-  if (!["inherit","fixed","custom"].includes(pricingMode)) {\n    return apiError("INVALID_ORDER", "pricing_mode must be inherit, fixed, or custom.", 400, auth.id);\n  }\n\n  if (saleCurrency && saleCurrency !== "ZAR") {
+  if (!["inherit","fixed","custom"].includes(pricingMode)) {
+    return apiError("INVALID_ORDER", "pricing_mode must be inherit, fixed, or custom.", 400, auth.id);
+  }
+
+  if (saleCurrency && saleCurrency !== "ZAR") {
     return apiError("INVALID_CURRENCY", "sale_currency must be ZAR.", 400, auth.id);
   }
 
@@ -84,7 +89,13 @@ export async function POST(request: Request) {
 
   if (pricingMode === "custom" && salePrice != null && salePrice < basePrice) {
     return apiError("SALE_PRICE_BELOW_BASE_PRICE", "sale_price is below the NewVelion base price.", 409, auth.id);
-  }\n\n  if (pricingMode === "custom" && salePrice != null && salePrice <= 0) {\n    return apiError("INVALID_ORDER", "A custom mapping sale_price must be positive when supplied.", 400, auth.id);\n  }\n\n  if (saleCurrency && saleCurrency !== product.moeda) {
+  }
+
+  if (pricingMode === "custom" && salePrice != null && salePrice <= 0) {
+    return apiError("INVALID_ORDER", "A custom mapping sale_price must be positive when supplied.", 400, auth.id);
+  }
+
+  if (saleCurrency && saleCurrency !== product.moeda) {
     return apiError("INVALID_CURRENCY", "sale_currency must match the NewVelion product currency.", 409, auth.id);
   }
 
