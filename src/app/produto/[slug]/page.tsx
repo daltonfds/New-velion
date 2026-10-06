@@ -240,9 +240,9 @@ export default function ProdutoPage() {
             </p>
           </div>
           <div className="border-b border-slate-200 px-6 py-7 text-center sm:border-b-0 sm:border-r">
-            <p className="text-lg font-extrabold text-[#16294F]">60-day guarantee</p>
+            <p className="text-lg font-extrabold text-[#16294F]">Product guarantee</p>
             <p className="mt-1 text-sm text-slate-500">
-              When a product guarantee is provided
+              {product.garantia_texto || "Guarantee details are shown below"}
             </p>
           </div>
           <div className="px-6 py-7 text-center">
