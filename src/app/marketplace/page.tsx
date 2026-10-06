@@ -257,6 +257,25 @@ const filteredProducts = useMemo(() => {
     await handleCopy(product.id);
   }
 
+  function customBaseForProduct(product: Product) {
+    return Number(
+      product.custom_pricing_floor_zar ??
+        product.supplier_min_selling_price ??
+        product.preco_custo ??
+        0,
+    );
+  }
+
+  function commissionForProduct(product: Product) {
+    const price = product.preco_promocional ?? product.preco;
+    if (product.pricing_mode === "custom") {
+      return Math.max(price - customBaseForProduct(product), 0);
+    }
+    return product.comissao_tipo === "percentual"
+      ? (price * product.comissao_valor) / 100
+      : product.comissao_valor;
+  }
+
   function getCategoryName(product: Product) {
     return (
       categories.find((category) => category.id === product.categoria_id)
