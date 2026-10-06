@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   if (!auth.ok) return Response.json({ error: auth.message }, { status: auth.status });
   let body: any;
   try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON." }, { status: 400 }); }
-  const countries = Array.isArray(body.country_codes) ? body.country_codes.map(String).map((x:string)=>x.trim().toUpperCase()).filter(Boolean) : [];
+  const countries = ["ZA"];
   const payload = {
     supplier_id: auth.userId,
     name: String(body.name ?? "").trim(),
