@@ -46,7 +46,9 @@ export default function IntegrationDocsPage() {
                 ["GET", "/api/integrations/v1/products/:id"],
                 ["GET", "/api/integrations/v1/products/:id/stock"],
                 ["POST", "/api/integrations/v1/sellers"],
-                ["POST", "/api/integrations/v1/products/mapping"],\n                ["POST", "/api/integrations/v1/offers"],\n                ["GET", "/api/integrations/v1/offers/:id"],
+                ["POST", "/api/integrations/v1/products/mapping"],
+                ["POST", "/api/integrations/v1/offers"],
+                ["GET", "/api/integrations/v1/offers/:id"],
                 ["POST", "/api/integrations/v1/orders"],
                 ["GET", "/api/integrations/v1/orders/:externalOrderId"],
               ].map(([method, endpoint]) => (
@@ -56,6 +58,36 @@ export default function IntegrationDocsPage() {
                 </div>
               ))}
             </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold">Pricing modes</h2>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="rounded-xl border border-slate-200 p-5">
+                <h3 className="font-semibold">Fixed Offer</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  NewVelion controls the selling price and commission. The platform must use the returned fixed price.
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-200 p-5">
+                <h3 className="font-semibold">Custom Pricing</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  The platform chooses the seller price, but the price can never be below NewVelion&apos;s ZAR economic base.
+                </p>
+              </div>
+            </div>
+            <pre className="mt-4 overflow-x-auto rounded-xl bg-slate-950 p-5 text-sm leading-6 text-slate-100">
+{JSON.stringify({
+  external_seller_id: "seller_123",
+  external_product_id: "prod_123",
+  newvelion_product_id: "product-uuid",
+  pricing_mode: "custom",
+  sale_price: 299
+}, null, 2)}
+            </pre>
+            <p className="mt-4 text-sm leading-6 text-slate-600">
+              Creating an offer returns an <code>offer_token</code> and <code>sales_url</code>. For orders using that offer, send <code>offer_token</code> with the order. NewVelion validates the seller, product, pricing mode and exact offer price in the database.
+            </p>
           </section>
 
           <section>
