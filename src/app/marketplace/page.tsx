@@ -98,7 +98,7 @@ export default function MarketplacePage() {
           throw categoryResult.error;
         }
 
-        setProducts(productData);
+        setProducts(productData.filter((product) => product.moeda === "ZAR"));
         setCategories((categoryResult.data ?? []) as Category[]);
 
         const { data: affiliations, error: affiliationError } = await supabase
