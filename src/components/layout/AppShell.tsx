@@ -115,7 +115,7 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
 const navigation: Record<AppArea, NavItem[]> = {
   seller: [
     { label: "Dashboard", href: "/dashboard/seller", icon: "home" },
-    { label: "Marketplace", href: "/marketplace", icon: "grid" },
+    { label: "Marketplace", href: "/dashboard/seller/marketplace", icon: "grid" },
     { label: "My Products", href: "/dashboard/seller/products", icon: "box" },
     { label: "Orders & Sales", href: "/dashboard/seller/sales", icon: "sales" },
     { label: "Commissions", href: "/dashboard/seller/commissions", icon: "wallet" },
