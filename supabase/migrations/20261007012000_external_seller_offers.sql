@@ -92,11 +92,14 @@ create function public.create_integration_order_from_offer(
 returns table(order_id uuid,order_status text,order_total numeric,order_currency text)
 language plpgsql security definer set search_path=''
 as $function$
-declare o public.integration_external_offers%rowtype; i jsonb; v_result record;
+declare o public.integration_external_offers%rowtype; i jsonb; v_result record; v_customer_country text; v_shipping_country text;
 begin
  select * into o from public.integration_external_offers where id=p_external_offer_id and platform_id=p_platform_id and external_seller_id=p_external_seller_id and status='active' for share;
  if not found then raise exception 'OFFER_NOT_FOUND'; end if;
  if p_currency<>'ZAR' then raise exception 'CUSTOMER_CURRENCY_MUST_BE_ZAR'; end if;
+ v_customer_country:=upper(trim(coalesce(p_customer->>'country_code',p_customer->>'country','')));
+ v_shipping_country:=upper(trim(coalesce(p_shipping_address->>'country_code',p_shipping_address->>'country','')));
+ if v_customer_country<>'ZA' or v_shipping_country<>'ZA' then raise exception 'CUSTOMER_COUNTRY_MUST_BE_ZA'; end if;
  if jsonb_typeof(p_items)<>'array' or jsonb_array_length(p_items)=0 then raise exception 'INVALID_ORDER'; end if;
  if o.mapping_id is null then raise exception 'PRODUCT_NOT_MAPPED'; end if;
  if not exists(select 1 from public.integration_product_mappings where id=o.mapping_id and platform_id=p_platform_id and newvelion_product_id=o.newvelion_product_id and status='active') then raise exception 'PRODUCT_NOT_MAPPED'; end if;
@@ -106,7 +109,7 @@ begin
    if abs((i->>'sale_price')::numeric-o.sale_price)>0.01 then raise exception 'OFFER_PRICE_MISMATCH'; end if;
  end loop;
  select * into v_result from public.create_integration_order(p_platform_id,p_external_order_id,p_external_seller_id,p_currency,p_items,p_customer,p_shipping_address,p_shipping_amount,p_metadata,p_idempotency_key);
- update public.integration_orders set external_offer_id=o.id where id=v_result.order_id;
+ update public.integration_orders set external_offer_id=o.id,customer_country_code='ZA' where id=v_result.order_id;
  update public.integration_order_items set external_offer_id=o.id where order_id=v_result.order_id;
  return query select v_result.order_id,v_result.order_status,v_result.order_total,v_result.order_currency;
 end;
