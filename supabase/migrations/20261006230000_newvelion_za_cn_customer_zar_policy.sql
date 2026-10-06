@@ -264,3 +264,11 @@ returns trigger language plpgsql security definer set search_path=''
 as $$ begin new.currency:='ZAR'; return new; end; $$;
 drop trigger if exists supplier_shipping_customer_currency_policy on public.supplier_shipping_profiles;
 create trigger supplier_shipping_customer_currency_policy before insert or update of currency on public.supplier_shipping_profiles for each row execute function public.enforce_customer_shipping_currency();
+
+
+revoke execute on function public.enforce_newvelion_supplier_geo() from public,anon,authenticated;
+revoke execute on function public.enforce_newvelion_product_geo_currency() from public,anon,authenticated;
+revoke execute on function public.enforce_checkout_za_zar() from public,anon,authenticated;
+revoke execute on function public.enforce_integration_za_zar() from public,anon,authenticated;
+revoke execute on function public.enforce_customer_shipping_currency() from public,anon,authenticated;
+revoke execute on function public.capture_supplier_fx_for_integration_item() from public,anon,authenticated;
