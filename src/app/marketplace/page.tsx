@@ -192,7 +192,7 @@ const filteredProducts = useMemo(() => {
       setError(null);
       setAffiliating(productId);
 
-      const { data, error } = await supabase.rpc("create_affiliation_with_price", { p_product_id: productId, p_sale_price: Number(salePrice) });
+      const { data, error } = await supabase.rpc("create_affiliation_with_price", {\n        p_product_id: productId,\n        p_sale_price: pricingProduct?.pricing_mode === "custom" ? Number(salePrice) : null,\n      });
       if (error) throw new Error(error.message);
       const result = { affiliate_link: data?.affiliate_link ?? data?.[0]?.affiliate_link };
 
@@ -890,7 +890,7 @@ const filteredProducts = useMemo(() => {
                       <button
                         type="button"
                         disabled={isAffiliating}
-                        onClick={() => { setPricingProduct(product); setSalePrice(String((product as any).supplier_suggested_price ?? price)); }}
+                        onClick={() => {\n                          setPricingProduct(product);\n                          setSalePrice(product.pricing_mode === "custom"\n                            ? String(product.supplier_suggested_price ?? product.custom_pricing_floor_zar ?? product.supplier_min_selling_price ?? "")\n                            : String(price));\n                        }}
                         className="mt-4 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {isAffiliating
