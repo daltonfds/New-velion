@@ -4,14 +4,14 @@ export type ProductStatus = "draft" | "active" | "inactive";
 
 export type CommissionType = "percentual" | "fixo";
 
-export type Currency = "ZAR";
+export type Currency = "ZAR" | "MZN";
 export type SupplierCountry = "ZA" | "CN";
 export type SupplierCostCurrency = "ZAR" | "CNY";
 
 export interface Profile {
   id: string;
   nome_completo: string | null;
-  pais: "ZA" | null;
+  pais: "ZA" | "MZ" | null;
   telefone: string | null;
   role: UserRole;
   kyc_status: string | null;
