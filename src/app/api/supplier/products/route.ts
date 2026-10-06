@@ -34,7 +34,6 @@ export async function POST(request: Request) {
   const pricingMode = String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed";
   const cost = Number(body.preco_custo);
   const requestedSupplierCountry = cleanString(body.supplier_country_code || body.fornecedor_pais).toUpperCase();
-  const supplierCostCurrency = requestedSupplierCountry === "CN" ? "CNY" : "ZAR";
   const supplierCostAmount = Number(body.supplier_cost_amount ?? body.preco_custo);
   const checkoutUrl = cleanString(body.checkout_url);
 
@@ -44,13 +43,16 @@ export async function POST(request: Request) {
   if (!Number.isFinite(cost) || cost < 0) return Response.json({ error: "Invalid cost price." }, { status: 400 });
   if (requestedSupplierCountry && !["ZA", "CN"].includes(requestedSupplierCountry)) return Response.json({ error: "Supplier country must be South Africa (ZA) or China (CN)." }, { status: 400 });
   if (!Number.isFinite(supplierCostAmount) || supplierCostAmount < 0) return Response.json({ error: "Invalid supplier cost." }, { status: 400 });
+  if (pricingMode === "custom" && (!Number.isFinite(Number(body.custom_pricing_floor_zar)) || Number(body.custom_pricing_floor_zar) <= 0)) return Response.json({ error: "A positive custom pricing base is required." }, { status: 400 });
+  if (supplierCountry === "CN" && (!Number.isFinite(Number(body.supplier_fx_rate_to_zar)) || Number(body.supplier_fx_rate_to_zar) <= 0)) return Response.json({ error: "A valid CNY to ZAR FX rate is required for China suppliers." }, { status: 400 });
   if (!/^https?:\/\//i.test(checkoutUrl)) return Response.json({ error: "A valid checkout URL is required." }, { status: 400 });
 
   const slug = cleanString(body.slug) || slugify(name) || "product-" + crypto.randomUUID().slice(0, 8);
   const { data: supplierProfile } = await auth.client.from("supplier_profiles").select("approval_status,country_code").eq("user_id", auth.userId).maybeSingle();
-  const supplierCountry = String(requestedSupplierCountry || supplierProfile?.country_code || "").toUpperCase();
+  const supplierCountry = String(supplierProfile?.country_code || "").toUpperCase();
   if (!["ZA","CN"].includes(supplierCountry)) return Response.json({ error: "Supplier country must be South Africa (ZA) or China (CN)." }, { status: 400 });
-  if (supplierProfile?.country_code && String(supplierProfile.country_code).toUpperCase() !== supplierCountry) return Response.json({ error: "Supplier country does not match the approved supplier profile." }, { status: 400 });
+  if (requestedSupplierCountry && requestedSupplierCountry !== supplierCountry) return Response.json({ error: "Supplier country does not match the approved supplier profile." }, { status: 400 });
+  const supplierCostCurrency = supplierCountry === "CN" ? "CNY" : "ZAR";
   const initialStatus = supplierProfile?.approval_status === "approved" ? "pending_review" : "draft";
 
   const { data, error } = await auth.client.from("products").insert({
@@ -69,7 +71,7 @@ export async function POST(request: Request) {
     fotos: Array.isArray(body.fotos) ? body.fotos.map(String) : [], video_url: cleanString(body.video_url) || null,
     checkout_url: checkoutUrl, estoque: Math.max(0, Math.floor(Number(body.estoque ?? 0))), reserved_estoque: 0,
     low_stock_threshold: Math.max(0, Math.floor(Number(body.low_stock_threshold ?? 5))),
-    pricing_mode: String(body.pricing_mode ?? "fixed") === "custom" ? "custom" : "fixed",
+    pricing_mode: pricingMode,
     custom_pricing_floor_zar: String(body.pricing_mode ?? "fixed") === "custom" && body.custom_pricing_floor_zar != null ? Number(body.custom_pricing_floor_zar) : null,
     supplier_min_selling_price: Number(body.supplier_min_selling_price ?? price),
     supplier_suggested_price: Number(body.supplier_suggested_price ?? price),
