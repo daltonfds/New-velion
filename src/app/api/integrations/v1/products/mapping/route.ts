@@ -39,13 +39,13 @@ export async function POST(request: Request) {
     return apiError("INVALID_ORDER", "sale_price must be a non-negative number.", 400, auth.id);
   }
 
-  if (saleCurrency && saleCurrency !== "ZAR") {
+  if (!["inherit","fixed","custom"].includes(pricingMode)) {\n    return apiError("INVALID_ORDER", "pricing_mode must be inherit, fixed, or custom.", 400, auth.id);\n  }\n\n  if (saleCurrency && saleCurrency !== "ZAR") {
     return apiError("INVALID_CURRENCY", "sale_currency must be ZAR.", 400, auth.id);
   }
 
   const { data: product, error: productError } = await auth.client
     .from("products")
-    .select("id,ativo,moeda")
+    .select("id,ativo,moeda,pricing_mode")
     .eq("id", newvelionProductId)
     .maybeSingle();
 
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     return apiError("PRODUCT_NOT_FOUND", "NewVelion product is not available for integration.", 409, auth.id);
   }
 
-  if (saleCurrency && saleCurrency !== product.moeda) {
+  if (pricingMode === "fixed" && salePrice == null) {\n    return apiError("INVALID_ORDER", "A fixed mapping requires sale_price.", 400, auth.id);\n  }\n\n  if (pricingMode === "custom" && salePrice != null && salePrice <= 0) {\n    return apiError("INVALID_ORDER", "A custom mapping sale_price must be positive when supplied.", 400, auth.id);\n  }\n\n  if (saleCurrency && saleCurrency !== product.moeda) {
     return apiError("INVALID_CURRENCY", "sale_currency must match the NewVelion product currency.", 409, auth.id);
   }
 
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
       metadata: body.metadata ?? {},
     })
     .select(
-      "id,external_product_id,newvelion_product_id,external_seller_id,sale_price,sale_currency,status,metadata,created_at,updated_at",
+      "id,external_product_id,newvelion_product_id,external_seller_id,sale_price,sale_currency,pricing_mode,base_price_zar,status,metadata,created_at,updated_at",
     )
     .single();
 
