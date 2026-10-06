@@ -58,7 +58,7 @@ const handler = createMcpHandler(() => {
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ query, limit }) => {
     let q = supabase.from("products")
-      .select("id,nome,slug,preco_venda,preco_promocional,moeda,estoque,reserved_estoque,supplier_country_code,supplier_status,pricing_mode,custom_pricing_floor_zar,supplier_min_selling_price")
+      .select("id,nome,slug,preco,preco_promocional,moeda,estoque,reserved_estoque,supplier_country_code,supplier_status,pricing_mode,custom_pricing_floor_zar,supplier_min_selling_price")
       .order("created_at", { ascending: false }).limit(limit);
     if (query?.trim()) q = q.ilike("nome", `%${query.trim()}%`);
     const { data, error } = await q;
@@ -158,6 +158,111 @@ const handler = createMcpHandler(() => {
     });
     if (error) return result({ error: error.message });
     return result({ data: Array.isArray(data) ? data[0] ?? null : data });
+  });
+
+
+  server.registerTool("get_product", {
+    title: "Get NewVelion Product",
+    description: "Get one live product with public catalog data and seller pricing rules.",
+    inputSchema: z.object({ product_id: z.string().uuid() }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ product_id }) => {
+    const { data, error } = await supabase.from("products")
+      .select("id,nome,slug,descricao,preco,preco_promocional,moeda,estoque,reserved_estoque,ativo,destaque,novo,avaliacao_media,total_avaliacoes,fotos,video_url,categoria_id,beneficios,ingredientes,modo_uso,garantia_texto,supplier_status,supplier_country_code,supplier_cost_currency,supplier_cost_amount,supplier_fx_rate_to_zar,supplier_fx_rate_captured_at,supplier_min_selling_price,supplier_suggested_price,supplier_commission_rate,pricing_mode,custom_pricing_floor_zar,peso_kg")
+      .eq("id", product_id).maybeSingle();
+    if (error) return result({ error: error.message });
+    return result({ data });
+  });
+
+  server.registerTool("list_suppliers", {
+    title: "List Suppliers",
+    description: "List approved NewVelion suppliers with public-safe company information.",
+    inputSchema: z.object({ country_code: z.enum(["ZA","CN"]).optional(), limit: z.number().int().min(1).max(100).default(50) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ country_code, limit }) => {
+    let q = supabase.from("supplier_profiles")
+      .select("user_id,company_name,company_description,country_code,city,approval_status,processing_days,created_at")
+      .eq("approval_status","approved").order("created_at",{ascending:false}).limit(limit);
+    if (country_code) q=q.eq("country_code",country_code);
+    const { data, error } = await q;
+    if (error) return result({ error: error.message });
+    return result({ data: data ?? [] });
+  });
+
+  server.registerTool("get_inventory", {
+    title: "Get Inventory",
+    description: "Return stock and reserved stock for a product.",
+    inputSchema: z.object({ product_id: z.string().uuid() }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ product_id }) => {
+    const { data, error } = await supabase.from("products").select("id,nome,estoque,reserved_estoque,low_stock_threshold,ativo,supplier_status").eq("id",product_id).maybeSingle();
+    if (error) return result({ error: error.message });
+    if (!data) return result({ error:"PRODUCT_NOT_FOUND" });
+    return result({ data:{...data,available_stock:Math.max(0,Number(data.estoque)-Number(data.reserved_estoque))} });
+  });
+
+  server.registerTool("list_orders", {
+    title: "List Orders",
+    description: "List customer orders as operational sales without exposing customer contact data.",
+    inputSchema: z.object({ status: z.enum(["paga","reembolsada","cancelada"]).optional(), limit: z.number().int().min(1).max(100).default(50) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ status, limit }) => {
+    let q=supabase.from("sales").select("id,vendedor_id,product_id,affiliation_id,valor_venda,product_amount,shipping_amount,quantity,currency,status,gateway_ref,vendido_em,garantia_libera_em,comissao_vendedor,taxa_plataforma,ganho_plataforma,seller_margin_zar,commission_snapshot_zar,customer_id").order("vendido_em",{ascending:false}).limit(limit);
+    if(status) q=q.eq("status",status);
+    const {data,error}=await q;
+    if(error) return result({error:error.message});
+    return result({data:data??[]});
+  });
+
+  server.registerTool("get_wallet", {
+    title: "Get Seller Wallet",
+    description: "Return wallet ledger entries for one seller or supplier.",
+    inputSchema: z.object({ seller_id: z.string().uuid(), limit: z.number().int().min(1).max(200).default(100) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ seller_id, limit }) => {
+    const {data,error}=await supabase.from("wallet_entries").select("id,vendedor_id,sale_id,tipo,valor,estado,currency,withdrawal_id,integration_order_id,created_at").eq("vendedor_id",seller_id).order("created_at",{ascending:false}).limit(limit);
+    if(error) return result({error:error.message});
+    return result({data:data??[]});
+  });
+
+  server.registerTool("list_withdrawals", {
+    title: "List Withdrawals",
+    description: "Inspect seller withdrawal lifecycle and payout audit references.",
+    inputSchema: z.object({ seller_id: z.string().uuid().optional(), status: z.string().max(40).optional(), limit: z.number().int().min(1).max(100).default(50) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ seller_id, status, limit }) => {
+    let q=supabase.from("withdrawals").select("id,vendedor_id,valor_solicitado,taxa_percentual,taxa_fixa,valor_liquido,metodo,status,prazo_estimado_dias,created_at,processado_em,wallet_currency,payout_currency,exchange_rate,valor_convertido").order("created_at",{ascending:false}).limit(limit);
+    if(seller_id) q=q.eq("vendedor_id",seller_id);
+    if(status) q=q.eq("status",status);
+    const {data,error}=await q;
+    if(error) return result({error:error.message});
+    return result({data:data??[]});
+  });
+
+  server.registerTool("list_integrations", {
+    title: "List Integrations",
+    description: "List connected external commerce platforms and their operational status.",
+    inputSchema: z.object({ status: z.string().max(40).optional(), limit: z.number().int().min(1).max(100).default(50) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ status, limit }) => {
+    let q=supabase.from("integration_platforms").select("id,name,slug,status,created_at,updated_at").order("created_at",{ascending:false}).limit(limit);
+    if(status) q=q.eq("status",status);
+    const {data,error}=await q;
+    if(error) return result({error:error.message});
+    return result({data:data??[]});
+  });
+
+  server.registerTool("get_integration_orders", {
+    title: "Get Integration Orders",
+    description: "Inspect external orders and their NewVelion fulfillment status.",
+    inputSchema: z.object({ platform_id: z.string().uuid().optional(), limit: z.number().int().min(1).max(100).default(50) }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ platform_id, limit }) => {
+    let q=supabase.from("integration_orders").select("id,platform_id,external_order_id,external_seller_id,status,currency,subtotal,shipping_amount,total,fulfillment_order_id,newvelion_base_total,created_at,updated_at").order("created_at",{ascending:false}).limit(limit);
+    if(platform_id) q=q.eq("platform_id",platform_id);
+    const {data,error}=await q;
+    if(error) return result({error:error.message});
+    return result({data:data??[]});
   });
 
   return server;
