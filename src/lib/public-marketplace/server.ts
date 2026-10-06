@@ -79,8 +79,7 @@ async function supplierSources(database: SupabaseClient) {
   const { data, error } = await database
     .from("supplier_profiles")
     .select("user_id,company_name,country_code,country_name,description,logo_url,public_city,public_region,approval_status,public_profile_enabled,created_at")
-    .eq("approval_status", "approved")
-    .eq("public_profile_enabled", true);
+    .in("approval_status", ["approved", "suspended", "rejected", "pending", "under_review"]);
 
   if (error) throw error;
   return (data ?? []) as SupplierSource[];
@@ -116,6 +115,8 @@ function supplierFromProduct(
   source: SupplierSource | undefined,
   count: number,
 ): PublicSupplierSummary | null {
+  if (source && (source.approval_status !== "approved" || !source.public_profile_enabled)) return null;
+
   const name =
     source?.company_name?.trim() ||
     row.fornecedor_nome?.trim() ||
