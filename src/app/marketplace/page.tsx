@@ -192,7 +192,10 @@ const filteredProducts = useMemo(() => {
       setError(null);
       setAffiliating(productId);
 
-      const { data, error } = await supabase.rpc("create_affiliation_with_price", {\n        p_product_id: productId,\n        p_sale_price: pricingProduct?.pricing_mode === "custom" ? Number(salePrice) : null,\n      });
+      const { data, error } = await supabase.rpc("create_affiliation_with_price", {
+        p_product_id: productId,
+        p_sale_price: pricingProduct?.pricing_mode === "custom" ? Number(salePrice) : null,
+      });
       if (error) throw new Error(error.message);
       const result = { affiliate_link: data?.affiliate_link ?? data?.[0]?.affiliate_link };
 
@@ -909,7 +912,12 @@ const filteredProducts = useMemo(() => {
                       <button
                         type="button"
                         disabled={isAffiliating}
-                        onClick={() => {\n                          setPricingProduct(product);\n                          setSalePrice(product.pricing_mode === "custom"\n                            ? String(product.supplier_suggested_price ?? product.custom_pricing_floor_zar ?? product.supplier_min_selling_price ?? "")\n                            : String(price));\n                        }}
+                        onClick={() => {
+                          setPricingProduct(product);
+                          setSalePrice(product.pricing_mode === "custom"
+                            ? String(product.supplier_suggested_price ?? product.custom_pricing_floor_zar ?? product.supplier_min_selling_price ?? "")
+                            : String(price));
+                        }}
                         className="mt-4 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {isAffiliating
@@ -956,6 +964,61 @@ const filteredProducts = useMemo(() => {
           </div>
         )}
       </div>
+
+      {pricingProduct && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/40 p-4 sm:items-center">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">
+                  {pricingProduct.pricing_mode === "custom" ? "Custom Pricing" : "Fixed Offer"}
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-slate-900">{pricingProduct.nome}</h2>
+              </div>
+              <button type="button" onClick={() => { setPricingProduct(null); setSalePrice(""); }} className="text-slate-400 hover:text-slate-700" aria-label="Close">×</button>
+            </div>
+
+            {pricingProduct.pricing_mode === "fixed" ? (
+              <div className="mt-6 space-y-3">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs text-slate-500">Selling price</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-900">{money(Number(salePrice))}</p>
+                </div>
+                <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+                  <p className="text-xs text-indigo-600">Your commission</p>
+                  <p className="mt-1 text-xl font-semibold text-indigo-700">{money(commissionForProduct(pricingProduct))}</p>
+                </div>
+                <p className="text-sm text-slate-500">NewVelion controls the selling price for this offer.</p>
+              </div>
+            ) : (
+              <div className="mt-6 space-y-4">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs text-slate-500">NewVelion / Supplier base</p>
+                  <p className="mt-1 text-xl font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p>
+                </div>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-medium text-slate-700">Your selling price</span>
+                  <input type="number" min={customBaseForProduct(pricingProduct)} step="0.01" value={salePrice} onChange={(event) => setSalePrice(event.target.value)} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-lg font-semibold text-slate-900 outline-none focus:border-indigo-500" />
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-500">Base</p><p className="mt-1 font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p></div>
+                  <div className="rounded-xl bg-indigo-50 p-4"><p className="text-xs text-indigo-600">Your margin</p><p className="mt-1 font-semibold text-indigo-700">{money(Math.max(Number(salePrice || 0) - customBaseForProduct(pricingProduct), 0))}</p></div>
+                </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              disabled={affiliating === pricingProduct.id || (pricingProduct.pricing_mode === "custom" && (!Number.isFinite(Number(salePrice)) || Number(salePrice) < customBaseForProduct(pricingProduct)))}
+              onClick={() => void handleAffiliate(pricingProduct.id)}
+              className="mt-6 w-full rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {affiliating === pricingProduct.id ? "Creating affiliate link..." : "Generate Link"}
+            </button>
+          </div>
+        </div>
+      )}
+
     </AppShell>
   );
 }
