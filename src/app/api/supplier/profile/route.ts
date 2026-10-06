@@ -33,7 +33,7 @@ export async function PUT(request: Request) {
     legal_name: String(body.legal_name ?? "").trim() || null,
     business_type: ["supplier", "producer", "producer_supplier"].includes(String(body.business_type)) ? String(body.business_type) : "supplier",
     country_code: countryCode,
-    country_name: countryCode === "CN" ? "China" : "South Africa", String(body.country_name ?? "").trim() || null,
+    country_name: countryCode === "CN" ? "China" : "South Africa",
     calling_code: countryCode === "CN" ? "+86" : "+27",
     payout_currency: countryCode === "CN" ? "CNY" : "ZAR",
     business_phone: String(body.business_phone ?? "").trim() || null,
