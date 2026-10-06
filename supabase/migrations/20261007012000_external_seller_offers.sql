@@ -78,3 +78,38 @@ end;
 $function$;
 revoke execute on function public.create_external_seller_offer(uuid,uuid,uuid,uuid,text,numeric) from public,anon,authenticated;
 grant execute on function public.create_external_seller_offer(uuid,uuid,uuid,uuid,text,numeric) to service_role;
+
+
+alter table public.integration_orders add column if not exists external_offer_id uuid references public.integration_external_offers(id) on delete set null;
+alter table public.integration_order_items add column if not exists external_offer_id uuid references public.integration_external_offers(id) on delete set null;
+create index if not exists integration_orders_external_offer_idx on public.integration_orders(external_offer_id);
+create index if not exists integration_order_items_external_offer_idx on public.integration_order_items(external_offer_id);
+
+create function public.create_integration_order_from_offer(
+ p_platform_id uuid,p_external_order_id text,p_external_seller_id uuid,p_external_offer_id uuid,p_currency text,p_items jsonb,p_customer jsonb,
+ p_shipping_address jsonb,p_shipping_amount numeric,p_metadata jsonb,p_idempotency_key text
+)
+returns table(order_id uuid,order_status text,order_total numeric,order_currency text)
+language plpgsql security definer set search_path=''
+as $function$
+declare o public.integration_external_offers%rowtype; i jsonb; v_result record;
+begin
+ select * into o from public.integration_external_offers where id=p_external_offer_id and platform_id=p_platform_id and external_seller_id=p_external_seller_id and status='active' for share;
+ if not found then raise exception 'OFFER_NOT_FOUND'; end if;
+ if p_currency<>'ZAR' then raise exception 'CUSTOMER_CURRENCY_MUST_BE_ZAR'; end if;
+ if jsonb_typeof(p_items)<>'array' or jsonb_array_length(p_items)=0 then raise exception 'INVALID_ORDER'; end if;
+ if o.mapping_id is null then raise exception 'PRODUCT_NOT_MAPPED'; end if;
+ if not exists(select 1 from public.integration_product_mappings where id=o.mapping_id and platform_id=p_platform_id and newvelion_product_id=o.newvelion_product_id and status='active') then raise exception 'PRODUCT_NOT_MAPPED'; end if;
+ for i in select value from jsonb_array_elements(p_items) loop
+   if coalesce((i->>'quantity')::integer,0)<=0 then raise exception 'INVALID_QUANTITY'; end if;
+   if coalesce((i->>'sale_price')::numeric,0)<=0 then raise exception 'INVALID_ORDER'; end if;
+   if abs((i->>'sale_price')::numeric-o.sale_price)>0.01 then raise exception 'OFFER_PRICE_MISMATCH'; end if;
+ end loop;
+ select * into v_result from public.create_integration_order(p_platform_id,p_external_order_id,p_external_seller_id,p_currency,p_items,p_customer,p_shipping_address,p_shipping_amount,p_metadata,p_idempotency_key);
+ update public.integration_orders set external_offer_id=o.id where id=v_result.order_id;
+ update public.integration_order_items set external_offer_id=o.id where order_id=v_result.order_id;
+ return query select v_result.order_id,v_result.order_status,v_result.order_total,v_result.order_currency;
+end;
+$function$;
+revoke execute on function public.create_integration_order_from_offer(uuid,text,uuid,uuid,text,jsonb,jsonb,jsonb,numeric,jsonb,text) from public,anon,authenticated;
+grant execute on function public.create_integration_order_from_offer(uuid,text,uuid,uuid,text,jsonb,jsonb,jsonb,numeric,jsonb,text) to service_role;
