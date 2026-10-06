@@ -136,3 +136,29 @@ begin
   return new;
 end;
 $function$;
+
+
+-- Correct base precedence: explicit floor/minimum wins; supplier cost + origin shipping is the fallback.
+create or replace function private.product_pricing_snapshot(p_product_id uuid)
+returns table(pricing_mode text,fixed_sale_price_zar numeric,base_price_zar numeric,commission_zar numeric,commission_type text)
+language plpgsql security definer set search_path=''
+as $function$
+declare p public.products%rowtype; v_fixed numeric; v_base numeric; v_cost numeric; v_shipping numeric; v_commission numeric;
+begin
+ select * into p from public.products where id=p_product_id and ativo=true and supplier_status='approved';
+ if not found then raise exception 'PRODUCT_NOT_AVAILABLE'; end if;
+ if p.moeda<>'ZAR' then raise exception 'PRODUCT_CURRENCY_MUST_BE_ZAR'; end if;
+ v_fixed:=case when coalesce(p.preco_promocional,0)>0 then p.preco_promocional else p.preco end;
+ if p.custom_pricing_floor_zar is not null then v_base:=p.custom_pricing_floor_zar;
+ elsif p.supplier_min_selling_price is not null then v_base:=p.supplier_min_selling_price;
+ else
+   v_cost:=case when p.supplier_cost_currency='CNY' and coalesce(p.supplier_fx_rate_to_zar,0)>0 then coalesce(p.supplier_cost_amount,0)*p.supplier_fx_rate_to_zar when p.supplier_cost_currency='ZAR' then coalesce(p.supplier_cost_amount,0) else coalesce(p.preco_custo,0) end;
+   v_shipping:=coalesce(p.supplier_origin_shipping_cost,0)*case when p.supplier_origin_shipping_currency='CNY' and coalesce(p.supplier_fx_rate_to_zar,0)>0 then p.supplier_fx_rate_to_zar else 1 end;
+   v_base:=v_cost+v_shipping;
+ end if;
+ if p.pricing_mode='custom' and coalesce(v_base,0)<=0 then raise exception 'CUSTOM_PRICING_BASE_NOT_CONFIGURED'; end if;
+ if coalesce(v_fixed,0)<=0 then raise exception 'FIXED_SALE_PRICE_NOT_CONFIGURED'; end if;
+ v_commission:=case when p.comissao_tipo='percentual' then round(v_fixed*p.comissao_valor/100,2) when p.comissao_tipo='fixo' then greatest(p.comissao_valor,0) else 0 end;
+ return query select p.pricing_mode,v_fixed,greatest(coalesce(v_base,0),0),greatest(coalesce(v_commission,0),0),p.comissao_tipo;
+end;
+$function$;
