@@ -34,6 +34,7 @@ export async function GET(request: Request) {
       { count: "exact" },
     )
     .eq("ativo", true)
+    .eq("moeda", "ZAR")
     .order("created_at", { ascending: false });
 
   if (search) {
