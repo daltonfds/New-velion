@@ -46,7 +46,7 @@ export default function IntegrationDocsPage() {
                 ["GET", "/api/integrations/v1/products/:id"],
                 ["GET", "/api/integrations/v1/products/:id/stock"],
                 ["POST", "/api/integrations/v1/sellers"],
-                ["POST", "/api/integrations/v1/products/mapping"],
+                ["POST", "/api/integrations/v1/products/mapping"],\n                ["POST", "/api/integrations/v1/offers"],\n                ["GET", "/api/integrations/v1/offers/:id"],
                 ["POST", "/api/integrations/v1/orders"],
                 ["GET", "/api/integrations/v1/orders/:externalOrderId"],
               ].map(([method, endpoint]) => (
@@ -75,16 +75,16 @@ export default function IntegrationDocsPage() {
   ],
   customer: {
     name: "Customer Name",
-    phone: "+258...",
+    phone: "+27...",
     email: "customer@example.com"
   },
   shipping_address: {
     country: "ZA",
-    province: "Maputo",
+    province: "Gauteng",
     city: "Maputo",
     address: "Street 1",
     postal_code: "1100",
-    phone: "+258..."
+    phone: "+27..."
   }
 }, null, 2)}
             </pre>
