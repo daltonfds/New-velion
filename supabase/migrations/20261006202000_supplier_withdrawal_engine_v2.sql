@@ -1,0 +1,3 @@
+-- Supplier withdrawals use supplier_profiles KYC and supplier earning wallet entries.
+-- Seller withdrawals continue using private.seller_financials.
+-- Production functions were updated by supplier_withdrawal_engine_v2 and supplier_withdrawal_server_rpc_v2.
