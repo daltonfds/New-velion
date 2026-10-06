@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getWalletSummary } from "@/lib/services/wallet";
 import { supabase } from "@/lib/supabase";
 import { notify } from "@/lib/notify";
+import { currencyForCountry, formatCurrency } from "@/lib/currency";
 
 type Method = "bank_transfer" | "mpesa" | "emola";
 
@@ -87,6 +88,9 @@ export default function SellerWithdrawalsPage() {
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [country, setCountry] = useState("");
   const [minimumWithdrawal, setMinimumWithdrawal] = useState(100);
+  const [walletCurrency, setWalletCurrency] = useState("ZAR");
+  const [exchangeRate, setExchangeRate] = useState(1);
+  const [rateLoading, setRateLoading] = useState(false);
   const [configured, setConfigured] = useState<Record<Method, Details | null>>({
     bank_transfer: null,
     mpesa: null,
@@ -146,6 +150,22 @@ export default function SellerWithdrawalsPage() {
         ).toUpperCase();
 
         setCountry(detected);
+        const localCurrency = currencyForCountry(detected);
+        setWalletCurrency(localCurrency);
+        if (localCurrency !== "ZAR") {
+          setRateLoading(true);
+          try {
+            const fx = await fetch(`/api/currency/rate?base=ZAR&quote=${encodeURIComponent(localCurrency)}`).then((r) => r.json());
+            if (!Number.isFinite(Number(fx?.rate)) || Number(fx.rate) <= 0) throw new Error("Exchange rate unavailable.");
+            setExchangeRate(Number(fx.rate));
+          } catch (e) {
+            setError(e instanceof Error ? e.message : "Exchange rate unavailable.");
+          } finally {
+            setRateLoading(false);
+          }
+        } else {
+          setExchangeRate(1);
+        }
 
         const { data: payoutConfig } = await supabase
           .from("payout_methods")
@@ -192,6 +212,7 @@ export default function SellerWithdrawalsPage() {
   }, []);
 
   const numeric = Number(amount) || 0;
+  const numericZar = walletCurrency === "ZAR" ? numeric : numeric / exchangeRate;
 
   const fee = useMemo(
     () => numeric * 0.05 + (numeric > 0 ? 10 : 0),
@@ -199,7 +220,7 @@ export default function SellerWithdrawalsPage() {
   );
 
   const net = Math.max(numeric - fee, 0);
-  const convertedNet = net;
+  const convertedNet = net * exchangeRate;
 
   const available = (Object.keys(configured) as Method[]).filter(
     (m) => configured[m]
@@ -266,7 +287,7 @@ export default function SellerWithdrawalsPage() {
             : method === "emola"
               ? "e-mola"
               : undefined,
-        exchange_rate: country === "MZ" ? exchangeRate : 1,
+        exchange_rate: exchangeRate,
       };
 
       const { error } = await supabase.rpc("server_request_withdrawal", {
@@ -318,11 +339,7 @@ export default function SellerWithdrawalsPage() {
     }
   }
 
-  const money = (v: number) =>
-    new Intl.NumberFormat("en-ZA", {
-      style: "currency",
-      currency: "ZAR",
-    }).format(v);
+  const money = (v: number) => formatCurrency(v, walletCurrency);
 
   const methodLabel = (m: string) =>
     m === "mobile_wallet" ? "Mobile Wallet" : "Bank Transfer";
@@ -469,7 +486,7 @@ export default function SellerWithdrawalsPage() {
 
                       <div className="flex h-12 overflow-hidden rounded-md border border-slate-300 bg-white focus-within:border-[#16294F] focus-within:ring-1 focus-within:ring-[#16294F]">
                         <span className="flex items-center border-r border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-500">
-                          ZAR
+                          {walletCurrency}
                         </span>
                         <input
                           type="number"
@@ -486,6 +503,7 @@ export default function SellerWithdrawalsPage() {
                       <p className="mt-2 text-xs text-slate-500">
                         Minimum withdrawal: {money(minimumWithdrawal)}
                       </p>
+                      {walletCurrency !== "ZAR" && <p className="mt-1 text-xs text-slate-400">Reference rate: 1 ZAR = {exchangeRate.toFixed(4)} {walletCurrency}</p>}
                     </div>
 
                     <div className="rounded-md border border-slate-200">
@@ -512,7 +530,7 @@ export default function SellerWithdrawalsPage() {
                       </div>
                     </div>
 
-                    {country === "MZ" && (
+                    {walletCurrency !== "ZAR" && (
                       <div className="rounded-md border border-slate-200 bg-white">
                         <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
                           <span className="text-sm font-semibold text-slate-800">
@@ -531,7 +549,7 @@ export default function SellerWithdrawalsPage() {
                         <div className="grid grid-cols-2 divide-x divide-slate-100">
                           <div className="p-4">
                             <p className="text-xs text-slate-500">
-                              Net in ZAR
+                              Net in {walletCurrency}
                             </p>
                             <p className="mt-1 text-lg font-semibold text-slate-900">
                               {money(net)}
@@ -540,7 +558,7 @@ export default function SellerWithdrawalsPage() {
 
                           <div className="p-4">
                             <p className="text-xs text-slate-500">
-                              Estimated payout
+                              Estimated local payout
                             </p>
                             <p className="mt-1 text-lg font-semibold text-[#16294F]">
                               {exchangeRate ? mzn(convertedNet) : "—"}
@@ -627,7 +645,7 @@ export default function SellerWithdrawalsPage() {
                         numeric < minimumWithdrawal ||
                         numeric > wallet.disponivel ||
                         !available.length ||
-                        (country === "MZ" && !exchangeRate)
+                        (walletCurrency !== "ZAR" && (!exchangeRate || rateLoading))
                       }
                       className="h-11 w-full rounded-md bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
@@ -694,7 +712,7 @@ export default function SellerWithdrawalsPage() {
                                 {money(Number(w.valor_liquido))}
                               </td>
                               <td className="px-4 py-4 text-slate-700">
-                                {w.payout_currency === "MZN" &&
+                                {w.payout_currency === walletCurrency &&
                                 w.valor_convertido != null
                                   ? mzn(Number(w.valor_convertido))
                                   : money(Number(w.valor_liquido))}
