@@ -85,7 +85,14 @@ export async function POST(request: Request) {
         );
       }
 
-      if (/product out of stock/i.test(message)) {\n        return NextResponse.json(\n          { error: "Not enough stock for the requested quantity." },\n          { status: 409 },\n        );\n      }\n\n      if (/required customer delivery fields/i.test(message)) {
+      if (/product out of stock/i.test(message)) {
+        return NextResponse.json(
+          { error: "Not enough stock for the requested quantity." },
+          { status: 409 },
+        );
+      }
+
+      if (/required customer delivery fields/i.test(message)) {
         return NextResponse.json(
           { error: "Please complete all required fields." },
           { status: 400 },
