@@ -50,7 +50,7 @@ export async function POST(request: Request) {
   const externalProductId = String(body.external_product_id ?? "").trim();
   const newvelionProductId = String(body.newvelion_product_id ?? "").trim();
   const pricingMode = String(body.pricing_mode ?? "").trim();
-  const salePrice = body.sale_price == null ? null : Number(body.sale_price);
+  const salePrice = body.sale_price == null ? null : Number(body.sale_price);\n\n  const { data: seller } = await auth.client\n    .from("integration_external_sellers")\n    .select("id,status")\n    .eq("platform_id", auth.platform.id)\n    .eq("external_seller_id", externalSellerId)\n    .maybeSingle();\n\n  if (!seller || seller.status !== "active") {\n    return apiError("INVALID_SELLER", "External seller is not registered or active.", 404, auth.id);\n  }
 
   if (!externalSellerId || !newvelionProductId || !pricingMode) {
     return apiError(
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       .eq("platform_id", auth.platform.id)
       .eq("external_product_id", externalProductId)
       .eq("newvelion_product_id", newvelionProductId)
-      .or(`external_seller_id.is.null,external_seller_id.eq.${externalSellerId}`)
+      .or(`external_seller_id.is.null,external_seller_id.eq.${seller.id}`)
       .eq("status", "active")
       .maybeSingle();
 
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 
   const { data, error } = await auth.client.rpc("create_external_seller_offer", {
     p_platform_id: auth.platform.id,
-    p_external_seller_id: externalSellerId,
+    p_external_seller_id: seller.id,
     p_newvelion_product_id: newvelionProductId,
     p_mapping_id: mappingId,
     p_pricing_mode: pricingMode,
