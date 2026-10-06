@@ -215,7 +215,7 @@ export default function SellerLinksPage() {
           </div>
 
           <a
-            href="/marketplace"
+            href="/dashboard/seller/marketplace"
             className="inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white transition hover:bg-indigo-700"
           >
             Browse Marketplace
@@ -268,7 +268,7 @@ export default function SellerLinksPage() {
               </p>
 
               <a
-                href="/marketplace"
+                href="/dashboard/seller/marketplace"
                 className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white hover:bg-indigo-700"
               >
                 Go to Marketplace
