@@ -204,3 +204,58 @@ begin
  return v_fulfillment.id;
 end;
 $$;
+
+
+alter table public.wallet_entries add column if not exists currency text not null default 'ZAR';
+
+create or replace function private.post_sale_to_ledger()
+returns trigger language plpgsql security definer set search_path=''
+as $function$
+declare v_product public.products%rowtype; v_supplier_id uuid; v_supplier_amount numeric; v_supplier_currency text;
+begin
+ insert into public.wallet_entries(vendedor_id,sale_id,tipo,valor,estado,currency)
+ values(new.vendedor_id,new.id,'comissao',new.comissao_vendedor-new.valor_garantia,'disponivel','ZAR'),
+       (new.vendedor_id,new.id,'garantia_retida',new.valor_garantia,'retido','ZAR');
+ select p.* into v_product from public.products p where p.id=new.product_id;
+ if found then
+  select pr.id into v_supplier_id from public.profiles pr where pr.id=v_product.created_by and pr.role='supplier';
+  v_supplier_currency:=coalesce(v_product.supplier_cost_currency,case when v_product.supplier_country_code='CN' then 'CNY' else 'ZAR' end);
+  v_supplier_amount:=greatest(coalesce(v_product.supplier_cost_amount,v_product.preco_custo,0),0)*greatest(coalesce(new.quantity,1),1);
+  if v_supplier_id is not null and v_supplier_amount>0 then
+   insert into public.wallet_entries(vendedor_id,sale_id,tipo,valor,estado,currency)
+   values(v_supplier_id,new.id,'supplier_earning',v_supplier_amount,'retido',v_supplier_currency)
+   on conflict(sale_id,vendedor_id,tipo) do update set valor=excluded.valor,currency=excluded.currency;
+  end if;
+ end if;
+ return new;
+end;
+$function$;
+
+create or replace function private.post_integration_order_to_ledger(p_order_id uuid)
+returns void language plpgsql security definer set search_path=''
+as $function$
+declare r record; v_currency text; v_amount numeric;
+begin
+ for r in
+  select io.id integration_order_id,oi.newvelion_product_id,oi.quantity,p.created_by,p.supplier_country_code,p.supplier_cost_currency,p.supplier_cost_amount,p.preco_custo
+  from public.integration_orders io join public.integration_order_items oi on oi.order_id=io.id
+  join public.products p on p.id=oi.newvelion_product_id
+  join public.profiles pr on pr.id=p.created_by and pr.role='supplier'
+  where io.id=p_order_id
+ loop
+  v_currency:=coalesce(r.supplier_cost_currency,case when r.supplier_country_code='CN' then 'CNY' else 'ZAR' end);
+  v_amount:=round(coalesce(r.supplier_cost_amount,r.preco_custo,0)*r.quantity,2);
+  if r.created_by is not null and v_amount>0 then
+   insert into public.wallet_entries(vendedor_id,integration_order_id,tipo,valor,estado,currency)
+   values(r.created_by,r.integration_order_id,'supplier_earning',v_amount,'retido',v_currency)
+   on conflict (integration_order_id,vendedor_id,tipo) do update set valor=excluded.valor,currency=excluded.currency;
+  end if;
+ end loop;
+end;
+$function$;
+
+create or replace function public.enforce_customer_shipping_currency()
+returns trigger language plpgsql security definer set search_path=''
+as $$ begin new.currency:='ZAR'; return new; end; $$;
+drop trigger if exists supplier_shipping_customer_currency_policy on public.supplier_shipping_profiles;
+create trigger supplier_shipping_customer_currency_policy before insert or update of currency on public.supplier_shipping_profiles for each row execute function public.enforce_customer_shipping_currency();
