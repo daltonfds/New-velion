@@ -58,8 +58,12 @@ export function PublicMarketplacePage() {
     return () => controller.abort();
   }, [q, category, supplier, featured, newOnly]);
 
+  const isFiltered = Boolean(q.trim() || category || supplier || featured || newOnly);
   const featuredProducts = useMemo(() => products.filter((p) => p.featured).slice(0, 4), [products]);
+  const offerProducts = useMemo(() => products.filter((p) => p.compareAtPrice != null && p.compareAtPrice > p.price).slice(0, 4), [products]);
+  const newProducts = useMemo(() => products.filter((p) => p.isNew).slice(0, 4), [products]);
   const visibleSuppliers = useMemo(() => suppliers.slice(0, 6), [suppliers]);
+  const visibleCategories = useMemo(() => categories.slice(0, 8), [categories]);
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
@@ -95,6 +99,17 @@ export function PublicMarketplacePage() {
             <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-[#16294F] sm:text-5xl">Discover products from verified suppliers.</h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">Explore products available for delivery across South Africa, compare offers, meet the supplier behind each catalog, and purchase securely.</p>
           </div>
+          <div className="mt-7 flex flex-wrap gap-2">
+            {visibleCategories.map((item) => (
+              <button key={item.id} type="button" onClick={() => setCategory(item.slug)}
+                className={category === item.slug ? "rounded-full bg-[#16294F] px-4 py-2 text-xs font-bold text-white" : "rounded-full border border-blue-200 bg-white px-4 py-2 text-xs font-bold text-[#16294F] hover:bg-blue-50"}>
+                {item.name}
+              </button>
+            ))}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-4 text-xs font-semibold text-slate-500">
+            <span>✓ Verified suppliers</span><span>✓ South Africa delivery</span><span>✓ Secure checkout</span>
+          </div>
           <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-3">
             <div className="grid gap-3 lg:grid-cols-[1fr_220px_220px_auto]">
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search products, suppliers or categories..." className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm outline-none focus:border-blue-500 focus:bg-white" />
@@ -118,14 +133,36 @@ export function PublicMarketplacePage() {
 
       <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
         {error && <div className="mb-8 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
-        {featuredProducts.length > 0 && !q && !category && !supplier && !featured && !newOnly && (
-          <section>
-            <div className="flex items-end justify-between gap-4">
-              <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Curated</p><h2 className="mt-2 text-2xl font-extrabold text-[#16294F]">Featured products</h2></div>
-              <span className="text-sm text-slate-500">{products.length} products</span>
-            </div>
-            <ProductGrid products={featuredProducts} />
-          </section>
+        {!isFiltered && (
+          <>
+            {offerProducts.length > 0 && (
+              <section>
+                <div className="flex items-end justify-between gap-4">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#C99A2E]">Limited offers</p><h2 className="mt-2 text-2xl font-extrabold text-[#16294F]">Best deals right now</h2></div>
+                  <span className="text-sm text-slate-500">Save on selected products</span>
+                </div>
+                <ProductGrid products={offerProducts} />
+              </section>
+            )}
+            {featuredProducts.length > 0 && (
+              <section className="mt-14">
+                <div className="flex items-end justify-between gap-4">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Curated</p><h2 className="mt-2 text-2xl font-extrabold text-[#16294F]">Featured products</h2></div>
+                  <span className="text-sm text-slate-500">Top picks from the marketplace</span>
+                </div>
+                <ProductGrid products={featuredProducts} />
+              </section>
+            )}
+            {newProducts.length > 0 && (
+              <section className="mt-14">
+                <div className="flex items-end justify-between gap-4">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Just added</p><h2 className="mt-2 text-2xl font-extrabold text-[#16294F]">New arrivals</h2></div>
+                  <span className="text-sm text-slate-500">Fresh from our suppliers</span>
+                </div>
+                <ProductGrid products={newProducts} />
+              </section>
+            )}
+          </>
         )}
         <section className="mt-14">
           <div className="flex items-end justify-between gap-4">
@@ -141,6 +178,23 @@ export function PublicMarketplacePage() {
               <Link href="/fornecedores" className="text-sm font-bold text-blue-700 hover:underline">View all suppliers →</Link>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{visibleSuppliers.map((item) => <SupplierCard key={item.id} supplier={item} />)}</div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <Link href="/fornecedores" className="rounded-2xl border border-blue-100 bg-[#eef4fb] p-5 hover:border-blue-200">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Supplier network</p>
+                <p className="mt-2 text-lg font-extrabold text-[#16294F]">Find a supplier</p>
+                <p className="mt-1 text-sm text-slate-600">Browse verified businesses and their catalogs.</p>
+              </Link>
+              <Link href="/register" className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-blue-200">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">For sellers</p>
+                <p className="mt-2 text-lg font-extrabold text-[#16294F]">Start selling</p>
+                <p className="mt-1 text-sm text-slate-600">Choose products, set your price and track sales.</p>
+              </Link>
+              <Link href="/register/customer" className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-blue-200">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">For customers</p>
+                <p className="mt-2 text-lg font-extrabold text-[#16294F]">Create your account</p>
+                <p className="mt-1 text-sm text-slate-600">Save favorites, manage your cart and follow orders.</p>
+              </Link>
+            </div>
           </section>
         )}
       </div>
