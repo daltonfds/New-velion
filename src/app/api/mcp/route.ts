@@ -174,7 +174,7 @@ const handle = withOAuthProtectedResource(
       return Response.json({ error: "Unauthorized MCP request." }, { status: 401 });
     }
 
-    const { data: profile, error } = await context.supabaseAdmin
+    const { data: profile, error } = await db()
       .from("profiles")
       .select("role")
       .eq("id", userId)
