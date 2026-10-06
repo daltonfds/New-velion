@@ -70,7 +70,9 @@ export async function POST(request: Request) {
     body.metadata && typeof body.metadata === "object" && !Array.isArray(body.metadata)
       ? body.metadata
       : {};
-  const offerToken = String(body.offer_token ?? "").trim() || null;\n\n  const idempotencyKey =
+  const offerToken = String(body.offer_token ?? "").trim() || null;
+
+  const idempotencyKey =
     request.headers.get("idempotency-key")?.trim() ||
     String(body.idempotency_key ?? "").trim() ||
     null;
