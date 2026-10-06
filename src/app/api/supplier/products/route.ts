@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const status = cleanString(url.searchParams.get("status"));
   let query = auth.client.from("products")
-    .select("id,nome,slug,descricao,categoria_id,subcategoria_id,preco,preco_promocional,moeda,comissao_tipo,comissao_valor,preco_custo,taxa_plataforma,taxa_entrega,comissao_afiliado,fotos,video_url,checkout_url,estoque,reserved_estoque,low_stock_threshold,ativo,destaque,novo,supplier_status,supplier_min_selling_price,supplier_suggested_price,supplier_commission_rate,supplier_rejection_reason,supplier_country_code,supplier_cost_currency,supplier_cost_amount,supplier_fx_rate_to_zar,supplier_fx_rate_captured_at,created_at,updated_at")
+    .select("id,nome,slug,descricao,categoria_id,subcategoria_id,preco,preco_promocional,moeda,comissao_tipo,comissao_valor,preco_custo,taxa_plataforma,taxa_entrega,comissao_afiliado,fotos,video_url,checkout_url,estoque,reserved_estoque,low_stock_threshold,ativo,destaque,novo,supplier_status,pricing_mode,custom_pricing_floor_zar,supplier_min_selling_price,supplier_suggested_price,supplier_commission_rate,supplier_rejection_reason,supplier_country_code,supplier_cost_currency,supplier_cost_amount,supplier_fx_rate_to_zar,supplier_fx_rate_captured_at,created_at,updated_at")
     .eq("created_by", auth.userId).order("created_at", { ascending: false });
   if (status) query = query.eq("supplier_status", status);
 
