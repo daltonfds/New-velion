@@ -46,6 +46,10 @@ export async function PUT(request: Request) {
     description: String(body.description ?? "").trim() || null,
     responsible_name: responsibleName,
     responsible_title: String(body.responsible_title ?? "").trim() || null,
+    logo_url: String(body.logo_url ?? "").trim() || null,
+    public_city: String(body.public_city ?? "").trim() || null,
+    public_region: String(body.public_region ?? "").trim() || null,
+    public_profile_enabled: body.public_profile_enabled !== false,
     updated_at: new Date().toISOString(),
   };
 
