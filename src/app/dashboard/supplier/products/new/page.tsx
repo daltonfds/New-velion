@@ -57,8 +57,7 @@ export default function NewSupplierProductPage() {
           supplier_country_code:form.fornecedor_pais,
           supplier_cost_amount:Number(form.supplier_cost_amount || form.preco_custo),
           supplier_fx_rate_to_zar:Number(form.supplier_fx_rate_to_zar || (form.fornecedor_pais === "ZA" ? 1 : 0)),
-          fotos:form.fotos.split("
-").map((v)=>v.trim()).filter(Boolean)
+          fotos:form.fotos.split("\n").map((v)=>v.trim()).filter(Boolean)
         })
       });
       router.push("/dashboard/supplier/products/" + result.data.id);
