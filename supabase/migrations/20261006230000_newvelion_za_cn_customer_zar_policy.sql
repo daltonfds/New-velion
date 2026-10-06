@@ -323,3 +323,9 @@ as $function$
 select a.product_id,a.id,p.slug,a.sale_price from public.affiliations a join public.products p on p.id=a.product_id
 where a.link_unico=p_link_unico and a.ativo=true and p.ativo=true and p.supplier_status='approved' and p.moeda='ZAR' limit 1;
 $function$;
+
+
+create or replace function public.enforce_sale_za_zar() returns trigger language plpgsql security definer set search_path='' as $$ begin new.currency:='ZAR'; new.customer_country_code:='ZA'; return new; end; $$;
+drop trigger if exists sale_za_zar_policy on public.sales;
+create trigger sale_za_zar_policy before insert or update of currency,customer_country_code on public.sales for each row execute function public.enforce_sale_za_zar();
+revoke execute on function public.enforce_sale_za_zar() from public,anon,authenticated;
