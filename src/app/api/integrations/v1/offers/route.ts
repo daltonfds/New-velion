@@ -20,7 +20,7 @@ function mapOfferError(message: string) {
     case "MAPPING_SELLER_MISMATCH":
       return ["MAPPING_SELLER_MISMATCH", "The mapping belongs to another external seller.", 409] as const;
     case "INVALID_PRICING_MODE":
-      return ["INVALID_PRICING_MODE", "pricing_mode must be fixed or custom.", 400] as const;
+      return ["INVALID_PRICING_MODE", "pricing_mode must be inherit, fixed or custom.", 400] as const;
     case "FIXED_PRICE_MISMATCH":
       return ["FIXED_PRICE_MISMATCH", "The supplied price does not match the fixed NewVelion price.", 409] as const;
     case "SALE_PRICE_BELOW_BASE_PRICE":
@@ -63,10 +63,10 @@ export async function POST(request: Request) {
     return apiError("INVALID_SELLER", "External seller is not registered or active.", 404, auth.id);
   }
 
-  if (!externalSellerId || !newvelionProductId || !pricingMode) {
+  if (!externalSellerId || !externalProductId || !newvelionProductId || !pricingMode) {
     return apiError(
       "INVALID_ORDER",
-      "external_seller_id, newvelion_product_id, pricing_mode and sale_price are required.",
+      "external_seller_id, external_product_id, newvelion_product_id, pricing_mode and sale_price are required.",
       400,
       auth.id,
     );
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
   }
 
   let mappingId: string | null = null;
-  if (externalProductId) {
+  {
     const { data: mapping } = await auth.client
       .from("integration_product_mappings")
       .select("id")
