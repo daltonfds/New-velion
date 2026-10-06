@@ -17,7 +17,7 @@ export type IntegrationProduct = {
   name: string;
   slug: string;
   description: string;
-  currency: "ZAR" | "MZN";
+  currency: "ZAR";
   price: number;
   promotional_price: number | null;
   stock: number;
@@ -38,7 +38,7 @@ export type IntegrationOrderItem = {
   newvelion_product_id: string;
   quantity: number;
   sale_price: number;
-  currency: "ZAR" | "MZN";
+  currency: "ZAR";
   product_name: string;
 };
 
@@ -46,7 +46,7 @@ export type IntegrationOrder = {
   id: string;
   external_order_id: string;
   status: IntegrationOrderStatus;
-  currency: "ZAR" | "MZN";
+  currency: "ZAR";
   subtotal: number;
   shipping_amount: number;
   total: number;
