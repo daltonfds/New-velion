@@ -174,3 +174,5 @@ async function handle\n\nasync function handle(request: Request) {
 export const GET = handle;
 export const POST = handle;
 export const DELETE = handle;
+
+export { handler as mcpHandler };
