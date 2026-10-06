@@ -47,5 +47,12 @@ export interface Product {
   supplier_min_selling_price?: number | null;
   supplier_suggested_price?: number | null;
   supplier_commission_rate?: number | null;
+  supplier_country_code?: "ZA" | "CN" | null;
+  supplier_cost_currency?: "ZAR" | "CNY" | null;
+  supplier_cost_amount?: number | null;
+  supplier_fx_rate_to_zar?: number | null;
+  supplier_fx_rate_captured_at?: string | null;
+  supplier_origin_shipping_cost?: number | null;
+  supplier_origin_shipping_currency?: "ZAR" | "CNY" | null;
   reserved_estoque?: number | null;
 }
