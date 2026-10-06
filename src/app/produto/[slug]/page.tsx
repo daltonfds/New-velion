@@ -115,6 +115,7 @@ export default function ProdutoPage() {
         )
         .eq("slug", slug)
         .eq("ativo", true)
+        .eq("moeda", "ZAR")
         .maybeSingle();
 
       if (cancelled) return;
