@@ -117,9 +117,9 @@ const handler = createMcpHandler(() => {
     inputSchema: z.object({ tracking_token: z.string().min(16).max(128) }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ tracking_token }) => {
-    const { data, error } = await supabase.rpc("get_public_fulfillment_tracking", { p_token: tracking_token.trim() });
+    const { data, error } = await supabase.from("fulfillment_orders").select("id,status,tracking_number,carrier,tracking_url,created_at,fulfilled_at").eq("public_tracking_token", tracking_token.trim()).maybeSingle();
     if (error) return result({ error: error.message });
-    return result({ data: Array.isArray(data) ? data[0] ?? null : data });
+    return result({ data });
   });
 
   server.registerTool("update_fulfillment_order", {
