@@ -242,7 +242,7 @@ export default function SellerSalesPage() {
           </div>
 
           <Link
-            href="/marketplace"
+            href="/dashboard/seller/marketplace"
             className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700"
           >
             Find products
@@ -364,7 +364,7 @@ export default function SellerSalesPage() {
 
               {!search && statusFilter === "all" && (
                 <Link
-                  href="/marketplace"
+                  href="/dashboard/seller/marketplace"
                   className="mt-6 inline-flex h-10 items-center justify-center rounded-lg border border-[#16294F] px-5 text-sm font-semibold text-[#16294F] transition hover:bg-slate-50"
                 >
                   Browse Marketplace
