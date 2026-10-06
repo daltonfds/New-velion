@@ -9,7 +9,7 @@ import {
 
 function mapOrderError(message: string) {
   const code = message.match(
-    /INVALID_ORDER|INVALID_SELLER|PRODUCT_NOT_MAPPED|PRODUCT_NOT_FOUND|PRODUCT_OUT_OF_STOCK|INVALID_QUANTITY|INVALID_CURRENCY|INVALID_CURRENCY|SALE_PRICE_BELOW_MINIMUM|PRODUCT_NOT_AVAILABLE|API_MONTHLY_ORDER_LIMIT/,
+    /INVALID_ORDER|INVALID_SELLER|PRODUCT_NOT_MAPPED|PRODUCT_NOT_FOUND|PRODUCT_OUT_OF_STOCK|INVALID_QUANTITY|INVALID_CURRENCY|SALE_PRICE_BELOW_MINIMUM|PRODUCT_NOT_AVAILABLE|API_MONTHLY_ORDER_LIMIT/,
   )?.[0];
 
   switch (code) {
@@ -17,7 +17,9 @@ function mapOrderError(message: string) {
       return ["INVALID_SELLER", "External seller is invalid or inactive.", 404] as const;
     case "PRODUCT_NOT_MAPPED":
       return ["PRODUCT_NOT_MAPPED", "The external product is not mapped to NewVelion.", 409] as const;
-    case "PRODUCT_NOT_AVAILABLE":\n      return ["PRODUCT_NOT_AVAILABLE", "The mapped product is not approved for external fulfillment.", 409] as const;\n    case "PRODUCT_NOT_FOUND":
+    case "PRODUCT_NOT_AVAILABLE":
+      return ["PRODUCT_NOT_AVAILABLE", "The mapped product is not approved for external fulfillment.", 409] as const;
+    case "PRODUCT_NOT_FOUND":
       return ["PRODUCT_NOT_FOUND", "The NewVelion product is unavailable.", 404] as const;
     case "PRODUCT_OUT_OF_STOCK":
       return ["PRODUCT_OUT_OF_STOCK", "The requested product quantity is out of stock.", 409] as const;
@@ -25,7 +27,9 @@ function mapOrderError(message: string) {
       return ["INVALID_QUANTITY", "Every order quantity must be greater than zero.", 400] as const;
     case "INVALID_CURRENCY":
       return ["INVALID_CURRENCY", "The order currency is not supported for the mapped product.", 409] as const;
-    case "API_MONTHLY_ORDER_LIMIT":\n      return ["API_MONTHLY_ORDER_LIMIT", "This integration has reached its monthly order limit.", 429] as const;\n    case "SALE_PRICE_BELOW_MINIMUM":
+    case "API_MONTHLY_ORDER_LIMIT":
+      return ["API_MONTHLY_ORDER_LIMIT", "This integration has reached its monthly order limit.", 429] as const;
+    case "SALE_PRICE_BELOW_MINIMUM":
       return ["SALE_PRICE_BELOW_MINIMUM", "The seller price is below the supplier minimum.", 409] as const;
     default:
       return ["INVALID_ORDER", "The order payload is invalid.", 400] as const;
