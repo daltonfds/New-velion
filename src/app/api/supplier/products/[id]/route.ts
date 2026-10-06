@@ -14,7 +14,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   const auth = await requireSupplier(request);
   if (!auth.ok) return Response.json({ error: auth.message }, { status: auth.status });
   const { id } = await context.params;
-  const { data: existing, error: existingError } = await auth.client.from("products").select("id,supplier_status").eq("id", id).eq("created_by", auth.userId).maybeSingle();
+  const { data: existing, error: existingError } = await auth.client.from("products").select("id,supplier_status,supplier_country_code,supplier_cost_currency").eq("id", id).eq("created_by", auth.userId).maybeSingle();
   if (existingError) return Response.json({ error: existingError.message }, { status: 500 });
   if (!existing) return Response.json({ error: "Product not found." }, { status: 404 });
 
@@ -39,15 +39,19 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
   const price = Number(body.preco);
   const cost = Number(body.preco_custo);
-  if (!Number.isFinite(price) || price < 0 || !Number.isFinite(cost) || cost < 0) return Response.json({ error: "Invalid price or cost." }, { status: 400 });
+  const supplierCountry = String(body.supplier_country_code ?? body.fornecedor_pais ?? existing.supplier_country_code ?? "").trim().toUpperCase();
+  const supplierCostCurrency = supplierCountry === "CN" ? "CNY" : "ZAR";
+  const supplierCostAmount = Number(body.supplier_cost_amount ?? body.preco_custo);
+  if (!Number.isFinite(price) || price < 0 || !Number.isFinite(cost) || cost < 0 || !Number.isFinite(supplierCostAmount) || supplierCostAmount < 0) return Response.json({ error: "Invalid price or cost." }, { status: 400 });
+  if (!["ZA", "CN"].includes(supplierCountry)) return Response.json({ error: "Supplier country must be South Africa (ZA) or China (CN)." }, { status: 400 });
 
   const nextStatus = existing.supplier_status === "approved" ? "pending_review" : "draft";
   const { data, error } = await auth.client.from("products").update({
     nome: String(body.nome ?? "").trim(), slug: String(body.slug ?? "").trim(), descricao: String(body.descricao ?? "").trim(),
     categoria_id: String(body.categoria_id ?? ""), subcategoria_id: String(body.subcategoria_id ?? "").trim() || null,
-    preco: String(body.moeda ?? "ZAR") === "ZAR" ? Math.round(price) : price,
+    preco: Math.round(price),
     preco_promocional: body.preco_promocional == null || body.preco_promocional === "" ? null : Number(body.preco_promocional),
-    moeda: String(body.moeda ?? "ZAR"), preco_custo: cost, comissao_afiliado: Number(body.comissao_afiliado ?? 0),
+    moeda: "ZAR", preco_custo: supplierCountry === "ZA" ? supplierCostAmount : cost, supplier_country_code: supplierCountry, supplier_cost_currency: supplierCostCurrency, supplier_cost_amount: supplierCostAmount, supplier_fx_rate_to_zar: supplierCostCurrency === "ZAR" ? 1 : (Number(body.supplier_fx_rate_to_zar) || null), supplier_fx_rate_captured_at: supplierCostCurrency === "ZAR" ? new Date().toISOString() : (Number(body.supplier_fx_rate_to_zar) > 0 ? new Date().toISOString() : null), comissao_afiliado: Number(body.comissao_afiliado ?? 0),
     supplier_min_selling_price: Number(body.supplier_min_selling_price ?? price), supplier_suggested_price: Number(body.supplier_suggested_price ?? price),
     supplier_commission_rate: Number(body.supplier_commission_rate ?? 0), estoque: Math.max(0, Math.floor(Number(body.estoque ?? 0))),
     low_stock_threshold: Math.max(0, Math.floor(Number(body.low_stock_threshold ?? 5))),
