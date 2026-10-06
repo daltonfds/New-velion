@@ -1,0 +1,4 @@
+-- Integration orders reserve stock through create_integration_fulfillment.
+-- Do not decrement products.estoque before fulfillment creation; available stock is
+-- estoque - reserved_estoque and create_integration_fulfillment increments reserved_estoque.
+-- Production function replacement applied as integration_stock_reservation_fix_v1.
