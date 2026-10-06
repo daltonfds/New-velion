@@ -75,8 +75,8 @@ export async function POST(request: Request) {
     String(body.idempotency_key ?? "").trim() ||
     null;
 
-  if (!externalOrderId || !externalSellerId || !["ZAR", "MZN"].includes(currency)) {
-    return apiError("INVALID_ORDER", "external_order_id, external_seller_id and a supported currency are required.", 400, auth.id);
+  if (!externalOrderId || !externalSellerId || currency !== "ZAR") {
+    return apiError("INVALID_CURRENCY", "Integration orders must use ZAR. NewVelion customers are South African.", 400, auth.id);
   }
 
   if (!items.length) {
@@ -98,7 +98,11 @@ export async function POST(request: Request) {
     return apiError("INVALID_SELLER", "External seller is invalid or inactive.", 404, auth.id);
   }
 
-  if (!shippingAddress.country || !shippingAddress.city || !shippingAddress.address || !shippingAddress.phone) {
+  if (String(shippingAddress.country ?? "").trim().toUpperCase() !== "ZA") {
+    return apiError("INVALID_ADDRESS", "Integration delivery addresses must be in South Africa (ZA).", 400, auth.id);
+  }
+
+  if (!shippingAddress.city || !shippingAddress.address || !shippingAddress.phone) {
     return apiError(
       "INVALID_ADDRESS",
       "shipping_address.country, city, address and phone are required.",
