@@ -217,7 +217,7 @@ export async function getPublicProduct(slug: string, affiliateRef?: string) {
   const database = db();
   let affiliatePrice: number | null = null;
   if (affiliateRef) {
-    const { data: affiliateData } = await database.rpc("resolve_affiliate_product_with_slug", { p_link_unico: affiliateRef.replace(/^https?:\\/\\/[^/]+\\//, "").replace(/^\\//, "") });
+    const { data: affiliateData } = await database.rpc("resolve_affiliate_product_with_slug", { p_link_unico: affiliateRef.replace(/^https?:\/\/[^/]+\//, "").replace(/^\//, "") });
     const resolved = Array.isArray(affiliateData) ? affiliateData[0] : affiliateData;
     if (resolved?.product_id === product.id && Number.isFinite(Number(resolved.sale_price))) affiliatePrice = Number(resolved.sale_price);
   }
