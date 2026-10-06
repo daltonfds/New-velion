@@ -90,6 +90,9 @@ create trigger product_geo_currency_policy
 before insert or update of moeda,created_by,supplier_country_code,supplier_cost_currency,supplier_fx_rate_to_zar,supplier_origin_shipping_currency
 on public.products for each row execute function public.enforce_newvelion_product_geo_currency();
 
+alter table public.checkout_sessions add column if not exists customer_country_code text;
+alter table public.integration_orders add column if not exists customer_country_code text;
+
 create or replace function public.enforce_checkout_za_zar()
 returns trigger language plpgsql security definer set search_path=''
 as $$
