@@ -215,8 +215,8 @@ export default function SellerWithdrawalsPage() {
   const numericZar = walletCurrency === "ZAR" ? numeric : numeric / exchangeRate;
 
   const fee = useMemo(
-    () => numeric * 0.05 + (numeric > 0 ? 10 : 0),
-    [numeric]
+    () => numeric * 0.05 + (numeric > 0 ? 10 * exchangeRate : 0),
+    [numeric, exchangeRate]
   );
 
   const net = Math.max(numeric - fee, 0);
@@ -265,7 +265,7 @@ export default function SellerWithdrawalsPage() {
       return;
     }
 
-    if (numeric > wallet.disponivel) {
+    if (numericZar > wallet.disponivel) {
       setError("The withdrawal amount cannot exceed your available balance.");
       return;
     }
@@ -643,7 +643,7 @@ export default function SellerWithdrawalsPage() {
                       disabled={
                         submitting ||
                         numeric < minimumWithdrawal ||
-                        numeric > wallet.disponivel ||
+                        numericZar > wallet.disponivel ||
                         !available.length ||
                         (walletCurrency !== "ZAR" && (!exchangeRate || rateLoading))
                       }
