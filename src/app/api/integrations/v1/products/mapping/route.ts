@@ -69,19 +69,23 @@ export async function POST(request: Request) {
   const fixedPrice = Number(
     Number(product.preco_promocional ?? 0) > 0 ? product.preco_promocional : product.preco,
   );
-  const basePrice = Number(
-    product.custom_pricing_floor_zar ??
-      product.supplier_min_selling_price ??
-      (
-        (product.supplier_cost_currency === "CNY" && Number(product.supplier_fx_rate_to_zar ?? 0) > 0
-          ? Number(product.supplier_cost_amount ?? 0) * Number(product.supplier_fx_rate_to_zar)
-          : Number(product.supplier_cost_amount ?? 0)) +
-        Number(product.supplier_origin_shipping_cost ?? 0) *
-          (product.supplier_origin_shipping_currency === "CNY" && Number(product.supplier_fx_rate_to_zar ?? 0) > 0
-            ? Number(product.supplier_fx_rate_to_zar)
-            : 1)
-      )
-  );
+  let basePrice = 0;
+  if (product.custom_pricing_floor_zar != null) {
+    basePrice = Number(product.custom_pricing_floor_zar);
+  } else if (product.supplier_min_selling_price != null) {
+    basePrice = Number(product.supplier_min_selling_price);
+  } else {
+    const supplierCost =
+      product.supplier_cost_currency === "CNY" && Number(product.supplier_fx_rate_to_zar ?? 0) > 0
+        ? Number(product.supplier_cost_amount ?? 0) * Number(product.supplier_fx_rate_to_zar)
+        : Number(product.supplier_cost_amount ?? 0);
+    const originShipping =
+      Number(product.supplier_origin_shipping_cost ?? 0) *
+      (product.supplier_origin_shipping_currency === "CNY" && Number(product.supplier_fx_rate_to_zar ?? 0) > 0
+        ? Number(product.supplier_fx_rate_to_zar)
+        : 1);
+    basePrice = supplierCost + originShipping;
+  }
 
   if (pricingMode === "fixed" && salePrice != null && Math.abs(salePrice - fixedPrice) > 0.01) {
     return apiError("FIXED_PRICE_MISMATCH", "sale_price must match the NewVelion fixed price.", 409, auth.id);
