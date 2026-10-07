@@ -150,7 +150,7 @@ export async function authenticateIntegrationRequest(request: Request) {
   const match = authorization.match(/^Bearer\s+([^\s]+)$/i);
 
   if (!match) {
-    return { ok: false as const, id, error: apiError("INVALID_API_KEY", "Missing integration credentials.", 401, id) };
+    return { ok: false as const, id, error: apiError("UNAUTHORIZED", "Authentication required.", 401, id) };
   }
 
   const credential = match[1];
