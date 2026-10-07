@@ -169,7 +169,7 @@ export default function SellerDashboardPage() {
               <p className="mb-2 text-sm font-medium text-[#C99A2E]">
                 Seller dashboard
               </p>
-              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#16294F]">
+              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#0E1F3D]">
                 Welcome back, {userName}
               </h1>
               <p className="mt-2 text-sm text-[#60708A]">
@@ -180,7 +180,7 @@ export default function SellerDashboardPage() {
 
             <Link
               href="/dashboard/seller/marketplace"
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700"
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-[#0E4AAB] px-5 text-sm font-semibold text-white transition hover:bg-[#0B3D8F]"
             >
               Browse marketplace
             </Link>
@@ -226,7 +226,7 @@ export default function SellerDashboardPage() {
                   />
                 </div>
 
-                <div className="mt-5 text-2xl font-semibold tracking-[-0.025em] text-[#16294F]">
+                <div className="mt-5 text-2xl font-semibold tracking-[-0.025em] text-[#0E1F3D]">
                   {loading ? "—" : item.value}
                 </div>
 
@@ -239,7 +239,7 @@ export default function SellerDashboardPage() {
             <Card className="border-[#DCE3EE] bg-white p-6 shadow-none">
               <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
                 <div>
-                  <h2 className="text-base font-semibold text-[#16294F]">
+                  <h2 className="text-base font-semibold text-[#0E1F3D]">
                     Sales performance
                   </h2>
                   <p className="mt-1 text-sm text-[#7C8798]">
@@ -322,7 +322,7 @@ export default function SellerDashboardPage() {
 
             <Card className="border-[#DCE3EE] bg-white p-6 shadow-none">
               <div>
-                <h2 className="text-base font-semibold text-[#16294F]">
+                <h2 className="text-base font-semibold text-[#0E1F3D]">
                   Wallet position
                 </h2>
                 <p className="mt-1 text-sm text-[#7C8798]">
@@ -333,7 +333,7 @@ export default function SellerDashboardPage() {
               <div className="mt-8 space-y-5">
                 {[
                   ["Available", wallet.disponivel, "bg-[#2B5F9E]"],
-                  ["Retained", wallet.retido, "bg-[#C99A2E]"],
+                  ["Retained", wallet.retido, "bg-[#0E4AAB]"],
                   ["Reserved", wallet.reservado, "bg-[#8A8570]"],
                 ].map(([label, value, color]) => {
                   const total =
@@ -348,7 +348,7 @@ export default function SellerDashboardPage() {
                         <span className="font-medium text-[#405579]">
                           {label}
                         </span>
-                        <span className="text-[#16294F]">
+                        <span className="text-[#0E1F3D]">
                           {money(Number(value))}
                         </span>
                       </div>
@@ -367,7 +367,7 @@ export default function SellerDashboardPage() {
               <div className="mt-8 border-t border-[#E9EEF5] pt-5">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-[#60708A]">Total balance</span>
-                  <span className="text-lg font-semibold text-[#16294F]">
+                  <span className="text-lg font-semibold text-[#0E1F3D]">
                     {money(
                       totalBalance
                     )}
@@ -382,7 +382,7 @@ export default function SellerDashboardPage() {
               <p className="text-sm font-medium text-[#60708A]">
                 Sales revenue
               </p>
-              <p className="mt-3 text-2xl font-semibold text-[#16294F]">
+              <p className="mt-3 text-2xl font-semibold text-[#0E1F3D]">
                 {money(totalSales)}
               </p>
               <p className="mt-1 text-xs text-[#7C8798]">
@@ -394,7 +394,7 @@ export default function SellerDashboardPage() {
               <p className="text-sm font-medium text-[#60708A]">
                 Commission earned
               </p>
-              <p className="mt-3 text-2xl font-semibold text-[#16294F]">
+              <p className="mt-3 text-2xl font-semibold text-[#0E1F3D]">
                 {money(totalCommission)}
               </p>
               <p className="mt-1 text-xs text-[#7C8798]">
@@ -406,7 +406,7 @@ export default function SellerDashboardPage() {
               <p className="text-sm font-medium text-[#60708A]">
                 Paid conversions
               </p>
-              <p className="mt-3 text-2xl font-semibold text-[#16294F]">
+              <p className="mt-3 text-2xl font-semibold text-[#0E1F3D]">
                 {financialSummary?.sales_count ?? 0}
               </p>
               <p className="mt-1 text-xs text-[#7C8798]">
@@ -419,7 +419,7 @@ export default function SellerDashboardPage() {
             <Card className="overflow-hidden border-[#DCE3EE] bg-white p-0 shadow-none">
               <div className="flex flex-col justify-between gap-3 border-b border-[#E9EEF5] px-6 py-5 sm:flex-row sm:items-center">
                 <div>
-                  <h2 className="text-base font-semibold text-[#16294F]">
+                  <h2 className="text-base font-semibold text-[#0E1F3D]">
                     Recent sales
                   </h2>
                   <p className="mt-1 text-sm text-[#7C8798]">
@@ -452,7 +452,7 @@ export default function SellerDashboardPage() {
                       <path d="M4 19V5M4 19h16M8 15v-3M12 15V8M16 15v-6" />
                     </svg>
                   </div>
-                  <p className="mt-4 text-sm font-semibold text-[#16294F]">
+                  <p className="mt-4 text-sm font-semibold text-[#0E1F3D]">
                     No paid sales yet
                   </p>
                   <p className="mx-auto mt-1 max-w-md text-sm text-[#7C8798]">
@@ -479,7 +479,7 @@ export default function SellerDashboardPage() {
                               "en-GB"
                             )}
                           </td>
-                          <td className="px-6 py-4 font-medium text-[#16294F]">
+                          <td className="px-6 py-4 font-medium text-[#0E1F3D]">
                             {money(Number(sale.valor_venda || 0))}
                           </td>
                           <td className="px-6 py-4 font-medium text-[#18794E]">
