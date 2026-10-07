@@ -258,7 +258,7 @@ export default function AdminCategoriesPage() {
                     {categories.map((category) => (
                       <tr
                         key={category.id}
-                        className="hover:bg-slate-50"
+                        className="hover:bg-[#F6F9FC]"
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
