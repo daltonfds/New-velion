@@ -18,10 +18,10 @@ export default function StoreFeatures() {
   ];
 
   return (
-    <section className="border-b border-slate-100 bg-white">
+    <section className="border-b border-[#E7EDF5] bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#16294F]">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
             The Newvelion experience
           </p>
 
@@ -39,7 +39,7 @@ export default function StoreFeatures() {
           {features.map((feature) => (
             <div
               key={feature.number}
-              className="border border-slate-200 bg-white p-7"
+              className="border border-[#DDE5EF] bg-white p-7"
             >
               <span className="text-sm font-bold text-[#C99A2E]">
                 {feature.number}
