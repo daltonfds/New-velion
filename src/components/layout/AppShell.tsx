@@ -241,7 +241,7 @@ export default function AppShell({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f7f8fb] text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-screen bg-[#f6f9fc] text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       {mobileOpen && (
         <button
           aria-label="Close menu"
@@ -252,13 +252,13 @@ export default function AppShell({
 
       <aside
         className={[
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col",
+          "fixed inset-y-0 left-0 z-50 flex w-[248px] flex-col",
           "border-r border-gray-200 bg-white dark:border-slate-800 dark:bg-slate-900",
           "transition-transform duration-200",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         ].join(" ")}
       >
-        <div className="flex h-[76px] items-center border-b border-slate-100 px-6 dark:border-slate-800">
+        <div className="flex h-[72px] items-center border-b border-slate-100 px-6 dark:border-slate-800">
           <NewvelionBrand size="md" />
         </div>
 
@@ -274,21 +274,21 @@ export default function AppShell({
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
                 className={[
-                  "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "group relative flex items-center gap-3 rounded-[7px] px-3 py-2.5 text-sm font-medium transition-colors",
                   pathname === item.href
-                    ? "bg-[#eef4fb] text-[#16294F] dark:bg-slate-800 dark:text-blue-300"
+                    ? "bg-[#eef5ff] text-[#0e4aab] dark:bg-slate-800 dark:text-blue-300"
                     : "text-slate-600 hover:bg-slate-50 hover:text-blue-600",
                 ].join(" ")}
               >
                 {pathname === item.href && (
-                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-[#C99A2E]" />
+                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-[#0e4aab]" />
                 )}
 
                 <span
                   className={[
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
                     pathname === item.href
-                      ? "text-[#16294F]"
+                      ? "text-[#0e1f3d]"
                       : "text-slate-500 group-hover:text-blue-600",
                   ].join(" ")}
                 >
@@ -370,7 +370,7 @@ export default function AppShell({
                 type="button"
                 disabled={loggingOut}
                 onClick={handleLogout}
-                className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 rounded-lg bg-[#0e4aab] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0b3d8f] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loggingOut ? t("Logging out...","A sair...") : t("Log out","Sair")}
               </button>
@@ -379,8 +379,8 @@ export default function AppShell({
         </div>
       )}
 
-      <div className="lg:pl-[252px]">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-8 dark:border-slate-800 dark:bg-slate-900">
+      <div className="lg:pl-[248px]">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#dde5ef] bg-white px-4 lg:px-8 dark:border-slate-800 dark:bg-slate-900">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -416,7 +416,7 @@ export default function AppShell({
           </div>
         </header>
 
-        <main className="min-h-[calc(100vh-4.75rem)] p-4 lg:p-7">
+        <main className="min-h-[calc(100vh-4.5rem)] bg-[#f6f9fc] p-4 lg:p-7">
           {children}
         </main>
       </div>
