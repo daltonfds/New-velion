@@ -16,10 +16,15 @@ export default function TermsPage() {
       </p>
 
       <p>
-        The legal entity operating Newvelion, including its registered name,
-        registration number and registered address, will be identified in the
-        final version of these Terms once the operating company is formally
-        registered.
+        Newvelion is the platform brand for the commerce infrastructure
+        service described in these Terms. The operator's registered legal
+        name, registration number and registered address will be published
+        here as soon as the operating entity is formally registered.
+      </p>
+      <p>
+        Until those details are published, this page does not represent that
+        Newvelion has completed formal company registration in any particular
+        jurisdiction.
       </p>
 
       <h2>2. Acceptance</h2>
