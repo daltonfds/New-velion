@@ -262,7 +262,7 @@ export default function AdminAnalyticsPage() {
           <select
             value={period}
             onChange={(event) => setPeriod(event.target.value)}
-            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+            className="h-10 rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
           >
             <option value="all">All time</option>
             <option value="7d">Last 7 days</option>
