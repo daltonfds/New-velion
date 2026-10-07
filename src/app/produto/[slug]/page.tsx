@@ -71,8 +71,8 @@ export default function ProdutoPage() {
     return () => { cancelled = true; };
   }, [slug, affiliateRef]);
 
-  if (loading) return <main className="flex min-h-screen items-center justify-center bg-white"><div className="text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#16294F]" /><p className="mt-4 text-sm text-slate-500">Loading product...</p></div></main>;
-  if (error || !data?.product) return <main className="flex min-h-screen items-center justify-center bg-white px-6"><div className="max-w-md text-center"><h1 className="text-2xl font-extrabold text-[#16294F]">Product unavailable</h1><p className="mt-2 text-sm text-slate-500">{error || "This product could not be found."}</p></div></main>;
+  if (loading) return <main className="flex min-h-screen items-center justify-center bg-white"><div className="text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#DDE5EF] border-t-[#0E1F3D]" /><p className="mt-4 text-sm text-slate-500">Loading product...</p></div></main>;
+  if (error || !data?.product) return <main className="flex min-h-screen items-center justify-center bg-white px-6"><div className="max-w-md text-center"><h1 className="text-2xl font-extrabold text-[#0E1F3D]">Product unavailable</h1><p className="mt-2 text-sm text-slate-500">{error || "This product could not be found."}</p></div></main>;
 
   const raw = data.product;
   const product: Product = {
@@ -94,12 +94,12 @@ export default function ProdutoPage() {
     garantia_texto: raw.guarantee,
   };
 
-  return <main className="min-h-screen bg-white text-slate-950">
+  return <main className="min-h-screen bg-[#F6F9FC] text-slate-950">
     <AnnouncementBar />
     <Header />
     <ProductInfo product={product} affiliateLink={affiliateRef} priceOverride={data.affiliatePrice ?? null} />
-    {raw.supplier && <section className="border-b border-slate-100 bg-white"><div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-5 lg:px-8"><div><p className="text-[11px] font-bold uppercase tracking-[0.18em] text-blue-600">Supplier</p><p className="mt-1 font-bold text-[#16294F]">{raw.supplier.name}</p><p className="text-sm text-slate-500">{raw.supplier.countryName}{raw.supplier.city ? " · " + raw.supplier.city : ""}</p></div><a href={"/fornecedor/" + encodeURIComponent(raw.supplier.slug)} className="shrink-0 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-bold text-[#16294F] hover:bg-slate-50">View supplier</a></div></section>}
-    <section className="border-b border-slate-100 bg-slate-50"><div className="mx-auto grid max-w-7xl grid-cols-1 sm:grid-cols-3"><div className="border-b border-slate-200 px-6 py-7 text-center sm:border-b-0 sm:border-r"><p className="text-lg font-extrabold text-[#16294F]">Fast delivery</p><p className="mt-1 text-sm text-slate-500">South African delivery options</p></div><div className="border-b border-slate-200 px-6 py-7 text-center sm:border-b-0 sm:border-r"><p className="text-lg font-extrabold text-[#16294F]">Product guarantee</p><p className="mt-1 text-sm text-slate-500">{product.garantia_texto || "Guarantee details are shown below"}</p></div><div className="px-6 py-7 text-center"><p className="text-lg font-extrabold text-[#16294F]">Customer support</p><p className="mt-1 text-sm text-slate-500">Help throughout your purchase</p></div></div></section>
+    {raw.supplier && <section className="border-b border-[#E7EDF5] bg-white"><div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-5 lg:px-8"><div><p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#0E4AAB]">Supplier</p><p className="mt-1 font-bold text-[#0E1F3D]">{raw.supplier.name}</p><p className="text-sm text-slate-500">{raw.supplier.countryName}{raw.supplier.city ? " · " + raw.supplier.city : ""}</p></div><a href={"/fornecedor/" + encodeURIComponent(raw.supplier.slug)} className="shrink-0 rounded-lg border border-[#DDE5EF] px-4 py-2.5 text-sm font-bold text-[#0E1F3D] hover:bg-[#F6F9FC]">View supplier</a></div></section>}
+    <section className="border-b border-[#E7EDF5] bg-[#F6F9FC]"><div className="mx-auto grid max-w-7xl grid-cols-1 sm:grid-cols-3"><div className="border-b border-[#DDE5EF] px-6 py-7 text-center sm:border-b-0 sm:border-r"><p className="text-lg font-extrabold text-[#0E1F3D]">Fast delivery</p><p className="mt-1 text-sm text-slate-500">South African delivery options</p></div><div className="border-b border-[#DDE5EF] px-6 py-7 text-center sm:border-b-0 sm:border-r"><p className="text-lg font-extrabold text-[#0E1F3D]">Product guarantee</p><p className="mt-1 text-sm text-slate-500">{product.garantia_texto || "Guarantee details are shown below"}</p></div><div className="px-6 py-7 text-center"><p className="text-lg font-extrabold text-[#0E1F3D]">Customer support</p><p className="mt-1 text-sm text-slate-500">Help throughout your purchase</p></div></div></section>
     <WhyChooseSection product={product} />
     <ProductDetails product={product} />
     <StoreFeatures />
