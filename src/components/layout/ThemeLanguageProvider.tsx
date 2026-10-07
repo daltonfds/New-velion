@@ -128,9 +128,9 @@ const wordTranslations: Record<string, string> = {
   address:"morada", city:"cidade", state:"província", "postal":"postal", code:"código", revenue:"receita", profit:"lucro", margin:"margem",
   rate:"taxa", amount:"valor", balance:"saldo", wallet:"carteira", analytics:"análises", report:"relatório", reports:"relatórios",
   performance:"desempenho", clicks:"cliques", conversions:"conversões", views:"visualizações", visitors:"visitantes", conversion:"conversão",
-  customer:"cliente", customers:"clientes", inventory:"inventário", stock:"stock", catalog:"catálogo", fulfillment:"logística",
-  shipping:"envio", offer:"oferta", offers:"ofertas", review:"avaliação", reviews:"avaliações", rating:"avaliação", verified:"verificado",
-  available:"disponível", unavailable:"indisponível", "in":"em", "out":"fora", secure:"seguro", checkout:"checkout", order:"pedido",
+    inventory:"inventário", stock:"stock", catalog:"catálogo", fulfillment:"logística",
+   offer:"oferta", offers:"ofertas", review:"avaliação", reviews:"avaliações", rating:"avaliação", verified:"verificado",
+  available:"disponível", unavailable:"indisponível", "in":"em", "out":"fora", secure:"seguro", checkout:"checkout", 
   details:"detalhes", information:"informação", general:"geral", business:"negócio", personal:"pessoal", notification:"notificação",
   notifications:"notificações", search:"pesquisar", save:"guardar", cancel:"cancelar", delete:"eliminar", edit:"editar", add:"adicionar",
   remove:"remover", back:"voltar", next:"seguinte", previous:"anterior", submit:"enviar", confirm:"confirmar", close:"fechar",
@@ -138,7 +138,7 @@ const wordTranslations: Record<string, string> = {
   import:"importar", copy:"copiar", create:"criar", update:"atualizar", apply:"aplicar", reset:"repor", filter:"filtrar", filters:"filtros",
   sort:"ordenar", "by":"por", view:"ver", manage:"gerir", new:"novo", old:"antigo", yes:"sim", no:"não", required:"obrigatório",
   optional:"opcional", date:"data", time:"hora", today:"hoje", yesterday:"ontem", week:"semana", month:"mês", year:"ano",
-  "this":"este", "last":"último", "recent":"recente", "top":"principais", "all":"todos", "no":"não", "data":"dados", "available":"disponível",
+  "this":"este", "last":"último", "recent":"recente", "top":"principais", "all":"todos",  "data":"dados", 
   "loading":"a carregar", "saving":"a guardar", "deleting":"a eliminar", "updating":"a atualizar", "creating":"a criar",
 };
 
