@@ -156,7 +156,7 @@ export async function authenticateIntegrationRequest(request: Request) {
   const credential = match[1];
   const separator = credential.indexOf(".");
   if (separator <= 0 || separator === credential.length - 1) {
-    return { ok: false as const, id, error: apiError("INVALID_API_KEY", "Invalid integration credentials.", 401, id) };
+    return { ok: false as const, id, error: apiError("UNAUTHORIZED", "Authentication failed.", 401, id) };
   }
 
   const apiKey = credential.slice(0, separator);
@@ -170,7 +170,7 @@ export async function authenticateIntegrationRequest(request: Request) {
     .maybeSingle();
 
   if (error || !platform) {
-    return { ok: false as const, id, error: apiError("INVALID_API_KEY", "Invalid integration credentials.", 401, id) };
+    return { ok: false as const, id, error: apiError("UNAUTHORIZED", "Authentication failed.", 401, id) };
   }
 
   if (platform.status !== "active") {
@@ -179,7 +179,7 @@ export async function authenticateIntegrationRequest(request: Request) {
 
   const receivedHash = sha256(apiSecret);
   if (!safeEqualHex(receivedHash, platform.api_secret_hash)) {
-    return { ok: false as const, id, error: apiError("INVALID_API_KEY", "Invalid integration credentials.", 401, id) };
+    return { ok: false as const, id, error: apiError("UNAUTHORIZED", "Authentication failed.", 401, id) };
   }
 
   const { data: allowed } = await client.rpc("consume_integration_rate_limit", {
