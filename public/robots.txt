@@ -1,8 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /dashboard/
-Disallow: /api/
-Disallow: /account/
-Disallow: /checkout/
-Disallow: /cart/
-Sitemap: https://veliongroup.online/sitemap.xml
