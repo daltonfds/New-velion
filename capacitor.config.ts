@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Newvelion',
   webDir: 'out',
   server: {
-    url: 'https://www.veliongroup.online',
+    url: 'https://veliongroup.online',
     cleartext: false
   }
 };
