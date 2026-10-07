@@ -88,18 +88,18 @@ export default function SupplierSettingsPage() {
   return (
     <AppShell area="supplier" title="Settings" subtitle="Manage supplier payout preferences.">
       <div className="mx-auto max-w-4xl space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-5">
+        <div className="flex items-center justify-between border-b border-[#DDE5EF] pb-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-600">Supplier account</p>
-            <h1 className="mt-1 text-3xl font-bold text-[#16294F]">Payout settings</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#0E4AAB]">Supplier account</p>
+            <h1 className="mt-1 text-3xl font-bold text-[#0E1F3D]">Payout settings</h1>
             <p className="mt-1 text-sm text-slate-500">{country === "ZA" ? "South Africa · ZAR · +27" : country === "CN" ? "China · CNY · +86" : "Country not configured"}</p>
           </div>
-          <Link href="/dashboard/supplier/withdrawals" className="text-sm font-semibold text-blue-600">Withdrawals →</Link>
+          <Link href="/dashboard/supplier/withdrawals" className="text-sm font-semibold text-[#0E4AAB]">Withdrawals →</Link>
         </div>
         {message && <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</div>}
         {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
-        <section className="rounded-xl border border-slate-200 bg-white p-6">
+        <section className="rounded-[10px] border border-[#DDE5EF] bg-white p-6">
           <h2 className="font-semibold text-slate-900">Country-specific payout methods</h2>
           <p className="mt-1 text-sm text-slate-500">Only methods available for your approved supplier country are shown. The payout holder must match your KYC-approved name.</p>
           {loading ? <div className="mt-6 text-sm text-slate-500">Loading...</div> : (
@@ -108,10 +108,10 @@ export default function SupplierSettingsPage() {
                 const value = saved[option.key] ?? {};
                 const enabled = value.enabled === true;
                 return (
-                  <div key={option.key} className="rounded-xl border border-slate-200 p-5">
+                  <div key={option.key} className="rounded-[10px] border border-[#DDE5EF] p-5">
                     <button type="button" onClick={() => toggle(option.key)} className="flex w-full items-center justify-between text-left">
                       <div><p className="font-semibold text-slate-900">{option.label}</p><p className="mt-1 text-xs text-slate-500">{option.description}</p></div>
-                      <span className={enabled ? "font-semibold text-blue-600" : "text-slate-400"}>{enabled ? "Enabled" : "Disabled"}</span>
+                      <span className={enabled ? "font-semibold text-[#0E4AAB]" : "text-slate-400"}>{enabled ? "Enabled" : "Disabled"}</span>
                     </button>
                     {enabled && <div className="mt-4 grid gap-4 md:grid-cols-2">
                       {option.fields.map(([field,label]) => (
@@ -127,7 +127,7 @@ export default function SupplierSettingsPage() {
               {!options.length && <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-800">Set your supplier country to South Africa or China before configuring payouts.</div>}
             </div>
           )}
-          <button disabled={saving || loading || !options.length} onClick={save} className="mt-6 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">{saving ? "Saving..." : "Save payout settings"}</button>
+          <button disabled={saving || loading || !options.length} onClick={save} className="mt-6 rounded-lg bg-[#0E4AAB] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0B3D8F] disabled:opacity-50">{saving ? "Saving..." : "Save payout settings"}</button>
         </section>
       </div>
     </AppShell>
