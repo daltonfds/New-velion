@@ -416,7 +416,7 @@ export default function AppShell({
           </div>
         </header>
 
-        <main className="min-h-[calc(100vh-4.5rem)] bg-[#f6f9fc] p-4 lg:p-7">
+        <main className="nv-dashboard min-h-[calc(100vh-4.5rem)] bg-[#f6f9fc] p-4 lg:p-7">
           {children}
         </main>
       </div>
