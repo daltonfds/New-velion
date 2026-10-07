@@ -22,7 +22,7 @@ export default function ReviewCard({ review }: { review: Review }) {
       });
 
   return (
-    <article className="border border-slate-200 bg-white p-6">
+    <article className="border border-[#DDE5EF] bg-white p-6">
       <div className="flex items-center justify-between gap-4">
         <div className="tracking-widest text-[#C99A2E]" aria-label={`${rating} out of 5 stars`}>
           {"★".repeat(rating)}
@@ -46,7 +46,7 @@ export default function ReviewCard({ review }: { review: Review }) {
             className="h-10 w-10 rounded-full object-cover"
           />
         ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-[#16294F]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-[#0E1F3D]">
             {(review.reviewer_name || "N").charAt(0).toUpperCase()}
           </div>
         )}
