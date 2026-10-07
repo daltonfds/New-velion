@@ -11,10 +11,10 @@ export default function WhyChooseSection({
   const benefits = product.beneficios?.filter(Boolean) || [];
 
   return (
-    <section className="border-y border-slate-100 bg-white">
+    <section className="border-y border-[#E7EDF5] bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#16294F]">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
             Why choose this product?
           </p>
 
@@ -34,9 +34,9 @@ export default function WhyChooseSection({
             {benefits.slice(0, 8).map((benefit, index) => (
               <div
                 key={`${benefit}-${index}`}
-                className="border border-slate-200 bg-white p-6"
+                className="border border-[#DDE5EF] bg-white p-6"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#16294F] text-sm font-bold text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0E1F3D] text-sm font-bold text-white">
                   ✓
                 </div>
 
@@ -49,7 +49,7 @@ export default function WhyChooseSection({
         )}
 
         {product.ingredientes && (
-          <div className="mt-10 border-t border-slate-100 pt-8">
+          <div className="mt-10 border-t border-[#E7EDF5] pt-8">
             <h3 className="text-lg font-bold text-slate-950">
               Product composition
             </h3>
