@@ -17,7 +17,7 @@ export default function SellerIntegrationsPage() {
     <main className="min-h-screen bg-white px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">
+          <p className="text-sm font-semibold uppercase tracking-wide text-[#0E4AAB]">
             Seller
           </p>
 
@@ -41,11 +41,11 @@ export default function SellerIntegrationsPage() {
               <Link
                 key={integration.name}
                 href={integration.href}
-                className="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-blue-300 hover:bg-slate-50"
+                className="group rounded-[12px] border border-[#DDE5EF] bg-white p-6 transition hover:border-blue-300 hover:bg-[#F6F9FC]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-white">
                       <svg
                         viewBox="0 0 48 48"
                         className="h-11 w-11"
@@ -81,7 +81,7 @@ export default function SellerIntegrationsPage() {
                   </span>
                 </div>
 
-                <div className="mt-6 text-sm font-semibold text-blue-600 group-hover:text-blue-700">
+                <div className="mt-6 text-sm font-semibold text-[#0E4AAB] group-hover:text-[#0E4AAB]">
                   Configure integration →
                 </div>
               </Link>
