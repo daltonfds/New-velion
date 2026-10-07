@@ -28,7 +28,7 @@ export default function ReviewsSection({
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#16294F]">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
             Customer reviews
           </p>
 
@@ -62,7 +62,7 @@ export default function ReviewsSection({
             ))}
           </div>
         ) : (
-          <div className="mx-auto mt-10 max-w-xl border border-slate-200 bg-slate-50 p-8 text-center">
+          <div className="mx-auto mt-10 max-w-xl border border-[#DDE5EF] bg-[#F6F9FC] p-8 text-center">
             <p className="text-sm font-semibold text-slate-700">
               No customer reviews yet.
             </p>
