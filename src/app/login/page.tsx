@@ -69,14 +69,14 @@ function LoginPageContent() {
 
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white px-5 py-10">
+    <main className="flex min-h-screen items-center justify-center bg-[#f6f9fc] px-5 py-10">
       <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-blue-100 bg-white p-7 shadow-[0_20px_60px_rgba(37,99,235,0.08)] sm:p-8">
+        <div className="rounded-[12px] border border-[#dde5ef] bg-white p-7 shadow-none sm:p-8">
           <div className="mb-8 flex justify-center border-b border-slate-100 pb-7">
             <NewvelionBrand size="md" />
           </div>
 
-          <h1 className="text-3xl font-bold text-[#16294F]">
+          <h1 className="text-3xl font-bold text-[#0e1f3d]">
             Welcome back
           </h1>
 
@@ -95,7 +95,7 @@ function LoginPageContent() {
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                className="w-full rounded-[7px] border border-[#dde5ef] bg-white px-4 py-3.5 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-[#eef5ff]"
                 placeholder="you@example.com"
                 autoComplete="email"
               />
@@ -132,7 +132,7 @@ function LoginPageContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-blue-600 px-4 py-3.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-[#0e4aab] px-4 py-3.5 font-semibold text-white transition hover:bg-[#0b3d8f] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
