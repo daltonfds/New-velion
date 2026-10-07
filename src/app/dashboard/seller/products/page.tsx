@@ -233,7 +233,7 @@ export default function SellerProductsPage() {
                   setCategoryId(event.target.value);
                   setSubcategoryId("all");
                 }}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600"
+                className="w-full rounded-lg border border-[#DDE5EF] bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600"
               >
                 <option value="all">All categories</option>
                 {parentCategories.map((category) => (
@@ -252,7 +252,7 @@ export default function SellerProductsPage() {
                 value={subcategoryId}
                 onChange={(event) => setSubcategoryId(event.target.value)}
                 disabled={categoryId === "all" || visibleSubcategories.length === 0}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600 disabled:bg-slate-50 disabled:text-slate-400"
+                className="w-full rounded-lg border border-[#DDE5EF] bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600 disabled:bg-[#F6F9FC] disabled:text-slate-400"
               >
                 <option value="all">
                   {categoryId === "all"
@@ -361,12 +361,12 @@ export default function SellerProductsPage() {
                       </div>
 
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600">
+                        <span className="rounded-md border border-[#DDE5EF] bg-white px-2.5 py-1 text-xs font-medium text-slate-600">
                           {getCategoryName(product.categoria_id)}
                         </span>
 
                         {product.subcategoria_id && (
-                          <span className="rounded-md border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                          <span className="rounded-md border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#0E4AAB]">
                             {getSubcategoryName(product.subcategoria_id)}
                           </span>
                         )}
@@ -380,7 +380,7 @@ export default function SellerProductsPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-lg bg-slate-50 p-3">
+                      <div className="rounded-lg bg-[#F6F9FC] p-3">
                         <p className="text-xs text-slate-500">
                           Price
                         </p>
@@ -392,7 +392,7 @@ export default function SellerProductsPage() {
                         </p>
                       </div>
 
-                      <div className="rounded-lg bg-slate-50 p-3">
+                      <div className="rounded-lg bg-[#F6F9FC] p-3">
                         <p className="text-xs text-slate-500">
                           Commission
                         </p>
@@ -415,7 +415,7 @@ export default function SellerProductsPage() {
                         <input
                           readOnly
                           value={affiliateUrl}
-                          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 outline-none"
+                          className="min-w-0 flex-1 rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] px-3 py-2 text-xs text-slate-600 outline-none"
                         />
 
                         <button
@@ -426,7 +426,7 @@ export default function SellerProductsPage() {
                               affiliation.id,
                             )
                           }
-                          className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                          className="shrink-0 rounded-lg border border-[#DDE5EF] bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-[#F6F9FC]"
                         >
                           {copied === affiliation.id
                             ? "Copied"
