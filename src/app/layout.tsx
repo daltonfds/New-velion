@@ -10,11 +10,11 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-export const metadata: Metadata = {
+export const metadata: Metadata = {\n  metadataBase: new URL("https://veliongroup.online"),
   title: "Newvelion",
   description: "Commerce infrastructure",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  alternates: { canonical: "https://veliongroup.online" },\n  icons: { icon: "/icon.svg", apple: "/icon.svg" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
