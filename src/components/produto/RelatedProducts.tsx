@@ -34,11 +34,11 @@ export default function RelatedProducts({
   }
 
   return (
-    <section className="border-t border-slate-100 bg-slate-50">
+    <section className="border-t border-[#E7EDF5] bg-[#F6F9FC]">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#16294F]">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
               More products
             </p>
 
@@ -49,7 +49,7 @@ export default function RelatedProducts({
 
           <Link
             href="/marketplace"
-            className="text-sm font-bold text-[#16294F] hover:underline"
+            className="text-sm font-bold text-[#0E1F3D] hover:underline"
           >
             View marketplace →
           </Link>
@@ -73,7 +73,7 @@ export default function RelatedProducts({
               <Link
                 key={product.id}
                 href={`/produto/${product.slug}`}
-                className="group border border-slate-200 bg-white"
+                className="group border border-[#DDE5EF] bg-white"
               >
                 <div className="aspect-square overflow-hidden bg-white">
                   {image ? (
