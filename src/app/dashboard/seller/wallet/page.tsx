@@ -231,7 +231,7 @@ export default function SellerWalletPage() {
               Finance
             </p>
 
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#16294F]">
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0E1F3D]">
               Wallet
             </h1>
 
@@ -251,7 +251,7 @@ export default function SellerWalletPage() {
 
             <Link
               href="/dashboard/seller/withdrawals"
-              className="inline-flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700"
+              className="inline-flex h-10 items-center rounded-lg bg-[#0E4AAB] px-4 text-sm font-semibold text-white hover:bg-[#0B3D8F]"
             >
               Withdraw funds
             </Link>
@@ -307,7 +307,7 @@ export default function SellerWalletPage() {
                         {label}
                       </p>
 
-                      <p className="mt-2 text-2xl font-semibold tracking-tight text-[#16294F]">
+                      <p className="mt-2 text-2xl font-semibold tracking-tight text-[#0E1F3D]">
                         {money(Number(value))}
                       </p>
                     </div>
@@ -328,7 +328,7 @@ export default function SellerWalletPage() {
               <Card className="overflow-hidden">
                 <div className="flex items-center justify-between border-b border-[#DCE3EE] px-5 py-5">
                   <div>
-                    <h2 className="font-semibold text-[#16294F]">
+                    <h2 className="font-semibold text-[#0E1F3D]">
                       Wallet performance
                     </h2>
 
@@ -358,12 +358,12 @@ export default function SellerWalletPage() {
                           className="flex h-full flex-1 flex-col justify-end"
                         >
                           <div className="group relative flex h-full items-end">
-                            <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-blue-600 px-2 py-1 text-[10px] font-semibold text-white group-hover:block">
+                            <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-[#0E4AAB] px-2 py-1 text-[10px] font-semibold text-white group-hover:block">
                               {money(month.value)}
                             </span>
 
                             <div
-                              className="w-full rounded-t-md bg-blue-600 transition hover:bg-blue-700"
+                              className="w-full rounded-t-md bg-[#0E4AAB] transition hover:bg-[#0B3D8F]"
                               style={{ height: `${height}%` }}
                             />
                           </div>
@@ -381,7 +381,7 @@ export default function SellerWalletPage() {
               <Card className="p-5">
                 <div className="flex justify-between">
                   <div>
-                    <h2 className="font-semibold text-[#16294F]">
+                    <h2 className="font-semibold text-[#0E1F3D]">
                       Balance position
                     </h2>
 
@@ -401,7 +401,7 @@ export default function SellerWalletPage() {
                       Available balance
                     </span>
 
-                    <span className="font-semibold text-[#16294F]">
+                    <span className="font-semibold text-[#0E1F3D]">
                       {wallet.saldo_total
                         ? Math.round(
                             (wallet.disponivel / wallet.saldo_total) * 100,
@@ -476,7 +476,7 @@ export default function SellerWalletPage() {
                   Total outflow
                 </p>
 
-                <p className="mt-2 text-xl font-semibold text-[#16294F]">
+                <p className="mt-2 text-xl font-semibold text-[#0E1F3D]">
                   {money(chart.outflow)}
                 </p>
 
@@ -489,7 +489,7 @@ export default function SellerWalletPage() {
             <Card className="overflow-hidden">
               <div className="flex flex-col justify-between gap-4 border-b border-[#DCE3EE] px-5 py-5 sm:flex-row sm:items-center">
                 <div>
-                  <h2 className="font-semibold text-[#16294F]">
+                  <h2 className="font-semibold text-[#0E1F3D]">
                     Wallet history
                   </h2>
 
@@ -511,7 +511,7 @@ export default function SellerWalletPage() {
                       onClick={() => setPeriod(value)}
                       className={`rounded-md px-3 py-1.5 text-xs font-semibold ${
                         period === value
-                          ? "bg-white text-[#16294F] shadow-sm"
+                          ? "bg-white text-[#0E1F3D] shadow-sm"
                           : "text-[#7C8798]"
                       }`}
                     >
@@ -523,7 +523,7 @@ export default function SellerWalletPage() {
 
               {filtered.length === 0 ? (
                 <div className="px-5 py-14 text-center">
-                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-[#DCE3EE] bg-[#F5F8FC] text-[#7C8798]">
+                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[10px] border border-[#DCE3EE] bg-[#F5F8FC] text-[#7C8798]">
                     <Icon />
                   </span>
 
@@ -561,7 +561,7 @@ export default function SellerWalletPage() {
                                 <Icon type={entry.tipo} />
                               </span>
 
-                              <span className="font-medium text-[#16294F]">
+                              <span className="font-medium text-[#0E1F3D]">
                                 {labels[entry.tipo]}
                               </span>
                             </div>
@@ -571,7 +571,7 @@ export default function SellerWalletPage() {
                             className={`px-5 py-4 text-sm font-semibold ${
                               entry.valor >= 0
                                 ? "text-[#18794E]"
-                                : "text-[#16294F]"
+                                : "text-[#0E1F3D]"
                             }`}
                           >
                             {entry.valor > 0 ? "+" : ""}
