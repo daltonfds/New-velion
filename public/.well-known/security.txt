@@ -1,0 +1,5 @@
+Contact: mailto:contact@newvelion.com
+Policy: https://veliongroup.online/security
+Preferred-Languages: en, pt
+Canonical: https://veliongroup.online/.well-known/security.txt
+Expires: 2027-10-07T00:00:00.000Z
