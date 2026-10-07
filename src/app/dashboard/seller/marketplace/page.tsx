@@ -289,7 +289,7 @@ const filteredProducts = useMemo(() => {
   return (
     <AppShell area="seller">
       <div className="space-y-7">
-        <section className="overflow-hidden rounded-xl bg-[#3730d9] px-7 py-7 text-white lg:px-9 lg:py-8">
+        <section className="overflow-hidden rounded-[10px] bg-[#3730d9] px-7 py-7 text-white lg:px-9 lg:py-8">
           <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-100">
@@ -370,7 +370,7 @@ const filteredProducts = useMemo(() => {
           </Card>
         )}
 
-        <Card className="border-slate-200 bg-white p-0">
+        <Card className="border-[#DDE5EF] bg-white p-0">
           <div className="border-b border-slate-100 px-5 py-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
               <div className="relative flex-1">
@@ -384,7 +384,7 @@ const filteredProducts = useMemo(() => {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search products, categories..."
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white"
+                  className="w-full rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white"
                 />
               </div>
               <select
@@ -394,7 +394,7 @@ const filteredProducts = useMemo(() => {
                   setCategoryId(event.target.value);
                   setSubcategoryId("all");
                 }}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 lg:w-56"
+                className="rounded-lg border border-[#DDE5EF] bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 lg:w-56"
               >
                 <option value="all">All categories</option>
                 {parentCategories.map((category) => (
@@ -408,7 +408,7 @@ const filteredProducts = useMemo(() => {
                 value={subcategoryId}
                 onChange={(event) => setSubcategoryId(event.target.value)}
                 disabled={categoryId === "all" || visibleSubcategories.length === 0}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 lg:w-64"
+                className="rounded-lg border border-[#DDE5EF] bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:bg-[#F6F9FC] disabled:text-slate-400 lg:w-64"
               >
                 <option value="all">
                   {categoryId === "all"
@@ -430,11 +430,11 @@ const filteredProducts = useMemo(() => {
 
           <div className="flex flex-wrap items-center gap-2 px-5 py-3">
             <button type="button" onClick={() => setFeaturedOnly((current) => !current)}
-              className={`rounded-md border px-3.5 py-2 text-sm font-medium transition ${featuredOnly ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>
+              className={`rounded-md border px-3.5 py-2 text-sm font-medium transition ${featuredOnly ? "border-indigo-600 bg-indigo-600 text-white" : "border-[#DDE5EF] bg-white text-slate-600 hover:bg-[#F6F9FC]"}`}>
               Featured
             </button>
             <button type="button" onClick={() => setNewOnly((current) => !current)}
-              className={`rounded-md border px-3.5 py-2 text-sm font-medium transition ${newOnly ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>
+              className={`rounded-md border px-3.5 py-2 text-sm font-medium transition ${newOnly ? "border-indigo-600 bg-indigo-600 text-white" : "border-[#DDE5EF] bg-white text-slate-600 hover:bg-[#F6F9FC]"}`}>
               New
             </button>
             {(search || categoryId !== "all" || featuredOnly || newOnly) && (
@@ -450,7 +450,7 @@ const filteredProducts = useMemo(() => {
               {loading ? "Loading products..." : `${filteredProducts.length} products`}
             </p>
 
-            <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50 p-1">
+            <div className="flex items-center rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] p-1">
               <button
                 type="button"
                 onClick={() => {
@@ -683,15 +683,15 @@ const filteredProducts = useMemo(() => {
                   key={product.id}
                   className={
                     viewMode === "grid"
-                      ? "overflow-hidden border-slate-200 bg-white p-0 shadow-none transition hover:border-slate-300"
-                      : "overflow-hidden border-slate-200 bg-white p-0 shadow-none transition hover:border-slate-300 md:flex"
+                      ? "overflow-hidden border-[#DDE5EF] bg-white p-0 shadow-none transition hover:border-slate-300"
+                      : "overflow-hidden border-[#DDE5EF] bg-white p-0 shadow-none transition hover:border-slate-300 md:flex"
                   }
                 >
                   <div
                     className={
                       viewMode === "grid"
-                        ? "relative h-56 overflow-hidden border-b border-slate-100 bg-slate-50"
-                        : "relative h-56 overflow-hidden border-b border-slate-100 bg-slate-50 md:h-auto md:w-64 md:shrink-0 md:border-b-0 md:border-r"
+                        ? "relative h-56 overflow-hidden border-b border-slate-100 bg-[#F6F9FC]"
+                        : "relative h-56 overflow-hidden border-b border-slate-100 bg-[#F6F9FC] md:h-auto md:w-64 md:shrink-0 md:border-b-0 md:border-r"
                     }
                   >
                     {product.fotos?.length > 0 ? (
@@ -759,7 +759,7 @@ const filteredProducts = useMemo(() => {
                                   [product.id]: nextIndex,
                                 }));
                               }}
-                              className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-semibold text-slate-700 shadow-none transition hover:bg-slate-50"
+                              className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#DDE5EF] bg-white text-lg font-semibold text-slate-700 shadow-none transition hover:bg-[#F6F9FC]"
                             >
                               ‹
                             </button>
@@ -789,7 +789,7 @@ const filteredProducts = useMemo(() => {
                                   [product.id]: nextIndex,
                                 }));
                               }}
-                              className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-semibold text-slate-700 shadow-none transition hover:bg-slate-50"
+                              className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#DDE5EF] bg-white text-lg font-semibold text-slate-700 shadow-none transition hover:bg-[#F6F9FC]"
                             >
                               ›
                             </button>
@@ -903,7 +903,7 @@ const filteredProducts = useMemo(() => {
 
                     <a
                       href={`/produto/${encodeURIComponent(product.slug)}`}
-                      className="mt-4 flex w-full items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                      className="mt-4 flex w-full items-center justify-center rounded-lg border border-[#DDE5EF] bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-[#F6F9FC]"
                     >
                       View Product
                     </a>
@@ -967,7 +967,7 @@ const filteredProducts = useMemo(() => {
 
       {pricingProduct && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/40 p-4 sm:items-center">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-md rounded-[12px] bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">
@@ -980,11 +980,11 @@ const filteredProducts = useMemo(() => {
 
             {pricingProduct.pricing_mode === "fixed" ? (
               <div className="mt-6 space-y-3">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="rounded-[10px] border border-[#DDE5EF] bg-[#F6F9FC] p-4">
                   <p className="text-xs text-slate-500">Selling price</p>
                   <p className="mt-1 text-2xl font-semibold text-slate-900">{money(Number(salePrice))}</p>
                 </div>
-                <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+                <div className="rounded-[10px] border border-indigo-100 bg-indigo-50 p-4">
                   <p className="text-xs text-indigo-600">Your commission</p>
                   <p className="mt-1 text-xl font-semibold text-indigo-700">{money(commissionForProduct(pricingProduct))}</p>
                 </div>
@@ -992,17 +992,17 @@ const filteredProducts = useMemo(() => {
               </div>
             ) : (
               <div className="mt-6 space-y-4">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="rounded-[10px] border border-[#DDE5EF] bg-[#F6F9FC] p-4">
                   <p className="text-xs text-slate-500">NewVelion / Supplier base</p>
                   <p className="mt-1 text-xl font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p>
                 </div>
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-slate-700">Your selling price</span>
-                  <input type="number" min={customBaseForProduct(pricingProduct)} step="0.01" value={salePrice} onChange={(event) => setSalePrice(event.target.value)} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-lg font-semibold text-slate-900 outline-none focus:border-indigo-500" />
+                  <input type="number" min={customBaseForProduct(pricingProduct)} step="0.01" value={salePrice} onChange={(event) => setSalePrice(event.target.value)} className="w-full rounded-[10px] border border-[#DDE5EF] px-4 py-3 text-lg font-semibold text-slate-900 outline-none focus:border-indigo-500" />
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-500">Base</p><p className="mt-1 font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p></div>
-                  <div className="rounded-xl bg-indigo-50 p-4"><p className="text-xs text-indigo-600">Your margin</p><p className="mt-1 font-semibold text-indigo-700">{money(Math.max(Number(salePrice || 0) - customBaseForProduct(pricingProduct), 0))}</p></div>
+                  <div className="rounded-[10px] bg-[#F6F9FC] p-4"><p className="text-xs text-slate-500">Base</p><p className="mt-1 font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p></div>
+                  <div className="rounded-[10px] bg-indigo-50 p-4"><p className="text-xs text-indigo-600">Your margin</p><p className="mt-1 font-semibold text-indigo-700">{money(Math.max(Number(salePrice || 0) - customBaseForProduct(pricingProduct), 0))}</p></div>
                 </div>
               </div>
             )}
@@ -1011,7 +1011,7 @@ const filteredProducts = useMemo(() => {
               type="button"
               disabled={affiliating === pricingProduct.id || (pricingProduct.pricing_mode === "custom" && (!Number.isFinite(Number(salePrice)) || Number(salePrice) < customBaseForProduct(pricingProduct)))}
               onClick={() => void handleAffiliate(pricingProduct.id)}
-              className="mt-6 w-full rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-6 w-full rounded-[10px] bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {affiliating === pricingProduct.id ? "Creating affiliate link..." : "Generate Link"}
             </button>
