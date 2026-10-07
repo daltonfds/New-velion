@@ -223,15 +223,15 @@ export async function getPublicProduct(slug: string, affiliateRef?: string) {
     if (resolved?.product_id === product.id && Number.isFinite(Number(resolved.sale_price))) affiliatePrice = Number(resolved.sale_price);
   }
 
-  const { data: reviews, error } = await database
+  // Reviews are optional for the public product page. A missing/changed
+  // reviews table must never make an otherwise valid product unavailable.
+  const { data: reviews } = await database
     .from("product_reviews")
     .select("id,reviewer_name,rating,review_text,media_urls,verified_buyer,created_at")
     .eq("product_id", product.id)
     .eq("status", "approved")
     .order("created_at", { ascending: false })
     .limit(12);
-
-  if (error) throw error;
 
   return {
     product,
