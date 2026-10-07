@@ -65,10 +65,10 @@ export default function ProductInfo({
     : `/checkout?product=${encodeURIComponent(product.id)}&qty=${encodeURIComponent(String(quantity))}`;
 
   return (
-    <section className="border-b border-slate-100 bg-white">
+    <section className="border-b border-[#E7EDF5] bg-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-6 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14 lg:px-8 lg:py-12">
         <div>
-          <div className="aspect-square overflow-hidden bg-slate-50">
+          <div className="aspect-square overflow-hidden bg-[#F6F9FC]">
             {images.length ? (
               <img
                 src={images[photo]}
@@ -89,7 +89,7 @@ export default function ProductInfo({
                   key={`${src}-${index}`}
                   type="button"
                   onClick={() => setPhoto(index)}
-                  className={`aspect-square overflow-hidden border bg-white ${photo === index ? "border-[#16294F] ring-1 ring-[#16294F]" : "border-slate-200"}`}
+                  className={`aspect-square overflow-hidden border bg-white ${photo === index ? "border-[#0E1F3D] ring-1 ring-[#0E1F3D]" : "border-[#DDE5EF]"}`}
                   aria-label={`View product image ${index + 1}`}
                 >
                   <img
@@ -104,7 +104,7 @@ export default function ProductInfo({
         </div>
 
         <div className="flex flex-col justify-center">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#16294F]">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
             Newvelion product
           </p>
 
@@ -143,7 +143,7 @@ export default function ProductInfo({
           </div>
 
           {product.beneficios?.length > 0 && (
-            <div className="mt-7 border-t border-slate-100 pt-6">
+            <div className="mt-7 border-t border-[#E7EDF5] pt-6">
               <p className="mb-3 text-sm font-bold text-slate-950">
                 Product benefits
               </p>
@@ -163,7 +163,7 @@ export default function ProductInfo({
             </div>
           )}
 
-          <div className="mt-7 border-t border-slate-100 pt-6">
+          <div className="mt-7 border-t border-[#E7EDF5] pt-6">
             <p className="mb-3 text-sm font-bold text-slate-950">
               Quantity
             </p>
@@ -208,11 +208,11 @@ export default function ProductInfo({
                 const { error } = await supabase.from("customer_cart_items").upsert({ user_id: user.id, product_id: product.id, quantity }, { onConflict: "user_id,product_id" });
                 if (error) { window.alert(error.message); return; }
                 window.location.href = "/cart";
-              }} className="flex min-h-14 flex-1 items-center justify-center border border-[#16294F] px-5 text-sm font-extrabold text-[#16294F] hover:bg-slate-50">ADD TO CART</button>
+              }} className="flex min-h-14 flex-1 items-center justify-center border border-[#0E1F3D] px-5 text-sm font-extrabold text-[#0E1F3D] hover:bg-[#F6F9FC]">ADD TO CART</button>
               {checkoutUrl ? (
               <a
                 href={checkoutUrl}
-                className="flex min-h-14 w-full items-center justify-center bg-[#16294F] px-6 text-base font-extrabold text-white transition hover:bg-[#0e1d38]"
+                className="flex min-h-14 w-full items-center justify-center bg-[#0E1F3D] px-6 text-base font-extrabold text-white transition hover:bg-[#0e1d38]"
               >
                 BUY NOW
               </a>
@@ -220,7 +220,7 @@ export default function ProductInfo({
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-3 gap-2 border-y border-slate-100 py-4 text-center text-[11px] font-bold uppercase tracking-wide text-slate-500">
+          <div className="mt-5 grid grid-cols-3 gap-2 border-y border-[#E7EDF5] py-4 text-center text-[11px] font-bold uppercase tracking-wide text-slate-500">
             <span>Secure checkout</span>
             <span>ZA delivery</span>
             <span>Support</span>
