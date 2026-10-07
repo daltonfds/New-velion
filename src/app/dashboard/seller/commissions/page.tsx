@@ -250,18 +250,18 @@ export default function SellerCommissionsPage() {
       return "border-amber-200 bg-amber-50 text-amber-700";
     if (status === "cancelada")
       return "border-red-200 bg-red-50 text-red-700";
-    return "border-slate-200 bg-slate-50 text-slate-600";
+    return "border-[#DDE5EF] bg-[#F6F9FC] text-slate-600";
   };
 
   return (
     <AppShell area="seller">
       <div className="mx-auto max-w-7xl space-y-7">
-        <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-[#DDE5EF] pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#C99A2E]">
               Finance
             </p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#16294F]">
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#0E1F3D]">
               Commissions
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-500">
@@ -272,7 +272,7 @@ export default function SellerCommissionsPage() {
 
           <Link
             href="/dashboard/seller/withdrawals"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#0E4AAB] px-5 text-sm font-semibold text-white transition hover:bg-[#0B3D8F]"
           >
             View withdrawals
           </Link>
@@ -286,7 +286,7 @@ export default function SellerCommissionsPage() {
             ["Guarantee retained", formatMoney(metrics.retainedGuarantee), "Currently retained"],
             ["Refunded commission", formatMoney(metrics.refunded), "Commission reversed"],
           ].map(([label, value, description]) => (
-            <Card key={label} className="border-slate-200">
+            <Card key={label} className="border-[#DDE5EF]">
               <p className="text-sm font-medium text-slate-500">{label}</p>
               <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
                 {value}
@@ -297,7 +297,7 @@ export default function SellerCommissionsPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr]">
-          <Card className="border-slate-200">
+          <Card className="border-[#DDE5EF]">
             <div className="flex flex-col gap-2 border-b border-slate-100 pb-5 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <h2 className="text-base font-semibold text-slate-900">
@@ -308,7 +308,7 @@ export default function SellerCommissionsPage() {
                 </p>
               </div>
 
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-500">
+              <span className="rounded-full border border-[#DDE5EF] bg-[#F6F9FC] px-3 py-1 text-xs font-medium text-slate-500">
                 Live database data
               </span>
             </div>
@@ -337,7 +337,7 @@ export default function SellerCommissionsPage() {
 
                       <div className="flex h-[190px] items-end">
                         <div
-                          className="w-full rounded-t-md bg-blue-600 transition-all"
+                          className="w-full rounded-t-md bg-[#0E4AAB] transition-all"
                           style={{ height: `${height}%` }}
                           title={`${item.label}: ${formatMoney(item.commission)}`}
                         />
@@ -353,7 +353,7 @@ export default function SellerCommissionsPage() {
             </div>
           </Card>
 
-          <Card className="border-slate-200">
+          <Card className="border-[#DDE5EF]">
             <div className="border-b border-slate-100 pb-5">
               <h2 className="text-base font-semibold text-slate-900">
                 Performance summary
@@ -373,7 +373,7 @@ export default function SellerCommissionsPage() {
                 </div>
                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-blue-600"
+                    className="h-full rounded-full bg-[#0E4AAB]"
                     style={{
                       width: `${Math.min(
                         100,
@@ -402,11 +402,11 @@ export default function SellerCommissionsPage() {
                 </span>
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
                   Conversion value
                 </p>
-                <p className="mt-2 text-xl font-semibold text-[#16294F]">
+                <p className="mt-2 text-xl font-semibold text-[#0E1F3D]">
                   {metrics.totalSalesValue > 0
                     ? `${(
                         (metrics.totalCommission /
@@ -424,7 +424,7 @@ export default function SellerCommissionsPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="border-slate-200">
+          <Card className="border-[#DDE5EF]">
             <div className="border-b border-slate-100 pb-5">
               <h2 className="text-base font-semibold text-slate-900">
                 Top products
@@ -445,7 +445,7 @@ export default function SellerCommissionsPage() {
                     key={product.name}
                     className="flex items-center gap-4 py-4"
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-semibold text-[#16294F]">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-semibold text-[#0E1F3D]">
                       {index + 1}
                     </div>
 
@@ -459,7 +459,7 @@ export default function SellerCommissionsPage() {
                       </p>
                     </div>
 
-                    <p className="text-sm font-semibold text-[#16294F]">
+                    <p className="text-sm font-semibold text-[#0E1F3D]">
                       {formatMoney(product.commission)}
                     </p>
                   </div>
@@ -468,7 +468,7 @@ export default function SellerCommissionsPage() {
             )}
           </Card>
 
-          <Card className="border-slate-200">
+          <Card className="border-[#DDE5EF]">
             <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <h2 className="text-base font-semibold text-slate-900">
@@ -484,13 +484,13 @@ export default function SellerCommissionsPage() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search..."
-                  className="h-9 rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-[#16294F]"
+                  className="h-9 rounded-lg border border-[#DDE5EF] px-3 text-sm outline-none focus:border-[#0E1F3D]"
                 />
 
                 <select
                   value={period}
                   onChange={(event) => setPeriod(event.target.value)}
-                  className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#16294F]"
+                  className="h-9 rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm outline-none focus:border-[#0E1F3D]"
                 >
                   <option value="30">Last 30 days</option>
                   <option value="90">Last 90 days</option>
@@ -501,7 +501,7 @@ export default function SellerCommissionsPage() {
                 <select
                   value={statusFilter}
                   onChange={(event) => setStatusFilter(event.target.value)}
-                  className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#16294F]"
+                  className="h-9 rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm outline-none focus:border-[#0E1F3D]"
                 >
                   <option value="all">All statuses</option>
                   <option value="paga">Paid</option>
@@ -529,7 +529,7 @@ export default function SellerCommissionsPage() {
               </div>
             ) : filteredCommissions.length === 0 ? (
               <div className="py-12 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-[#16294F]">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#DDE5EF] bg-[#F6F9FC] text-[#0E1F3D]">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -578,7 +578,7 @@ export default function SellerCommissionsPage() {
                         {formatStatus(commission.status)}
                       </span>
 
-                      <span className="text-sm font-semibold text-[#16294F]">
+                      <span className="text-sm font-semibold text-[#0E1F3D]">
                         {formatMoney(
                           Number(commission.comissao_vendedor || 0),
                           commission.product?.moeda || "ZAR",
