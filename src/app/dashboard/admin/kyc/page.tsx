@@ -184,7 +184,7 @@ export default function AdminKycPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
             >
               <option value="all">
                 All KYC statuses
@@ -208,7 +208,7 @@ export default function AdminKycPage() {
               onChange={(event) =>
                 setRoleFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
             >
               <option value="all">All Users</option>
               <option value="seller">Sellers</option>
@@ -287,7 +287,7 @@ export default function AdminKycPage() {
                     return (
                       <tr
                         key={profile.id}
-                        className="hover:bg-slate-50"
+                        className="hover:bg-[#F6F9FC]"
                       >
                         <td className="px-6 py-4">
                           <div className="font-medium text-slate-900">
