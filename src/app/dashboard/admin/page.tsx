@@ -84,7 +84,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-[10px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -93,7 +93,7 @@ export default function AdminDashboardPage() {
           {cards.map(([label, value]) => (
             <div
               key={label}
-              className="rounded-xl border border-slate-200 bg-white p-5"
+              className="rounded-[10px] border border-[#DDE5EF] bg-white p-5"
             >
               <p className="text-sm text-slate-500">{label}</p>
               <p className="mt-2 text-2xl font-semibold text-slate-900">
@@ -104,21 +104,21 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="rounded-[10px] border border-[#DDE5EF] bg-white p-5">
             <p className="text-sm text-slate-500">Active Sellers</p>
             <p className="mt-2 text-xl font-semibold text-slate-900">
               {loading ? "—" : stats?.active_sellers.toLocaleString()}
             </p>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="rounded-[10px] border border-[#DDE5EF] bg-white p-5">
             <p className="text-sm text-slate-500">Sales Today</p>
             <p className="mt-2 text-xl font-semibold text-slate-900">
               {loading ? "—" : stats?.sales_today.toLocaleString()}
             </p>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="rounded-[10px] border border-[#DDE5EF] bg-white p-5">
             <p className="text-sm text-slate-500">Pending Withdrawals</p>
             <p className="mt-2 text-xl font-semibold text-slate-900">
               {loading ? "—" : stats?.pending_withdrawals.toLocaleString()}
