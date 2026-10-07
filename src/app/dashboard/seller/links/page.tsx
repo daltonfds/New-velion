@@ -240,7 +240,7 @@ export default function SellerLinksPage() {
                 setSearch(event.target.value)
               }
               placeholder="Search products or links..."
-              className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 md:w-80"
+              className="h-10 w-full rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 md:w-80"
             />
           </div>
         </Card>
@@ -356,7 +356,7 @@ export default function SellerLinksPage() {
                       </div>
 
                       <div className="mt-4 grid grid-cols-2 gap-2">
-                        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                        <div className="rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] px-3 py-2">
                           <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
                             Commission
                           </p>
@@ -373,7 +373,7 @@ export default function SellerLinksPage() {
                           </p>
                         </div>
 
-                        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                        <div className="rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] px-3 py-2">
                           <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
                             Attribution
                           </p>
@@ -387,19 +387,19 @@ export default function SellerLinksPage() {
                       </div>
 
                       <div className="mt-3 grid grid-cols-3 gap-2">
-                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                        <div className="rounded-lg border border-[#DDE5EF] bg-white px-3 py-2">
                           <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Clicks</p>
                           <p className="mt-1 text-lg font-semibold text-slate-900">
                             {stats[item.id]?.clicks ?? 0}
                           </p>
                         </div>
-                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                        <div className="rounded-lg border border-[#DDE5EF] bg-white px-3 py-2">
                           <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Leads</p>
                           <p className="mt-1 text-lg font-semibold text-slate-900">
                             {stats[item.id]?.sessions ?? 0}
                           </p>
                         </div>
-                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                        <div className="rounded-lg border border-[#DDE5EF] bg-white px-3 py-2">
                           <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Sales</p>
                           <p className="mt-1 text-lg font-semibold text-slate-900">
                             {stats[item.id]?.approved ?? 0}
@@ -407,7 +407,7 @@ export default function SellerLinksPage() {
                         </div>
                       </div>
 
-                      <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                      <div className="mt-3 rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] px-3 py-2">
                         <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
                           Affiliate Link
                         </p>
@@ -440,7 +440,7 @@ export default function SellerLinksPage() {
                               productName,
                             )
                           }
-                          className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm font-medium text-slate-700 hover:bg-[#F6F9FC]"
                         >
                           Share
                         </button>
@@ -449,7 +449,7 @@ export default function SellerLinksPage() {
                           href={item.affiliateUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm font-medium text-slate-700 hover:bg-[#F6F9FC]"
                         >
                           Open Link
                         </a>
