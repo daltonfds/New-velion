@@ -105,7 +105,7 @@ export default function RegisterPage() {
             <NewvelionBrand size="md" />
           </div>
 
-          <h1 className="text-3xl font-bold text-[#16294F]">
+          <h1 className="text-3xl font-bold text-[#0A0440]">
             Create your seller account
           </h1>
 
@@ -115,7 +115,7 @@ export default function RegisterPage() {
 
           <form onSubmit={submit} className="mt-8 space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+              <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
                 Full name
               </label>
 
@@ -149,7 +149,7 @@ export default function RegisterPage() {
             />
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+              <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
                 Email
               </label>
 
@@ -167,7 +167,7 @@ export default function RegisterPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+                <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
                   Password
                 </label>
 
@@ -185,7 +185,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+                <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
                   Confirm password
                 </label>
 
