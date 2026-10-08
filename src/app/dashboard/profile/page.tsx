@@ -91,7 +91,7 @@ export default function ProfilePage() {
           <div className="border-b border-slate-100 px-6 py-5">
             <h3 className="font-semibold text-slate-900">Account information</h3>
             <p className="mt-1 text-sm text-slate-500">
-              Your NewVelion account preferences are managed from this area.
+              Your Newvelion account preferences are managed from this area.
             </p>
           </div>
 
