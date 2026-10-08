@@ -385,7 +385,7 @@ export default function AdminCheckoutSessionsPage() {
           ].map(([label, value]) => (
             <div
               key={label}
-              className="rounded-[10px] border border-[#DDE5EF] bg-white p-5"
+              className="rounded-[10px] border border-[#E5E7EB] bg-white p-5"
             >
               <p className="text-sm text-slate-500">{label}</p>
               <p className="mt-2 text-2xl font-semibold text-slate-950">
@@ -401,7 +401,7 @@ export default function AdminCheckoutSessionsPage() {
           </div>
         )}
 
-        <div className="overflow-hidden rounded-[10px] border border-[#DDE5EF] bg-white">
+        <div className="overflow-hidden rounded-[10px] border border-[#E5E7EB] bg-white">
           {loading ? (
             <div className="p-8 text-sm text-slate-500">
               Loading checkout sessions...
@@ -418,7 +418,7 @@ export default function AdminCheckoutSessionsPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] text-left text-sm">
-                <thead className="border-b border-[#DDE5EF] bg-[#F6F9FC]">
+                <thead className="border-b border-[#E5E7EB] bg-[#F7F8FA]">
                   <tr>
                     <th className="px-5 py-4 font-semibold text-slate-700">
                       Customer
@@ -446,7 +446,7 @@ export default function AdminCheckoutSessionsPage() {
                   {sessions.map((session) => (
                     <tr
                       key={session.id}
-                      className="hover:bg-[#F6F9FC]"
+                      className="hover:bg-[#F7F8FA]"
                     >
                       <td className="px-5 py-4">
                         <div className="font-medium text-slate-900">
@@ -479,7 +479,7 @@ export default function AdminCheckoutSessionsPage() {
                                 ? "border-red-200 bg-red-50 text-red-700"
                                 : session.payment_comparison_status === "review"
                                   ? "border-amber-200 bg-amber-50 text-amber-700"
-                                  : "border-[#DDE5EF] bg-[#F6F9FC] text-slate-600"
+                                  : "border-[#E5E7EB] bg-[#F7F8FA] text-slate-600"
                           }`}
                         >
                           {session.payment_comparison_status === "matched"
@@ -493,7 +493,7 @@ export default function AdminCheckoutSessionsPage() {
                       </td>
 
                       <td className="px-5 py-4">
-                        <span className="inline-flex rounded-full border border-[#DDE5EF] px-2.5 py-1 text-xs font-medium text-slate-700">
+                        <span className="inline-flex rounded-full border border-[#E5E7EB] px-2.5 py-1 text-xs font-medium text-slate-700">
                           {session.status}
                         </span>
                       </td>
@@ -506,7 +506,7 @@ export default function AdminCheckoutSessionsPage() {
                         <button
                           type="button"
                           onClick={() => openSession(session)}
-                          className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-[#F6F9FC]"
+                          className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-[#F7F8FA]"
                         >
                           View details
                         </button>
@@ -522,8 +522,8 @@ export default function AdminCheckoutSessionsPage() {
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-[10px] border border-[#DDE5EF] bg-white">
-            <div className="flex items-center justify-between border-b border-[#DDE5EF] px-6 py-5">
+          <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-[10px] border border-[#E5E7EB] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E5E7EB] px-6 py-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                   Checkout session
@@ -539,7 +539,7 @@ export default function AdminCheckoutSessionsPage() {
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-[#F6F9FC]"
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-[#F7F8FA]"
               >
                 Close
               </button>
@@ -569,7 +569,7 @@ export default function AdminCheckoutSessionsPage() {
                   ].map(([label, value]) => (
                     <div
                       key={label}
-                      className="rounded-lg border border-[#DDE5EF] p-4"
+                      className="rounded-lg border border-[#E5E7EB] p-4"
                     >
                       <p className="text-xs text-slate-500">{label}</p>
                       <p className="mt-1 break-words text-sm font-medium text-slate-900">
@@ -578,7 +578,7 @@ export default function AdminCheckoutSessionsPage() {
                     </div>
                   ))}
 
-                  <div className="rounded-lg border border-[#DDE5EF] p-4 sm:col-span-2 lg:col-span-3">
+                  <div className="rounded-lg border border-[#E5E7EB] p-4 sm:col-span-2 lg:col-span-3">
                     <p className="text-xs text-slate-500">
                       Delivery address
                     </p>
@@ -594,7 +594,7 @@ export default function AdminCheckoutSessionsPage() {
                 </div>
               </section>
 
-              <section className="rounded-[10px] border border-[#DDE5EF] bg-[#F6F9FC] p-5">
+              <section className="rounded-[10px] border border-[#E5E7EB] bg-[#F7F8FA] p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -609,7 +609,7 @@ export default function AdminCheckoutSessionsPage() {
                     </p>
                   </div>
 
-                  <span className="rounded-full border border-[#DDE5EF] bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
+                  <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
                     {selected.payment_comparison_status === "matched"
                       ? "Matched"
                       : selected.payment_comparison_status === "mismatch"
@@ -621,7 +621,7 @@ export default function AdminCheckoutSessionsPage() {
                 </div>
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-lg border border-[#DDE5EF] bg-white p-4">
+                  <div className="rounded-lg border border-[#E5E7EB] bg-white p-4">
                     <p className="text-xs text-slate-500">
                       NewVelion order
                     </p>
@@ -630,7 +630,7 @@ export default function AdminCheckoutSessionsPage() {
                     </p>
                   </div>
 
-                  <div className="rounded-lg border border-[#DDE5EF] bg-white p-4">
+                  <div className="rounded-lg border border-[#E5E7EB] bg-white p-4">
                     <p className="text-xs text-slate-500">
                       External payment
                     </p>
@@ -645,7 +645,7 @@ export default function AdminCheckoutSessionsPage() {
                     </p>
                   </div>
 
-                  <div className="rounded-lg border border-[#DDE5EF] bg-white p-4">
+                  <div className="rounded-lg border border-[#E5E7EB] bg-white p-4">
                     <p className="text-xs text-slate-500">
                       Payment reference
                     </p>
@@ -740,7 +740,7 @@ export default function AdminCheckoutSessionsPage() {
                 </button>
               </section>
 
-              <section className="border-t border-[#DDE5EF] pt-6">
+              <section className="border-t border-[#E5E7EB] pt-6">
                 <h3 className="text-sm font-semibold text-slate-950">
                   Attribution & order
                 </h3>
@@ -777,7 +777,7 @@ export default function AdminCheckoutSessionsPage() {
               </section>
             </div>
 
-            <div className="flex flex-wrap gap-3 border-t border-[#DDE5EF] p-6">
+            <div className="flex flex-wrap gap-3 border-t border-[#E5E7EB] p-6">
               <button
                 type="button"
                 disabled={
