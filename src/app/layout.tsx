@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeLanguageProvider } from "@/components/layout/ThemeLanguageProvider";
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-poppins",
-  weight: ["400","500","600","700","800","900"],
+  variable: "--font-inter",
+  weight: ["400", "600", "800"],
 });
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={poppins.variable}>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
       <body className="font-sans">
         <ThemeLanguageProvider>
           <ToastProvider>{children}</ToastProvider>
