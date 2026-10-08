@@ -1,6 +1,6 @@
-# NewVelion ChatGPT MCP App
+# Newvelion ChatGPT MCP App
 
-NewVelion exposes a remote Model Context Protocol server for trusted AI clients such as ChatGPT.
+Newvelion exposes a remote Model Context Protocol server for trusted AI clients such as ChatGPT.
 
 ## Endpoint
 
@@ -8,7 +8,7 @@ Production MCP endpoint:
 
 `https://<NEWVELION-DOMAIN>/mcp`
 
-The endpoint uses Supabase OAuth 2.1 and is restricted to NewVelion administrator accounts.
+The endpoint uses Supabase OAuth 2.1 and is restricted to Newvelion administrator accounts.
 
 ## Authentication
 
@@ -17,7 +17,7 @@ The MCP server uses:
 - Supabase Auth OAuth 2.1 authorization code flow with PKCE
 - OAuth Protected Resource metadata
 - Dynamic client registration when enabled in Supabase
-- NewVelion admin-role authorization after OAuth authentication
+- Newvelion admin-role authorization after OAuth authentication
 
 Do not add a static MCP bearer token to production.
 
@@ -46,7 +46,7 @@ In Supabase:
 3. Set Authorization Path to `/oauth/consent`.
 4. Enable Dynamic Client Registration for MCP clients.
 5. Use asymmetric JWT signing keys (RS256 or ES256).
-6. Confirm the Auth Site URL is the production NewVelion origin.
+6. Confirm the Auth Site URL is the production Newvelion origin.
 
 The consent UI is implemented at:
 
@@ -60,7 +60,7 @@ In ChatGPT web:
 2. Create a custom MCP server.
 3. Set the server URL to the production `/mcp` endpoint.
 4. Select OAuth authentication.
-5. Complete the NewVelion OAuth consent flow.
+5. Complete the Newvelion OAuth consent flow.
 6. Install the resulting plugin/app in the conversation.
 
 The MCP server supports streaming HTTP through the MCP handler.
@@ -80,7 +80,7 @@ The MCP server supports streaming HTTP through the MCP handler.
 
 - `update_fulfillment_order`
 
-The write tool validates the existing fulfillment lifecycle before calling NewVelion's existing `set_fulfillment_status` RPC.
+The write tool validates the existing fulfillment lifecycle before calling Newvelion's existing `set_fulfillment_status` RPC.
 
 ## Operational safety
 
