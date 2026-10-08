@@ -53,14 +53,14 @@ export default function ReviewModerationPage() {
     <AppShell area="admin">
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#0E1F3D]">Customer reviews</h1>
+          <h1 className="text-2xl font-bold text-[#0A0440]">Customer reviews</h1>
           <p className="mt-1 text-sm text-slate-500">Customers submit reviews; admins only moderate publication.</p>
         </div>
 
         <div className="flex gap-2">
           {["pending", "approved", "rejected"].map((value) => (
             <button key={value} type="button" onClick={() => setStatus(value)}
-              className={"rounded-lg px-4 py-2 text-sm font-semibold " + (status === value ? "bg-[#0E1F3D] text-white" : "border border-[#DDE5EF] bg-white text-slate-600")}>
+              className={"rounded-lg px-4 py-2 text-sm font-semibold " + (status === value ? "bg-[#0A0440] text-white" : "border border-[#E5E7EB] bg-white text-slate-600")}>
               {value[0].toUpperCase() + value.slice(1)}
             </button>
           ))}
@@ -75,9 +75,9 @@ export default function ReviewModerationPage() {
                 <div className="flex gap-4">
                   {review.product?.fotos?.[0] && <img src={review.product.fotos[0]} alt="" className="h-20 w-20 rounded-[10px] object-cover" />}
                   <div className="max-w-3xl">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#0E4AAB]">{review.product?.nome || "Product"}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#10069F]">{review.product?.nome || "Product"}</p>
                     <div className="mt-1 flex items-center gap-2">
-                      <span className="tracking-widest text-[#C99A2E]">{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</span>
+                      <span className="tracking-widest text-[#10069F]">{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</span>
                       <span className="text-xs text-slate-400">{review.verified_buyer ? "Verified buyer" : "Buyer"}</span>
                     </div>
                     <p className="mt-3 text-sm leading-6 text-slate-700">{review.review_text}</p>
@@ -86,7 +86,7 @@ export default function ReviewModerationPage() {
                 </div>
                 {status === "pending" && (
                   <div className="flex shrink-0 items-start gap-2">
-                    <button onClick={() => void moderate(review.id, "approved")} className="rounded-lg bg-[#0E4AAB] px-4 py-2.5 text-sm font-semibold text-white">Approve</button>
+                    <button onClick={() => void moderate(review.id, "approved")} className="rounded-lg bg-[#10069F] px-4 py-2.5 text-sm font-semibold text-white">Approve</button>
                     <button onClick={() => void moderate(review.id, "rejected")} className="rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600">Reject</button>
                   </div>
                 )}
