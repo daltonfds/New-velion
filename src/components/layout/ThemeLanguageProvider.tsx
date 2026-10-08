@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 const translations: Record<string, string> = {
   "Marketplace":"Mercado","Suppliers":"Fornecedores","My account":"Minha conta","Cart":"Carrinho",
   "Sign in":"Entrar","Sign up":"Registar","Create account":"Criar conta","Start selling":"Começar a vender",
-  "NewVelion Marketplace":"Mercado NewVelion","Discover products from verified suppliers.":"Descubra produtos de fornecedores verificados.",
+  "Newvelion Marketplace":"Mercado Newvelion","Discover products from verified suppliers.":"Descubra produtos de fornecedores verificados.",
   "Search products, suppliers or categories...":"Pesquisar produtos, fornecedores ou categorias...","All categories":"Todas as categorias",
   "All suppliers":"Todos os fornecedores","Clear":"Limpar","Featured":"Em destaque","New arrivals":"Novidades",
   "Featured products":"Produtos em destaque","All products":"Todos os produtos","Best deals right now":"Melhores ofertas agora",
@@ -58,7 +58,7 @@ const translations: Record<string, string> = {
   "No orders found":"Nenhum pedido encontrado","No customers found":"Nenhum cliente encontrado","Something went wrong":"Algo correu mal",
   "An error occurred":"Ocorreu um erro","Please try again":"Tente novamente","Required":"Obrigatório","Optional":"Opcional",
   "Yes":"Sim","No":"Não","Yes, delete":"Sim, eliminar","Are you sure?":"Tem a certeza?","Are you sure you want to continue?":"Tem a certeza de que pretende continuar?",
-  "Are you sure you want to log out of your NewVelion account?":"Tem a certeza de que pretende sair da sua conta NewVelion?",
+  "Are you sure you want to log out of your Newvelion account?":"Tem a certeza de que pretende sair da sua conta Newvelion?",
   "English":"Inglês","Portuguese":"Português","Language":"Idioma","Theme":"Tema","Dark mode":"Modo escuro","Light mode":"Modo claro",
   "Use dark mode":"Usar modo escuro","Use light mode":"Usar modo claro","Preferences":"Preferências","Platform preferences":"Preferências da plataforma",
   "Login":"Iniciar sessão","Register":"Registar","Password":"Palavra-passe","Confirm password":"Confirmar palavra-passe",
