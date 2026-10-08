@@ -111,7 +111,7 @@ export default function ShopifyIntegrationPage() {
     <main className="min-h-screen bg-white px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-[#0E4AAB]">
+          <p className="text-sm font-semibold uppercase tracking-wide text-[#10069F]">
             Seller · Integrations
           </p>
 
@@ -131,7 +131,7 @@ export default function ShopifyIntegrationPage() {
           </div>
         )}
 
-        <section className="rounded-[12px] border border-[#DDE5EF] bg-white p-6">
+        <section className="rounded-[12px] border border-[#E5E7EB] bg-white p-6">
           <div className="flex flex-col gap-6">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
@@ -156,7 +156,7 @@ export default function ShopifyIntegrationPage() {
                 type="button"
                 onClick={connectShopify}
                 disabled={connecting}
-                className="h-11 rounded-[10px] bg-[#0E4AAB] px-6 text-sm font-semibold text-white transition hover:bg-[#0B3D8F] disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-11 rounded-[10px] bg-[#10069F] px-6 text-sm font-semibold text-white transition hover:bg-[#0B3D8F] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {connecting ? "Connecting..." : "Connect Shopify"}
               </button>
@@ -164,7 +164,7 @@ export default function ShopifyIntegrationPage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-[12px] border border-[#DDE5EF] bg-white p-6">
+        <section className="mt-6 rounded-[12px] border border-[#E5E7EB] bg-white p-6">
           <div className="mb-5">
             <h2 className="text-lg font-semibold text-slate-900">
               Connected stores
@@ -193,7 +193,7 @@ export default function ShopifyIntegrationPage() {
               {stores.map((store) => (
                 <div
                   key={store.id}
-                  className="flex flex-col gap-3 rounded-[10px] border border-[#DDE5EF] p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 rounded-[10px] border border-[#E5E7EB] p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="font-semibold text-slate-900">
