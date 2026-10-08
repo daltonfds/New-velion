@@ -14,7 +14,7 @@ export default function WhyChooseSection({
     <section className="border-y border-[#E7EDF5] bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0A0440]">
             Why choose this product?
           </p>
 
@@ -34,9 +34,9 @@ export default function WhyChooseSection({
             {benefits.slice(0, 8).map((benefit, index) => (
               <div
                 key={`${benefit}-${index}`}
-                className="border border-[#DDE5EF] bg-white p-6"
+                className="border border-[#E5E7EB] bg-white p-6"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0E1F3D] text-sm font-bold text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A0440] text-sm font-bold text-white">
                   ✓
                 </div>
 
