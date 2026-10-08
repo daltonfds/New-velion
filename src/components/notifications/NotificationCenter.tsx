@@ -87,7 +87,7 @@ function NotificationDetails({ item }: { item: NotificationItem }) {
 
   return (
     <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#16294F]">
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#0A0440]">
         {isWithdrawal ? "Withdrawal details" : "Sale details"}
       </p>
 
@@ -412,7 +412,7 @@ export default function NotificationCenter() {
         <BellIcon />
 
         {unread > 0 && (
-          <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#C99A2E] px-1 text-[10px] font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#10069F] px-1 text-[10px] font-bold text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -422,7 +422,7 @@ export default function NotificationCenter() {
         <div className="absolute right-0 top-12 z-[80] w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
             <div>
-              <p className="text-sm font-bold text-[#16294F]">
+              <p className="text-sm font-bold text-[#0A0440]">
                 Notifications
               </p>
               <p className="text-xs text-slate-400">
@@ -434,7 +434,7 @@ export default function NotificationCenter() {
               <button
                 type="button"
                 onClick={() => void markAllRead()}
-                className="text-xs font-semibold text-[#16294F]"
+                className="text-xs font-semibold text-[#0A0440]"
               >
                 Mark all read
               </button>
@@ -445,7 +445,7 @@ export default function NotificationCenter() {
             <button
               type="button"
               onClick={() => void enablePush()}
-              className="m-3 w-[calc(100%-1.5rem)] rounded-lg border border-[#C99A2E]/40 bg-[#FCF8ED] px-3 py-2 text-left text-xs font-semibold text-[#705313]"
+              className="m-3 w-[calc(100%-1.5rem)] rounded-lg border border-[#10069F]/40 bg-[#FCF8ED] px-3 py-2 text-left text-xs font-semibold text-[#705313]"
             >
               Enable external notifications on this device
             </button>
@@ -473,12 +473,12 @@ export default function NotificationCenter() {
                       className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
                         item.read_at
                           ? "bg-slate-200"
-                          : "bg-[#C99A2E]"
+                          : "bg-[#10069F]"
                       }`}
                     />
 
                     <div>
-                      <p className="text-sm font-semibold text-[#16294F]">
+                      <p className="text-sm font-semibold text-[#0A0440]">
                         {item.title}
                       </p>
 
