@@ -371,12 +371,12 @@ export default function SellerWithdrawalsPage() {
     <AppShell area="seller">
       <div className="min-h-full bg-[#f7f8fa] -m-4 p-4 md:-m-6 md:p-6">
         <div className="mx-auto max-w-[1320px] space-y-6">
-          <div className="flex flex-col gap-4 border-b border-[#DDE5EF] pb-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-4 border-b border-[#E5E7EB] pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                 Finance
               </p>
-              <h1 className="mt-1 text-[27px] font-semibold tracking-tight text-[#0E1F3D]">
+              <h1 className="mt-1 text-[27px] font-semibold tracking-tight text-[#0A0440]">
                 Withdrawals
               </h1>
               <p className="mt-1 text-sm text-slate-500">
@@ -386,7 +386,7 @@ export default function SellerWithdrawalsPage() {
 
             <a
               href="/dashboard/seller/settings"
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#DDE5EF] bg-white px-4 text-sm font-medium text-slate-700 hover:border-slate-300 hover:bg-[#F6F9FC]"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#E5E7EB] bg-white px-4 text-sm font-medium text-slate-700 hover:border-slate-300 hover:bg-[#F7F8FA]"
             >
               Payout settings
               {icons.arrow}
@@ -422,10 +422,10 @@ export default function SellerWithdrawalsPage() {
             </Card>
           ) : (
             <>
-              <div className="grid gap-px overflow-hidden rounded-lg border border-[#DDE5EF] bg-slate-200 md:grid-cols-3">
+              <div className="grid gap-px overflow-hidden rounded-lg border border-[#E5E7EB] bg-slate-200 md:grid-cols-3">
                 <div className="bg-white p-5">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-100 text-[#0E1F3D]">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-100 text-[#0A0440]">
                       {icons.wallet}
                     </span>
                     <span className="text-sm text-slate-500">
@@ -453,7 +453,7 @@ export default function SellerWithdrawalsPage() {
 
                 <div className="bg-white p-5">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-100 text-[#0E1F3D]">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-100 text-[#0A0440]">
                       {icons.wallet}
                     </span>
                     <span className="text-sm text-slate-500">
@@ -484,8 +484,8 @@ export default function SellerWithdrawalsPage() {
                         Withdrawal amount
                       </label>
 
-                      <div className="flex h-12 overflow-hidden rounded-md border border-slate-300 bg-white focus-within:border-[#0E1F3D] focus-within:ring-1 focus-within:ring-[#0E1F3D]">
-                        <span className="flex items-center border-r border-[#DDE5EF] bg-[#F6F9FC] px-3 text-sm font-medium text-slate-500">
+                      <div className="flex h-12 overflow-hidden rounded-md border border-slate-300 bg-white focus-within:border-[#0A0440] focus-within:ring-1 focus-within:ring-[#0A0440]">
+                        <span className="flex items-center border-r border-[#E5E7EB] bg-[#F7F8FA] px-3 text-sm font-medium text-slate-500">
                           {walletCurrency}
                         </span>
                         <input
@@ -506,7 +506,7 @@ export default function SellerWithdrawalsPage() {
                       {walletCurrency !== "ZAR" && <p className="mt-1 text-xs text-slate-400">Reference rate: 1 ZAR = {exchangeRate.toFixed(4)} {walletCurrency}</p>}
                     </div>
 
-                    <div className="rounded-md border border-[#DDE5EF]">
+                    <div className="rounded-md border border-[#E5E7EB]">
                       <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
                         <span className="text-sm text-slate-600">
                           Withdrawal fee
@@ -525,13 +525,13 @@ export default function SellerWithdrawalsPage() {
                         </span>
                       </div>
 
-                      <div className="border-t border-slate-100 bg-[#F6F9FC] px-4 py-3 text-xs text-slate-500">
+                      <div className="border-t border-slate-100 bg-[#F7F8FA] px-4 py-3 text-xs text-slate-500">
                         Fee: 5% + R10 fixed fee.
                       </div>
                     </div>
 
                     {walletCurrency !== "ZAR" && (
-                      <div className="rounded-md border border-[#DDE5EF] bg-white">
+                      <div className="rounded-md border border-[#E5E7EB] bg-white">
                         <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
                           <span className="text-sm font-semibold text-slate-800">
                             Currency conversion
@@ -560,7 +560,7 @@ export default function SellerWithdrawalsPage() {
                             <p className="text-xs text-slate-500">
                               Estimated local payout
                             </p>
-                            <p className="mt-1 text-lg font-semibold text-[#0E1F3D]">
+                            <p className="mt-1 text-lg font-semibold text-[#0A0440]">
                               {exchangeRate ? money(convertedNet) : "—"}
                             </p>
                           </div>
@@ -586,12 +586,12 @@ export default function SellerWithdrawalsPage() {
                             onClick={() => setMethod(m)}
                             className={`flex w-full items-center justify-between rounded-md border px-4 py-3 text-left transition ${
                               method === m
-                                ? "border-[#0E1F3D] bg-[#F6F9FC]"
-                                : "border-[#DDE5EF] bg-white hover:border-slate-300"
+                                ? "border-[#0A0440] bg-[#F7F8FA]"
+                                : "border-[#E5E7EB] bg-white hover:border-slate-300"
                             }`}
                           >
                             <span className="flex items-center gap-3">
-                              <span className="text-[#0E1F3D]">
+                              <span className="text-[#0A0440]">
                                 {m === "bank_transfer"
                                   ? icons.bank
                                   : icons.phone}
@@ -612,7 +612,7 @@ export default function SellerWithdrawalsPage() {
                             <span
                               className={`flex h-5 w-5 items-center justify-center rounded-full border ${
                                 method === m
-                                  ? "border-[#0E1F3D] bg-[#0E4AAB] text-white"
+                                  ? "border-[#0A0440] bg-[#10069F] text-white"
                                   : "border-slate-300"
                               }`}
                             >
@@ -647,7 +647,7 @@ export default function SellerWithdrawalsPage() {
                         !available.length ||
                         (walletCurrency !== "ZAR" && (!exchangeRate || rateLoading))
                       }
-                      className="h-11 w-full rounded-md bg-[#0E4AAB] px-4 text-sm font-semibold text-white transition hover:bg-[#0B3D8F] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="h-11 w-full rounded-md bg-[#10069F] px-4 text-sm font-semibold text-white transition hover:bg-[#0B3D8F] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {submitting ? "Submitting..." : "Request Withdrawal"}
                     </button>
@@ -670,7 +670,7 @@ export default function SellerWithdrawalsPage() {
 
                   {withdrawals.length === 0 ? (
                     <div className="flex min-h-[360px] flex-col items-center justify-center px-6 text-center">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#DDE5EF] bg-[#F6F9FC] text-slate-400">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#E5E7EB] bg-[#F7F8FA] text-slate-400">
                         {icons.wallet}
                       </div>
                       <p className="mt-4 text-sm font-medium text-slate-700">
@@ -685,7 +685,7 @@ export default function SellerWithdrawalsPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[760px] text-left text-sm">
                         <thead>
-                          <tr className="border-b border-slate-100 bg-[#F6F9FC] text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                          <tr className="border-b border-slate-100 bg-[#F7F8FA] text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                             <th className="px-6 py-3">Request</th>
                             <th className="px-4 py-3">Amount</th>
                             <th className="px-4 py-3">Net</th>
@@ -700,7 +700,7 @@ export default function SellerWithdrawalsPage() {
                           {withdrawals.map((w) => (
                             <tr
                               key={w.id}
-                              className="hover:bg-[#F6F9FC]/70"
+                              className="hover:bg-[#F7F8FA]/70"
                             >
                               <td className="px-6 py-4 font-medium text-slate-800">
                                 #{w.id.slice(0, 8)}
