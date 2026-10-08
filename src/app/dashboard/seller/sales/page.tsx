@@ -188,7 +188,7 @@ export default function SellerSalesPage() {
       return "border-red-200 bg-red-50 text-red-700";
     }
 
-    return "border-[#DDE5EF] bg-[#F6F9FC] text-slate-600";
+    return "border-[#E5E7EB] bg-[#F7F8FA] text-slate-600";
   };
 
   const metricCards = [
@@ -227,12 +227,12 @@ export default function SellerSalesPage() {
   return (
     <AppShell area="seller">
       <div className="mx-auto max-w-7xl space-y-7">
-        <div className="flex flex-col gap-4 border-b border-[#DDE5EF] pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-[#E5E7EB] pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#C99A2E]">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#10069F]">
               Sales
             </p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#0E1F3D]">
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#0A0440]">
               Orders & Sales
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-500">
@@ -243,7 +243,7 @@ export default function SellerSalesPage() {
 
           <Link
             href="/dashboard/seller/marketplace"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#0E4AAB] px-5 text-sm font-semibold text-white transition hover:bg-[#0B3D8F]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#10069F] px-5 text-sm font-semibold text-white transition hover:bg-[#0B3D8F]"
           >
             Find products
           </Link>
@@ -251,7 +251,7 @@ export default function SellerSalesPage() {
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           {metricCards.map((metric) => (
-            <Card key={metric.label} className="border-[#DDE5EF]">
+            <Card key={metric.label} className="border-[#E5E7EB]">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-500">
@@ -262,7 +262,7 @@ export default function SellerSalesPage() {
                   </p>
                 </div>
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] text-[#0E1F3D]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#E5E7EB] bg-[#F7F8FA] text-[#0A0440]">
                   {metric.icon}
                 </div>
               </div>
@@ -274,8 +274,8 @@ export default function SellerSalesPage() {
           ))}
         </div>
 
-        <Card className="border-[#DDE5EF] p-0">
-          <div className="flex flex-col gap-4 border-b border-[#DDE5EF] p-5 lg:flex-row lg:items-center lg:justify-between">
+        <Card className="border-[#E5E7EB] p-0">
+          <div className="flex flex-col gap-4 border-b border-[#E5E7EB] p-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 className="text-base font-semibold text-slate-900">
                 Sales history
@@ -302,14 +302,14 @@ export default function SellerSalesPage() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search sales..."
-                  className="h-10 w-full rounded-lg border border-[#DDE5EF] bg-white pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-[#0E1F3D] sm:w-72"
+                  className="h-10 w-full rounded-lg border border-[#E5E7EB] bg-white pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-[#0A0440] sm:w-72"
                 />
               </div>
 
               <select
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value)}
-                className="h-10 rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#0E1F3D]"
+                className="h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#0A0440]"
               >
                 <option value="all">All statuses</option>
                 <option value="paga">Paid</option>
@@ -337,7 +337,7 @@ export default function SellerSalesPage() {
             </div>
           ) : filteredSales.length === 0 ? (
             <div className="px-5 py-16 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#DDE5EF] bg-[#F6F9FC] text-[#0E1F3D]">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#E5E7EB] bg-[#F7F8FA] text-[#0A0440]">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -365,7 +365,7 @@ export default function SellerSalesPage() {
               {!search && statusFilter === "all" && (
                 <Link
                   href="/dashboard/seller/marketplace"
-                  className="mt-6 inline-flex h-10 items-center justify-center rounded-lg border border-[#0E1F3D] px-5 text-sm font-semibold text-[#0E1F3D] transition hover:bg-[#F6F9FC]"
+                  className="mt-6 inline-flex h-10 items-center justify-center rounded-lg border border-[#0A0440] px-5 text-sm font-semibold text-[#0A0440] transition hover:bg-[#F7F8FA]"
                 >
                   Browse Marketplace
                 </Link>
@@ -376,7 +376,7 @@ export default function SellerSalesPage() {
               <div className="hidden overflow-x-auto md:block">
                 <table className="w-full min-w-[1050px]">
                   <thead>
-                    <tr className="border-b border-slate-100 bg-[#F6F9FC]/70 text-left">
+                    <tr className="border-b border-slate-100 bg-[#F7F8FA]/70 text-left">
                       <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                         Sale
                       </th>
@@ -400,7 +400,7 @@ export default function SellerSalesPage() {
 
                   <tbody className="divide-y divide-slate-100">
                     {filteredSales.map((sale) => (
-                      <tr key={sale.id} className="transition hover:bg-[#F6F9FC]/70">
+                      <tr key={sale.id} className="transition hover:bg-[#F7F8FA]/70">
                         <td className="px-5 py-4">
                           <p className="font-semibold text-slate-900">
                             #{sale.id.slice(0, 8)}
@@ -425,7 +425,7 @@ export default function SellerSalesPage() {
                           )}
                         </td>
 
-                        <td className="px-5 py-4 text-sm font-semibold text-[#0E1F3D]">
+                        <td className="px-5 py-4 text-sm font-semibold text-[#0A0440]">
                           {formatMoney(
                             Number(sale.comissao_vendedor || 0),
                             sale.product?.moeda || "ZAR",
@@ -480,7 +480,7 @@ export default function SellerSalesPage() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 rounded-lg bg-[#F6F9FC] p-4">
+                    <div className="grid grid-cols-2 gap-4 rounded-lg bg-[#F7F8FA] p-4">
                       <div>
                         <p className="text-xs text-slate-500">Sale value</p>
                         <p className="mt-1 text-sm font-semibold text-slate-900">
@@ -493,7 +493,7 @@ export default function SellerSalesPage() {
 
                       <div>
                         <p className="text-xs text-slate-500">Commission</p>
-                        <p className="mt-1 text-sm font-semibold text-[#0E1F3D]">
+                        <p className="mt-1 text-sm font-semibold text-[#0A0440]">
                           {formatMoney(
                             Number(sale.comissao_vendedor || 0),
                             sale.product?.moeda || "ZAR",
