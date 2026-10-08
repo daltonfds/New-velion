@@ -46,13 +46,13 @@ export default function SupplierDashboardPage() {
 
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0E4AAB]">Supplier Center</p>
-            <h1 className="mt-2 text-3xl font-bold text-[#0E1F3D]">Your commerce operation</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#10069F]">Supplier Center</p>
+            <h1 className="mt-2 text-3xl font-bold text-[#0A0440]">Your commerce operation</h1>
             <p className="mt-2 text-sm text-slate-500">Manage products, inventory, fulfillment and earnings from one place.</p>
           </div>
           <div className="flex gap-2">
-            <Link href="/dashboard/supplier/withdrawals" className="rounded-lg border border-[#DDE5EF] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-[#F6F9FC]">Withdrawals</Link>
-            <Link href="/dashboard/supplier/products/new" className="rounded-lg bg-[#0E4AAB] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0B3D8F]">Add product</Link>
+            <Link href="/dashboard/supplier/withdrawals" className="rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-[#F7F8FA]">Withdrawals</Link>
+            <Link href="/dashboard/supplier/products/new" className="rounded-lg bg-[#10069F] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0B3D8F]">Add product</Link>
           </div>
         </div>
 
@@ -77,11 +77,11 @@ export default function SupplierDashboardPage() {
         <Card className="border-blue-100 bg-blue-50/40 p-5">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#0E4AAB]">Supplier balance</p>
-              <p className="mt-1 text-3xl font-bold text-[#0E1F3D]">{loading ? "—" : finance.total.toLocaleString()}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#10069F]">Supplier balance</p>
+              <p className="mt-1 text-3xl font-bold text-[#0A0440]">{loading ? "—" : finance.total.toLocaleString()}</p>
               <p className="mt-1 text-sm text-slate-500">Available funds can be withdrawn after KYC approval and the configured hold period.</p>
             </div>
-            <Link href="/dashboard/supplier/withdrawals" className="rounded-lg bg-[#0E1F3D] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">Manage withdrawals</Link>
+            <Link href="/dashboard/supplier/withdrawals" className="rounded-lg bg-[#0A0440] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">Manage withdrawals</Link>
           </div>
         </Card>
 
@@ -89,11 +89,11 @@ export default function SupplierDashboardPage() {
           <Card className="p-0">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <div><h2 className="font-semibold text-slate-900">Products</h2><p className="text-xs text-slate-500">{lowStock} low-stock items</p></div>
-              <Link href="/dashboard/supplier/products" className="text-sm font-semibold text-[#0E4AAB]">View all</Link>
+              <Link href="/dashboard/supplier/products" className="text-sm font-semibold text-[#10069F]">View all</Link>
             </div>
             <div className="divide-y divide-slate-100">
               {products.slice(0, 5).map((product) => (
-                <Link key={product.id} href={"/dashboard/supplier/products/" + product.id} className="flex items-center justify-between px-5 py-4 hover:bg-[#F6F9FC]">
+                <Link key={product.id} href={"/dashboard/supplier/products/" + product.id} className="flex items-center justify-between px-5 py-4 hover:bg-[#F7F8FA]">
                   <div><p className="font-medium text-slate-900">{product.nome}</p><p className="text-xs text-slate-500">{product.supplier_status}</p></div>
                   <span className="text-sm text-slate-600">{product.estoque - product.reserved_estoque} available</span>
                 </Link>
@@ -105,7 +105,7 @@ export default function SupplierDashboardPage() {
           <Card className="p-0">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <div><h2 className="font-semibold text-slate-900">Recent orders</h2><p className="text-xs text-slate-500">Fulfillment queue</p></div>
-              <Link href="/dashboard/supplier/orders" className="text-sm font-semibold text-[#0E4AAB]">View all</Link>
+              <Link href="/dashboard/supplier/orders" className="text-sm font-semibold text-[#10069F]">View all</Link>
             </div>
             <div className="divide-y divide-slate-100">
               {orders.slice(0, 5).map((order) => (
