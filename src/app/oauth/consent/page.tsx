@@ -81,9 +81,9 @@ export default async function OAuthConsentPage({
       <div className="w-full max-w-xl">
         <div className="mb-6 text-center">
           <div className="inline-flex items-end gap-1" aria-label="Newvelion">
-            <span className="h-3 w-2 rounded-sm bg-[#C99A2E]" />
-            <span className="h-5 w-2 rounded-sm bg-[#C99A2E]" />
-            <span className="h-7 w-2 rounded-sm bg-[#C99A2E]" />
+            <span className="h-3 w-2 rounded-sm bg-[#FFB800]" />
+            <span className="h-5 w-2 rounded-sm bg-[#FFB800]" />
+            <span className="h-7 w-2 rounded-sm bg-[#FFB800]" />
           </div>
           <div className="mt-2 text-xl font-bold text-[#16294F]">Newvelion</div>
         </div>
