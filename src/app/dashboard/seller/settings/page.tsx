@@ -218,13 +218,13 @@ export default function SellerSettingsPage(){
   const showMZ=country==="MZ";
   return <AppShell area="seller" title="Settings" subtitle="Manage your account and payout preferences.">
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-[#0E4AAB]">← Account</Link>
-      <div><h2 className="mt-3 text-2xl font-bold text-[#0E1F3D]">Settings</h2><p className="mt-1 text-sm text-slate-500">Payout methods and account preferences are stored securely in NewVelion.</p></div>
+      <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-[#10069F]">← Account</Link>
+      <div><h2 className="mt-3 text-2xl font-bold text-[#0A0440]">Settings</h2><p className="mt-1 text-sm text-slate-500">Payout methods and account preferences are stored securely in NewVelion.</p></div>
       {error&&<div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
       {message&&<div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</div>}
-      {loading?<div className="rounded-[10px] border border-[#DDE5EF] bg-white p-6 text-sm text-slate-500">Loading settings...</div>:<>
+      {loading?<div className="rounded-[10px] border border-[#E5E7EB] bg-white p-6 text-sm text-slate-500">Loading settings...</div>:<>
 
-        <section className="rounded-[10px] border border-[#DDE5EF] bg-white">
+        <section className="rounded-[10px] border border-[#E5E7EB] bg-white">
           <div className="border-b border-slate-100 px-6 py-5">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
@@ -267,7 +267,7 @@ export default function SellerSettingsPage(){
                       value={kycCountry}
                       onChange={e=>setKycCountry(e.target.value)}
                       disabled={Boolean(country)}
-                      className="h-11 w-full rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700 disabled:bg-[#F6F9FC] disabled:text-slate-500"
+                      className="h-11 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700 disabled:bg-[#F7F8FA] disabled:text-slate-500"
                     >
                       <option value="">Select your country</option>
                       {COUNTRIES.map(c=><option key={c.code} value={c.code}>{c.name}</option>)}
@@ -282,7 +282,7 @@ export default function SellerSettingsPage(){
                     <select
                       value={documentType}
                       onChange={e=>setDocumentType(e.target.value as KycDocumentType)}
-                      className="h-11 w-full rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700"
+                      className="h-11 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700"
                     >
                       <option value="national_id">National ID (BI)</option>
                       <option value="drivers_license">Driver's License</option>
@@ -293,7 +293,7 @@ export default function SellerSettingsPage(){
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">
-                  <label className="rounded-lg border border-dashed border-slate-300 bg-[#F6F9FC] p-4">
+                  <label className="rounded-lg border border-dashed border-slate-300 bg-[#F7F8FA] p-4">
                     <span className="block text-sm font-semibold text-slate-800">Front of document</span>
                     <span className="mt-1 block text-xs text-slate-500">JPG, PNG, WEBP or PDF</span>
                     <input
@@ -305,7 +305,7 @@ export default function SellerSettingsPage(){
                     {documentFront&&<span className="mt-2 block truncate text-xs text-slate-700">{documentFront.name}</span>}
                   </label>
 
-                  <label className="rounded-lg border border-dashed border-slate-300 bg-[#F6F9FC] p-4">
+                  <label className="rounded-lg border border-dashed border-slate-300 bg-[#F7F8FA] p-4">
                     <span className="block text-sm font-semibold text-slate-800">Back of document</span>
                     <span className="mt-1 block text-xs text-slate-500">JPG, PNG, WEBP or PDF</span>
                     <input
@@ -317,7 +317,7 @@ export default function SellerSettingsPage(){
                     {documentBack&&<span className="mt-2 block truncate text-xs text-slate-700">{documentBack.name}</span>}
                   </label>
 
-                  <label className="rounded-lg border border-dashed border-slate-300 bg-[#F6F9FC] p-4">
+                  <label className="rounded-lg border border-dashed border-slate-300 bg-[#F7F8FA] p-4">
                     <span className="block text-sm font-semibold text-slate-800">Photo holding the document</span>
                     <span className="mt-1 block text-xs text-slate-500">Clear face + document photo</span>
                     <input
@@ -330,7 +330,7 @@ export default function SellerSettingsPage(){
                   </label>
                 </div>
 
-                <div className="rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] px-4 py-3 text-xs leading-5 text-slate-500">
+                <div className="rounded-lg border border-[#E5E7EB] bg-[#F7F8FA] px-4 py-3 text-xs leading-5 text-slate-500">
                   Accepted documents: National ID (BI), Driver's License, Voter's Card, or Passport.
                   Make sure all details are readable and the photo holding the document clearly shows your face and the document.
                 </div>
@@ -339,7 +339,7 @@ export default function SellerSettingsPage(){
                   <button
                     onClick={submitKyc}
                     disabled={kycSubmitting||kycLoading}
-                    className="rounded-lg bg-[#0E4AAB] px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg bg-[#10069F] px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {kycSubmitting ? "Submitting KYC..." : "Submit KYC"}
                   </button>
@@ -355,11 +355,11 @@ export default function SellerSettingsPage(){
           </div>
         </section>
 
-        <section className="rounded-[10px] border border-[#DDE5EF] bg-white">
+        <section className="rounded-[10px] border border-[#E5E7EB] bg-white">
           <div className="border-b border-slate-100 px-6 py-5"><h3 className="font-semibold text-slate-900">Payout methods</h3><p className="mt-1 text-sm text-slate-500">Configure your payout account here. Withdrawals will only show configured methods.</p></div>
           <div className="space-y-5 p-6">
             <label className="flex items-center gap-3"><input type="checkbox" checked={methods.bank_transfer} onChange={e=>setMethods(m=>({...m,bank_transfer:e.target.checked}))}/><span className="font-medium">Bank Transfer</span></label>
-            {methods.bank_transfer&&<div className="grid gap-4 rounded-lg border border-[#DDE5EF] p-4 md:grid-cols-2">
+            {methods.bank_transfer&&<div className="grid gap-4 rounded-lg border border-[#E5E7EB] p-4 md:grid-cols-2">
               <input placeholder="Bank name" value={details.bank_transfer.bank} onChange={e=>setDetail("bank_transfer","bank",e.target.value)} className="rounded-lg border px-3 py-2.5"/>
               <input placeholder="Account number" value={details.bank_transfer.account_number} onChange={e=>setDetail("bank_transfer","account_number",e.target.value)} className="rounded-lg border px-3 py-2.5"/>
               <input placeholder="Branch code" value={details.bank_transfer.branch_code} onChange={e=>setDetail("bank_transfer","branch_code",e.target.value)} className="rounded-lg border px-3 py-2.5"/>
@@ -368,20 +368,20 @@ export default function SellerSettingsPage(){
             </div>}
             {showMZ&&<>
               <label className="flex items-center gap-3"><input type="checkbox" checked={methods.mpesa} onChange={e=>setMethods(m=>({...m,mpesa:e.target.checked}))}/><span className="font-medium">M-Pesa</span></label>
-              {methods.mpesa&&<div className="grid gap-4 rounded-lg border border-[#DDE5EF] p-4 md:grid-cols-2"><input placeholder="M-Pesa phone number" value={details.mpesa.phone} onChange={e=>setDetail("mpesa","phone",e.target.value)} className="rounded-lg border px-3 py-2.5"/><input placeholder="Account holder name" value={details.mpesa.holder_name} onChange={e=>setDetail("mpesa","holder_name",e.target.value)} className="rounded-lg border px-3 py-2.5"/></div>}
+              {methods.mpesa&&<div className="grid gap-4 rounded-lg border border-[#E5E7EB] p-4 md:grid-cols-2"><input placeholder="M-Pesa phone number" value={details.mpesa.phone} onChange={e=>setDetail("mpesa","phone",e.target.value)} className="rounded-lg border px-3 py-2.5"/><input placeholder="Account holder name" value={details.mpesa.holder_name} onChange={e=>setDetail("mpesa","holder_name",e.target.value)} className="rounded-lg border px-3 py-2.5"/></div>}
               <label className="flex items-center gap-3"><input type="checkbox" checked={methods.emola} onChange={e=>setMethods(m=>({...m,emola:e.target.checked}))}/><span className="font-medium">e-Mola</span></label>
-              {methods.emola&&<div className="grid gap-4 rounded-lg border border-[#DDE5EF] p-4 md:grid-cols-2"><input placeholder="e-Mola phone number" value={details.emola.phone} onChange={e=>setDetail("emola","phone",e.target.value)} className="rounded-lg border px-3 py-2.5"/><input placeholder="Account holder name" value={details.emola.holder_name} onChange={e=>setDetail("emola","holder_name",e.target.value)} className="rounded-lg border px-3 py-2.5"/></div>}
+              {methods.emola&&<div className="grid gap-4 rounded-lg border border-[#E5E7EB] p-4 md:grid-cols-2"><input placeholder="e-Mola phone number" value={details.emola.phone} onChange={e=>setDetail("emola","phone",e.target.value)} className="rounded-lg border px-3 py-2.5"/><input placeholder="Account holder name" value={details.emola.holder_name} onChange={e=>setDetail("emola","holder_name",e.target.value)} className="rounded-lg border px-3 py-2.5"/></div>}
             </>}
           </div>
         </section>
-        <section className="rounded-[10px] border border-[#DDE5EF] bg-white">
+        <section className="rounded-[10px] border border-[#E5E7EB] bg-white">
           <div className="border-b border-slate-100 px-6 py-5"><h3 className="font-semibold text-slate-900">Account preferences</h3></div>
           <div className="space-y-5 p-6">
             <label className="flex items-center justify-between"><span><b className="block text-sm">Email notifications</b><small className="text-slate-500">Important account and payout notifications.</small></span><input type="checkbox" checked={emailNotifications} onChange={e=>setEmailNotifications(e.target.checked)}/></label>
             <label className="flex items-center justify-between"><span><b className="block text-sm">Sales notifications</b><small className="text-slate-500">Notifications when affiliate sales are recorded.</small></span><input type="checkbox" checked={salesNotifications} onChange={e=>setSalesNotifications(e.target.checked)}/></label>
           </div>
         </section>
-        <div className="flex justify-end"><button onClick={save} disabled={saving} className="rounded-lg bg-[#0E4AAB] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving?"Saving...":"Save settings"}</button></div>
+        <div className="flex justify-end"><button onClick={save} disabled={saving} className="rounded-lg bg-[#10069F] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving?"Saving...":"Save settings"}</button></div>
       </>}
     </div>
   </AppShell>
