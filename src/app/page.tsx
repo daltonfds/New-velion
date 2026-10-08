@@ -1,45 +1,16 @@
 import Link from "next/link";
 
-function Icon({
-  name,
-  size = 20,
-}: {
-  name: "menu" | "arrow" | "chart" | "shopping" | "truck" | "wallet" | "support" | "shield" | "users" | "close" | "chevron";
-  size?: number;
-}) {
-  const common = {
-    width: size,
-    height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    "aria-hidden": true,
-  };
+const categories = [
+  ["Health & Beauty", "Explore products"],
+  ["Home & Lifestyle", "Explore products"],
+  ["Electronics", "Explore products"],
+  ["Fitness", "Explore products"],
+];
 
-  const paths = {
-    menu: <><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h16" /></>,
-    close: <><path d="m6 6 12 12" /><path d="M18 6 6 18" /></>,
-    arrow: <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>,
-    chevron: <path d="m8 10 4 4 4-4" />,
-    chart: <><path d="M4 19V5" /><path d="M4 19h16" /><path d="m7 15 3-4 3 2 5-7" /></>,
-    shopping: <><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.5L20.5 8H6" /><circle cx="10" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></>,
-    truck: <><path d="M3 6h11v10H3z" /><path d="M14 10h4l3 3v3h-7z" /><circle cx="7" cy="18" r="2" /><circle cx="18" cy="18" r="2" /></>,
-    wallet: <><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 16.5z" /><path d="M4 8h15" /><path d="M16 13h5" /><circle cx="16" cy="13" r=".6" /></>,
-    support: <><path d="M4 13a8 8 0 0 1 16 0" /><path d="M4 13v4a2 2 0 0 0 2 2h1v-6H4Z" /><path d="M20 13v4a2 2 0 0 1-2 2h-1v-6h3Z" /><path d="M15 19c-.5 1-1.5 1.5-3 1.5" /></>,
-    shield: <><path d="M12 3 20 6v5c0 5-3.3 8.4-8 10-4.7-1.6-8-5-8-10V6z" /><path d="m8.5 12 2.2 2.2 4.8-5" /></>,
-    users: <><circle cx="9" cy="8" r="3" /><path d="M3.5 20c.6-3.2 2.4-5 5.5-5s4.9 1.8 5.5 5" /><path d="M15 6.5a3 3 0 0 1 0 5.8" /><path d="M16 15c2.6.4 4.2 2 4.7 5" /></>,
-  };
-
-  return <svg {...common}>{paths[name]}</svg>;
-}
-
-function Logo({ light = false }: { light?: boolean }) {
+function Logo() {
   return (
-    <Link href="/" className={`nv-home-logo ${light ? "is-light" : ""}`} aria-label="Newvelion home">
-      <span className="nv-home-mark" aria-hidden="true"><i /><i /><i /></span>
+    <Link href="/" className="nv-new-logo" aria-label="Newvelion home">
+      <span className="nv-new-mark" aria-hidden="true"><i /><i /><i /></span>
       <strong>newvelion</strong>
     </Link>
   );
@@ -47,133 +18,109 @@ function Logo({ light = false }: { light?: boolean }) {
 
 export default function HomePage() {
   return (
-    <main className="nv-home">
-      <header className="nv-home-header">
-        <div className="nv-home-header-inner">
+    <main className="nv-new-home">
+      <div className="nv-new-topbar">Commerce infrastructure for South Africa</div>
+
+      <header className="nv-new-header">
+        <div className="nv-new-header-inner">
           <Logo />
-          <nav className="nv-home-nav" aria-label="Primary navigation">
-            <Link href="/register">Become a Seller</Link>
-            <Link href="/become-supplier">Become a Supplier</Link>
+          <nav>
+            <Link href="/marketplace">Marketplace</Link>
+            <Link href="/register">For Sellers</Link>
+            <Link href="/become-supplier">For Suppliers</Link>
             <Link href="/support">Support</Link>
           </nav>
-          <div className="nv-home-actions">
-            <Link href="/login" className="nv-home-login">Login</Link>
-            <Link href="/register" className="nv-home-signup">Sign Up</Link>
+          <div className="nv-new-header-actions">
+            <Link href="/login">Log in</Link>
+            <Link href="/register" className="nv-new-button">Sign up</Link>
           </div>
-          <details className="nv-home-menu">
-            <summary aria-label="Open menu"><Icon name="menu" size={24} /></summary>
-            <div className="nv-home-drawer">
-              <div className="nv-home-drawer-head">
-                <Logo />
-                <span aria-hidden="true"><Icon name="close" size={20} /></span>
-              </div>
-              <div className="nv-home-drawer-section">
-                <span className="nv-home-drawer-label">Newvelion</span>
-                <Link href="/register"><Icon name="users" size={18} /> Become a Seller <Icon name="chevron" size={16} /></Link>
-                <Link href="/become-supplier"><Icon name="shopping" size={18} /> Become a Supplier <Icon name="chevron" size={16} /></Link>
-                <Link href="/login"><Icon name="shield" size={18} /> Sign in <Icon name="chevron" size={16} /></Link>
-              </div>
-              <div className="nv-home-drawer-section">
-                <span className="nv-home-drawer-label">Platform</span>
-                <a href="#platform"><Icon name="chart" size={18} /> Performance & analytics <Icon name="chevron" size={16} /></a>
-                <a href="#platform"><Icon name="shopping" size={18} /> Commerce tools <Icon name="chevron" size={16} /></a>
-                <a href="#platform"><Icon name="truck" size={18} /> Fulfillment & delivery <Icon name="chevron" size={16} /></a>
-                <a href="#platform"><Icon name="wallet" size={18} /> Commissions & withdrawals <Icon name="chevron" size={16} /></a>
-              </div>
-              <div className="nv-home-drawer-section">
-                <span className="nv-home-drawer-label">Support</span>
-                <Link href="/support"><Icon name="support" size={18} /> Help & Support <Icon name="chevron" size={16} /></Link>
-                <a href="mailto:contact@newvelion.com"><Icon name="support" size={18} /> contact@newvelion.com</a>
-                <a href="tel:+27722958915"><Icon name="support" size={18} /> +27 72 295 8915</a>
-              </div>
-            </div>
-          </details>
         </div>
       </header>
 
-      <section className="nv-home-hero">
-        <div className="nv-home-hero-inner">
-          <div className="nv-home-hero-copy">
-            <span className="nv-home-eyebrow">COMMERCE INFRASTRUCTURE</span>
-            <h1>Scale your commerce.<br /><span>Empower your growth.</span></h1>
-            <p>Newvelion connects suppliers, sellers and customers with tools for commerce, product promotion, commissions, orders and fulfillment.</p>
-            <div className="nv-home-hero-actions">
-              <Link href="/register" className="nv-home-primary">Become a Seller <Icon name="arrow" size={18} /></Link>
-              <Link href="/become-supplier" className="nv-home-secondary">Become a Supplier</Link>
+      <section className="nv-new-hero">
+        <div className="nv-new-hero-inner">
+          <div className="nv-new-hero-copy">
+            <span className="nv-new-kicker">THE COMMERCE PLATFORM</span>
+            <h1>Find products.<br /><span>Build sales.</span></h1>
+            <p>Newvelion connects products, suppliers, sellers and customers in one commerce ecosystem built for South Africa.</p>
+            <div className="nv-new-actions">
+              <Link href="/marketplace" className="nv-new-button nv-new-button-large">Explore marketplace</Link>
+              <Link href="/register" className="nv-new-outline">Start selling</Link>
             </div>
-            <div className="nv-home-trustline"><span /><p>The climbing starts here.</p></div>
-          </div>
-
-          <div className="nv-home-hero-visual" aria-label="Newvelion commerce platform">
-            <div className="nv-home-ui-window">
-              <div className="nv-home-ui-top"><span /><span /><span /><b>NEWVELION</b><Icon name="chart" size={17} /></div>
-              <div className="nv-home-ui-body">
-                <div className="nv-home-ui-sidebar"><i /><i /><i /><i /></div>
-                <div className="nv-home-ui-content">
-                  <div className="nv-home-ui-title"><span /><em /></div>
-                  <div className="nv-home-ui-stats"><i /><i /><i /></div>
-                  <div className="nv-home-ui-chart"><span /><span /><span /><span /><span /><span /></div>
-                  <div className="nv-home-ui-table"><i /><i /><i /></div>
-                </div>
-              </div>
+            <div className="nv-new-proof">
+              <span>✓ Products</span><span>✓ Affiliate selling</span><span>✓ Fulfillment</span>
             </div>
-            <div className="nv-home-floating nv-home-floating-one"><Icon name="shopping" size={18} /><span>Commerce</span></div>
-            <div className="nv-home-floating nv-home-floating-two"><Icon name="truck" size={18} /><span>Fulfillment</span></div>
+          </div>
+          <div className="nv-new-hero-card">
+            <div className="nv-new-search"><span>Search products, categories...</span><b>Search</b></div>
+            <div className="nv-new-card-head"><strong>Popular on Newvelion</strong><Link href="/marketplace">View all</Link></div>
+            <div className="nv-new-product-row">
+              <div className="nv-new-product-image">NEW</div>
+              <div><strong>Discover products ready to sell</strong><span>Choose a product and start promoting.</span><b>View marketplace →</b></div>
+            </div>
+            <div className="nv-new-mini-grid">
+              <div><span>01</span><strong>Choose</strong><small>Find products</small></div>
+              <div><span>02</span><strong>Sell</strong><small>Share your link</small></div>
+              <div><span>03</span><strong>Grow</strong><small>Track your sales</small></div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="nv-home-section" id="platform">
-        <div className="nv-home-section-head">
-          <span className="nv-home-eyebrow">THE PLATFORM</span>
-          <h2>Everything you need to move commerce forward.</h2>
-          <p>Core workflows across products, selling, orders, delivery, commissions and support — brought together in one platform.</p>
+      <section className="nv-new-section">
+        <div className="nv-new-section-head">
+          <div><span className="nv-new-kicker">SHOP THE MARKETPLACE</span><h2>Explore what is selling.</h2></div>
+          <Link href="/marketplace">View marketplace →</Link>
         </div>
-        <div className="nv-home-feature-grid">
-          <article><span className="nv-home-icon"><Icon name="shopping" /></span><h3>Commerce tools</h3><p>Products, accounts, carts, checkout and orders in one platform.</p><b>01</b></article>
-          <article><span className="nv-home-icon"><Icon name="chart" /></span><h3>Seller & affiliate activity</h3><p>Promote products, use affiliate links and manage commissions.</p><b>02</b></article>
-          <article><span className="nv-home-icon"><Icon name="truck" /></span><h3>Fulfillment & delivery</h3><p>Support fulfillment, delivery and tracking for customer orders.</p><b>03</b></article>
-          <article><span className="nv-home-icon"><Icon name="wallet" /></span><h3>Commissions & withdrawals</h3><p>Platform workflows for commissions and seller withdrawals.</p><b>04</b></article>
-        </div>
-      </section>
-
-      <section className="nv-home-split">
-        <div className="nv-home-split-copy">
-          <span className="nv-home-eyebrow">BUILT AROUND ROLES</span>
-          <h2>One infrastructure. Different ways to participate.</h2>
-          <p>Newvelion supports the people involved in the commerce journey, with workflows designed around suppliers, sellers and customers.</p>
-          <div className="nv-home-split-actions">
-            <Link href="/become-supplier" className="nv-home-primary">Become a Supplier <Icon name="arrow" size={18} /></Link>
-            <Link href="/register" className="nv-home-secondary">Become a Seller</Link>
-          </div>
-        </div>
-        <div className="nv-home-role-card">
-          <div><span className="nv-home-role-number">01</span><Icon name="users" size={20} /><span>Suppliers</span><small>Products & fulfillment</small></div>
-          <div><span className="nv-home-role-number">02</span><Icon name="chart" size={20} /><span>Sellers & affiliates</span><small>Promotion & commissions</small></div>
-          <div><span className="nv-home-role-number">03</span><Icon name="shopping" size={20} /><span>Customers</span><small>Orders & delivery</small></div>
+        <div className="nv-new-category-grid">
+          {categories.map(([title, sub]) => (
+            <Link href="/marketplace" className="nv-new-category" key={title}>
+              <span className="nv-new-category-icon">↗</span><strong>{title}</strong><small>{sub}</small>
+            </Link>
+          ))}
         </div>
       </section>
 
-      <section className="nv-home-support">
-        <div className="nv-home-support-icon"><Icon name="support" size={28} /></div>
-        <div><span className="nv-home-eyebrow">SUPPORT</span><h2>Support that stays close to the commerce journey.</h2><p>Support covers seller and affiliate accounts, orders, commissions, withdrawals, checkout, delivery, transactions, buyer protection, privacy and security reports.</p></div>
-        <Link href="/support" className="nv-home-primary">Contact Support <Icon name="arrow" size={18} /></Link>
-      </section>
-
-      <section className="nv-home-cta">
-        <span className="nv-home-eyebrow">NEWVELION</span>
-        <h2>Choose where you start.</h2>
-        <p>Join Newvelion as a seller or supplier and build from there.</p>
-        <div><Link href="/register" className="nv-home-primary">Become a Seller</Link><Link href="/become-supplier" className="nv-home-secondary">Become a Supplier</Link></div>
-      </section>
-
-      <footer className="nv-home-footer">
-        <div className="nv-home-footer-inner">
-          <div><Logo light /><p>Commerce infrastructure.</p></div>
-          <div><strong>Explore</strong><Link href="/register">Become a Seller</Link><Link href="/become-supplier">Become a Supplier</Link><Link href="/login">Login</Link></div>
-          <div><strong>Support</strong><Link href="/support">Help & Support</Link><a href="mailto:contact@newvelion.com">contact@newvelion.com</a><a href="tel:+27722958915">+27 72 295 8915</a></div>
+      <section className="nv-new-seller">
+        <div>
+          <span className="nv-new-kicker">FOR SELLERS & AFFILIATES</span>
+          <h2>Turn great products into your next sale.</h2>
+          <p>Choose products from the marketplace, promote them with your affiliate link and manage your commerce activity from one place.</p>
+          <Link href="/register" className="nv-new-button">Become a seller</Link>
         </div>
-        <div className="nv-home-footer-bottom">© 2026 Newvelion. All rights reserved.</div>
+        <div className="nv-new-dashboard-card">
+          <div className="nv-new-dash-top"><strong>Seller overview</strong><span>● Live</span></div>
+          <div className="nv-new-dash-number"><small>Available balance</small><strong>R 12,480</strong></div>
+          <div className="nv-new-dash-bars"><i /><i /><i /><i /><i /><i /><i /></div>
+          <div className="nv-new-dash-bottom"><span>Sales <b>+24.8%</b></span><span>Orders <b>128</b></span></div>
+        </div>
+      </section>
+
+      <section className="nv-new-supplier">
+        <div className="nv-new-supplier-copy">
+          <span className="nv-new-kicker">FOR SUPPLIERS</span>
+          <h2>Put your products in front of more sellers.</h2>
+          <p>Register your company, submit your catalog for approval and build a distribution channel through Newvelion.</p>
+          <Link href="/become-supplier" className="nv-new-outline nv-new-outline-dark">Become a supplier →</Link>
+        </div>
+        <div className="nv-new-steps">
+          <div><b>01</b><strong>Register your business</strong><span>Company and responsible-person details.</span></div>
+          <div><b>02</b><strong>Submit products</strong><span>Build your catalog and pricing.</span></div>
+          <div><b>03</b><strong>Fulfill orders</strong><span>Manage delivery and tracking.</span></div>
+        </div>
+      </section>
+
+      <section className="nv-new-final">
+        <span className="nv-new-kicker">NEWVELION</span>
+        <h2>Commerce starts with the right infrastructure.</h2>
+        <p>One platform for products, selling, orders and fulfillment.</p>
+        <div><Link href="/marketplace" className="nv-new-button">Explore marketplace</Link><Link href="/register" className="nv-new-outline">Create account</Link></div>
+      </section>
+
+      <footer className="nv-new-footer">
+        <div><Logo /><p>Commerce infrastructure.</p></div>
+        <div><strong>Platform</strong><Link href="/marketplace">Marketplace</Link><Link href="/register">For Sellers</Link><Link href="/become-supplier">For Suppliers</Link></div>
+        <div><strong>Company</strong><Link href="/support">Support</Link><Link href="/login">Log in</Link></div>
       </footer>
     </main>
   );
