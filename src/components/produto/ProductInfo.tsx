@@ -68,12 +68,12 @@ export default function ProductInfo({
     <section className="nv-product-detail border-b border-[#E0E0E0] bg-white">
       <div className="nv-container grid gap-8 py-6 lg:grid-cols-[1.5fr_1fr] lg:gap-10 lg:py-10">
         <div>
-          <div className="nv-detail-image aspect-square overflow-hidden bg-white border border-[#E0E0E0] rounded-lg">
+          <div className="nv-detail-image relative aspect-square overflow-hidden rounded-2xl border border-[#DCE8F7] bg-[#F7FAFF]">
             {images.length ? (
               <img
                 src={images[photo]}
                 alt={product.nome}
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain p-6 sm:p-10"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-slate-400">
@@ -89,7 +89,7 @@ export default function ProductInfo({
                   key={`${src}-${index}`}
                   type="button"
                   onClick={() => setPhoto(index)}
-                  className={`aspect-square overflow-hidden border bg-white ${photo === index ? "border-[#0A0440] ring-1 ring-[#0A0440]" : "border-[#E5E7EB]"}`}
+                  className={`aspect-square overflow-hidden border bg-white ${photo === index ? "border-[#003B95] ring-1 ring-[#003B95]" : "border-[#E5E7EB]"}`}
                   aria-label={`View product image ${index + 1}`}
                 >
                   <img
@@ -104,11 +104,11 @@ export default function ProductInfo({
         </div>
 
         <div className="flex flex-col justify-center">
-          <p className="nv-kicker">
+          <p className="inline-flex w-fit rounded-full bg-[#EAF3FF] px-3 py-1 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#003B95]">
             Newvelion product
           </p>
 
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-black tracking-tight text-[#001B44] sm:text-5xl">
             {product.nome}
           </h1>
 
@@ -120,7 +120,7 @@ export default function ProductInfo({
 
           <div className="mt-4 flex items-center gap-3">
             <span
-              className="tracking-[0.18em] text-[#10069F]"
+              className="tracking-[0.18em] text-[#0078E8]"
               aria-label={`${rating} out of 5 stars`}
             >
               {"★".repeat(rating)}
@@ -131,13 +131,13 @@ export default function ProductInfo({
             </span>
           </div>
 
-          <div className="nv-detail-price mt-5 flex items-end gap-3">
+          <div className="nv-detail-price mt-6 flex items-end gap-3">
             {oldPrice !== null && (
               <span className="text-lg text-slate-400 line-through">
                 {money(oldPrice, product.moeda)}
               </span>
             )}
-            <span className="text-3xl font-black text-[#665800] sm:text-4xl">
+            <span className="text-3xl font-black text-[#003B95] sm:text-4xl">
               {money(price, product.moeda)}
             </span>
           </div>
@@ -153,7 +153,7 @@ export default function ProductInfo({
                     key={`${benefit}-${index}`}
                     className="flex items-start gap-3 text-sm text-slate-700"
                   >
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0078E8] text-xs font-bold text-white">
                       ✓
                     </span>
                     <span>{benefit}</span>
@@ -208,11 +208,11 @@ export default function ProductInfo({
                 const { error } = await supabase.from("customer_cart_items").upsert({ user_id: user.id, product_id: product.id, quantity }, { onConflict: "user_id,product_id" });
                 if (error) { window.alert(error.message); return; }
                 window.location.href = "/cart";
-              }} className="flex min-h-14 flex-1 items-center justify-center border border-[#E0E0E0] rounded-md bg-[#FBB129] px-5 text-sm font-extrabold text-black hover:bg-[#E5A020]">ADD TO CART</button>
+              }} className="flex min-h-14 flex-1 items-center justify-center rounded-xl border border-[#0078E8] bg-white px-5 text-sm font-black text-[#003B95] hover:bg-[#EAF3FF]">ADD TO CART</button>
               {checkoutUrl ? (
               <a
                 href={checkoutUrl}
-                className="flex min-h-14 w-full items-center justify-center rounded-md bg-[#FBB129] px-6 text-base font-extrabold text-black transition hover:bg-[#E5A020]"
+                className="flex min-h-14 w-full items-center justify-center rounded-xl bg-[#0078E8] px-6 text-base font-black text-white transition hover:bg-[#006CE5]"
               >
                 BUY NOW
               </a>
