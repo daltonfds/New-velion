@@ -300,7 +300,7 @@ export async function deliverIntegrationWebhook(eventId: string) {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "user-agent": "NewVelion-IntegrationAPI/1.0",
+        "user-agent": "Newvelion-IntegrationAPI/1.0",
         "x-newvelion-event": event.event_type,
         "x-newvelion-timestamp": timestamp,
         "x-newvelion-signature": signature,
