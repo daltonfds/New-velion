@@ -38,7 +38,7 @@ export default function ReviewsSection({
 
           <div className="mt-5 flex items-center justify-center gap-3">
             <span
-              className="tracking-widest text-[#C99A2E]"
+              className="tracking-widest text-[#FFB800]"
               aria-label={`${roundedAverage} out of 5 stars`}
             >
               {"★".repeat(roundedAverage)}
