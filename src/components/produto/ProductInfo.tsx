@@ -65,15 +65,15 @@ export default function ProductInfo({
     : `/checkout?product=${encodeURIComponent(product.id)}&qty=${encodeURIComponent(String(quantity))}`;
 
   return (
-    <section className="nv-product-detail border-b border-[#E0E0E0] bg-white">
-      <div className="nv-container grid gap-8 py-6 lg:grid-cols-[1.5fr_1fr] lg:gap-10 lg:py-10">
+    <section className="nv-product-detail border-b border-[#E5E7EB] bg-white">
+      <div className="nv-container grid gap-10 py-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-16 lg:py-14">
         <div>
-          <div className="nv-detail-image relative aspect-square overflow-hidden rounded-2xl border border-[#DCE8F7] bg-[#F7FAFF]">
+          <div className="nv-detail-image relative aspect-square overflow-hidden rounded-none border-0 bg-[#F7F8FA]">
             {images.length ? (
               <img
                 src={images[photo]}
                 alt={product.nome}
-                className="h-full w-full object-contain p-6 sm:p-10"
+                className="h-full w-full object-contain p-5 sm:p-8"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-slate-400">
@@ -89,7 +89,7 @@ export default function ProductInfo({
                   key={`${src}-${index}`}
                   type="button"
                   onClick={() => setPhoto(index)}
-                  className={`aspect-square overflow-hidden border bg-white ${photo === index ? "border-[#003B95] ring-1 ring-[#003B95]" : "border-[#E5E7EB]"}`}
+                  className={`aspect-square overflow-hidden border bg-white ${photo === index ? "border-[#10069F] ring-1 ring-[#10069F]" : "border-[#E5E7EB]"}`}
                   aria-label={`View product image ${index + 1}`}
                 >
                   <img
@@ -104,23 +104,23 @@ export default function ProductInfo({
         </div>
 
         <div className="flex flex-col justify-center">
-          <p className="inline-flex w-fit rounded-full bg-[#EAF3FF] px-3 py-1 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#003B95]">
+          <p className="inline-flex w-fit text-[12px] font-semibold uppercase tracking-[.12em] text-[#6B7280]">
             Newvelion product
           </p>
 
-          <h1 className="mt-4 text-3xl font-black tracking-tight text-[#001B44] sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-bold tracking-[-.03em] text-[#1F2937] sm:text-[42px] sm:leading-[1.08]">
             {product.nome}
           </h1>
 
           {product.descricao && (
-            <p className="mt-3 text-base leading-7 text-slate-600">
+            <p className="mt-4 text-[15px] leading-7 text-[#6B7280]">
               {product.descricao}
             </p>
           )}
 
           <div className="mt-4 flex items-center gap-3">
             <span
-              className="tracking-[0.18em] text-[#0078E8]"
+              className="tracking-[0.18em] text-[#10069F]"
               aria-label={`${rating} out of 5 stars`}
             >
               {"★".repeat(rating)}
@@ -137,14 +137,14 @@ export default function ProductInfo({
                 {money(oldPrice, product.moeda)}
               </span>
             )}
-            <span className="text-3xl font-black text-[#003B95] sm:text-4xl">
+            <span className="text-3xl font-bold text-[#10069F] sm:text-[34px]">
               {money(price, product.moeda)}
             </span>
           </div>
 
           {product.beneficios?.length > 0 && (
             <div className="mt-7 border-t border-[#E7EDF5] pt-6">
-              <p className="mb-3 text-sm font-bold text-slate-950">
+              <p className="mb-3 text-sm font-semibold text-[#1F2937]">
                 Product benefits
               </p>
               <ul className="space-y-2.5">
@@ -208,11 +208,11 @@ export default function ProductInfo({
                 const { error } = await supabase.from("customer_cart_items").upsert({ user_id: user.id, product_id: product.id, quantity }, { onConflict: "user_id,product_id" });
                 if (error) { window.alert(error.message); return; }
                 window.location.href = "/cart";
-              }} className="flex min-h-14 flex-1 items-center justify-center rounded-xl border border-[#0078E8] bg-white px-5 text-sm font-black text-[#003B95] hover:bg-[#EAF3FF]">ADD TO CART</button>
+              }} className="flex min-h-14 flex-1 items-center justify-center rounded-none border border-[#10069F] bg-white px-5 text-sm font-semibold text-[#10069F] hover:bg-[#E8EDFF]">ADD TO CART</button>
               {checkoutUrl ? (
               <a
                 href={checkoutUrl}
-                className="flex min-h-14 w-full items-center justify-center rounded-xl bg-[#0078E8] px-6 text-base font-black text-white transition hover:bg-[#006CE5]"
+                className="flex min-h-14 w-full items-center justify-center rounded-none bg-[#10069F] px-6 text-base font-semibold text-white transition hover:bg-[#0A0440]"
               >
                 BUY NOW
               </a>
