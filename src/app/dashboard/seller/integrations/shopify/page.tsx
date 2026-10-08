@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import AppShell from "@/components/layout/AppShell";
 
 const SHOPIFY_API =
   "https://ndtitpmkfbouvaiforfx.supabase.co/functions/v1/shopify";
@@ -108,10 +109,10 @@ export default function ShopifyIntegrationPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white px-4 py-8 sm:px-6 lg:px-8">
+    <AppShell area="seller" title="Shopify" subtitle="Connect and manage your Shopify store integration.">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-[#10069F]">
+          <p className="text-sm font-semibold uppercase tracking-wide text-[#003B95]">
             Seller · Integrations
           </p>
 
@@ -156,7 +157,7 @@ export default function ShopifyIntegrationPage() {
                 type="button"
                 onClick={connectShopify}
                 disabled={connecting}
-                className="h-11 rounded-[10px] bg-[#10069F] px-6 text-sm font-semibold text-white transition hover:bg-[#0B3D8F] disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-11 rounded-[10px] bg-[#003B95] px-6 text-sm font-semibold text-white transition hover:bg-[#001B44] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {connecting ? "Connecting..." : "Connect Shopify"}
               </button>
@@ -213,6 +214,6 @@ export default function ShopifyIntegrationPage() {
           )}
         </section>
       </div>
-    </main>
+    </AppShell>
   );
 }
