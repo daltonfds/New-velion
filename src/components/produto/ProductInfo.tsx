@@ -89,7 +89,7 @@ export default function ProductInfo({
                   key={`${src}-${index}`}
                   type="button"
                   onClick={() => setPhoto(index)}
-                  className={`aspect-square overflow-hidden border bg-white ${photo === index ? "border-[#0E1F3D] ring-1 ring-[#0E1F3D]" : "border-[#DDE5EF]"}`}
+                  className={`aspect-square overflow-hidden border bg-white ${photo === index ? "border-[#0A0440] ring-1 ring-[#0A0440]" : "border-[#E5E7EB]"}`}
                   aria-label={`View product image ${index + 1}`}
                 >
                   <img
@@ -120,7 +120,7 @@ export default function ProductInfo({
 
           <div className="mt-4 flex items-center gap-3">
             <span
-              className="tracking-[0.18em] text-[#C99A2E]"
+              className="tracking-[0.18em] text-[#10069F]"
               aria-label={`${rating} out of 5 stars`}
             >
               {"★".repeat(rating)}
