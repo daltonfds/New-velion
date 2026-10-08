@@ -9,7 +9,7 @@ export default function IntegrationDocsPage() {
       <div className="mx-auto max-w-5xl px-6 py-14 lg:px-10">
         <div className="mb-12">
           <Link href="/" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
-            ← NewVelion
+            ← Newvelion
           </Link>
           <p className="mt-8 text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
             Integration API v1
@@ -19,7 +19,7 @@ export default function IntegrationDocsPage() {
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-600">
             External platforms keep their sellers, storefronts, customers and sale prices.
-            NewVelion remains the source of truth for products, stock, fulfillment and tracking.
+            Newvelion remains the source of truth for products, stock, fulfillment and tracking.
           </p>
         </div>
 
@@ -66,13 +66,13 @@ export default function IntegrationDocsPage() {
               <div className="rounded-xl border border-slate-200 p-5">
                 <h3 className="font-semibold">Fixed Offer</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  NewVelion controls the selling price and commission. The platform must use the returned fixed price.
+                  Newvelion controls the selling price and commission. The platform must use the returned fixed price.
                 </p>
               </div>
               <div className="rounded-xl border border-slate-200 p-5">
                 <h3 className="font-semibold">Custom Pricing</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  The platform chooses the seller price, but the price can never be below NewVelion&apos;s ZAR economic base.
+                  The platform chooses the seller price, but the price can never be below Newvelion&apos;s ZAR economic base.
                 </p>
               </div>
             </div>
@@ -86,7 +86,7 @@ export default function IntegrationDocsPage() {
 }, null, 2)}
             </pre>
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              Creating an offer returns an <code>offer_token</code> and <code>sales_url</code>. For orders using that offer, send <code>offer_token</code> with the order. NewVelion validates the seller, product, pricing mode and exact offer price in the database.
+              Creating an offer returns an <code>offer_token</code> and <code>sales_url</code>. For orders using that offer, send <code>offer_token</code> with the order. Newvelion validates the seller, product, pricing mode and exact offer price in the database.
             </p>
           </section>
 
@@ -130,14 +130,14 @@ export default function IntegrationDocsPage() {
           <section>
             <h2 className="text-2xl font-bold">Webhooks</h2>
             <p className="mt-2 text-slate-600">
-              NewVelion sends events such as <code>order.created</code>,
+              Newvelion sends events such as <code>order.created</code>,
               <code>order.processing</code>, <code>order.shipped</code>,
               <code>order.delivered</code>, <code>order.cancelled</code> and
               <code>order.returned</code>.
             </p>
             <div className="mt-4 rounded-xl border border-slate-200 p-5 text-sm leading-6 text-slate-600">
-              Headers: <code>X-NewVelion-Event</code>, <code>X-NewVelion-Event-Id</code>,
-              <code>X-NewVelion-Timestamp</code> and <code>X-NewVelion-Signature</code>.
+              Headers: <code>X-Newvelion-Event</code>, <code>X-Newvelion-Event-Id</code>,
+              <code>X-Newvelion-Timestamp</code> and <code>X-Newvelion-Signature</code>.
               The signature is HMAC-SHA256 over <code>timestamp.payload</code>.
             </div>
           </section>
