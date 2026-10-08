@@ -65,10 +65,10 @@ export default function ProductInfo({
     : `/checkout?product=${encodeURIComponent(product.id)}&qty=${encodeURIComponent(String(quantity))}`;
 
   return (
-    <section className="border-b border-[#E7EDF5] bg-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-6 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14 lg:px-8 lg:py-12">
+    <section className="nv-product-detail border-b border-[#E0E0E0] bg-white">
+      <div className="nv-container grid gap-8 py-6 lg:grid-cols-[1.5fr_1fr] lg:gap-10 lg:py-10">
         <div>
-          <div className="aspect-square overflow-hidden bg-[#F6F9FC]">
+          <div className="nv-detail-image aspect-square overflow-hidden bg-white border border-[#E0E0E0] rounded-lg">
             {images.length ? (
               <img
                 src={images[photo]}
@@ -104,11 +104,11 @@ export default function ProductInfo({
         </div>
 
         <div className="flex flex-col justify-center">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
+          <p className="nv-kicker">
             Newvelion product
           </p>
 
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
             {product.nome}
           </h1>
 
@@ -131,13 +131,13 @@ export default function ProductInfo({
             </span>
           </div>
 
-          <div className="mt-5 flex items-end gap-3">
+          <div className="nv-detail-price mt-5 flex items-end gap-3">
             {oldPrice !== null && (
               <span className="text-lg text-slate-400 line-through">
                 {money(oldPrice, product.moeda)}
               </span>
             )}
-            <span className="text-3xl font-extrabold text-slate-950 sm:text-4xl">
+            <span className="text-3xl font-black text-[#665800] sm:text-4xl">
               {money(price, product.moeda)}
             </span>
           </div>
@@ -208,11 +208,11 @@ export default function ProductInfo({
                 const { error } = await supabase.from("customer_cart_items").upsert({ user_id: user.id, product_id: product.id, quantity }, { onConflict: "user_id,product_id" });
                 if (error) { window.alert(error.message); return; }
                 window.location.href = "/cart";
-              }} className="flex min-h-14 flex-1 items-center justify-center border border-[#0E1F3D] px-5 text-sm font-extrabold text-[#0E1F3D] hover:bg-[#F6F9FC]">ADD TO CART</button>
+              }} className="flex min-h-14 flex-1 items-center justify-center border border-[#E0E0E0] rounded-md bg-[#FBB129] px-5 text-sm font-extrabold text-black hover:bg-[#E5A020]">ADD TO CART</button>
               {checkoutUrl ? (
               <a
                 href={checkoutUrl}
-                className="flex min-h-14 w-full items-center justify-center bg-[#0E1F3D] px-6 text-base font-extrabold text-white transition hover:bg-[#0e1d38]"
+                className="flex min-h-14 w-full items-center justify-center rounded-md bg-[#FBB129] px-6 text-base font-extrabold text-black transition hover:bg-[#E5A020]"
               >
                 BUY NOW
               </a>
