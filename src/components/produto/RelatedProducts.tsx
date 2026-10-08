@@ -34,11 +34,11 @@ export default function RelatedProducts({
   }
 
   return (
-    <section className="border-t border-[#E7EDF5] bg-[#F6F9FC]">
+    <section className="border-t border-[#E7EDF5] bg-[#F7F8FA]">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0A0440]">
               More products
             </p>
 
@@ -66,7 +66,7 @@ export default function RelatedProducts({
               <Link
                 key={product.id}
                 href={`/produto/${product.slug}`}
-                className="group border border-[#DDE5EF] bg-white"
+                className="group border border-[#E5E7EB] bg-white"
               >
                 <div className="aspect-square overflow-hidden bg-white">
                   {image ? (
@@ -84,7 +84,7 @@ export default function RelatedProducts({
 
                 <div className="p-5">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs tracking-widest text-[#C99A2E]">
+                    <span className="text-xs tracking-widest text-[#10069F]">
                       {"★".repeat(rating)}
                       {"☆".repeat(5 - rating)}
                     </span>
