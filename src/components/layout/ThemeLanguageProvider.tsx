@@ -194,7 +194,6 @@ function translatePage(toPortuguese: boolean) {
 }
 
 export function ThemeLanguageProvider({ children }: { children: React.ReactNode }) {
-  const [dark, setDark] = useState(false);
   const [pt, setPt] = useState(false);
 
   useEffect(() => {
@@ -218,11 +217,6 @@ export function ThemeLanguageProvider({ children }: { children: React.ReactNode 
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem("newvelion-theme", dark ? "dark" : "light");
-  }, [dark]);
-
-  useEffect(() => {
     document.documentElement.lang = pt ? "pt" : "en";
     localStorage.setItem("newvelion-language", pt ? "pt" : "en");
     translatePage(pt);
@@ -234,9 +228,6 @@ export function ThemeLanguageProvider({ children }: { children: React.ReactNode 
       <div className="newvelion-preferences" aria-label="Platform preferences">
         <button type="button" onClick={() => setPt(true)} className={pt ? "active" : ""}>PT</button>
         <button type="button" onClick={() => setPt(false)} className={!pt ? "active" : ""}>EN</button>
-        <button type="button" onClick={() => setDark((v) => !v)} aria-label={dark ? "Use light mode" : "Use dark mode"}>
-          {dark ? "☀" : "☾"}
-        </button>
       </div>
     </>
   );
