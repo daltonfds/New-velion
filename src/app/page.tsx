@@ -53,7 +53,7 @@ export default function HomePage() {
           <Logo />
           <nav className="nv-home-nav" aria-label="Primary navigation">
             <Link href="/register">Become a Seller</Link>
-            <Link href="/fornecedores">Become a Supplier</Link>
+            <Link href="/become-supplier">Become a Supplier</Link>
             <Link href="/support">Support</Link>
           </nav>
           <div className="nv-home-actions">
@@ -70,7 +70,7 @@ export default function HomePage() {
               <div className="nv-home-drawer-section">
                 <span className="nv-home-drawer-label">Newvelion</span>
                 <Link href="/register"><Icon name="users" size={18} /> Become a Seller <Icon name="chevron" size={16} /></Link>
-                <Link href="/fornecedores"><Icon name="shopping" size={18} /> Become a Supplier <Icon name="chevron" size={16} /></Link>
+                <Link href="/become-supplier"><Icon name="shopping" size={18} /> Become a Supplier <Icon name="chevron" size={16} /></Link>
                 <Link href="/login"><Icon name="shield" size={18} /> Sign in <Icon name="chevron" size={16} /></Link>
               </div>
               <div className="nv-home-drawer-section">
@@ -99,7 +99,7 @@ export default function HomePage() {
             <p>Newvelion connects suppliers, sellers and customers with tools for commerce, product promotion, commissions, orders and fulfillment.</p>
             <div className="nv-home-hero-actions">
               <Link href="/register" className="nv-home-primary">Become a Seller <Icon name="arrow" size={18} /></Link>
-              <Link href="/fornecedores" className="nv-home-secondary">Become a Supplier</Link>
+              <Link href="/become-supplier" className="nv-home-secondary">Become a Supplier</Link>
             </div>
             <div className="nv-home-trustline"><span /><p>The climbing starts here.</p></div>
           </div>
@@ -143,7 +143,7 @@ export default function HomePage() {
           <h2>One infrastructure. Different ways to participate.</h2>
           <p>Newvelion supports the people involved in the commerce journey, with workflows designed around suppliers, sellers and customers.</p>
           <div className="nv-home-split-actions">
-            <Link href="/fornecedores" className="nv-home-primary">Become a Supplier <Icon name="arrow" size={18} /></Link>
+            <Link href="/become-supplier" className="nv-home-primary">Become a Supplier <Icon name="arrow" size={18} /></Link>
             <Link href="/register" className="nv-home-secondary">Become a Seller</Link>
           </div>
         </div>
@@ -164,13 +164,13 @@ export default function HomePage() {
         <span className="nv-home-eyebrow">NEWVELION</span>
         <h2>Choose where you start.</h2>
         <p>Join Newvelion as a seller or supplier and build from there.</p>
-        <div><Link href="/register" className="nv-home-primary">Become a Seller</Link><Link href="/fornecedores" className="nv-home-secondary">Become a Supplier</Link></div>
+        <div><Link href="/register" className="nv-home-primary">Become a Seller</Link><Link href="/become-supplier" className="nv-home-secondary">Become a Supplier</Link></div>
       </section>
 
       <footer className="nv-home-footer">
         <div className="nv-home-footer-inner">
           <div><Logo light /><p>Commerce infrastructure.</p></div>
-          <div><strong>Explore</strong><Link href="/register">Become a Seller</Link><Link href="/fornecedores">Become a Supplier</Link><Link href="/login">Login</Link></div>
+          <div><strong>Explore</strong><Link href="/register">Become a Seller</Link><Link href="/become-supplier">Become a Supplier</Link><Link href="/login">Login</Link></div>
           <div><strong>Support</strong><Link href="/support">Help & Support</Link><a href="mailto:contact@newvelion.com">contact@newvelion.com</a><a href="tel:+27722958915">+27 72 295 8915</a></div>
         </div>
         <div className="nv-home-footer-bottom">© 2026 Newvelion. All rights reserved.</div>
