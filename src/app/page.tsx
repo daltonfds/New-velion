@@ -1,5 +1,5 @@
-import { PublicMarketplacePage } from "@/components/marketplace/PublicMarketplacePage";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return <PublicMarketplacePage />;
+  redirect("/login");
 }
