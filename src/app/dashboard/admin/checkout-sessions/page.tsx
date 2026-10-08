@@ -196,7 +196,7 @@ export default function AdminCheckoutSessionsPage() {
       if (result?.comparison_status === "mismatch") {
         notify.warning(
           "Pagamento registrado com divergência",
-          "O valor ou a moeda do pagamento não corresponde ao pedido NewVelion."
+          "O valor ou a moeda do pagamento não corresponde ao pedido Newvelion."
         );
       } else if (result?.comparison_status === "review") {
         notify.warning(
@@ -220,7 +220,7 @@ export default function AdminCheckoutSessionsPage() {
 
       if (result?.comparison_status === "mismatch") {
         setError(
-          "Payment mismatch: amount or currency does not match the NewVelion order."
+          "Payment mismatch: amount or currency does not match the Newvelion order."
         );
       } else if (result?.comparison_status === "review") {
         setError(
@@ -552,7 +552,7 @@ export default function AdminCheckoutSessionsPage() {
                     Customer information
                   </h3>
                   <p className="mt-1 text-xs text-slate-500">
-                    Information submitted on the NewVelion product page.
+                    Information submitted on the Newvelion product page.
                   </p>
                 </div>
 
@@ -605,7 +605,7 @@ export default function AdminCheckoutSessionsPage() {
                     </h3>
                     <p className="mt-1 max-w-2xl text-sm text-slate-500">
                       Enter the payment information from the external checkout.
-                      NewVelion compares it with the customer/order data.
+                      Newvelion compares it with the customer/order data.
                     </p>
                   </div>
 
@@ -623,7 +623,7 @@ export default function AdminCheckoutSessionsPage() {
                 <div className="mt-5 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-lg border border-[#E5E7EB] bg-white p-4">
                     <p className="text-xs text-slate-500">
-                      NewVelion order
+                      Newvelion order
                     </p>
                     <p className="mt-1 text-lg font-semibold text-slate-950">
                       {money(Number(selected.amount), selected.currency)}
