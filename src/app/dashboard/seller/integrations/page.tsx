@@ -6,7 +6,7 @@ const integrations = [
   {
     name: "Shopify",
     description:
-      "Connect your Shopify store to NewVelion to sync products, orders, inventory, and fulfillment.",
+      "Connect your Shopify store to Newvelion to sync products, orders, inventory, and fulfillment.",
     href: "/dashboard/seller/integrations/shopify",
     status: "Available",
   },
@@ -26,7 +26,7 @@ export default function SellerIntegrationsPage() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Conecte o NewVelion às plataformas e ferramentas que você utiliza
+            Conecte o Newvelion às plataformas e ferramentas que você utiliza
             para administrar suas vendas.
           </p>
         </div>
