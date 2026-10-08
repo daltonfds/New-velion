@@ -234,7 +234,7 @@ export default function AdminCommissionsPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
             >
               <option value="all">All statuses</option>
               <option value="paga">Paid</option>
@@ -298,7 +298,7 @@ export default function AdminCommissionsPage() {
                   {filteredSales.map((sale) => (
                     <tr
                       key={sale.id}
-                      className="hover:bg-[#F6F9FC]"
+                      className="hover:bg-[#F7F8FA]"
                     >
                       <td className="px-6 py-4">
                         <div className="max-w-[180px] truncate text-sm font-medium text-slate-900">
