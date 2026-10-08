@@ -41,7 +41,7 @@ export default function StoreFeatures() {
               key={feature.number}
               className="border border-[#DDE5EF] bg-white p-7"
             >
-              <span className="text-sm font-bold text-[#C99A2E]">
+              <span className="text-sm font-bold text-[#FFB800]">
                 {feature.number}
               </span>
 
