@@ -212,13 +212,13 @@ export default function NotificationCenter() {
   }, []);
 
   async function enablePush() {
-    console.log("[NewVelion Push] 1. Starting");
+    console.log("[Newvelion Push] 1. Starting");
 
     const hasNotification = "Notification" in window;
     const hasServiceWorker = "serviceWorker" in navigator;
     const hasPushManager = "PushManager" in window;
 
-    console.log("[NewVelion Push] 2. API availability:", {
+    console.log("[Newvelion Push] 2. API availability:", {
       Notification: hasNotification,
       ServiceWorker: hasServiceWorker,
       PushManager: hasPushManager,
@@ -229,7 +229,7 @@ export default function NotificationCenter() {
     });
 
     if (!hasNotification || !hasServiceWorker || !hasPushManager) {
-      console.error("[NewVelion Push] 2. Push APIs unavailable", {
+      console.error("[Newvelion Push] 2. Push APIs unavailable", {
         Notification: hasNotification,
         ServiceWorker: hasServiceWorker,
         PushManager: hasPushManager,
@@ -237,50 +237,50 @@ export default function NotificationCenter() {
       return;
     }
 
-    console.log("[NewVelion Push] 2. Push APIs available");
+    console.log("[Newvelion Push] 2. Push APIs available");
 
     const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
     if (!publicKey) {
       console.error(
-        "[NewVelion Push] 3. NEXT_PUBLIC_VAPID_PUBLIC_KEY is missing",
+        "[Newvelion Push] 3. NEXT_PUBLIC_VAPID_PUBLIC_KEY is missing",
       );
       return;
     }
 
     console.log(
-      "[NewVelion Push] 3. VAPID public key exists",
+      "[Newvelion Push] 3. VAPID public key exists",
       publicKey.slice(0, 12) + "...",
     );
 
     let permission = window.Notification.permission;
     console.log(
-      "[NewVelion Push] 4. Notification permission:",
+      "[Newvelion Push] 4. Notification permission:",
       permission,
     );
 
     if (permission !== "granted") {
       permission = await window.Notification.requestPermission();
       console.log(
-        "[NewVelion Push] 5. Permission result:",
+        "[Newvelion Push] 5. Permission result:",
         permission,
       );
     }
 
     if (permission !== "granted") {
       console.error(
-        "[NewVelion Push] 6. Permission was not granted",
+        "[Newvelion Push] 6. Permission was not granted",
       );
       return;
     }
 
-    console.log("[NewVelion Push] 6. Permission granted");
+    console.log("[Newvelion Push] 6. Permission granted");
 
     const registration =
       await navigator.serviceWorker.register("/sw.js");
 
     console.log(
-      "[NewVelion Push] 7. Service worker registered:",
+      "[Newvelion Push] 7. Service worker registered:",
       registration.scope,
     );
 
@@ -289,11 +289,11 @@ export default function NotificationCenter() {
 
     if (subscription) {
       console.log(
-        "[NewVelion Push] 8. Existing push subscription found",
+        "[Newvelion Push] 8. Existing push subscription found",
       );
     } else {
       console.log(
-        "[NewVelion Push] 8. Creating new push subscription",
+        "[Newvelion Push] 8. Creating new push subscription",
       );
 
       subscription =
@@ -304,7 +304,7 @@ export default function NotificationCenter() {
         });
 
       console.log(
-        "[NewVelion Push] 9. New push subscription created",
+        "[Newvelion Push] 9. New push subscription created",
       );
     }
 
@@ -314,13 +314,13 @@ export default function NotificationCenter() {
 
     if (!session?.access_token) {
       console.error(
-        "[NewVelion Push] 10. No authenticated session",
+        "[Newvelion Push] 10. No authenticated session",
       );
       return;
     }
 
     console.log(
-      "[NewVelion Push] 10. Authenticated session exists",
+      "[Newvelion Push] 10. Authenticated session exists",
     );
 
     const response = await fetch(
@@ -339,14 +339,14 @@ export default function NotificationCenter() {
       await response.text().catch(() => "");
 
     console.log(
-      "[NewVelion Push] 11. Subscribe API response:",
+      "[Newvelion Push] 11. Subscribe API response:",
       response.status,
       responseText,
     );
 
     if (!response.ok) {
       console.error(
-        "[NewVelion Push] 12. Failed to save subscription",
+        "[Newvelion Push] 12. Failed to save subscription",
       );
       setPushEnabled(false);
       return;
@@ -355,7 +355,7 @@ export default function NotificationCenter() {
     setPushEnabled(true);
 
     console.log(
-      "[NewVelion Push] 12. Push subscription saved successfully",
+      "[Newvelion Push] 12. Push subscription saved successfully",
     );
   }
 
