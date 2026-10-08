@@ -94,7 +94,7 @@ function VerifyEmailForm() {
             ✉
           </div>
 
-          <h1 className="mt-6 text-2xl font-bold text-[#16294F]">
+          <h1 className="mt-6 text-2xl font-bold text-[#0A0440]">
             Verify your email
           </h1>
 
@@ -110,7 +110,7 @@ function VerifyEmailForm() {
 
             <label
               htmlFor="verification-code"
-              className="mb-2 block text-left text-sm font-semibold text-[#16294F]"
+              className="mb-2 block text-left text-sm font-semibold text-[#0A0440]"
             >
               Verification code
             </label>
@@ -126,7 +126,7 @@ function VerifyEmailForm() {
                 setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
               }
               placeholder="000000"
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-4 text-center text-2xl font-bold tracking-[0.45em] text-[#16294F] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-4 text-center text-2xl font-bold tracking-[0.45em] text-[#0A0440] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
             />
 
             {error && (
@@ -178,7 +178,7 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <main className="flex min-h-screen items-center justify-center bg-white">
-          <div className="text-sm font-semibold text-[#16294F]">
+          <div className="text-sm font-semibold text-[#0A0440]">
             Loading...
           </div>
         </main>
