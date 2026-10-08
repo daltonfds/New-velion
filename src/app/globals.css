@@ -498,3 +498,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-primary); 
  .nv-home-support{margin:45px auto;padding:24px}
  .nv-home-cta{padding:75px 20px}
 }
+
+/* Brand token bridge: keeps legacy utility classes aligned with the current Newvelion identity. */
+.bg-blue-600{background-color:#10069F!important}
+.bg-blue-700{background-color:#0A0440!important}
+.text-blue-600,.text-blue-700{color:#10069F!important}
+.border-blue-100,.border-blue-200,.border-blue-300{border-color:#E8EDFF!important}
+.bg-blue-50{background-color:#E8EDFF!important}
+.hover\\:bg-blue-700:hover{background-color:#0A0440!important}
+.hover\\:text-blue-700:hover,.hover\\:text-blue-600:hover{color:#10069F!important}
+.focus\\:border-blue-500:focus{border-color:#10069F!important}
+.focus\\:ring-blue-50:focus{--tw-ring-color:#E8EDFF!important}
