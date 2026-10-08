@@ -18,8 +18,8 @@ export default function Newsletter() {
   return (
     <section className="border-t border-[#E7EDF5] bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-        <div className="mx-auto max-w-3xl border border-[#DDE5EF] bg-[#F6F9FC] px-6 py-10 text-center sm:px-10">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E1F3D]">
+        <div className="mx-auto max-w-3xl border border-[#E5E7EB] bg-[#F7F8FA] px-6 py-10 text-center sm:px-10">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0A0440]">
             Stay connected
           </p>
 
@@ -47,12 +47,12 @@ export default function Newsletter() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="Your email address"
-                className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-[#0E1F3D]"
+                className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-[#0A0440]"
               />
 
               <button
                 type="submit"
-                className="rounded-lg bg-[#0E1F3D] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0e1d38]"
+                className="rounded-lg bg-[#0A0440] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0e1d38]"
               >
                 Subscribe
               </button>
