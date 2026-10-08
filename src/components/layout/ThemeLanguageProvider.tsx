@@ -59,8 +59,7 @@ const translations: Record<string, string> = {
   "An error occurred":"Ocorreu um erro","Please try again":"Tente novamente","Required":"Obrigatório","Optional":"Opcional",
   "Yes":"Sim","No":"Não","Yes, delete":"Sim, eliminar","Are you sure?":"Tem a certeza?","Are you sure you want to continue?":"Tem a certeza de que pretende continuar?",
   "Are you sure you want to log out of your NewVelion account?":"Tem a certeza de que pretende sair da sua conta NewVelion?",
-  "English":"Inglês","Portuguese":"Português","Language":"Idioma","Theme":"Tema","Dark mode":"Modo escuro","Light mode":"Modo claro",
-  "Use dark mode":"Usar modo escuro","Use light mode":"Usar modo claro","Preferences":"Preferências","Platform preferences":"Preferências da plataforma",
+  "English":"Inglês","Portuguese":"Português","Language":"Idioma","Preferences":"Preferências","Platform preferences":"Preferências da plataforma",
   "Login":"Iniciar sessão","Register":"Registar","Password":"Palavra-passe","Confirm password":"Confirmar palavra-passe",
   "Forgot password?":"Esqueceu-se da palavra-passe?","Reset password":"Redefinir palavra-passe","Remember me":"Lembrar-me",
   "Welcome back":"Bem-vindo de volta","Welcome":"Bem-vindo","Already have an account?":"Já tem uma conta?",
@@ -197,14 +196,9 @@ export function ThemeLanguageProvider({ children }: { children: React.ReactNode 
   const [pt, setPt] = useState(false);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem("newvelion-theme");
     const storedLanguage = localStorage.getItem("newvelion-language");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const nextDark = storedTheme ? storedTheme === "dark" : prefersDark;
     const nextPt = storedLanguage ? storedLanguage === "pt" : false;
-    setDark(nextDark);
     setPt(nextPt);
-    document.documentElement.classList.toggle("dark", nextDark);
     document.documentElement.lang = nextPt ? "pt" : "en";
 
     const observer = new MutationObserver(() => {
