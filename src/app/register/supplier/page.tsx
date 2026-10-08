@@ -34,7 +34,7 @@ export default function SupplierRegisterPage() {
     <div className="mb-8 flex justify-center border-b border-slate-100 pb-7"><NewvelionBrand size="md"/></div>
     <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">Supplier / Producer</p>
     <h1 className="mt-2 text-3xl font-bold text-[#16294F]">Create your supplier account</h1>
-    <p className="mt-2 text-slate-500">List your products, manage inventory and fulfill orders through NewVelion.</p>
+    <p className="mt-2 text-slate-500">List your products, manage inventory and fulfill orders through Newvelion.</p>
     <form onSubmit={submit} className="mt-8 space-y-5">
       <label className="block text-sm font-semibold text-[#16294F]">Full name<input required value={form.fullName} onChange={e=>setForm({...form,fullName:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label>
       <label className="block text-sm font-semibold text-[#16294F]">Company name<input required value={form.companyName} onChange={e=>setForm({...form,companyName:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label>
