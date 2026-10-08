@@ -395,13 +395,13 @@ export default function SalesPage() {
         .brand {
           font-weight: 900;
           font-size: 22px;
-          color: #16294f;
+          color: #0A0440;
           white-space: nowrap;
           letter-spacing: -0.04em;
         }
 
         .brand span {
-          color: #c99a2e;
+          color: #FFB800;
         }
 
         .search {
