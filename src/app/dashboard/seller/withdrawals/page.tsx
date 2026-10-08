@@ -88,7 +88,8 @@ export default function SellerWithdrawalsPage() {
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [country, setCountry] = useState("");
   const [minimumWithdrawal, setMinimumWithdrawal] = useState(100);
-  const [walletCurrency, setWalletCurrency] = useState("ZAR");
+  const [walletCurrency] = useState("ZAR");
+  const [payoutCurrency, setPayoutCurrency] = useState("MZN");
   const [exchangeRate, setExchangeRate] = useState(1);
   const [rateLoading, setRateLoading] = useState(false);
   const [configured, setConfigured] = useState<Record<Method, Details | null>>({
@@ -151,7 +152,7 @@ export default function SellerWithdrawalsPage() {
 
         setCountry(detected);
         const localCurrency = currencyForCountry(detected);
-        setWalletCurrency(localCurrency);
+        setPayoutCurrency(localCurrency);
         if (localCurrency !== "ZAR") {
           setRateLoading(true);
           try {
@@ -212,11 +213,11 @@ export default function SellerWithdrawalsPage() {
   }, []);
 
   const numeric = Number(amount) || 0;
-  const numericZar = walletCurrency === "ZAR" ? numeric : numeric / exchangeRate;
+  const numericZar = numeric;
 
   const fee = useMemo(
-    () => numeric * 0.05 + (numeric > 0 ? 10 * exchangeRate : 0),
-    [numeric, exchangeRate]
+    () => numeric * 0.05 + (numeric > 0 ? 10 : 0),
+    [numeric]
   );
 
   const net = Math.max(numeric - fee, 0);
@@ -486,7 +487,7 @@ export default function SellerWithdrawalsPage() {
 
                       <div className="flex h-12 overflow-hidden rounded-md border border-slate-300 bg-white focus-within:border-[#0A0440] focus-within:ring-1 focus-within:ring-[#0A0440]">
                         <span className="flex items-center border-r border-[#E5E7EB] bg-[#F7F8FA] px-3 text-sm font-medium text-slate-500">
-                          {walletCurrency}
+                          ZAR
                         </span>
                         <input
                           type="number"
@@ -501,7 +502,7 @@ export default function SellerWithdrawalsPage() {
                       </div>
 
                       <p className="mt-2 text-xs text-slate-500">
-                        Minimum withdrawal: {money(minimumWithdrawal)}
+                        Minimum withdrawal: {formatCurrency(minimumWithdrawal, "ZAR")}
                       </p>
                       {walletCurrency !== "ZAR" && <p className="mt-1 text-xs text-slate-400">Reference rate: 1 ZAR = {exchangeRate.toFixed(4)} {walletCurrency}</p>}
                     </div>
@@ -512,7 +513,7 @@ export default function SellerWithdrawalsPage() {
                           Withdrawal fee
                         </span>
                         <span className="font-medium text-slate-900">
-                          {money(fee)}
+                          {formatCurrency(fee, "ZAR")}
                         </span>
                       </div>
 
@@ -521,12 +522,12 @@ export default function SellerWithdrawalsPage() {
                           Estimated net
                         </span>
                         <span className="font-semibold text-slate-900">
-                          {money(net)}
+                          {formatCurrency(net, "ZAR")}
                         </span>
                       </div>
 
                       <div className="border-t border-slate-100 bg-[#F7F8FA] px-4 py-3 text-xs text-slate-500">
-                        Fee: 5% + R10 fixed fee.
+                        Fee: 5% + R10 fixed fee. The wallet balance and withdrawal amount are always in ZAR.
                       </div>
                     </div>
 
@@ -541,7 +542,7 @@ export default function SellerWithdrawalsPage() {
                             {rateLoading
                               ? "Updating..."
                               : exchangeRate
-                                ? `1 ZAR = ${exchangeRate.toFixed(4)} MZN`
+                                ? `1 ZAR = ${exchangeRate.toFixed(4)} ${payoutCurrency}`
                                 : "Rate unavailable"}
                           </span>
                         </div>
@@ -549,19 +550,19 @@ export default function SellerWithdrawalsPage() {
                         <div className="grid grid-cols-2 divide-x divide-slate-100">
                           <div className="p-4">
                             <p className="text-xs text-slate-500">
-                              Net in {walletCurrency}
+                              Net in ZAR
                             </p>
                             <p className="mt-1 text-lg font-semibold text-slate-900">
-                              {money(net)}
+                              {formatCurrency(net, "ZAR")}
                             </p>
                           </div>
 
                           <div className="p-4">
                             <p className="text-xs text-slate-500">
-                              Estimated local payout
+                              Estimated local payout ({payoutCurrency})
                             </p>
                             <p className="mt-1 text-lg font-semibold text-[#0A0440]">
-                              {exchangeRate ? money(convertedNet) : "—"}
+                              {exchangeRate ? formatCurrency(convertedNet, payoutCurrency) : "—"}
                             </p>
                           </div>
                         </div>
@@ -706,16 +707,16 @@ export default function SellerWithdrawalsPage() {
                                 #{w.id.slice(0, 8)}
                               </td>
                               <td className="px-4 py-4 text-slate-700">
-                                {money(Number(w.valor_solicitado))}
+                                {formatCurrency(Number(w.valor_solicitado), "ZAR")}
                               </td>
                               <td className="px-4 py-4 font-medium text-slate-800">
-                                {money(Number(w.valor_liquido))}
+                                {formatCurrency(Number(w.valor_liquido), "ZAR")}
                               </td>
                               <td className="px-4 py-4 text-slate-700">
                                 {w.payout_currency === walletCurrency &&
                                 w.valor_convertido != null
-                                  ? money(Number(w.valor_convertido))
-                                  : money(Number(w.valor_liquido))}
+                                  ? formatCurrency(Number(w.valor_convertido), w.payout_currency || payoutCurrency)
+                                  : formatCurrency(Number(w.valor_liquido), "ZAR")}
                               </td>
                               <td className="px-4 py-4 text-slate-600">
                                 {w.metodo === "mobile_wallet" &&
