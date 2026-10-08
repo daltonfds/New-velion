@@ -114,12 +114,10 @@ export default function MarketplacePage() {
         const existingLinks: Record<string, string> = {};
 
         for (const affiliation of affiliations ?? []) {
-          const baseUrl =
-            process.env.NEXT_PUBLIC_SITE_URL ||
-            window.location.origin;
+          const baseUrl = "https://www.veliongroup.online";
 
           existingLinks[affiliation.product_id] =
-            `${baseUrl.replace(/\/$/, "")}/${affiliation.link_unico}`;
+            `${baseUrl}/go/${String(affiliation.link_unico).replace(/^\/+/, "").replace(/^go\//i, "")}`;
         }
 
         setAffiliateLinks(existingLinks);
@@ -200,9 +198,14 @@ const filteredProducts = useMemo(() => {
       const result = { affiliate_link: data?.affiliate_link ?? data?.[0]?.affiliate_link };
 
       if (!result.affiliate_link) throw new Error("Affiliate link was not returned.");
+      const affiliateCode = String(result.affiliate_link)
+        .replace(/^https?:\/\/[^/]+\//i, "")
+        .replace(/^\/+/, "")
+        .replace(/^go\//i, "");
+
       setAffiliateLinks((current) => ({
         ...current,
-        [productId]: result.affiliate_link,
+        [productId]: `https://www.veliongroup.online/go/${affiliateCode}`,
       }));
     } catch (err) {
       console.error("Failed to create affiliation:", err);
