@@ -258,7 +258,7 @@ export default function AppShell({
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         ].join(" ")}
       >
-        <div className="flex h-[72px] items-center border-b border-slate-100 px-6 dark:border-slate-800">
+        <div className="flex h-[72px] items-center border-b border-slate-100 px-6">
           <NewvelionBrand size="md" />
         </div>
 
