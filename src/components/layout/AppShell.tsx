@@ -353,7 +353,7 @@ export default function AppShell({
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              {t("Are you sure you want to log out of your NewVelion account?","Tem a certeza de que pretende sair da sua conta NewVelion?")}
+              {t("Are you sure you want to log out of your Newvelion account?","Tem a certeza de que pretende sair da sua conta Newvelion?")}
             </p>
 
             <div className="mt-6 flex gap-3">
