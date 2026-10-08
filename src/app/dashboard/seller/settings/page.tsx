@@ -219,7 +219,7 @@ export default function SellerSettingsPage(){
   return <AppShell area="seller" title="Settings" subtitle="Manage your account and payout preferences.">
     <div className="mx-auto max-w-4xl space-y-6">
       <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-[#10069F]">← Account</Link>
-      <div><h2 className="mt-3 text-2xl font-bold text-[#0A0440]">Settings</h2><p className="mt-1 text-sm text-slate-500">Payout methods and account preferences are stored securely in NewVelion.</p></div>
+      <div><h2 className="mt-3 text-2xl font-bold text-[#0A0440]">Settings</h2><p className="mt-1 text-sm text-slate-500">Payout methods and account preferences are stored securely in Newvelion.</p></div>
       {error&&<div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
       {message&&<div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</div>}
       {loading?<div className="rounded-[10px] border border-[#E5E7EB] bg-white p-6 text-sm text-slate-500">Loading settings...</div>:<>
