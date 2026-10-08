@@ -17,7 +17,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
   const { data, error } = await auth.client.from("supplier_profiles").update({
     approval_status: status,
-    rejection_reason: status === "rejected" ? String(body.rejection_reason ?? "").trim() || "Application rejected by NewVelion." : null,
+    rejection_reason: status === "rejected" ? String(body.rejection_reason ?? "").trim() || "Application rejected by Newvelion." : null,
     approved_at: status === "approved" ? new Date().toISOString() : null,
     approved_by: status === "approved" ? auth.userId : null,
     updated_at: new Date().toISOString(),
