@@ -3,31 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc;
-  --foreground: #111827;
-  --primary: #0E4AAB;
-  --primary-hover: #0B3D8F;
-  --primary-light: #EEF5FF;
-  --border: #e5e7eb;
+  --background: #FFFFFF;
+  --foreground: #001B44;
+  --primary: #003B95;
+  --primary-hover: #006CE5;
+  --primary-light: #EAF3FF;
+  --border: #EAF3FF;
   --muted: #6b7280;
   --surface: #ffffff;
-  --surface-muted: #f8fafc;
+  --surface-muted: #FFFFFF;
   --success: #16a34a;
   --warning: #d97706;
   --danger: #dc2626;
-}
-
-html.dark {
-  color-scheme: dark;
-  --background: #0b1220;
-  --foreground: #e5e7eb;
-  --primary: #8fb4ff;
-  --primary-hover: #b3ccff;
-  --primary-light: #17233a;
-  --border: #263247;
-  --muted: #94a3b8;
-  --surface: #111b2e;
-  --surface-muted: #0f172a;
 }
 
 * { box-sizing: border-box; }
@@ -97,8 +84,8 @@ html.dark .bg-blue-100 { background-color: #17233a !important; }
 
 
 /* NewVelion product design system — Figma-aligned */
-:root{--nv-blue:#0E4AAB;--nv-blue-dark:#0B3D8F;--nv-ink:#0E1F3D;--nv-muted:#616E85;--nv-line:#DDE5EF;--nv-bg:#F6F9FC;--nv-gold:#C99A2E;}
-.nv-page{min-height:100vh;background:var(--nv-bg);color:var(--nv-ink)}
+:root{--nv-blue:#003B95;--nv-blue-dark:#006CE5;--nv-ink:#001B44;--nv-muted:#6B7280;--nv-line:#EAF3FF;--nv-bg:#FFFFFF;--nv-gold:#FFB800;}
+.nv-page{min-height:100vh;background:#FFFFFF;color:var(--nv-ink)}
 .nv-surface{background:#fff;border:1px solid var(--nv-line);border-radius:12px}
 .nv-button{display:inline-flex;align-items:center;justify-content:center;border-radius:7px;background:var(--nv-blue);color:#fff;font-weight:700;transition:.18s ease}
 .nv-button:hover{background:var(--nv-blue-dark)}
@@ -112,6 +99,6 @@ html.dark .bg-blue-100 { background-color: #17233a !important; }
 .nv-dashboard .shadow,.nv-dashboard .shadow-lg,.nv-dashboard .shadow-xl,.nv-dashboard .shadow-2xl{box-shadow:0 1px 2px rgba(14,31,61,.05),0 8px 24px rgba(14,31,61,.05)}
 .nv-dashboard .border-slate-200,.nv-dashboard .border-gray-200{border-color:var(--nv-line)}
 .nv-dashboard h1,.nv-dashboard h2,.nv-dashboard h3{letter-spacing:-.02em;color:var(--nv-ink)}
-.nv-dashboard table thead{background:#f6f9fc}
+.nv-dashboard table thead{background:#FFFFFF}
 .nv-dashboard table th{color:var(--nv-muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 .nv-dashboard input,.nv-dashboard select,.nv-dashboard textarea{border-radius:7px}
