@@ -110,7 +110,7 @@ export default function RegisterPage() {
           </h1>
 
           <p className="mt-2 text-slate-500">
-            Start selling products from Newvelion's marketplace.
+            Start selling with Newvelion.
           </p>
 
           <form onSubmit={submit} className="mt-8 space-y-5">
