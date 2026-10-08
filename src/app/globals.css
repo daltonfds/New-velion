@@ -152,3 +152,42 @@ h3 { font-weight:600; line-height:1.3; color:var(--color-primary-dark); }
 
 /* Accessibility */
 :focus-visible { outline:3px solid var(--color-primary-light); outline-offset:2px; }
+
+
+/* Global component normalization — ClickBank-inspired Newvelion UI */
+.nv-dashboard .bg-white { background-color:#FFFFFF !important; }
+.nv-dashboard .bg-slate-50,.nv-dashboard .bg-gray-50 { background-color:#F7F8FA !important; }
+.nv-dashboard .bg-slate-100,.nv-dashboard .bg-gray-100 { background-color:#F7F8FA !important; }
+.nv-dashboard .bg-slate-200,.nv-dashboard .bg-gray-200 { background-color:#E5E7EB !important; }
+.nv-dashboard .text-slate-900,.nv-dashboard .text-gray-900 { color:#1F2937 !important; }
+.nv-dashboard .text-slate-800,.nv-dashboard .text-gray-800 { color:#1F2937 !important; }
+.nv-dashboard .text-slate-700,.nv-dashboard .text-gray-700 { color:#1F2937 !important; }
+.nv-dashboard .text-slate-600,.nv-dashboard .text-gray-600 { color:#6B7280 !important; }
+.nv-dashboard .text-slate-500,.nv-dashboard .text-gray-500 { color:#6B7280 !important; }
+.nv-dashboard .text-slate-400,.nv-dashboard .text-gray-400 { color:#9CA3AF !important; }
+.nv-dashboard .border-slate-100,.nv-dashboard .border-gray-100,
+.nv-dashboard .border-slate-200,.nv-dashboard .border-gray-200,
+.nv-dashboard .border-slate-300,.nv-dashboard .border-gray-300 { border-color:#E5E7EB !important; }
+.nv-dashboard .bg-blue-50 { background:#E8EDFF !important; }
+.nv-dashboard .bg-blue-100 { background:#E8EDFF !important; }
+.nv-dashboard .bg-blue-600,.nv-dashboard .bg-indigo-600 { background:#10069F !important; }
+.nv-dashboard .bg-blue-700,.nv-dashboard .bg-indigo-700 { background:#0A0440 !important; }
+.nv-dashboard .text-blue-600,.nv-dashboard .text-blue-700,
+.nv-dashboard .text-indigo-600,.nv-dashboard .text-indigo-700 { color:#10069F !important; }
+.nv-dashboard .hover\:bg-slate-50:hover { background:#F7F8FA !important; }
+.nv-dashboard .hover\:bg-blue-700:hover,.nv-dashboard .hover\:bg-indigo-700:hover { background:#0A0440 !important; }
+.nv-dashboard .dark\:bg-slate-800,.nv-dashboard .dark\:bg-slate-900,
+.nv-dashboard .dark\:bg-slate-950 { background:#FFFFFF !important; }
+.nv-dashboard .dark\:text-slate-100,.nv-dashboard .dark\:text-slate-200,
+.nv-dashboard .dark\:text-white { color:#1F2937 !important; }
+.nv-dashboard .dark\:border-slate-800,.nv-dashboard .dark\:border-slate-700 { border-color:#E5E7EB !important; }
+
+.nv-dashboard [class*="rounded-"] { box-shadow:none; }
+.nv-dashboard .shadow-sm { box-shadow:0 1px 3px rgba(15,23,42,.06); }
+.nv-dashboard .shadow-md,.nv-dashboard .shadow-lg { box-shadow:0 4px 12px rgba(15,23,42,.06); }
+
+@media (max-width:767px) {
+  .nv-dashboard { padding:16px !important; }
+  .nv-dashboard table { min-width:640px; }
+  .nv-dashboard .overflow-x-auto { -webkit-overflow-scrolling:touch; }
+}
