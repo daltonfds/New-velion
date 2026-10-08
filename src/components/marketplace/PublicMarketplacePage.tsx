@@ -27,6 +27,12 @@ export function PublicMarketplacePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setHeroIndex((i) => (i + 1) % Math.max(1, Math.min(5, products.length))), 5000);
+    return () => window.clearInterval(timer);
+  }, [products.length]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -106,7 +112,10 @@ export function PublicMarketplacePage() {
             <p>Discover products from verified suppliers with delivery across South Africa.</p>
             <button onClick={() => document.getElementById("catalog")?.scrollIntoView({behavior:"smooth"})}>Shop Now</button>
           </div>
-          {products[0]?.images[0] && <div className="nv-hero-product"><Image src={products[0].images[0]} alt={products[0].name} fill unoptimized sizes="40vw" priority /></div>}
+          {products.slice(0, 5).length > 0 && <div className="nv-hero-product">
+            {products.slice(0, 5).map((p, i) => p.images[0] ? <Image key={p.id} src={p.images[0]} alt={p.name} fill unoptimized sizes="40vw" priority={i === 0} className={i === heroIndex ? "nv-hero-image-active" : "nv-hero-image"} /> : null)}
+          </div>}
+          {products.slice(0, 5).length > 1 && <div className="nv-hero-dots" aria-label="Hero slides">{products.slice(0, 5).map((p, i) => <button key={p.id} aria-label={"Slide " + (i + 1)} className={i === heroIndex ? "active" : ""} onClick={() => setHeroIndex(i)} />)}</div>}
         </section>
 
         <section className="nv-section nv-category-feature">
