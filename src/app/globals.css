@@ -191,3 +191,16 @@ h3 { font-weight:600; line-height:1.3; color:var(--color-primary-dark); }
   .nv-dashboard table { min-width:640px; }
   .nv-dashboard .overflow-x-auto { -webkit-overflow-scrolling:touch; }
 }
+
+
+/* Product detail — The Herbalist-inspired commerce layout, Newvelion identity */
+.nv-product-detail { font-family:var(--font-inter),Inter,Arial,sans-serif; }
+.nv-product-detail .nv-detail-image { min-height:520px; }
+.nv-product-detail h1 { font-family:var(--font-inter),Inter,Arial,sans-serif; }
+.nv-product-detail .nv-detail-price { border-top:1px solid #E5E7EB; padding-top:22px; }
+.nv-product-detail .nv-detail-price span:last-child { letter-spacing:-.03em; }
+.nv-product-detail button, .nv-product-detail a { transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease; }
+.nv-product-detail .nv-detail-image + div button:hover { border-color:#10069F; }
+@media(max-width:767px){
+  .nv-product-detail .nv-detail-image { min-height:360px; }
+}
