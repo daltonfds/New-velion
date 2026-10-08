@@ -84,14 +84,14 @@ export default function NewvelionBrand({
 
       <div className="flex flex-col">
         <span
-          className={`${config.name} font-bold leading-none tracking-[-0.055em] text-[#0A0440]`}
+          className={`${config.name} font-bold leading-none tracking-[-0.055em] text-[#001B44]`}
         >
           Newvelion
         </span>
 
         {showTagline && (
           <span
-            className={`${config.tagline} mt-1 font-medium uppercase tracking-[0.2em] text-[#8A8570]`}
+            className={`${config.tagline} mt-1 font-medium uppercase tracking-[0.2em] text-[#6B7280]`}
           >
             Commerce infrastructure
           </span>
