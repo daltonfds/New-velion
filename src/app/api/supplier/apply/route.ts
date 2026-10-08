@@ -1,4 +1,3 @@
-import { createClient } from "@supabase/supabase-js";
 import { adminClient } from "@/lib/integrations/server";
 
 export async function POST(request: Request) {
