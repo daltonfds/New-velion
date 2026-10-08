@@ -16,7 +16,7 @@ function mapOrderError(message: string) {
     case "INVALID_SELLER":
       return ["INVALID_SELLER", "External seller is invalid or inactive.", 404] as const;
     case "PRODUCT_NOT_MAPPED":
-      return ["PRODUCT_NOT_MAPPED", "The external product is not mapped to NewVelion.", 409] as const;
+      return ["PRODUCT_NOT_MAPPED", "The external product is not mapped to Newvelion.", 409] as const;
     case "PRODUCT_NOT_AVAILABLE":
       return ["PRODUCT_NOT_AVAILABLE", "The mapped product is not approved for external fulfillment.", 409] as const;
     case "OFFER_PRODUCT_MISMATCH":
@@ -26,7 +26,7 @@ function mapOrderError(message: string) {
     case "CUSTOMER_CURRENCY_MUST_BE_ZAR":
       return ["CUSTOMER_CURRENCY_MUST_BE_ZAR", "Integration customers must pay in ZAR.", 409] as const;
     case "PRODUCT_NOT_FOUND":
-      return ["PRODUCT_NOT_FOUND", "The NewVelion product is unavailable.", 404] as const;
+      return ["PRODUCT_NOT_FOUND", "The Newvelion product is unavailable.", 404] as const;
     case "PRODUCT_OUT_OF_STOCK":
       return ["PRODUCT_OUT_OF_STOCK", "The requested product quantity is out of stock.", 409] as const;
     case "INVALID_QUANTITY":
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     null;
 
   if (!externalOrderId || !externalSellerId || currency !== "ZAR") {
-    return apiError("INVALID_CURRENCY", "Integration orders must use ZAR. NewVelion customers are South African.", 400, auth.id);
+    return apiError("INVALID_CURRENCY", "Integration orders must use ZAR. Newvelion customers are South African.", 400, auth.id);
   }
 
   if (!items.length) {
@@ -254,7 +254,7 @@ export async function POST(request: Request) {
       statusCode: 500,
       durationMs: Date.now() - started,
     });
-    return apiError("INTERNAL_ERROR", "NewVelion could not create the order.", 500, auth.id);
+    return apiError("INTERNAL_ERROR", "Newvelion could not create the order.", 500, auth.id);
   }
 
   const webhook = await queueIntegrationWebhook(auth.platform.id, "order.created", {
