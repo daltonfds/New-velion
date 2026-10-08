@@ -135,7 +135,7 @@ export default function AdminSalesPage() {
               Sales
             </h1>
             <p className="mt-1 text-sm text-slate-500">
-              Confirmed sales recorded by NewVelion after payment verification.
+              Confirmed sales recorded by Newvelion after payment verification.
             </p>
           </div>
 
