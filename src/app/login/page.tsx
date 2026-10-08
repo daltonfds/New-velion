@@ -86,7 +86,7 @@ function LoginPageContent() {
 
           <form onSubmit={handleLogin} className="mt-8 space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+              <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
                 Email
               </label>
 
@@ -102,7 +102,7 @@ function LoginPageContent() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+              <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
                 Password
               </label>
 
