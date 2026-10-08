@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import AppShell from "@/components/layout/AppShell";
 
 const integrations = [
   {
@@ -14,10 +15,10 @@ const integrations = [
 
 export default function SellerIntegrationsPage() {
   return (
-    <main className="min-h-screen bg-white px-4 py-8 sm:px-6 lg:px-8">
+    <AppShell area="seller" title="Integrations" subtitle="Connect Newvelion to the platforms you use to sell.">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-[#0E4AAB]">
+          <p className="text-sm font-semibold uppercase tracking-wide text-[#003B95]">
             Seller
           </p>
 
@@ -41,7 +42,7 @@ export default function SellerIntegrationsPage() {
               <Link
                 key={integration.name}
                 href={integration.href}
-                className="group rounded-[12px] border border-[#DDE5EF] bg-white p-6 transition hover:border-blue-300 hover:bg-[#F6F9FC]"
+                className="group rounded-[12px] border border-[#DDE5EF] bg-white p-6 transition hover:border-[#0078E8] hover:bg-[#EAF3FF]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -81,7 +82,7 @@ export default function SellerIntegrationsPage() {
                   </span>
                 </div>
 
-                <div className="mt-6 text-sm font-semibold text-[#0E4AAB] group-hover:text-[#0E4AAB]">
+                <div className="mt-6 text-sm font-semibold text-[#006CE5] group-hover:text-[#003B95]">
                   Configure integration →
                 </div>
               </Link>
@@ -89,6 +90,6 @@ export default function SellerIntegrationsPage() {
           </div>
         </section>
       </div>
-    </main>
+    </AppShell>
   );
 }
