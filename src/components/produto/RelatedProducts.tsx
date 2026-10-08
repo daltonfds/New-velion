@@ -46,13 +46,6 @@ export default function RelatedProducts({
               You may also like
             </h2>
           </div>
-
-          <Link
-            href="/marketplace"
-            className="text-sm font-bold text-[#0E1F3D] hover:underline"
-          >
-            View marketplace →
-          </Link>
         </div>
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
