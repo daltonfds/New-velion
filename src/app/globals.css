@@ -41,7 +41,7 @@
 }
 
 
-/* NewVelion product design system — Figma-aligned */
+/* Newvelion product design system — Figma-aligned */
 :root{--nv-blue:#10069F;--nv-blue-dark:#0A0440;--nv-ink:#0A0440;--nv-muted:#616E85;--nv-line:#E5E7EB;--nv-bg:#F7F8FA;--nv-gold:#FFB800;}
 .nv-page{min-height:100vh;background:var(--nv-bg);color:var(--nv-ink)}
 .nv-surface{background:#fff;border:1px solid var(--nv-line);border-radius:12px}
@@ -372,7 +372,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-primary); 
 }
 
 
-/* NewVelion homepage polish — final visual pass */
+/* Newvelion homepage polish — final visual pass */
 .nv-home{font-family:var(--font-inter),sans-serif;overflow-x:hidden}
 .nv-home-header{backdrop-filter:none}
 .nv-home-header-inner{max-width:1240px;height:72px}
