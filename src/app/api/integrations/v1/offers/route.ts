@@ -14,7 +14,7 @@ function mapOfferError(message: string) {
     case "INVALID_SELLER":
       return ["INVALID_SELLER", "External seller is invalid or inactive.", 404] as const;
     case "PRODUCT_NOT_AVAILABLE":
-      return ["PRODUCT_NOT_AVAILABLE", "The NewVelion product is not available for external selling.", 409] as const;
+      return ["PRODUCT_NOT_AVAILABLE", "The Newvelion product is not available for external selling.", 409] as const;
     case "PRODUCT_NOT_MAPPED":
       return ["PRODUCT_NOT_MAPPED", "The product mapping is missing or inactive.", 409] as const;
     case "MAPPING_SELLER_MISMATCH":
@@ -22,9 +22,9 @@ function mapOfferError(message: string) {
     case "INVALID_PRICING_MODE":
       return ["INVALID_PRICING_MODE", "pricing_mode must be inherit, fixed or custom.", 400] as const;
     case "FIXED_PRICE_MISMATCH":
-      return ["FIXED_PRICE_MISMATCH", "The supplied price does not match the fixed NewVelion price.", 409] as const;
+      return ["FIXED_PRICE_MISMATCH", "The supplied price does not match the fixed Newvelion price.", 409] as const;
     case "SALE_PRICE_BELOW_BASE_PRICE":
-      return ["SALE_PRICE_BELOW_BASE_PRICE", "The custom selling price is below the NewVelion base.", 409] as const;
+      return ["SALE_PRICE_BELOW_BASE_PRICE", "The custom selling price is below the Newvelion base.", 409] as const;
     case "PRICING_BASE_NOT_CONFIGURED":
       return ["PRICING_BASE_NOT_CONFIGURED", "This product does not have a valid pricing base.", 409] as const;
     default:
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (!mapping) {
-      return apiError("PRODUCT_NOT_MAPPED", "The external product is not mapped to NewVelion.", 409, auth.id);
+      return apiError("PRODUCT_NOT_MAPPED", "The external product is not mapped to Newvelion.", 409, auth.id);
     }
     mappingId = mapping.id;
   }
