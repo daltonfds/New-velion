@@ -24,7 +24,7 @@ export default function ReviewCard({ review }: { review: Review }) {
   return (
     <article className="border border-[#DDE5EF] bg-white p-6">
       <div className="flex items-center justify-between gap-4">
-        <div className="tracking-widest text-[#C99A2E]" aria-label={`${rating} out of 5 stars`}>
+        <div className="tracking-widest text-[#FFB800]" aria-label={`${rating} out of 5 stars`}>
           {"★".repeat(rating)}
           {"☆".repeat(5 - rating)}
         </div>
