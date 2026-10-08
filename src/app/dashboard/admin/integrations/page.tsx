@@ -172,7 +172,7 @@ export default function AdminIntegrationsPage() {
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold text-[#10069F]"><Icon name="layers" size={15}/>Infrastructure / Integrations</div>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Platform Integrations</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Connect marketplaces and seller platforms to NewVelion Products, Stock, Orders and Fulfillment through Integration API v1.</p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Connect marketplaces and seller platforms to Newvelion Products, Stock, Orders and Fulfillment through Integration API v1.</p>
           </div>
           <div className="flex gap-2">
             <Link href="/docs/integrations" target="_blank" className="inline-flex items-center gap-2 rounded-[10px] border border-[#E5E7EB] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-[#F7F8FA]"><Icon name="docs" size={16}/> API docs</Link>
@@ -215,7 +215,7 @@ export default function AdminIntegrationsPage() {
             <section className="rounded-[12px] bg-[#0A0440] p-6 text-white">
               <p className="text-xs font-bold uppercase tracking-[.16em] text-blue-200">Partner architecture</p>
               <h2 className="mt-3 text-xl font-bold">One API. Multiple channels.</h2>
-              <p className="mt-2 text-sm leading-6 text-blue-100">External platforms own the storefront and customer sale. NewVelion owns the product, stock, fulfillment and tracking infrastructure.</p>
+              <p className="mt-2 text-sm leading-6 text-blue-100">External platforms own the storefront and customer sale. Newvelion owns the product, stock, fulfillment and tracking infrastructure.</p>
               <div className="mt-6 space-y-2 text-sm">{["Catalog & stock","External seller mapping","Order intake","Fulfillment status","Signed webhooks"].map(x=><div key={x} className="flex items-center gap-2"><Icon name="check" size={15}/>{x}</div>)}</div>
               <Link href="/docs/integrations" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-blue-200">Read partner docs <Icon name="arrow" size={15}/></Link>
             </section>
