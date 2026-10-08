@@ -1321,10 +1321,10 @@ export default function SalesPage() {
 
             <article className="feature-card">
               <Icon name="check" size={24} />
-              <h3>NewVelion marketplace</h3>
+              <h3>Newvelion marketplace</h3>
               <p>
                 Discover products from suppliers and brands available through
-                the NewVelion marketplace.
+                the Newvelion marketplace.
               </p>
             </article>
           </div>
@@ -1382,7 +1382,7 @@ export default function SalesPage() {
 
             <div className="trust-item">
               <Icon name="check" size={22} />
-              <strong>NewVelion</strong>
+              <strong>Newvelion</strong>
               <span>Marketplace infrastructure</span>
             </div>
           </div>
@@ -1452,7 +1452,7 @@ export default function SalesPage() {
           <div className="container">
             <h2 className="section-title">Related products</h2>
             <p className="section-subtitle">
-              Explore more products available on NewVelion.
+              Explore more products available on Newvelion.
             </p>
 
             <div className="related">
@@ -1499,7 +1499,7 @@ export default function SalesPage() {
             <h2>Stay updated</h2>
             <p>
               Get product updates, new offers and marketplace news from
-              NewVelion.
+              Newvelion.
             </p>
 
             <form
