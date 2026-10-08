@@ -241,7 +241,7 @@ export default function AppShell({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f6f9fc] text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="nv-app-shell min-h-screen bg-[#F7F8FA] text-[#1F2937]">
       {mobileOpen && (
         <button
           aria-label="Close menu"
@@ -253,17 +253,17 @@ export default function AppShell({
       <aside
         className={[
           "fixed inset-y-0 left-0 z-50 flex w-[248px] flex-col",
-          "border-r border-gray-200 bg-white dark:border-slate-800 dark:bg-slate-900",
+          "border-r border-[#E5E7EB] bg-white",
           "transition-transform duration-200",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         ].join(" ")}
       >
-        <div className="flex h-[72px] items-center border-b border-slate-100 px-6 dark:border-slate-800">
+        <div className="flex h-[72px] items-center border-b border-[#E5E7EB] px-6">
           <NewvelionBrand size="md" />
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-5">
-          <p className="px-3 pb-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+          <p className="px-3 pb-3 text-[11px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
             Platform
           </p>
 
@@ -276,8 +276,8 @@ export default function AppShell({
                 className={[
                   "group relative flex items-center gap-3 rounded-[7px] px-3 py-2.5 text-sm font-medium transition-colors",
                   pathname === item.href
-                    ? "bg-[#eef5ff] text-[#0e4aab] dark:bg-slate-800 dark:text-blue-300"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-blue-600",
+                    ? "bg-[#E8EDFF] text-[#10069F]"
+                    : "text-[#6B7280] hover:bg-[#F7F8FA] hover:text-[#10069F]",
                 ].join(" ")}
               >
                 {pathname === item.href && (
@@ -288,8 +288,8 @@ export default function AppShell({
                   className={[
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
                     pathname === item.href
-                      ? "text-[#0e1f3d]"
-                      : "text-slate-500 group-hover:text-blue-600",
+                      ? "text-[#10069F]"
+                      : "text-[#9CA3AF] group-hover:text-[#10069F]",
                   ].join(" ")}
                 >
                   <Icon name={item.icon} />
@@ -301,12 +301,12 @@ export default function AppShell({
           </div>
         </nav>
 
-        <div className="border-t border-gray-100 p-3">
+        <div className="border-t border-[#E5E7EB] p-3">
           <Link
             href="/dashboard/profile"
-            className="flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-slate-50"
+            className="flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#F7F8FA]"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef4fb] text-sm font-bold text-[#16294F]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8EDFF] text-sm font-bold text-[#10069F]">
               U
             </div>
 
@@ -323,7 +323,7 @@ export default function AppShell({
           <button
             type="button"
             onClick={() => setLogoutOpen(true)}
-            className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
+            className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-[#6B7280] transition-colors hover:bg-red-50 hover:text-red-600"
           >
             <span className="flex h-8 w-8 shrink-0 items-center justify-center">
               <Icon name="logout" size={18} />
@@ -339,7 +339,7 @@ export default function AppShell({
             role="dialog"
             aria-modal="true"
             aria-labelledby="logout-title"
-            className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-xl"
+            className="w-full max-w-sm rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-xl"
           >
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
               <Icon name="logout" size={20} />
@@ -347,12 +347,12 @@ export default function AppShell({
 
             <h2
               id="logout-title"
-              className="mt-4 text-lg font-bold text-slate-900"
+              className="mt-4 text-lg font-bold text-[#1F2937]"
             >
               {t("Log out?","Sair?")}
             </h2>
 
-            <p className="mt-2 text-sm leading-6 text-slate-500">
+            <p className="mt-2 text-sm leading-6 text-[#6B7280]">
               {t("Are you sure you want to log out of your Newvelion account?","Tem a certeza de que pretende sair da sua conta Newvelion?")}
             </p>
 
@@ -361,7 +361,7 @@ export default function AppShell({
                 type="button"
                 disabled={loggingOut}
                 onClick={() => setLogoutOpen(false)}
-                className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+                className="flex-1 rounded-lg border border-[#E5E7EB] px-4 py-2.5 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#F7F8FA] disabled:opacity-50"
               >
                 {t("Cancel","Cancelar")}
               </button>
@@ -370,7 +370,7 @@ export default function AppShell({
                 type="button"
                 disabled={loggingOut}
                 onClick={handleLogout}
-                className="flex-1 rounded-lg bg-[#0e4aab] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0b3d8f] disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 rounded-lg bg-[#10069F] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0A0440] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loggingOut ? t("Logging out...","A sair...") : t("Log out","Sair")}
               </button>
@@ -380,7 +380,7 @@ export default function AppShell({
       )}
 
       <div className="lg:pl-[248px]">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#dde5ef] bg-white px-4 lg:px-8 dark:border-slate-800 dark:bg-slate-900">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#E5E7EB] bg-white px-4 lg:px-8">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -393,11 +393,11 @@ export default function AppShell({
 
             <div>
               {title && (
-                <h1 className="text-lg font-bold text-gray-900 dark:text-slate-100">{title}</h1>
+                <h1 className="text-lg font-bold text-[#1F2937]">{title}</h1>
               )}
 
               {subtitle && (
-                <p className="hidden text-sm text-gray-500 dark:text-slate-400 sm:block">
+                <p className="hidden text-sm text-[#6B7280] sm:block">
                   {subtitle}
                 </p>
               )}
@@ -416,7 +416,7 @@ export default function AppShell({
           </div>
         </header>
 
-        <main className="nv-dashboard min-h-[calc(100vh-4.5rem)] bg-[#f6f9fc] p-4 lg:p-7">
+        <main className="nv-dashboard min-h-[calc(100vh-4.5rem)] bg-[#F7F8FA] p-4 lg:p-7">
           {children}
         </main>
       </div>
