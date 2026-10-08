@@ -15,7 +15,7 @@ export default async function OAuthConsentPage({
     return (
       <main className="flex min-h-screen items-center justify-center bg-white px-5 py-10">
         <div className="w-full max-w-lg rounded-3xl border border-red-100 bg-white p-8">
-          <h1 className="text-2xl font-bold text-[#16294F]">Invalid authorization request</h1>
+          <h1 className="text-2xl font-bold text-[#0A0440]">Invalid authorization request</h1>
           <p className="mt-2 text-slate-500">The OAuth authorization request is missing its authorization ID.</p>
         </div>
       </main>
@@ -59,7 +59,7 @@ export default async function OAuthConsentPage({
     return (
       <main className="flex min-h-screen items-center justify-center bg-white px-5 py-10">
         <div className="w-full max-w-lg rounded-3xl border border-red-100 bg-white p-8">
-          <h1 className="text-2xl font-bold text-[#16294F]">Authorization unavailable</h1>
+          <h1 className="text-2xl font-bold text-[#0A0440]">Authorization unavailable</h1>
           <p className="mt-2 text-slate-500">
             {error?.message || "This authorization request is invalid or has expired."}
           </p>
@@ -81,11 +81,11 @@ export default async function OAuthConsentPage({
       <div className="w-full max-w-xl">
         <div className="mb-6 text-center">
           <div className="inline-flex items-end gap-1" aria-label="Newvelion">
-            <span className="h-3 w-2 rounded-sm bg-[#C99A2E]" />
-            <span className="h-5 w-2 rounded-sm bg-[#C99A2E]" />
-            <span className="h-7 w-2 rounded-sm bg-[#C99A2E]" />
+            <span className="h-3 w-2 rounded-sm bg-[#FFB800]" />
+            <span className="h-5 w-2 rounded-sm bg-[#FFB800]" />
+            <span className="h-7 w-2 rounded-sm bg-[#FFB800]" />
           </div>
-          <div className="mt-2 text-xl font-bold text-[#16294F]">Newvelion</div>
+          <div className="mt-2 text-xl font-bold text-[#0A0440]">Newvelion</div>
         </div>
 
         <section className="rounded-3xl border border-blue-100 bg-white p-7 shadow-sm sm:p-9">
@@ -93,7 +93,7 @@ export default async function OAuthConsentPage({
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
               Secure connection
             </p>
-            <h1 className="mt-2 text-2xl font-bold text-[#16294F]">
+            <h1 className="mt-2 text-2xl font-bold text-[#0A0440]">
               Authorize {authDetails.client.name}
             </h1>
             <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -104,7 +104,7 @@ export default async function OAuthConsentPage({
           <div className="mt-6 space-y-4">
             <div className="rounded-2xl border border-slate-200 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Account</p>
-              <p className="mt-1 font-semibold text-[#16294F]">{user.email}</p>
+              <p className="mt-1 font-semibold text-[#0A0440]">{user.email}</p>
             </div>
 
             {scopes.length > 0 && (
