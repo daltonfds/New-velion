@@ -330,7 +330,7 @@ function DeliveryForm() {
               <p className="text-sm font-black text-[#0A0440]">Secure checkout</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
                 Your seller price is locked for this order. Delivery is
-                calculated from the NewVelion supplier shipping configuration.
+                calculated from the Newvelion supplier shipping configuration.
               </p>
             </div>
           </aside>
