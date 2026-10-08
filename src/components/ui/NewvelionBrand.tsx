@@ -64,7 +64,7 @@ export default function NewvelionBrand({
               width="9"
               height={bar.height}
               rx="4.5"
-              fill="#C99A2E"
+              fill="#FFB800"
               style={{ transformOrigin: `${bar.x + 4.5}px 48px` }}
               initial={
                 reduceMotion
