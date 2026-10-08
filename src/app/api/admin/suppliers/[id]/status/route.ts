@@ -28,7 +28,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if (kycStatus) await auth.client.from("profiles").update({ kyc_status: kycStatus }).eq("id", id);
 
   if (status === "approved") {
-    await auth.client.from("profiles").update({ status: "active" }).eq("id", id);
+    await auth.client.from("profiles").update({ status: "active", role: "supplier" }).eq("id", id);
     const { data: supplier } = await auth.client.from("supplier_profiles").select("country_code").eq("user_id", id).maybeSingle();
     const country = String(supplier?.country_code ?? "").toUpperCase();
     if (!["ZA","CN"].includes(country)) return Response.json({ error: "Supplier country must be South Africa (ZA) or China (CN)." }, { status: 400 });
