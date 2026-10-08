@@ -120,7 +120,7 @@ export default function ShopifyIntegrationPage() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Conecte sua loja Shopify ao NewVelion para sincronizar produtos,
+            Conecte sua loja Shopify ao Newvelion para sincronizar produtos,
             pedidos, estoque e operações de fulfillment.
           </p>
         </div>
