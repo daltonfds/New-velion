@@ -19,13 +19,13 @@ const handler = createMcpHandler(() => {
   const server = new McpServer(
     { name: "newvelion", version: "1.0.0" },
     {
-      instructions: "NewVelion operational MCP. Never invent orders, payments, customers, tracking numbers, or financial values.",
+      instructions: "Newvelion operational MCP. Never invent orders, payments, customers, tracking numbers, or financial values.",
       capabilities: { tools: {} },
     },
   );
 
   server.registerTool("get_platform_overview", {
-    title: "Get NewVelion Platform Overview",
+    title: "Get Newvelion Platform Overview",
     description: "Return a live operational snapshot of products, paid sales, suppliers, and fulfillment statuses.",
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async () => {
@@ -49,7 +49,7 @@ const handler = createMcpHandler(() => {
   });
 
   server.registerTool("list_products", {
-    title: "List NewVelion Products",
+    title: "List Newvelion Products",
     description: "Search the live catalog with pricing, stock, supplier country, approval, and pricing mode.",
     inputSchema: z.object({
       query: z.string().max(120).optional(),
@@ -114,7 +114,7 @@ const handler = createMcpHandler(() => {
 
   server.registerTool("get_public_tracking", {
     title: "Get Customer Tracking",
-    description: "Resolve a public NewVelion tracking token into customer-safe tracking information.",
+    description: "Resolve a public Newvelion tracking token into customer-safe tracking information.",
     inputSchema: z.object({ tracking_token: z.string().min(16).max(128) }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ tracking_token }) => {
@@ -162,7 +162,7 @@ const handler = createMcpHandler(() => {
 
 
   server.registerTool("get_product", {
-    title: "Get NewVelion Product",
+    title: "Get Newvelion Product",
     description: "Get one live product with public catalog data and seller pricing rules.",
     inputSchema: z.object({ product_id: z.string().uuid() }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -176,7 +176,7 @@ const handler = createMcpHandler(() => {
 
   server.registerTool("list_suppliers", {
     title: "List Suppliers",
-    description: "List approved NewVelion suppliers with public-safe company information.",
+    description: "List approved Newvelion suppliers with public-safe company information.",
     inputSchema: z.object({ country_code: z.enum(["ZA","CN"]).optional(), limit: z.number().int().min(1).max(100).default(50) }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ country_code, limit }) => {
@@ -254,7 +254,7 @@ const handler = createMcpHandler(() => {
 
   server.registerTool("get_integration_orders", {
     title: "Get Integration Orders",
-    description: "Inspect external orders and their NewVelion fulfillment status.",
+    description: "Inspect external orders and their Newvelion fulfillment status.",
     inputSchema: z.object({ platform_id: z.string().uuid().optional(), limit: z.number().int().min(1).max(100).default(50) }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ platform_id, limit }) => {
@@ -287,7 +287,7 @@ const handle = withOAuthProtectedResource(
 
     if (error || profile?.role !== "admin") {
       return Response.json(
-        { error: "NewVelion administrator access is required." },
+        { error: "Newvelion administrator access is required." },
         { status: 403 },
       );
     }
