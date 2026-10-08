@@ -241,7 +241,7 @@ export default function AppShell({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f6f9fc] text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-screen bg-white text-slate-900">
       {mobileOpen && (
         <button
           aria-label="Close menu"
@@ -253,7 +253,7 @@ export default function AppShell({
       <aside
         className={[
           "fixed inset-y-0 left-0 z-50 flex w-[248px] flex-col",
-          "border-r border-gray-200 bg-white dark:border-slate-800 dark:bg-slate-900",
+          "border-r border-gray-200 bg-white",
           "transition-transform duration-200",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         ].join(" ")}
@@ -276,12 +276,12 @@ export default function AppShell({
                 className={[
                   "group relative flex items-center gap-3 rounded-[7px] px-3 py-2.5 text-sm font-medium transition-colors",
                   pathname === item.href
-                    ? "bg-[#eef5ff] text-[#0e4aab] dark:bg-slate-800 dark:text-blue-300"
+                    ? "bg-[#EAF3FF] text-[#003B95]"
                     : "text-slate-600 hover:bg-slate-50 hover:text-blue-600",
                 ].join(" ")}
               >
                 {pathname === item.href && (
-                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-[#0e4aab]" />
+                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-[#003B95]" />
                 )}
 
                 <span
@@ -306,7 +306,7 @@ export default function AppShell({
             href="/dashboard/profile"
             className="flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-slate-50"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef4fb] text-sm font-bold text-[#16294F]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#001B44]">
               U
             </div>
 
@@ -370,7 +370,7 @@ export default function AppShell({
                 type="button"
                 disabled={loggingOut}
                 onClick={handleLogout}
-                className="flex-1 rounded-lg bg-[#0e4aab] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0b3d8f] disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 rounded-lg bg-[#003B95] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#006CE5] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loggingOut ? t("Logging out...","A sair...") : t("Log out","Sair")}
               </button>
@@ -380,7 +380,7 @@ export default function AppShell({
       )}
 
       <div className="lg:pl-[248px]">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#dde5ef] bg-white px-4 lg:px-8 dark:border-slate-800 dark:bg-slate-900">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#dde5ef] bg-white px-4 lg:px-8">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -393,11 +393,11 @@ export default function AppShell({
 
             <div>
               {title && (
-                <h1 className="text-lg font-bold text-gray-900 dark:text-slate-100">{title}</h1>
+                <h1 className="text-lg font-bold text-gray-900">{title}</h1>
               )}
 
               {subtitle && (
-                <p className="hidden text-sm text-gray-500 dark:text-slate-400 sm:block">
+                <p className="hidden text-sm text-gray-500 sm:block">
                   {subtitle}
                 </p>
               )}
@@ -409,14 +409,14 @@ export default function AppShell({
 
             <Link
               href="/dashboard/profile"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef4fb] text-sm font-bold text-[#16294F]"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#001B44]"
             >
               U
             </Link>
           </div>
         </header>
 
-        <main className="nv-dashboard min-h-[calc(100vh-4.5rem)] bg-[#f6f9fc] p-4 lg:p-7">
+        <main className="nv-dashboard min-h-[calc(100vh-4.5rem)] bg-white p-4 lg:p-7">
           {children}
         </main>
       </div>
