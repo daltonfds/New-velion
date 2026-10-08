@@ -8,9 +8,9 @@ export default function Footer() {
           <div className="max-w-sm">
             <Link href="/marketplace" className="inline-flex items-center gap-3">
               <span className="flex items-end gap-1" aria-hidden="true">
-                <span className="h-3 w-2 rounded-sm bg-[#C99A2E]" />
-                <span className="h-4 w-2 rounded-sm bg-[#C99A2E]" />
-                <span className="h-5 w-2 rounded-sm bg-[#C99A2E]" />
+                <span className="h-3 w-2 rounded-sm bg-[#FFB800]" />
+                <span className="h-4 w-2 rounded-sm bg-[#FFB800]" />
+                <span className="h-5 w-2 rounded-sm bg-[#FFB800]" />
               </span>
 
               <span className="text-xl font-black tracking-tight text-[#0E1F3D]">
