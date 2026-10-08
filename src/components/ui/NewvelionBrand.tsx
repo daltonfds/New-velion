@@ -64,7 +64,7 @@ export default function NewvelionBrand({
               width="9"
               height={bar.height}
               rx="4.5"
-              fill="#C99A2E"
+              fill="#FFB800"
               style={{ transformOrigin: `${bar.x + 4.5}px 48px` }}
               initial={
                 reduceMotion
@@ -84,7 +84,7 @@ export default function NewvelionBrand({
 
       <div className="flex flex-col">
         <span
-          className={`${config.name} font-bold leading-none tracking-[-0.055em] text-[#16294F]`}
+          className={`${config.name} font-bold leading-none tracking-[-0.055em] text-[#0A0440]`}
         >
           Newvelion
         </span>
