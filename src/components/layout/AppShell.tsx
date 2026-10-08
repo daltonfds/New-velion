@@ -276,20 +276,20 @@ export default function AppShell({
                 className={[
                   "group relative flex items-center gap-3 rounded-[7px] px-3 py-2.5 text-sm font-medium transition-colors",
                   pathname === item.href
-                    ? "bg-[#E8EDFF] text-[#10069F]"
-                    : "text-[#6B7280] hover:bg-[#F7F8FA] hover:text-[#10069F]",
+                    ? "bg-[#EAF3FF] text-[#003B95]"
+                    : "text-[#6B7280] hover:bg-[#F7F8FA] hover:text-[#003B95]",
                 ].join(" ")}
               >
                 {pathname === item.href && (
-                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-[#0e4aab]" />
+                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-[#006CE5]" />
                 )}
 
                 <span
                   className={[
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
                     pathname === item.href
-                      ? "text-[#10069F]"
-                      : "text-[#9CA3AF] group-hover:text-[#10069F]",
+                      ? "text-[#003B95]"
+                      : "text-[#9CA3AF] group-hover:text-[#003B95]",
                   ].join(" ")}
                 >
                   <Icon name={item.icon} />
@@ -306,7 +306,7 @@ export default function AppShell({
             href="/dashboard/profile"
             className="flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#F7F8FA]"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8EDFF] text-sm font-bold text-[#10069F]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#003B95]">
               U
             </div>
 
@@ -370,7 +370,7 @@ export default function AppShell({
                 type="button"
                 disabled={loggingOut}
                 onClick={handleLogout}
-                className="flex-1 rounded-lg bg-[#10069F] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0A0440] disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 rounded-lg bg-[#003B95] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#001B44] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loggingOut ? t("Logging out...","A sair...") : t("Log out","Sair")}
               </button>
@@ -409,7 +409,7 @@ export default function AppShell({
 
             <Link
               href="/dashboard/profile"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef4fb] text-sm font-bold text-[#16294F]"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#001B44]"
             >
               U
             </Link>
