@@ -127,16 +127,12 @@ export default function SellerLinksPage() {
     load();
   }, []);
 
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (typeof window !== "undefined"
-      ? window.location.origin
-      : "https://newvelion.com");
+  const siteUrl = "https://www.veliongroup.online";
 
   const links = useMemo(() => {
     return affiliations.map((item) => ({
       ...item,
-      affiliateUrl: `${siteUrl.replace(/\/$/, "")}/${item.link_unico}`,
+      affiliateUrl: `${siteUrl}/go/${String(item.link_unico).replace(/^\/+/, "").replace(/^go\//i, "")}`,
     }));
   }, [affiliations, siteUrl]);
 
