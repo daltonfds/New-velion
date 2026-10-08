@@ -986,12 +986,12 @@ const filteredProducts = useMemo(() => {
                   <p className="text-xs text-indigo-600">Your commission</p>
                   <p className="mt-1 text-xl font-semibold text-indigo-700">{money(commissionForProduct(pricingProduct))}</p>
                 </div>
-                <p className="text-sm text-slate-500">NewVelion controls the selling price for this offer.</p>
+                <p className="text-sm text-slate-500">Newvelion controls the selling price for this offer.</p>
               </div>
             ) : (
               <div className="mt-6 space-y-4">
                 <div className="rounded-[10px] border border-[#DDE5EF] bg-[#F6F9FC] p-4">
-                  <p className="text-xs text-slate-500">NewVelion / Supplier base</p>
+                  <p className="text-xs text-slate-500">Newvelion / Supplier base</p>
                   <p className="mt-1 text-xl font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p>
                 </div>
                 <label className="block">
