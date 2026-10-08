@@ -55,11 +55,11 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   if (productError || !product) {
-    return apiError("PRODUCT_NOT_FOUND", "NewVelion product not found.", 404, auth.id);
+    return apiError("PRODUCT_NOT_FOUND", "Newvelion product not found.", 404, auth.id);
   }
 
   if (!product.ativo) {
-    return apiError("PRODUCT_NOT_FOUND", "NewVelion product is not available for integration.", 409, auth.id);
+    return apiError("PRODUCT_NOT_FOUND", "Newvelion product is not available for integration.", 409, auth.id);
   }
 
   if (pricingMode === "fixed" && salePrice == null) {
@@ -88,11 +88,11 @@ export async function POST(request: Request) {
   }
 
   if (pricingMode === "fixed" && salePrice != null && Math.abs(salePrice - fixedPrice) > 0.01) {
-    return apiError("FIXED_PRICE_MISMATCH", "sale_price must match the NewVelion fixed price.", 409, auth.id);
+    return apiError("FIXED_PRICE_MISMATCH", "sale_price must match the Newvelion fixed price.", 409, auth.id);
   }
 
   if (pricingMode === "custom" && salePrice != null && salePrice < basePrice) {
-    return apiError("SALE_PRICE_BELOW_BASE_PRICE", "sale_price is below the NewVelion base price.", 409, auth.id);
+    return apiError("SALE_PRICE_BELOW_BASE_PRICE", "sale_price is below the Newvelion base price.", 409, auth.id);
   }
 
   if (pricingMode === "custom" && salePrice != null && salePrice <= 0) {
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
   }
 
   if (saleCurrency && saleCurrency !== product.moeda) {
-    return apiError("INVALID_CURRENCY", "sale_currency must match the NewVelion product currency.", 409, auth.id);
+    return apiError("INVALID_CURRENCY", "sale_currency must match the Newvelion product currency.", 409, auth.id);
   }
 
   let sellerUuid: string | null = null;
