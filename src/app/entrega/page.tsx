@@ -194,7 +194,7 @@ function DeliveryForm() {
             className="rounded-3xl border border-slate-200 bg-white p-5 md:p-8"
           >
             <div className="mb-8 border-b border-slate-100 pb-6">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#C99A2E]">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#FFB800]">
                 Step 1 of 2
               </p>
               <h1 className="mt-2 text-3xl font-black tracking-tight text-[#16294F]">
@@ -274,13 +274,13 @@ function DeliveryForm() {
             </button>
 
             <div className="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-slate-500">
-              <span className="text-[#C99A2E]">✓</span>
+              <span className="text-[#FFB800]">✓</span>
               Your delivery details are sent securely to checkout.
             </div>
           </form>
 
           <aside className="rounded-3xl border border-slate-200 bg-white p-5 md:p-6 lg:sticky lg:top-6">
-            <div className="mb-5 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C99A2E]">
+            <div className="mb-5 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#FFB800]">
               Order summary
               {previewLoading ? <span className="text-slate-400">Updating…</span> : null}
             </div>
@@ -365,9 +365,9 @@ function Brand() {
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-end gap-1" aria-hidden="true">
-        <span className="h-3 w-1.5 rounded-full bg-[#C99A2E]" />
-        <span className="h-4.5 w-1.5 rounded-full bg-[#C99A2E]" />
-        <span className="h-6 w-1.5 rounded-full bg-[#C99A2E]" />
+        <span className="h-3 w-1.5 rounded-full bg-[#FFB800]" />
+        <span className="h-4.5 w-1.5 rounded-full bg-[#FFB800]" />
+        <span className="h-6 w-1.5 rounded-full bg-[#FFB800]" />
       </div>
       <div>
         <div className="text-xl font-black tracking-tight text-[#16294F]">Newvelion</div>
