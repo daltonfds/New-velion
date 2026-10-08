@@ -27,7 +27,7 @@ export default function SupplierOrdersPage() {
   return (
     <AppShell area="supplier">
       <div className="space-y-6">
-        <div><h1 className="text-2xl font-bold text-[#0E1F3D]">Orders & fulfillment</h1><p className="mt-1 text-sm text-slate-500">Process orders assigned to your products and keep customers updated.</p></div>
+        <div><h1 className="text-2xl font-bold text-[#0A0440]">Orders & fulfillment</h1><p className="mt-1 text-sm text-slate-500">Process orders assigned to your products and keep customers updated.</p></div>
         {error && <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
         <div className="space-y-4">
           {orders.map((order) => {
@@ -36,15 +36,15 @@ export default function SupplierOrdersPage() {
             return <Card key={order.id} className="p-5">
               <div className="flex flex-col justify-between gap-4 lg:flex-row">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#0E4AAB]">Order #{order.id.slice(0,8)}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#10069F]">Order #{order.id.slice(0,8)}</p>
                   <h2 className="mt-1 text-lg font-semibold text-slate-900">{String(customer.name || customer.full_name || "Customer")}</h2>
                   <p className="mt-1 text-sm text-slate-500">{String(address.address || address.line1 || "")}, {String(address.city || "")}</p>
                   <p className="mt-3 font-semibold text-slate-900">{Number(order.total).toLocaleString()} {order.currency}</p>
                 </div>
-                <div className="lg:text-right"><span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#0E4AAB]">{order.status}</span><p className="mt-2 text-xs text-slate-500">{new Date(order.created_at).toLocaleString()}</p></div>
+                <div className="lg:text-right"><span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#10069F]">{order.status}</span><p className="mt-2 text-xs text-slate-500">{new Date(order.created_at).toLocaleString()}</p></div>
               </div>
               <div className="mt-5 flex flex-wrap gap-2">
-                {(nextActions[order.status] || []).map((status) => <button key={status} disabled={busy === order.id} onClick={() => void advance(order,status)} className="rounded-lg border border-[#DDE5EF] bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-[#F6F9FC] disabled:opacity-50">{busy === order.id ? "Updating..." : status.replace("_"," ")}</button>)}
+                {(nextActions[order.status] || []).map((status) => <button key={status} disabled={busy === order.id} onClick={() => void advance(order,status)} className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-[#F7F8FA] disabled:opacity-50">{busy === order.id ? "Updating..." : status.replace("_"," ")}</button>)}
               </div>
               {order.tracking_number && <p className="mt-3 text-xs text-slate-500">Tracking: {order.tracking_number} · {order.carrier || "Carrier"}</p>}
             </Card>;
