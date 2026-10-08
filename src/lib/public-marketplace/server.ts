@@ -120,7 +120,7 @@ function supplierFromProduct(
   const name =
     source?.company_name?.trim() ||
     row.fornecedor_nome?.trim() ||
-    "NewVelion Supplier";
+    "Newvelion Supplier";
 
   const code = (source?.country_code || (row.fornecedor_pais === "China" ? "CN" : "ZA")) as "ZA" | "CN";
 
