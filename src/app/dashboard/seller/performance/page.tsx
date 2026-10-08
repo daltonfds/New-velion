@@ -232,7 +232,7 @@ export default function SellerPerformancePage() {
             onChange={(event) =>
               setPeriod(event.target.value)
             }
-            className="h-10 rounded-lg border border-[#DDE5EF] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+            className="h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
@@ -367,7 +367,7 @@ export default function SellerPerformancePage() {
                     {dailyPerformance.map((day) => (
                       <div
                         key={day.date}
-                        className="flex items-center justify-between rounded-lg bg-[#F6F9FC] px-4 py-3"
+                        className="flex items-center justify-between rounded-lg bg-[#F7F8FA] px-4 py-3"
                       >
                         <div>
                           <p className="text-sm font-medium text-slate-900">
