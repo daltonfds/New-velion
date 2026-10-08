@@ -148,7 +148,7 @@ function DeliveryForm() {
         <div className="mx-auto max-w-6xl">
           <Brand />
           <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-10 text-center">
-            <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-[#16294F]" />
+            <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-[#0A0440]" />
             <p className="mt-4 text-sm font-medium text-slate-500">
               Preparing your secure checkout...
             </p>
@@ -181,7 +181,7 @@ function DeliveryForm() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
-      <div className="bg-[#16294F] px-4 py-3 text-center text-xs font-bold text-white">
+      <div className="bg-[#0A0440] px-4 py-3 text-center text-xs font-bold text-white">
         Secure checkout · South Africa · ZAR
       </div>
 
@@ -194,10 +194,10 @@ function DeliveryForm() {
             className="rounded-3xl border border-slate-200 bg-white p-5 md:p-8"
           >
             <div className="mb-8 border-b border-slate-100 pb-6">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#C99A2E]">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#10069F]">
                 Step 1 of 2
               </p>
-              <h1 className="mt-2 text-3xl font-black tracking-tight text-[#16294F]">
+              <h1 className="mt-2 text-3xl font-black tracking-tight text-[#0A0440]">
                 Delivery information
               </h1>
               <p className="mt-2 text-sm leading-6 text-slate-500">
@@ -268,19 +268,19 @@ function DeliveryForm() {
             <button
               type="submit"
               disabled={loading || !affiliateLink || previewLoading}
-              className="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#16294F] px-5 py-4 text-sm font-black text-white transition hover:bg-[#0e1d38] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0A0440] px-5 py-4 text-sm font-black text-white transition hover:bg-[#0e1d38] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? "SECURING YOUR ORDER..." : "CONTINUE TO SECURE PAYMENT →"}
             </button>
 
             <div className="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-slate-500">
-              <span className="text-[#C99A2E]">✓</span>
+              <span className="text-[#10069F]">✓</span>
               Your delivery details are sent securely to checkout.
             </div>
           </form>
 
           <aside className="rounded-3xl border border-slate-200 bg-white p-5 md:p-6 lg:sticky lg:top-6">
-            <div className="mb-5 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C99A2E]">
+            <div className="mb-5 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#10069F]">
               Order summary
               {previewLoading ? <span className="text-slate-400">Updating…</span> : null}
             </div>
@@ -294,7 +294,7 @@ function DeliveryForm() {
                 )}
               </div>
               <div className="min-w-0">
-                <h2 className="line-clamp-2 font-black leading-5 text-[#16294F]">{preview.product.name}</h2>
+                <h2 className="line-clamp-2 font-black leading-5 text-[#0A0440]">{preview.product.name}</h2>
                 <p className="mt-2 text-sm text-slate-500">
                   Quantity: <span className="font-bold text-slate-700">{preview.quantity}</span>
                 </p>
@@ -312,7 +312,7 @@ function DeliveryForm() {
               </div>
               <div className="flex justify-between gap-4 text-slate-500">
                 <span>Delivery</span>
-                <span className="font-bold text-[#16294F]">
+                <span className="font-bold text-[#0A0440]">
                   {formatZar(preview.shipping)}
                 </span>
               </div>
@@ -323,11 +323,11 @@ function DeliveryForm() {
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Total</p>
                 <p className="mt-1 text-xs text-slate-400">ZAR</p>
               </div>
-              <p className="text-xl font-black text-[#16294F]">{totalLabel}</p>
+              <p className="text-xl font-black text-[#0A0440]">{totalLabel}</p>
             </div>
 
             <div className="mt-6 rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm font-black text-[#16294F]">Secure checkout</p>
+              <p className="text-sm font-black text-[#0A0440]">Secure checkout</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
                 Your seller price is locked for this order. Delivery is
                 calculated from the NewVelion supplier shipping configuration.
@@ -347,7 +347,7 @@ function DeliveryForm() {
 }
 
 const inputClass =
-  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#16294F] focus:ring-2 focus:ring-[#16294F]/10";
+  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#0A0440] focus:ring-2 focus:ring-[#0A0440]/10";
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
@@ -365,12 +365,12 @@ function Brand() {
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-end gap-1" aria-hidden="true">
-        <span className="h-3 w-1.5 rounded-full bg-[#C99A2E]" />
-        <span className="h-4.5 w-1.5 rounded-full bg-[#C99A2E]" />
-        <span className="h-6 w-1.5 rounded-full bg-[#C99A2E]" />
+        <span className="h-3 w-1.5 rounded-full bg-[#10069F]" />
+        <span className="h-4.5 w-1.5 rounded-full bg-[#10069F]" />
+        <span className="h-6 w-1.5 rounded-full bg-[#10069F]" />
       </div>
       <div>
-        <div className="text-xl font-black tracking-tight text-[#16294F]">Newvelion</div>
+        <div className="text-xl font-black tracking-tight text-[#0A0440]">Newvelion</div>
         <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A8570]">Commerce infrastructure</div>
       </div>
     </div>
