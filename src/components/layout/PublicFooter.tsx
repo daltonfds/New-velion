@@ -33,7 +33,7 @@ export default function PublicFooter() {
             <h2 className="text-sm font-bold text-[#001B44]">Explore</h2>
             <ul className="mt-3 space-y-2 text-sm">
               <li><Link className="hover:text-[#006CE5]" href="/marketplace">Marketplace</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/suppliers">Suppliers</Link></li>
+              <li><Link className="hover:text-[#006CE5]" href="/fornecedores">Suppliers</Link></li>
               <li><Link className="hover:text-[#006CE5]" href="/register">Start selling</Link></li>
             </ul>
           </div>
