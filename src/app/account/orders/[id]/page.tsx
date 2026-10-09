@@ -14,6 +14,7 @@ export default function OrderDetailPage() {
   const [error, setError] = useState("");
   const [rating, setRating] = useState(5);
   const [reviewText, setReviewText] = useState("");
+  const [reviewFiles, setReviewFiles] = useState<File[]>([]);
   const [anonymous, setAnonymous] = useState(false);
   const [reviewerName, setReviewerName] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -43,6 +44,27 @@ export default function OrderDetailPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.replace("/login"); return; }
 
+    let mediaUrls: string[] = [];
+    if (reviewFiles.length) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { router.replace("/login"); return; }
+      const formData = new FormData();
+      formData.append("product_id", order.product_id);
+      reviewFiles.forEach((file) => formData.append("files", file));
+      const uploadResponse = await fetch("/api/customer/reviews", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + session.access_token, "x-review-media-upload": "1" },
+        body: formData,
+      });
+      const uploadBody = await uploadResponse.json();
+      if (!uploadResponse.ok) {
+        setSubmitting(false);
+        setReviewMessage(uploadBody.error || "Unable to upload photos.");
+        return;
+      }
+      mediaUrls = uploadBody.media_urls || [];
+    }
+
     const { error: insertError } = await supabase.from("product_reviews").insert({
       product_id: order.product_id,
       reviewer_id: user.id,
@@ -50,6 +72,7 @@ export default function OrderDetailPage() {
       verified_buyer: true,
       rating,
       review_text: reviewText.trim(),
+      media_urls: mediaUrls,
       is_anonymous: anonymous,
       reviewer_name: anonymous ? null : reviewerName.trim(),
       status: "pending",
@@ -63,6 +86,7 @@ export default function OrderDetailPage() {
 
     setReviewText("");
     setReviewerName("");
+    setReviewFiles([]);
     setReviewMessage("Review submitted. It will appear after admin approval.");
     await load();
   }
@@ -122,6 +146,17 @@ export default function OrderDetailPage() {
               </div>
               <textarea required minLength={5} maxLength={2000} value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="Tell other customers about your experience" className="min-h-32 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-[#16294F]" />
               {!anonymous && <input required minLength={2} maxLength={120} value={reviewerName} onChange={e => setReviewerName(e.target.value)} placeholder="Your name" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-[#16294F]" />}
+              <div>
+                <label htmlFor="order-review-photos" className="block text-sm font-bold text-slate-700">Add photos (up to 4)</label>
+                <input id="order-review-photos" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={e => {
+                  const selected = Array.from(e.target.files || []);
+                  if (selected.length > 4) { setReviewMessage("Choose up to 4 photos."); e.target.value = ""; setReviewFiles([]); return; }
+                  if (selected.some(file => file.size > 5 * 1024 * 1024)) { setReviewMessage("Each photo must be 5 MB or smaller."); e.target.value = ""; setReviewFiles([]); return; }
+                  setReviewMessage("");
+                  setReviewFiles(selected);
+                }} className="mt-2 block w-full rounded-xl border border-slate-300 p-3 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:font-bold file:text-blue-700" />
+                {reviewFiles.length > 0 && <p className="mt-2 text-xs text-slate-500">{reviewFiles.length} photo(s) selected</p>}
+              </div>
               <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={anonymous} onChange={e => setAnonymous(e.target.checked)} /> Post anonymously</label>
               <button type="submit" disabled={submitting} className="rounded-xl bg-[#16294F] px-5 py-3 text-sm font-extrabold text-white disabled:opacity-50">{submitting ? "Submitting..." : "Submit review"}</button>
               {reviewMessage && <p className="text-sm text-slate-600">{reviewMessage}</p>}
