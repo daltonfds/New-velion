@@ -49,6 +49,11 @@ export default function SellerDashboardPage() {
   >([]);
 
   useEffect(() => {
+    const savedGoal = Number(window.localStorage.getItem("newvelion-30day-commission-goal"));
+    if (Number.isFinite(savedGoal) && savedGoal > 0) setGoalTarget(savedGoal);
+  }, []);
+
+  useEffect(() => {
     async function load() {
       setLoading(true);
 
