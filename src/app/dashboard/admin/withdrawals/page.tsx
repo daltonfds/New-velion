@@ -297,12 +297,13 @@ export default function AdminWithdrawalsPage() {
 
       if (financialError) {
         setActionError(financialError.message);
-        setDetail(data);
+        setDetail({ ...data, audit_log: data?.audit || [] });
       } else {
         const row = Array.isArray(financials) ? financials[0] : financials;
 
         setDetail({
           ...data,
+          audit_log: data?.audit || [],
           wallet: {
             available_balance: Number(row?.available_balance ?? 0),
             on_hold: Number(row?.guarantee_retained ?? 0),
