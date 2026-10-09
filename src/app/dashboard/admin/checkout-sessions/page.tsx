@@ -756,16 +756,22 @@ export default function AdminCheckoutSessionsPage() {
                   </label>
                 </div>
 
-                <button
-                  type="button"
-                  disabled={paymentSaving}
-                  onClick={registerExternalPayment}
-                  className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-                >
-                  {paymentSaving
-                    ? "Comparing payment..."
-                    : "Register payment & compare"}
-                </button>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button type="button" disabled={paymentSaving} onClick={registerExternalPayment} className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+                    {paymentSaving ? "Comparing payment..." : "Register payment & compare"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={paymentSaving || ["approved", "rejected", "cancelled"].includes(selected.status)}
+                    onClick={() => {
+                      const reason = window.prompt("Why are you rejecting this checkout/payment?");
+                      if (reason?.trim()) void updateStatus(selected.id, "rejected", reason.trim());
+                    }}
+                    className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Reject payment / checkout
+                  </button>
+                </div>
               </section>
 
               <section className="border-t border-[#E5E7EB] pt-6">
