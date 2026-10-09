@@ -55,6 +55,9 @@ export default function AdminCheckoutSessionsPage() {
   const [selected, setSelected] = useState<Session | null>(null);
   const [error, setError] = useState("");
   const [paymentSaving, setPaymentSaving] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [createdFrom, setCreatedFrom] = useState("");
+  const [createdTo, setCreatedTo] = useState("");
 
   const [payment, setPayment] = useState({
     reference: "",
