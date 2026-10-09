@@ -23,7 +23,7 @@ export default function SupplierRegisterPage() {
     const {data,error:signupError}=await supabase.auth.signUp({email:form.email.trim(),password:form.password,options:{data:{
       full_name:form.fullName.trim(),country_code:form.country,country_name:country?.name||"",country_calling_code:form.callingCode,
       phone_number:form.phone,phone_e164:composeE164(form.callingCode,form.phone),whatsapp_number:form.whatsapp,
-      whatsapp_e164:form.whatsapp?composeE164(form.callingCode,form.whatsapp):"",preferred_language:"en",role:"supplier",
+      whatsapp_e164:form.whatsapp?composeE164(form.callingCode,form.whatsapp):"",preferred_language:"en",role:"supplier",platform_referral_code:new URLSearchParams(window.location.search).get("ref")?.trim().toUpperCase()||"",
       supplier_company_name:form.companyName.trim(),accepted_terms_at:new Date().toISOString(),accepted_terms_version:"2026-10-09",accepted_privacy_policy:true
     }}});
     setLoading(false);
