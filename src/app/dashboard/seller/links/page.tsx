@@ -421,7 +421,7 @@ export default function SellerLinksPage() {
                         </p>
                         <p className="break-all text-xs text-slate-700">
                           {(() => {
-                            const code = String(item.link_unico).replace(/^\\/+/, "").replace(/^go\\//i, "");
+                            const code = String(item.link_unico).replace(/^\/+/, "").replace(/^go\//i, "");
                             const affiliateRef = `go/${code}`;
                             return `${siteUrl}/entrega?ref=${encodeURIComponent(affiliateRef)}`;
                           })()}
@@ -463,7 +463,7 @@ export default function SellerLinksPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            const code = String(item.link_unico).replace(/^\\/+/, "").replace(/^go\\//i, "");
+                            const code = String(item.link_unico).replace(/^\/+/, "").replace(/^go\//i, "");
                             const affiliateRef = `go/${code}`;
                             const directCheckoutUrl = `${siteUrl}/entrega?ref=${encodeURIComponent(affiliateRef)}`;
                             void copyLink(directCheckoutUrl, `${item.id}-checkout`);
