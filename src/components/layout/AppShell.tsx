@@ -29,7 +29,13 @@ interface NavItem {
   icon: IconName;
 }
 
-function countryFlag(code: string) {\n  const normalized = code.trim().toUpperCase();\n  if (!/^[A-Z]{2}$/.test(normalized)) return "";\n  return String.fromCodePoint(...normalized.split("").map((letter) => 127397 + letter.charCodeAt(0)));\n}\n\nfunction Icon({ name, size = 18 }: { name: IconName; size?: number }) {
+function countryFlag(code: string) {
+  const normalized = code.trim().toUpperCase();
+  if (!/^[A-Z]{2}$/.test(normalized)) return "";
+  return String.fromCodePoint(...normalized.split("").map((letter) => 127397 + letter.charCodeAt(0)));
+}
+
+function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
   const props = {
     width: size,
     height: size,
@@ -171,7 +177,8 @@ export default function AppShell({
   subtitle,
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [profileInitial, setProfileInitial] = useState("U");\n  const [countryCode, setCountryCode] = useState("");
+  const [profileInitial, setProfileInitial] = useState("U");
+  const [countryCode, setCountryCode] = useState("");\n  const [countryCode, setCountryCode] = useState("");
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [pt, setPt] = useState(false);
@@ -229,8 +236,9 @@ export default function AppShell({
       ).trim();
 
       if (active && name) {
-        setProfileInitial(name.charAt(0).toUpperCase());
+        setProfileInitial(name.trim().charAt(0).toUpperCase());
       }
+      if (active) setCountryCode(String(profile?.country_code || profile?.pais || "").trim().toUpperCase());
     }
 
     loadProfileInitial();
@@ -306,8 +314,9 @@ export default function AppShell({
             href="/dashboard/profile"
             className="flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#F7F8FA]"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#003B95]">
-              U
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#003B95]">
+              {profileInitial}
+              {countryFlag(countryCode) && <span title={countryCode} className="absolute -bottom-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-white text-[10px] leading-none">{countryFlag(countryCode)}</span>}
             </div>
 
             <div className="min-w-0">
@@ -409,9 +418,11 @@ export default function AppShell({
 
             <Link
               href="/dashboard/profile"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#001B44]"
+              aria-label="Account profile"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#001B44]"
             >
-              U
+              {profileInitial}
+              {countryFlag(countryCode) && <span title={countryCode} className="absolute -bottom-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-white text-[10px] leading-none">{countryFlag(countryCode)}</span>}
             </Link>
           </div>
         </header>
