@@ -168,6 +168,20 @@ export default function NotificationCenter() {
         setItems((data || []) as NotificationItem[]);
       }
 
+      const refreshNotifications = async () => {
+        const { data: latest, error } = await supabase
+          .from("notifications")
+          .select("id,type,title,message,data,read_at,created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(30);
+        if (!cancelled && !error) setItems((latest || []) as NotificationItem[]);
+      };
+
+      refreshTimer = window.setInterval(() => void refreshNotifications(), 15000);
+      focusHandler = () => void refreshNotifications();
+      window.addEventListener("focus", focusHandler);
+
       channel = supabase
         .channel(`notifications-${user.id}`)
         .on(
@@ -208,6 +222,8 @@ export default function NotificationCenter() {
       if (channel) {
         void supabase.removeChannel(channel);
       }
+      if (refreshTimer !== null) window.clearInterval(refreshTimer);
+      if (focusHandler) window.removeEventListener("focus", focusHandler);
     };
   }, []);
 
