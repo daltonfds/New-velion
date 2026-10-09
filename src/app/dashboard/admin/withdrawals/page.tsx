@@ -121,7 +121,7 @@ export default function AdminWithdrawalsPage() {
           supabase
             .from("profiles")
             .select(
-              "id, nome_completo, full_name, pais, country, country_code, phone_e164, phone_number, telefone, whatsapp_e164, whatsapp_number, kyc_status",
+              "id, nome_completo, full_name, email, pais, country, country_code, phone, telefone, phone_e164, phone_number, whatsapp, whatsapp_e164, whatsapp_number, kyc_status",
             ),
         ]);
 
@@ -698,7 +698,8 @@ export default function AdminWithdrawalsPage() {
                       const sellerName =
                         profile?.nome_completo ||
                         profile?.full_name ||
-                        "Unknown seller";
+                        profile?.email?.split("@")[0] ||
+                        "Seller profile unavailable";
 
                       const fees =
                         Number(
@@ -1002,8 +1003,8 @@ export default function AdminWithdrawalsPage() {
                         ["Email", seller?.email],
                         ["Country", seller?.pais || seller?.country],
                         ["KYC", seller?.kyc_status],
-                        ["Phone", seller?.telefone || seller?.phone || seller?.phone_e164 || seller?.phone_number || profileMap[current?.vendedor_id || ""]?.phone_e164 || profileMap[current?.vendedor_id || ""]?.phone_number],
-                        ["WhatsApp", seller?.whatsapp || seller?.whatsapp_e164 || seller?.whatsapp_number || profileMap[current?.vendedor_id || ""]?.whatsapp_e164 || profileMap[current?.vendedor_id || ""]?.whatsapp_number],
+                        ["Phone", seller?.telefone || seller?.phone || seller?.phone_e164 || seller?.phone_number || profileMap[current?.vendedor_id || ""]?.telefone || profileMap[current?.vendedor_id || ""]?.phone || profileMap[current?.vendedor_id || ""]?.phone_e164 || profileMap[current?.vendedor_id || ""]?.phone_number],
+                        ["WhatsApp", seller?.whatsapp || seller?.whatsapp_e164 || seller?.whatsapp_number || profileMap[current?.vendedor_id || ""]?.whatsapp || profileMap[current?.vendedor_id || ""]?.whatsapp_e164 || profileMap[current?.vendedor_id || ""]?.whatsapp_number],
                       ].map(([label, value]) => (
                         <div key={label}>
                           <p className="text-xs text-slate-500">
