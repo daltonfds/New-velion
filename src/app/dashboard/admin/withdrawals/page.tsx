@@ -310,9 +310,9 @@ export default function AdminWithdrawalsPage() {
             reserved: Number(row?.reserved ?? 0),
             total_balance: Number(row?.total_balance ?? 0),
             total_earned: Number(row?.commission_earned ?? 0),
-            total_withdrawn: 0,
-            previous_withdrawals_count: 0,
-            last_withdrawal_at: null,
+            total_withdrawn: Number(data?.wallet?.paid_out ?? 0),
+            previous_withdrawals_count: Number(data?.wallet?.previous_withdrawals_count ?? 0),
+            last_withdrawal_at: data?.wallet?.last_withdrawal_at ?? null,
           },
         });
       }
