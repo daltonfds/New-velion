@@ -22,6 +22,7 @@ export default function RegisterPage() {
     confirm: "",
   });
 
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState("");
@@ -42,6 +43,11 @@ export default function RegisterPage() {
 
     if (form.password.length < 6) {
       setError("Password must contain at least 6 characters.");
+      return;
+    }
+
+    if (!acceptedTerms) {
+      setError("Please accept the Terms of Service and Privacy Policy to create an account.");
       return;
     }
 
@@ -78,6 +84,9 @@ export default function RegisterPage() {
           whatsapp_e164: whatsappE164,
           preferred_language: form.language,
           role: "seller",
+          accepted_terms_at: new Date().toISOString(),
+          accepted_terms_version: "2026-10-09",
+          accepted_privacy_policy: true,
         },
       },
     });
@@ -202,6 +211,22 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
+
+            <label className="flex items-start gap-3 text-sm leading-6 text-slate-600">
+              <input
+                type="checkbox"
+                required
+                checked={acceptedTerms}
+                onChange={(event) => setAcceptedTerms(event.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 accent-[#006CE5]"
+              />
+              <span>
+                I have read and agree to the{" "}
+                <Link href="/terms" target="_blank" className="font-semibold text-[#003B95] underline underline-offset-2">Terms of Service</Link>
+                {" "}and acknowledge the{" "}
+                <Link href="/privacy" target="_blank" className="font-semibold text-[#003B95] underline underline-offset-2">Privacy Policy</Link>.
+              </span>
+            </label>
 
             {error && (
               <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-600">
