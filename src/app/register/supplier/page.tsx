@@ -11,9 +11,10 @@ import { supabase } from "@/lib/supabase";
 export default function SupplierRegisterPage() {
   const router = useRouter();
   const [form,setForm]=useState({fullName:"",companyName:"",country:"",callingCode:"",phone:"",whatsapp:"",email:"",password:"",confirm:""});
-  const [loading,setLoading]=useState(false); const [error,setError]=useState("");
+  const [acceptedTerms,setAcceptedTerms]=useState(false); const [loading,setLoading]=useState(false); const [error,setError]=useState("");
 
   async function submit(event:FormEvent){event.preventDefault();setError("");
+    if(!acceptedTerms)return setError("Please accept the Terms of Service and Privacy Policy to create an account.");
     if(form.password!==form.confirm)return setError("Passwords do not match.");
     if(form.password.length<6)return setError("Password must contain at least 6 characters.");
     if(!form.country||!form.phone)return setError("Country and phone are required.");
@@ -23,7 +24,7 @@ export default function SupplierRegisterPage() {
       full_name:form.fullName.trim(),country_code:form.country,country_name:country?.name||"",country_calling_code:form.callingCode,
       phone_number:form.phone,phone_e164:composeE164(form.callingCode,form.phone),whatsapp_number:form.whatsapp,
       whatsapp_e164:form.whatsapp?composeE164(form.callingCode,form.whatsapp):"",preferred_language:"en",role:"supplier",
-      supplier_company_name:form.companyName.trim()
+      supplier_company_name:form.companyName.trim(),accepted_terms_at:new Date().toISOString(),accepted_terms_version:"2026-10-09",accepted_privacy_policy:true
     }}});
     setLoading(false);
     if(signupError){setError(signupError.message);return;}
@@ -41,6 +42,7 @@ export default function SupplierRegisterPage() {
       <PhoneFields countryCode={form.country} phone={form.phone} whatsapp={form.whatsapp} language="en" onCountryChange={(country,callingCode)=>setForm({...form,country,callingCode})} onPhoneChange={phone=>setForm({...form,phone})} onWhatsappChange={whatsapp=>setForm({...form,whatsapp})} onLanguageChange={()=>{}} allowedCountries={["ZA","CN"]}/>
       <label className="block text-sm font-semibold text-[#16294F]">Email<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label>
       <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold text-[#16294F]">Password<input required minLength={6} type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label><label className="text-sm font-semibold text-[#16294F]">Confirm password<input required minLength={6} type="password" value={form.confirm} onChange={e=>setForm({...form,confirm:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label></div>
+      <label className="flex items-start gap-3 text-sm leading-6 text-slate-600"><input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[#006CE5]"/><span>I agree to the <Link href="/terms" target="_blank" className="font-semibold text-[#003B95] underline">Terms of Service</Link> and acknowledge the <Link href="/privacy" target="_blank" className="font-semibold text-[#003B95] underline">Privacy Policy</Link>.</span></label>
       {error&&<div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
       <button disabled={loading} className="w-full rounded-xl bg-blue-600 py-3.5 font-bold text-white disabled:opacity-60">{loading?"Creating account...":"Create supplier account"}</button>
     </form>
