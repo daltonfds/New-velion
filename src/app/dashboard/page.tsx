@@ -24,6 +24,11 @@ export default function DashboardPage() {
         .eq("id", user.id)
         .maybeSingle();
 
+      if (profile?.role === "platform_affiliate") {
+        router.replace("/dashboard/affiliate");
+        return;
+      }
+
       if (profile?.role === "supplier") {
         router.replace("/dashboard/supplier");
         return;
