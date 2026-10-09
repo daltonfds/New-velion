@@ -74,6 +74,13 @@ export default function SupplierDashboardPage() {
           ))}
         </div>
 
+        <Card className="border border-blue-100 bg-white p-5 shadow-none">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div><p className="text-sm font-semibold text-[#003B95]">Newvelion Partner Program</p><h2 className="mt-1 text-lg font-bold text-[#001B44]">Earn R50 when a referred business makes its first sale</h2><p className="mt-1 max-w-2xl text-sm text-slate-600">Create a separate platform affiliate account to share referral links and unlock mystery prizes at 5, 10 and 25 active referrals. Registration alone does not count as active.</p></div>
+            <Link href="/register/affiliate" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[#003B95] px-4 py-3 text-sm font-semibold text-white hover:bg-[#002B70]">Become an affiliate</Link>
+          </div>
+        </Card>
+
         <Card className="border-blue-100 bg-blue-50/40 p-5">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
