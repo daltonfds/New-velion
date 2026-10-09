@@ -2,7 +2,7 @@ import { adminClient } from "@/lib/integrations/server";
 
 export async function GET(request: Request) {
   const authorization = request.headers.get("authorization") || "";
-  const token = authorization.replace(/^Bearer\\s+/i, "").trim();
+  const token = authorization.replace(/^Bearer\s+/i, "").trim();
 
   if (!token) {
     return Response.json({ error: "Authentication required." }, { status: 401 });
