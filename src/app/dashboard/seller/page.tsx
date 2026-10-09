@@ -451,8 +451,7 @@ export default function SellerDashboardPage() {
                     No paid sales yet
                   </p>
                   <p className="mx-auto mt-1 max-w-md text-sm text-[#7C8798]">
-                    Once your affiliate links generate confirmed sales, your
-                    performance will appear here automatically.
+                    Transactions from affiliate links and connected sales channels appear here when recorded. Pending and completed sales are shown with their current status.
                   </p>
                 </div>
               ) : (
@@ -481,8 +480,8 @@ export default function SellerDashboardPage() {
                             {money(Number(sale.comissao_vendedor || 0))}
                           </td>
                           <td className="px-6 py-4">
-                            <span className="inline-flex rounded-full bg-[#EAF7F0] px-2.5 py-1 text-xs font-medium text-[#18794E]">
-                              Paid
+                            <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${["paga", "paid", "approved", "completed", "success"].includes((sale.status || "").toLowerCase()) ? "bg-[#EAF7F0] text-[#18794E]" : (sale.status || "").toLowerCase() === "reembolsada" ? "bg-amber-50 text-amber-700" : (sale.status || "").toLowerCase() === "cancelada" ? "bg-red-50 text-red-700" : "bg-[#EAF3FF] text-[#003B95]"}`}>
+                              {["paga", "paid", "approved", "completed", "success"].includes((sale.status || "").toLowerCase()) ? "Paid" : (sale.status || "Pending").replaceAll("_", " ")}
                             </span>
                           </td>
                         </tr>
