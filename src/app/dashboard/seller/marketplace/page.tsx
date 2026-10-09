@@ -40,6 +40,7 @@ export default function MarketplacePage() {
 
   const [affiliating, setAffiliating] = useState<string | null>(null);
   const [pricingProduct, setPricingProduct] = useState<Product | null>(null);
+  const [sellingPath, setSellingPath] = useState<"fixed" | "suggested" | "custom" | null>(null);
   const [salePrice, setSalePrice] = useState("");
   const [affiliateLinks, setAffiliateLinks] = useState<Record<string, string>>(
     {}
@@ -217,6 +218,7 @@ const filteredProducts = useMemo(() => {
     } finally {
       setAffiliating(null);
       setPricingProduct(null);
+      setSellingPath(null);
       setSalePrice("");
     }
   }
@@ -915,6 +917,7 @@ const filteredProducts = useMemo(() => {
                         disabled={isAffiliating}
                         onClick={() => {
                           setPricingProduct(product);
+                          setSellingPath(null);
                           setSalePrice(product.pricing_mode === "custom"
                             ? String(product.supplier_suggested_price ?? product.custom_pricing_floor_zar ?? product.supplier_min_selling_price ?? "")
                             : String(price));
@@ -967,55 +970,104 @@ const filteredProducts = useMemo(() => {
       </div>
 
       {pricingProduct && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/40 p-4 sm:items-center">
-          <div className="w-full max-w-md rounded-[12px] bg-white p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/50 p-4 sm:items-center">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">
-                  {pricingProduct.pricing_mode === "custom" ? "Set Your Selling Price" : "Fixed Offer"}
-                </p>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#0078E8]">Sell this product</p>
                 <h2 className="mt-1 text-xl font-semibold text-slate-900">{pricingProduct.nome}</h2>
+                <p className="mt-2 text-sm text-slate-500">Choose the selling path that works for you.</p>
               </div>
-              <button type="button" onClick={() => { setPricingProduct(null); setSalePrice(""); }} className="text-slate-400 hover:text-slate-700" aria-label="Close">×</button>
+              <button type="button" onClick={() => { setPricingProduct(null); setSellingPath(null); setSalePrice(""); }} className="text-slate-400 hover:text-slate-700" aria-label="Close">×</button>
             </div>
 
-            {pricingProduct.pricing_mode === "fixed" ? (
+            {sellingPath === null ? (
               <div className="mt-6 space-y-3">
-                <div className="rounded-[10px] border border-[#DDE5EF] bg-[#F6F9FC] p-4">
-                  <p className="text-xs text-slate-500">Selling price</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-900">{money(Number(salePrice))}</p>
-                </div>
-                <div className="rounded-[10px] border border-indigo-100 bg-indigo-50 p-4">
-                  <p className="text-xs text-indigo-600">Your commission</p>
-                  <p className="mt-1 text-xl font-semibold text-indigo-700">{money(commissionForProduct(pricingProduct))}</p>
-                </div>
-                <p className="text-sm text-slate-500">Newvelion controls the selling price for this offer.</p>
+                <button
+                  type="button"
+                  onClick={() => { setSellingPath(pricingProduct.pricing_mode === "fixed" ? "fixed" : "suggested"); setSalePrice(pricingProduct.pricing_mode === "custom" ? String(pricingProduct.supplier_suggested_price ?? pricingProduct.custom_pricing_floor_zar ?? pricingProduct.supplier_min_selling_price ?? "") : String(pricingProduct.preco_promocional ?? pricingProduct.preco)); }}
+                  className="w-full rounded-xl border border-[#DDE5EF] p-4 text-left transition hover:border-[#0078E8] hover:bg-[#EAF3FF]"
+                >
+                  <span className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF3FF] text-[#003B95]">↗</span>
+                    <span>
+                      <span className="block font-semibold text-slate-900">{pricingProduct.pricing_mode === "custom" ? "Start with the suggested price" : "Promote the supplier's offer"}</span>
+                      <span className="mt-1 block text-sm leading-5 text-slate-500">{pricingProduct.pricing_mode === "custom" ? "Use the suggested price and review your estimated margin before creating your link." : "Use the supplier-approved selling price and earn the configured commission."}</span>
+                      <span className="mt-2 block text-sm font-semibold text-[#003B95]">{money(pricingProduct.pricing_mode === "custom" ? Number(pricingProduct.supplier_suggested_price ?? pricingProduct.custom_pricing_floor_zar ?? pricingProduct.supplier_min_selling_price ?? 0) : Number(pricingProduct.preco_promocional ?? pricingProduct.preco))}</span>
+                    </span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={pricingProduct.pricing_mode !== "custom"}
+                  onClick={() => { setSellingPath("custom"); setSalePrice(String(pricingProduct.supplier_suggested_price ?? pricingProduct.custom_pricing_floor_zar ?? pricingProduct.supplier_min_selling_price ?? "")); }}
+                  className="w-full rounded-xl border border-[#DDE5EF] p-4 text-left transition enabled:hover:border-[#0078E8] enabled:hover:bg-[#EAF3FF] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60"
+                >
+                  <span className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF3FF] text-[#003B95]">R</span>
+                    <span>
+                      <span className="block font-semibold text-slate-900">Set your own selling price</span>
+                      <span className="mt-1 block text-sm leading-5 text-slate-500">{pricingProduct.pricing_mode === "custom" ? "Choose your price above the minimum and see your estimated margin before generating a link." : "This product is configured by its supplier as a fixed-price offer, so custom pricing is not available."}</span>
+                      {pricingProduct.pricing_mode === "custom" && <span className="mt-2 block text-sm font-semibold text-[#003B95]">Custom pricing available</span>}
+                    </span>
+                  </span>
+                </button>
+                <p className="text-xs leading-5 text-slate-500">Price limits and commissions are validated by Newvelion's pricing system when your link is created.</p>
               </div>
             ) : (
-              <div className="mt-6 space-y-4">
-                <div className="rounded-[10px] border border-[#DDE5EF] bg-[#F6F9FC] p-4">
-                  <p className="text-xs font-medium text-slate-500">Minimum selling price — cannot go below this</p>
-                  <p className="mt-1 text-xl font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p>
+              <>
+                <div className="mt-6 flex items-center justify-between">
+                  <button type="button" onClick={() => setSellingPath(null)} className="text-sm font-medium text-[#0078E8] hover:underline">← Change selling path</button>
+                  <span className="rounded-full bg-[#EAF3FF] px-3 py-1 text-xs font-semibold text-[#003B95]">{sellingPath === "fixed" ? "Fixed offer" : sellingPath === "suggested" ? "Suggested price" : "Custom price"}</span>
                 </div>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-slate-700">Your selling price (ZAR)</span>
-                  <input type="number" min={customBaseForProduct(pricingProduct)} step="0.01" value={salePrice} onChange={(event) => setSalePrice(event.target.value)} className="w-full rounded-[10px] border border-[#DDE5EF] px-4 py-3 text-lg font-semibold text-slate-900 outline-none focus:border-indigo-500" />
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-[10px] bg-[#F6F9FC] p-4"><p className="text-xs text-slate-500">Supplier minimum</p><p className="mt-1 font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p></div>
-                  <div className="rounded-[10px] bg-indigo-50 p-4"><p className="text-xs text-indigo-600">Your estimated margin / commission</p><p className="mt-1 font-semibold text-indigo-700">{money(commissionForProduct(pricingProduct, Number(salePrice || 0)))}</p></div>
-                </div>
-              </div>
-            )}
 
-            <button
-              type="button"
-              disabled={affiliating === pricingProduct.id || (pricingProduct.pricing_mode === "custom" && (!Number.isFinite(Number(salePrice)) || Number(salePrice) < customBaseForProduct(pricingProduct)))}
-              onClick={() => void handleAffiliate(pricingProduct.id)}
-              className="mt-6 w-full rounded-[10px] bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {affiliating === pricingProduct.id ? "Creating affiliate link..." : "Generate Link"}
-            </button>
+                {pricingProduct.pricing_mode === "fixed" ? (
+                  <div className="mt-4 space-y-3">
+                    <div className="rounded-xl border border-[#DDE5EF] bg-[#F6F9FC] p-4">
+                      <p className="text-xs text-slate-500">Supplier-approved selling price</p>
+                      <p className="mt-1 text-2xl font-semibold text-slate-900">{money(Number(salePrice))}</p>
+                    </div>
+                    <div className="rounded-xl bg-[#EAF3FF] p-4">
+                      <p className="text-xs text-[#003B95]">Estimated commission</p>
+                      <p className="mt-1 text-xl font-semibold text-[#003B95]">{money(commissionForProduct(pricingProduct))}</p>
+                    </div>
+                    <p className="text-sm text-slate-500">The supplier controls the price for this offer.</p>
+                  </div>
+                ) : (
+                  <div className="mt-4 space-y-4">
+                    <div className="rounded-xl border border-[#DDE5EF] bg-[#F6F9FC] p-4">
+                      <p className="text-xs font-medium text-slate-500">Minimum selling price — cannot go below this</p>
+                      <p className="mt-1 text-xl font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p>
+                    </div>
+                    {sellingPath === "custom" ? (
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-slate-700">Your selling price (ZAR)</span>
+                        <input type="number" min={customBaseForProduct(pricingProduct)} step="0.01" value={salePrice} onChange={(event) => setSalePrice(event.target.value)} className="w-full rounded-xl border border-[#DDE5EF] px-4 py-3 text-lg font-semibold text-slate-900 outline-none focus:border-[#0078E8]" />
+                      </label>
+                    ) : (
+                      <div className="rounded-xl border border-[#DDE5EF] p-4">
+                        <p className="text-xs text-slate-500">Suggested selling price</p>
+                        <p className="mt-1 text-xl font-semibold text-slate-900">{money(Number(salePrice || 0))}</p>
+                      </div>
+                    )}
+                    <div className="rounded-xl bg-[#EAF3FF] p-4">
+                      <p className="text-xs text-[#003B95]">Estimated margin</p>
+                      <p className="mt-1 text-xl font-semibold text-[#003B95]">{money(Math.max(Number(salePrice || 0) - customBaseForProduct(pricingProduct), 0))}</p>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  disabled={affiliating === pricingProduct.id || (pricingProduct.pricing_mode === "custom" && (!Number.isFinite(Number(salePrice)) || Number(salePrice) < customBaseForProduct(pricingProduct)))}
+                  onClick={() => void handleAffiliate(pricingProduct.id)}
+                  className="mt-6 w-full rounded-xl bg-[#003B95] px-4 py-3 font-semibold text-white transition hover:bg-[#0078E8] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {affiliating === pricingProduct.id ? "Creating affiliate link..." : "Confirm and generate link"}
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
