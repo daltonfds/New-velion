@@ -407,6 +407,20 @@ export default function AdminCheckoutSessionsPage() {
           ))}
         </div>
 
+        <div className="grid gap-3 rounded-[10px] border border-[#E5E7EB] bg-white p-4 sm:grid-cols-3">
+          <label className="text-xs font-semibold text-slate-600">Filter by status
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="mt-1.5 h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal">
+              <option value="all">All statuses</option><option value="pending">Pending</option><option value="paid_pending_review">Paid / Review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option>
+            </select>
+          </label>
+          <label className="text-xs font-semibold text-slate-600">Created from
+            <input type="date" value={createdFrom} onChange={(event) => setCreatedFrom(event.target.value)} className="mt-1.5 h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal" />
+          </label>
+          <label className="text-xs font-semibold text-slate-600">Created to
+            <input type="date" value={createdTo} min={createdFrom || undefined} onChange={(event) => setCreatedTo(event.target.value)} className="mt-1.5 h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal" />
+          </label>
+        </div>
+
         {error && (
           <div className="rounded-[10px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
@@ -427,6 +441,8 @@ export default function AdminCheckoutSessionsPage() {
                 Customer submissions will appear here automatically.
               </p>
             </div>
+          ) : filteredSessions.length === 0 ? (
+            <div className="p-10 text-center text-sm text-slate-500">No checkout sessions match these filters.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] text-left text-sm">
@@ -455,7 +471,7 @@ export default function AdminCheckoutSessionsPage() {
                 </thead>
 
                 <tbody className="divide-y divide-slate-100">
-                  {sessions.map((session) => (
+                  {filteredSessions.map((session) => (
                     <tr
                       key={session.id}
                       className="hover:bg-[#F7F8FA]"
