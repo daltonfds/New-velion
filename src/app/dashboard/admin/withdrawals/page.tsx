@@ -33,6 +33,11 @@ interface Profile {
   telefone: string | null;
   phone: string | null;
   whatsapp: string | null;
+  phone_e164?: string | null;
+  phone_number?: string | null;
+  whatsapp_e164?: string | null;
+  whatsapp_number?: string | null;
+  country_code?: string | null;
   kyc_status: string | null;
 }
 
@@ -116,7 +121,7 @@ export default function AdminWithdrawalsPage() {
           supabase
             .from("profiles")
             .select(
-              "id, nome_completo, full_name, pais, country, kyc_status",
+              "id, nome_completo, full_name, pais, country, country_code, phone_e164, phone_number, telefone, whatsapp_e164, whatsapp_number, kyc_status",
             ),
         ]);
 
@@ -435,6 +440,9 @@ export default function AdminWithdrawalsPage() {
   const sellerName =
     seller?.nome_completo ||
     seller?.full_name ||
+    seller?.name ||
+    profileMap[current?.vendedor_id || ""]?.nome_completo ||
+    profileMap[current?.vendedor_id || ""]?.full_name ||
     "Unknown seller";
 
   const paymentPhone = paymentValue(
