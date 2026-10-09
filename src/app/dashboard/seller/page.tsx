@@ -235,7 +235,7 @@ export default function SellerDashboardPage() {
           {leaderboards && (
             <section className="mb-6 grid gap-5 xl:grid-cols-2">
               {[
-                { title: "Best seller in each country", rows: leaderboards.country, subtitle: leaderboards.country_code ? `Country: ${leaderboards.country_code}` : "Add your country to join this ranking" },
+                { title: "Best seller in each country", rows: leaderboards.country_leaders, subtitle: "Monthly leader by country" },
                 { title: "Newvelion platform ranking", rows: leaderboards.platform, subtitle: leaderboards.month_start ? `Monthly performance · ${new Date(leaderboards.month_start).toLocaleDateString("en-ZA", { month: "long", year: "numeric", timeZone: "UTC" })}` : "Monthly performance" },
               ].map((ranking) => (
                 <Card key={ranking.title} className="border border-blue-100 bg-white p-5 shadow-none">
