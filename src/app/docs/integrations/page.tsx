@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const code = `curl https://newvelion.com/api/integrations/v1/products \
+const code = `curl https://veliongroup.online/api/integrations/v1/products \
   -H "Authorization: Bearer nv_live_xxx.nvs_xxx"`;
 
 export default function IntegrationDocsPage() {
