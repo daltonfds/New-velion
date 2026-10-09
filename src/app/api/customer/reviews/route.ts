@@ -26,8 +26,18 @@ export async function POST(request: Request) {
 
   if (request.headers.get("x-review-media-upload") === "1") {
     const formData = await request.formData();
+    const productId = String(formData.get("product_id") || "");
     const files = formData.getAll("files").filter((item): item is File => item instanceof File);
+    if (!productId) return NextResponse.json({ error: "Product unavailable." }, { status: 400 });
     if (!files.length || files.length > MAX_FILES) return NextResponse.json({ error: "Choose between 1 and 4 photos." }, { status: 400 });
+
+    const { data: sales } = await admin.from("sales").select("id").eq("customer_id", user.id).eq("product_id", productId);
+    const saleIds = (sales || []).map((sale: any) => sale.id);
+    if (!saleIds.length) return NextResponse.json({ error: "You can only review products you purchased." }, { status: 403 });
+    const { data: fulfillment } = await admin.from("fulfillment_orders").select("sale_id").in("sale_id", saleIds).eq("status", "delivered").limit(1);
+    if (!fulfillment?.length) return NextResponse.json({ error: "You can review this product after delivery." }, { status: 403 });
+    const { data: existingReview } = await admin.from("product_reviews").select("id").eq("reviewer_id", user.id).eq("product_id", productId).maybeSingle();
+    if (existingReview) return NextResponse.json({ error: "You have already reviewed this product." }, { status: 409 });
     if (files.some((file) => !ALLOWED_TYPES.has(file.type) || file.size <= 0 || file.size > MAX_FILE_SIZE)) {
       return NextResponse.json({ error: "Photos must be JPG, PNG, WEBP or GIF, up to 5 MB each." }, { status: 400 });
     }
