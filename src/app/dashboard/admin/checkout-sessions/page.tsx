@@ -260,13 +260,6 @@ export default function AdminCheckoutSessionsPage() {
         const saleId = Array.isArray(data) ? data[0]?.sale_id : data?.sale_id;
         if (!saleId) throw new Error("Checkout was processed but no sale was created.");
         notify.success("Checkout approved", "The checkout was approved and the sale was created.");
-      } else if (status === "rejected") {
-        const { error } = await supabase.rpc("admin_reject_checkout_session", {
-          p_session_id: sessionId,
-          p_reason: rejectionReason.trim(),
-        });
-        if (error) throw new Error(error.message || "Failed to reject checkout session.");
-        notify.success("Checkout rejected", "The checkout was rejected and the reason was saved.");
       } else {
         const response = await fetch("/api/admin/checkout-sessions/status", {
           method: "POST",
@@ -274,7 +267,11 @@ export default function AdminCheckoutSessionsPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ session_id: sessionId, status }),
+          body: JSON.stringify({
+            session_id: sessionId,
+            status,
+            ...(status === "rejected" ? { rejection_reason: rejectionReason.trim() } : {}),
+          }),
         });
         const responseText = await response.text();
         let result: { error?: string } = {};
@@ -284,7 +281,10 @@ export default function AdminCheckoutSessionsPage() {
           throw new Error(`Checkout API returned an invalid response (${response.status}).`);
         }
         if (!response.ok) throw new Error(result?.error || "Failed to update checkout session.");
-        notify.success("Checkout updated", "The checkout status was updated successfully.");
+        notify.success(
+          status === "rejected" ? "Checkout rejected" : "Checkout updated",
+          status === "rejected" ? "The checkout was rejected and the reason was saved." : "The checkout status was updated successfully."
+        );
       }
 
       setSelected(null);
