@@ -198,11 +198,11 @@ export function ThemeLanguageProvider({ children }: { children: React.ReactNode 
   const [pt, setPt] = useState(false);
 
   useEffect(() => {
-    const storedLanguage = localStorage.getItem("newvelion-language");
-    const nextPt = storedLanguage ? storedLanguage === "pt" : false;
-    setPt(nextPt);
+    const nextPt = false;
+    localStorage.setItem("newvelion-language", "en");
+    setPt(false);
     document.documentElement.classList.remove("dark");
-    document.documentElement.lang = nextPt ? "pt" : "en";
+    document.documentElement.lang = "en";
 
     const observer = new MutationObserver(() => {
       const current = localStorage.getItem("newvelion-language") === "pt";
