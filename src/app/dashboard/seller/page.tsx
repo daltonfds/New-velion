@@ -55,7 +55,7 @@ export default function SellerDashboardPage() {
   const [salesActivationStatus, setSalesActivationStatus] = useState("inactive");
   const [goalTarget, setGoalTarget] = useState(10000);
   const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
-  const [leaderboards, setLeaderboards] = useState<{ month_start: string; country_code: string | null; platform: LeaderboardEntry[]; country: LeaderboardEntry[] } | null>(null);
+  const [leaderboards, setLeaderboards] = useState<{ month_start: string; country_code: string | null; platform: LeaderboardEntry[]; country: LeaderboardEntry[]; country_leaders: LeaderboardEntry[] } | null>(null);
   const [dailyPerformance, setDailyPerformance] = useState<
     { day: string; commission: number; sales_count: number; gross_sales: number }[]
   >([]);
