@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { supplierFetch } from "@/lib/supplier-client";
+import { supabase } from "@/lib/supabase";
 
 type Product = { id: string; nome: string; estoque: number; reserved_estoque: number; supplier_status: string; created_at: string };
 type Order = { id: string; status: string; total: number; currency: string; created_at: string };
@@ -15,6 +16,7 @@ export default function SupplierDashboardPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [finance, setFinance] = useState<Finance>({ available: 0, retained: 0, total: 0 });
   const [supplierStatus, setSupplierStatus] = useState("pending");
+  const [salesActivationStatus, setSalesActivationStatus] = useState("inactive");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -29,6 +31,11 @@ export default function SupplierDashboardPage() {
       setFinance(financeResult.data);
       const profileResult = await supplierFetch<{ data: { approval_status?: string } }>("/api/supplier/profile");
       setSupplierStatus(profileResult.data?.approval_status ?? "pending");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase.from("profiles").select("sales_activation_status").eq("id", user.id).maybeSingle();
+        setSalesActivationStatus(profile?.sales_activation_status || "inactive");
+      }
     }).catch((err) => setError(err instanceof Error ? err.message : "Could not load dashboard."))
       .finally(() => setLoading(false));
   }, []);
@@ -43,6 +50,11 @@ export default function SupplierDashboardPage() {
     <AppShell area="supplier">
       <div className="space-y-7">
         {supplierStatus !== "approved" && <div className="rounded-[10px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"><b>Supplier status:</b> {supplierStatus}. Your products cannot enter the marketplace until your supplier account is approved.</div>}
+        <Card className={"border p-4 shadow-none " + (salesActivationStatus === "active" ? "border-emerald-200 bg-emerald-50" : "border-blue-100 bg-[#EAF3FF]")}>
+          <p className="text-sm font-semibold text-[#001B44]">{salesActivationStatus === "active" ? "Account active — congratulations!" : "Your account is waiting for its first sale"}</p>
+          <p className="mt-1 text-sm text-slate-600">{salesActivationStatus === "active" ? "Your product has recorded a confirmed sale, activating your sales status." : "Registration creates your account, but sales activation happens only after one of your products records its first confirmed paid sale."}</p>
+          <span className={"mt-2 inline-flex rounded-full px-3 py-1 text-xs font-bold " + (salesActivationStatus === "active" ? "bg-emerald-100 text-emerald-800" : "bg-white text-[#003B95]")}>{salesActivationStatus === "active" ? "ACTIVE" : "INACTIVE"}</span>
+        </Card>
 
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
