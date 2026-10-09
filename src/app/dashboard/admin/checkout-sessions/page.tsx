@@ -826,7 +826,10 @@ export default function AdminCheckoutSessionsPage() {
 
               <button
                 type="button"
-                onClick={() => updateStatus(selected.id, "rejected")}
+                onClick={() => {
+                  const reason = window.prompt("Why are you rejecting this checkout/payment?");
+                  if (reason?.trim()) void updateStatus(selected.id, "rejected", reason.trim());
+                }}
                 className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50"
               >
                 Reject
