@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 import AppShell from "@/components/layout/AppShell";
 
 const Icon = ({ children }: { children: React.ReactNode }) => (
@@ -20,9 +22,21 @@ const Icon = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function ProfilePage() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function loadRole() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+      setIsAdmin(String(data?.role || "").toLowerCase() === "admin");
+    }
+    void loadRole();
+  }, []);
+
   return (
     <AppShell
-      area="seller"
+      area={isAdmin ? "admin" : "seller"}
       title="Profile & Settings"
       subtitle="Manage your account, profile and payout preferences."
     >
@@ -59,7 +73,7 @@ export default function ProfilePage() {
           </Link>
 
           <Link
-            href="/dashboard/seller/settings"
+            href={isAdmin ? "/dashboard/admin/platform-settings" : "/dashboard/seller/settings"}
             className="group rounded-xl border border-slate-200 bg-white p-6 transition-colors hover:border-slate-300 hover:bg-slate-50"
           >
             <div className="flex items-start justify-between">
@@ -79,10 +93,10 @@ export default function ProfilePage() {
               <span className="text-slate-400 group-hover:text-blue-600">→</span>
             </div>
             <h3 className="mt-5 text-base font-semibold text-slate-900">
-              Settings
+              {isAdmin ? "Administrator settings" : "Settings"}
             </h3>
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              Manage account preferences, payout methods and security settings.
+              {isAdmin ? "Manage platform configuration and administrator preferences." : "Manage account preferences, payout methods and security settings."}
             </p>
           </Link>
         </div>
@@ -112,15 +126,15 @@ export default function ProfilePage() {
             </Link>
 
             <Link
-              href="/dashboard/seller/settings"
+              href={isAdmin ? "/dashboard/admin/platform-settings" : "/dashboard/seller/settings"}
               className="flex items-center justify-between px-6 py-5 hover:bg-slate-50"
             >
               <div>
                 <p className="text-sm font-medium text-slate-900">
-                  Payout settings
+                  {isAdmin ? "Business settings" : "Payout settings"}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Configure your available withdrawal methods
+                  {isAdmin ? "Configure platform fees and marketplace rules" : "Configure your available withdrawal methods"}
                 </p>
               </div>
               <span className="text-slate-400">→</span>
@@ -132,10 +146,10 @@ export default function ProfilePage() {
             >
               <div>
                 <p className="text-sm font-medium text-slate-900">
-                  Account preferences
+                  {isAdmin ? "User management" : "Account preferences"}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Notifications and other account preferences
+                  {isAdmin ? "Review user accounts, roles and verification status" : "Notifications and other account preferences"}
                 </p>
               </div>
               <span className="text-slate-400">→</span>
