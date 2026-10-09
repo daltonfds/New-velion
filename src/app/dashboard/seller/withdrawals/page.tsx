@@ -92,6 +92,8 @@ export default function SellerWithdrawalsPage() {
   const [payoutCurrency, setPayoutCurrency] = useState("MZN");
   const [exchangeRate, setExchangeRate] = useState(1);
   const [rateLoading, setRateLoading] = useState(false);
+  const [rateUpdatedAt, setRateUpdatedAt] = useState<string | null>(null);
+  const [rateError, setRateError] = useState("");
   const [configured, setConfigured] = useState<Record<Method, Details | null>>({
     bank_transfer: null,
     mpesa: null,
@@ -156,16 +158,21 @@ export default function SellerWithdrawalsPage() {
         if (localCurrency !== "ZAR") {
           setRateLoading(true);
           try {
-            const fx = await fetch(`/api/currency/rate?base=ZAR&quote=${encodeURIComponent(localCurrency)}`).then((r) => r.json());
-            if (!Number.isFinite(Number(fx?.rate)) || Number(fx.rate) <= 0) throw new Error("Exchange rate unavailable.");
+            const response = await fetch(`/api/currency/rate?base=ZAR&quote=${encodeURIComponent(localCurrency)}`, { cache: "no-store" });
+            const fx = await response.json();
+            if (!response.ok || !Number.isFinite(Number(fx?.rate)) || Number(fx.rate) <= 0) throw new Error(fx?.error || "Exchange rate unavailable.");
             setExchangeRate(Number(fx.rate));
+            setRateUpdatedAt(typeof fx?.fetched_at === "string" ? fx.fetched_at : null);
+            setRateError("");
           } catch (e) {
-            setError(e instanceof Error ? e.message : "Exchange rate unavailable.");
+            setRateError(e instanceof Error ? e.message : "Exchange rate unavailable.");
           } finally {
             setRateLoading(false);
           }
         } else {
           setExchangeRate(1);
+          setRateUpdatedAt(new Date().toISOString());
+          setRateError("");
         }
 
         const { data: payoutConfig } = await supabase
@@ -504,7 +511,11 @@ export default function SellerWithdrawalsPage() {
                       <p className="mt-2 text-xs text-slate-500">
                         Minimum withdrawal: {formatCurrency(minimumWithdrawal, "ZAR")}
                       </p>
-                      {walletCurrency !== "ZAR" && <p className="mt-1 text-xs text-slate-400">Reference rate: 1 ZAR = {exchangeRate.toFixed(4)} {walletCurrency}</p>}
+                      {payoutCurrency !== "ZAR" && (
+                        <p className="mt-1 text-xs text-slate-500">
+                          Local currency: {payoutCurrency}. Equivalent values below are estimates.
+                        </p>
+                      )}
                     </div>
 
                     <div className="rounded-md border border-[#E5E7EB]">
@@ -531,8 +542,8 @@ export default function SellerWithdrawalsPage() {
                       </div>
                     </div>
 
-                    {walletCurrency !== "ZAR" && (
-                      <div className="rounded-md border border-[#E5E7EB] bg-white">
+                    {payoutCurrency !== "ZAR" && (
+                      <div className="rounded-md border border-[#D6E6FA] bg-white">
                         <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
                           <span className="text-sm font-semibold text-slate-800">
                             Currency conversion
@@ -540,8 +551,8 @@ export default function SellerWithdrawalsPage() {
 
                           <span className="text-xs font-medium text-slate-500">
                             {rateLoading
-                              ? "Updating..."
-                              : exchangeRate
+                              ? "Updating rate..."
+                              : exchangeRate > 0
                                 ? `1 ZAR = ${exchangeRate.toFixed(4)} ${payoutCurrency}`
                                 : "Rate unavailable"}
                           </span>
@@ -570,6 +581,16 @@ export default function SellerWithdrawalsPage() {
                         <div className="border-t border-slate-100 px-4 py-3 text-xs text-slate-500">
                           The exchange rate is captured when you submit the
                           withdrawal.
+                        </div>
+                        <div className="border-t border-slate-100 px-4 py-3 text-xs text-slate-500">
+                          {rateError ? (
+                            <span className="text-amber-700">Conversion unavailable: {rateError} The withdrawal form remains available, but no local estimate can be shown.</span>
+                          ) : (
+                            <span>
+                              {rateUpdatedAt ? `Rate updated ${new Date(rateUpdatedAt).toLocaleString()}. ` : ""}
+                              Indicative estimate only; your payout provider may apply a different rate.
+                            </span>
+                          )}
                         </div>
                       </div>
                     )}
