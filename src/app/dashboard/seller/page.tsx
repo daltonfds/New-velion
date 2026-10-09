@@ -42,6 +42,7 @@ export default function SellerDashboardPage() {
     saldo_total: 0,
   });
   const [userName, setUserName] = useState("Seller");
+  const [goalTarget, setGoalTarget] = useState(10000);
   const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
   const [dailyPerformance, setDailyPerformance] = useState<
     { day: string; commission: number; sales_count: number; gross_sales: number }[]
@@ -77,7 +78,7 @@ export default function SellerDashboardPage() {
             "id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id",
           )
           .eq("vendedor_id", user.id)
-          .order("created_at", { ascending: false }),
+          .order("vendido_em", { ascending: false }),
 
         supabase.rpc("get_seller_daily_performance", {
           p_vendedor_id: user.id,
@@ -134,6 +135,8 @@ export default function SellerDashboardPage() {
   const totalSales = financialSummary?.gross_sales ?? 0;
   const totalCommission = financialSummary?.commission_earned ?? 0;
   const totalBalance = financialSummary?.total_balance ?? 0;
+  const commissionLast30Days = dailyPerformance.reduce((sum, item) => sum + item.commission, 0);
+  const goalProgress = goalTarget > 0 ? Math.min(100, (commissionLast30Days / goalTarget) * 100) : 0;
 
 
   const chartPoints = useMemo(() => {
@@ -228,6 +231,41 @@ export default function SellerDashboardPage() {
                 <p className="mt-1 text-xs text-[#7C8798]">{item.note}</p>
               </Card>
             ))}
+          </section>
+
+          <section className="mt-6">
+            <Card className="border-[#DCE3EE] bg-white p-6 shadow-none">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-[#003B95]">30-day goal</p>
+                  <h2 className="mt-1 text-lg font-semibold text-[#001B44]">Commission progress</h2>
+                  <p className="mt-1 text-sm text-[#60708A]">Track confirmed commission earned over the last 30 days.</p>
+                </div>
+                <label className="text-xs font-semibold text-[#60708A]">
+                  Target (R)
+                  <input
+                    type="number"
+                    min="1"
+                    step="100"
+                    value={goalTarget}
+                    onChange={(event) => {
+                      const next = Math.max(1, Number(event.target.value) || 1);
+                      setGoalTarget(next);
+                      window.localStorage.setItem("newvelion-30day-commission-goal", String(next));
+                    }}
+                    className="mt-1 block w-36 rounded-lg border border-[#DCE3EE] px-3 py-2 text-sm font-semibold text-[#001B44] outline-none focus:border-[#0078E8]"
+                    aria-label="30-day commission goal in rand"
+                  />
+                </label>
+              </div>
+              <div className="mt-5 flex items-center justify-between gap-3 text-sm">
+                <span className="font-semibold text-[#001B44]">{money(commissionLast30Days)} earned</span>
+                <span className="text-[#60708A]">{Math.round(goalProgress)}% of {money(goalTarget)}</span>
+              </div>
+              <div className="mt-2 h-3 overflow-hidden rounded-full bg-[#EAF3FF]" role="progressbar" aria-label="30-day commission goal progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(goalProgress)}>
+                <div className="h-full rounded-full bg-[#0078E8] transition-[width]" style={{ width: `${goalProgress}%` }} />
+              </div>
+            </Card>
           </section>
 
           <section className="mt-6 grid gap-6 xl:grid-cols-[1.7fr_1fr]">
