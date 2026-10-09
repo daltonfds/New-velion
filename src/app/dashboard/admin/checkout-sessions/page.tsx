@@ -366,6 +366,14 @@ export default function AdminCheckoutSessionsPage() {
     (session) => session.status === "approved"
   ).length;
 
+  const filteredSessions = sessions.filter((session) => {
+    if (statusFilter !== "all" && session.status !== statusFilter) return false;
+    const createdAt = new Date(session.created_at).getTime();
+    if (createdFrom && createdAt < new Date(`${createdFrom}T00:00:00`).getTime()) return false;
+    if (createdTo && createdAt > new Date(`${createdTo}T23:59:59.999`).getTime()) return false;
+    return true;
+  });
+
   return (
     <AppShell area="admin">
       <div className="space-y-6">
