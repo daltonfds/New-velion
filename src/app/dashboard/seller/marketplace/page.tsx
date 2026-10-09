@@ -923,7 +923,7 @@ const filteredProducts = useMemo(() => {
                       >
                         {isAffiliating
                           ? "Creating affiliate link..."
-                          : "Sell This Product"}
+                          : product.pricing_mode === "custom" ? "Set Your Price & Sell" : "Sell This Product"}
                       </button>
                     ) : (
                       <div className="mt-4 space-y-3">
@@ -972,7 +972,7 @@ const filteredProducts = useMemo(() => {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">
-                  {pricingProduct.pricing_mode === "custom" ? "Custom Pricing" : "Fixed Offer"}
+                  {pricingProduct.pricing_mode === "custom" ? "Set Your Selling Price" : "Fixed Offer"}
                 </p>
                 <h2 className="mt-1 text-xl font-semibold text-slate-900">{pricingProduct.nome}</h2>
               </div>
@@ -994,16 +994,16 @@ const filteredProducts = useMemo(() => {
             ) : (
               <div className="mt-6 space-y-4">
                 <div className="rounded-[10px] border border-[#DDE5EF] bg-[#F6F9FC] p-4">
-                  <p className="text-xs text-slate-500">Newvelion / Supplier base</p>
+                  <p className="text-xs font-medium text-slate-500">Minimum selling price — cannot go below this</p>
                   <p className="mt-1 text-xl font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p>
                 </div>
                 <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-slate-700">Your selling price</span>
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">Your selling price (ZAR)</span>
                   <input type="number" min={customBaseForProduct(pricingProduct)} step="0.01" value={salePrice} onChange={(event) => setSalePrice(event.target.value)} className="w-full rounded-[10px] border border-[#DDE5EF] px-4 py-3 text-lg font-semibold text-slate-900 outline-none focus:border-indigo-500" />
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-[10px] bg-[#F6F9FC] p-4"><p className="text-xs text-slate-500">Supplier minimum</p><p className="mt-1 font-semibold text-slate-900">{money(customBaseForProduct(pricingProduct))}</p></div>
-                  <div className="rounded-[10px] bg-indigo-50 p-4"><p className="text-xs text-indigo-600">Commission</p><p className="mt-1 font-semibold text-indigo-700">{money(commissionForProduct(pricingProduct, Number(salePrice || 0)))}</p></div>
+                  <div className="rounded-[10px] bg-indigo-50 p-4"><p className="text-xs text-indigo-600">Your estimated margin / commission</p><p className="mt-1 font-semibold text-indigo-700">{money(commissionForProduct(pricingProduct, Number(salePrice || 0)))}</p></div>
                 </div>
               </div>
             )}
