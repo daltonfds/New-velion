@@ -47,6 +47,7 @@ export async function GET(request: Request) {
   return NextResponse.json({
     month_start: start,
     country_code: countryCode,
+    country_leaders: ranked.filter((r, i, rows) => Boolean(r.country_code) && rows.findIndex((candidate) => candidate.country_code === r.country_code) === i).map((r) => ({ ...r, rank_position: 1 })),
     platform: ranked.slice(0, 10).map((r, i) => ({ ...r, rank_position: i + 1 })),
     country: ranked.filter((r) => countryCode && r.country_code === countryCode).slice(0, 10).map((r, i) => ({ ...r, rank_position: i + 1 })),
   }, { headers: { "Cache-Control": "private, no-store" } });
