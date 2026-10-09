@@ -444,7 +444,8 @@ export default function AdminWithdrawalsPage() {
     seller?.name ||
     profileMap[current?.vendedor_id || ""]?.nome_completo ||
     profileMap[current?.vendedor_id || ""]?.full_name ||
-    "Unknown seller";
+    seller?.email?.split("@")[0] ||
+    "Seller profile unavailable";
 
   const paymentPhone = paymentValue(
     "phone",
