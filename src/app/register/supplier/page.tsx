@@ -27,7 +27,15 @@ export default function SupplierRegisterPage() {
       supplier_company_name:form.companyName.trim(),accepted_terms_at:new Date().toISOString(),accepted_terms_version:"2026-10-09",accepted_privacy_policy:true
     }}});
     setLoading(false);
-    if(signupError){setError(signupError.message);return;}
+    if (signupError) {
+      const detail = signupError.message.toLowerCase();
+      setError(
+        detail.includes("database error saving new user") || detail.includes("duplicate key")
+          ? "This phone number or WhatsApp number may already be linked to a Newvelion account. Please sign in or contact support."
+          : signupError.message,
+      );
+      return;
+    }
     router.push("/verify-email?email="+encodeURIComponent(data.user?.email||form.email.trim()));
   }
 
