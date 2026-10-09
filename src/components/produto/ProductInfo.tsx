@@ -6,6 +6,7 @@ import Link from "next/link";
 type Product = {
   id: string;
   nome: string;
+  slug: string;
   descricao: string | null;
   preco: number;
   preco_promocional: number | null;
