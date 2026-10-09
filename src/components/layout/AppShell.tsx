@@ -178,7 +178,7 @@ export default function AppShell({
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileInitial, setProfileInitial] = useState("U");
-  const [countryCode, setCountryCode] = useState("");\n  const [countryCode, setCountryCode] = useState("");
+  const [countryCode, setCountryCode] = useState("");
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [pt, setPt] = useState(false);
