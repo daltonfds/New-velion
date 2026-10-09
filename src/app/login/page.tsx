@@ -151,11 +151,17 @@ function LoginPageContent() {
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-500">
-            Don't have an account?{" "}
+            New customer?{" "}
             <Link
-              href="/register"
+              href={"/register/customer?next=" + encodeURIComponent(searchParams.get("redirect") || "/account")}
               className="font-semibold text-blue-600 hover:text-blue-700"
             >
+              Create a buyer account
+            </Link>
+          </p>
+          <p className="mt-3 text-center text-sm text-slate-500">
+            Want to sell?{" "}
+            <Link href="/register" className="font-semibold text-blue-600 hover:text-blue-700">
               Create a seller account
             </Link>
           </p>
