@@ -247,8 +247,22 @@ export default function SellerDashboardPage() {
                       {ranking.rows.map((row) => (
                         <div key={row.seller_id} className="flex items-center gap-3 rounded-lg border border-slate-100 p-3">
                           <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${row.rank_position === 1 ? "bg-[#FFB800] text-[#001B44]" : "bg-[#EAF3FF] text-[#003B95]"}`}>{row.rank_position}</span>
-                          <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-slate-900">{row.seller_name}</p><p className="mt-0.5 text-xs text-slate-500">{row.country_code || "Country not set"} · {row.sales_count} {row.sales_count === 1 ? "sale" : "sales"}</p></div>
-                          <div className="text-right"><p className="text-sm font-bold text-[#003B95]">{money(Number(row.monthly_commission || 0))}</p><p className="text-[11px] text-slate-500">earned this month</p></div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold text-slate-900">{row.seller_name}</p>
+                            <p className="mt-0.5 text-xs text-slate-500">{row.country_code || "Country not set"} · Rank #{row.rank_position}</p>
+                            <div className="mt-3 grid grid-cols-2 gap-3">
+                              <div className="rounded-md bg-[#F7FAFF] px-3 py-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Monthly sales</p>
+                                <p className="mt-1 text-sm font-bold text-[#003B95]">{money(Number(row.monthly_sales || 0))}</p>
+                                <p className="text-[11px] text-slate-500">{row.sales_count} {row.sales_count === 1 ? "completed sale" : "completed sales"}</p>
+                              </div>
+                              <div className="rounded-md bg-[#F0FDF4] px-3 py-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Commission earned</p>
+                                <p className="mt-1 text-sm font-bold text-[#18794E]">{money(Number(row.monthly_commission || 0))}</p>
+                                <p className="text-[11px] text-slate-500">This month</p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
