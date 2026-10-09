@@ -42,6 +42,7 @@ export default function SellerDashboardPage() {
     saldo_total: 0,
   });
   const [userName, setUserName] = useState("Seller");
+  const [salesActivationStatus, setSalesActivationStatus] = useState("inactive");
   const [goalTarget, setGoalTarget] = useState(10000);
   const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
   const [dailyPerformance, setDailyPerformance] = useState<
@@ -73,7 +74,7 @@ export default function SellerDashboardPage() {
       ] = await Promise.all([
         supabase
           .from("profiles")
-          .select("full_name,nome_completo")
+          .select("full_name,nome_completo,sales_activation_status,first_sale_at")
           .eq("id", user.id)
           .maybeSingle(),
 
@@ -101,6 +102,7 @@ export default function SellerDashboardPage() {
         "Seller";
 
       setUserName(name);
+      setSalesActivationStatus(profile?.sales_activation_status || "inactive");
 
       const canonicalWallet = {
         disponivel: Number(financialSummary.available_balance ?? 0),
@@ -188,6 +190,23 @@ export default function SellerDashboardPage() {
               Browse marketplace
             </Link>
           </div>
+
+          <Card className={"mb-6 border p-4 shadow-none " + (salesActivationStatus === "active" ? "border-emerald-200 bg-emerald-50" : "border-blue-100 bg-[#EAF3FF]")}>
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+              <div>
+                <p className="text-sm font-semibold text-[#001B44]">{salesActivationStatus === "active" ? "Account active — congratulations!" : "Your account is waiting for its first sale"}</p>
+                <p className="mt-1 text-sm text-slate-600">{salesActivationStatus === "active" ? "Your first confirmed sale activated your sales account." : "Your account is registered, but it becomes sales-active only after your first confirmed paid sale."}</p>
+              </div>
+              <span className={"w-fit rounded-full px-3 py-1 text-xs font-bold " + (salesActivationStatus === "active" ? "bg-emerald-100 text-emerald-800" : "bg-white text-[#003B95]")}>{salesActivationStatus === "active" ? "ACTIVE" : "INACTIVE"}</span>
+            </div>
+          </Card>
+
+          <Card className="mb-6 border border-blue-100 bg-white p-5 shadow-none">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div><p className="text-sm font-semibold text-[#003B95]">Grow with Newvelion</p><h2 className="mt-1 text-lg font-bold text-[#001B44]">Earn R50 for every referred seller’s first sale</h2><p className="mt-1 max-w-2xl text-sm text-slate-600">Join the platform affiliate program, share your referral link and unlock mystery prizes when you reach 5, 10 or 25 active referrals.</p></div>
+              <Link href="/register/affiliate" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[#003B95] px-4 py-3 text-sm font-semibold text-white hover:bg-[#002B70]">Become an affiliate</Link>
+            </div>
+          </Card>
 
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {[
