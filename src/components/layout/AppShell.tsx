@@ -165,7 +165,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Disputes", href: "/dashboard/admin/disputes", icon: "download" },
     { label: "KYC", href: "/dashboard/admin/kyc", icon: "users" },
     { label: "Analytics", href: "/dashboard/admin/analytics", icon: "chart" },
-    { label: "Integrations", href: "/dashboard/admin/integrations", icon: "link" },
+    { label: "System settings", href: "/dashboard/admin/platform-settings", icon: "chart" },
   ],
 };
 
