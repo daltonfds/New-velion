@@ -84,6 +84,7 @@ export default function RegisterPage() {
           whatsapp_e164: whatsappE164,
           preferred_language: form.language,
           role: "seller",
+          platform_referral_code: new URLSearchParams(window.location.search).get("ref")?.trim().toUpperCase() || "",
           accepted_terms_at: new Date().toISOString(),
           accepted_terms_version: "2026-10-09",
           accepted_privacy_policy: true,
