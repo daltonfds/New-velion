@@ -7,6 +7,16 @@ import Card from "@/components/ui/Card";
 import { supabase } from "@/lib/supabase";
 import { getSellerFinancialSummary } from "@/lib/services/seller-financials";
 
+type LeaderboardEntry = {
+  seller_id: string;
+  seller_name: string;
+  country_code: string | null;
+  sales_count: number;
+  monthly_sales: number;
+  monthly_commission: number;
+  rank_position: number;
+};
+
 type Sale = {
   id: string;
   vendido_em: string;
@@ -45,6 +55,7 @@ export default function SellerDashboardPage() {
   const [salesActivationStatus, setSalesActivationStatus] = useState("inactive");
   const [goalTarget, setGoalTarget] = useState(10000);
   const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
+  const [leaderboards, setLeaderboards] = useState<{ month_start: string; country_code: string | null; platform: LeaderboardEntry[]; country: LeaderboardEntry[] } | null>(null);
   const [dailyPerformance, setDailyPerformance] = useState<
     { day: string; commission: number; sales_count: number; gross_sales: number }[]
   >([]);
@@ -65,6 +76,19 @@ export default function SellerDashboardPage() {
       if (!user) {
         setLoading(false);
         return;
+      }
+
+      try {
+        const { data: { session } } = await db.auth.getSession();
+        if (session?.access_token) {
+          const response = await fetch("/api/seller/leaderboards", {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+            cache: "no-store",
+          });
+          if (response.ok) setLeaderboards(await response.json());
+        }
+      } catch (leaderboardError) {
+        console.error("Seller leaderboards:", leaderboardError);
       }
 
       const [
