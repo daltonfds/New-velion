@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import ReviewCard from "./ReviewCard";
 
 type Review = {
@@ -32,6 +33,7 @@ export default function ReviewsSection({ reviews }: { reviews: Review[] }) {
         <div className="mt-10 rounded-2xl border border-[#DCE8F7] bg-[#F7FAFF] p-6">
           <p className="text-lg font-black text-[#001B44]">Share your experience</p>
           <p className="mt-1 text-sm text-slate-500">Verified reviews are available after a delivered purchase. You can attach up to 4 photos.</p>
+          <p className="mt-2 text-sm text-slate-600">New to Newvelion? <Link href="/register/customer" className="font-bold text-[#10069F] underline underline-offset-2">Create a customer account</Link> with your mobile number and email.</p>
           <ReviewForm />
         </div>
         {reviews.length > 0 ? (
