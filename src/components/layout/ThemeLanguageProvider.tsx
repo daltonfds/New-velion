@@ -222,10 +222,6 @@ export function ThemeLanguageProvider({ children }: { children: React.ReactNode 
   return (
     <>
       {children}
-      <div className="newvelion-preferences" aria-label="Platform preferences">
-        <button type="button" onClick={() => setPt(true)} className={pt ? "active" : ""}>PT</button>
-        <button type="button" onClick={() => setPt(false)} className={!pt ? "active" : ""}>EN</button>
-      </div>
     </>
   );
 }
