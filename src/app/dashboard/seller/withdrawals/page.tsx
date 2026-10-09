@@ -149,14 +149,25 @@ export default function SellerWithdrawalsPage() {
       if (p.error) {
         setError(p.error.message);
       } else {
-        const detected = String(
-          p.data?.country_code ?? p.data?.pais ?? ""
-        ).toUpperCase();
+        const rawCountry = String(p.data?.country_code ?? p.data?.pais ?? "").trim().toUpperCase();
+        const countryAliases: Record<string, string> = {
+          "SOUTH AFRICA": "ZA",
+          "MOZAMBIQUE": "MZ",
+          "ANGOLA": "AO",
+          "FRANCE": "FR",
+          "PORTUGAL": "PT",
+          "UNITED STATES": "US",
+          "UNITED KINGDOM": "GB",
+          "CHINA": "CN",
+        };
+        const detected = countryAliases[rawCountry] ?? rawCountry;
 
         setCountry(detected);
         const localCurrency = currencyForCountry(detected);
         setPayoutCurrency(localCurrency);
         if (localCurrency !== "ZAR") {
+          setExchangeRate(0);
+          setRateUpdatedAt(null);
           setRateLoading(true);
           try {
             const response = await fetch(`/api/currency/rate?base=ZAR&quote=${encodeURIComponent(localCurrency)}`, { cache: "no-store" });
@@ -168,6 +179,8 @@ export default function SellerWithdrawalsPage() {
             setRateStale(updatedAt ? Date.now() - new Date(updatedAt).getTime() > 48 * 60 * 60 * 1000 : false);
             setRateError("");
           } catch (e) {
+            setExchangeRate(0);
+            setRateUpdatedAt(null);
             setRateError(e instanceof Error ? e.message : "Exchange rate unavailable.");
           } finally {
             setRateLoading(false);
@@ -256,6 +269,11 @@ export default function SellerWithdrawalsPage() {
 
     if (numeric <= 0) {
       setError("Enter a valid withdrawal amount.");
+      return;
+    }
+
+    if (payoutCurrency !== "ZAR" && (!Number.isFinite(exchangeRate) || exchangeRate <= 0 || rateError)) {
+      setError("A current exchange rate is required to calculate your local payout. Please try again when the rate service is available.");
       return;
     }
 
