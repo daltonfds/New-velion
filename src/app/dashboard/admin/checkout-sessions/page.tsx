@@ -244,113 +244,55 @@ export default function AdminCheckoutSessionsPage() {
   async function updateStatus(sessionId: string, status: string, rejectionReason = "") {
     setError("");
 
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    if (status === "rejected" && !rejectionReason.trim()) {
+      const reason = window.prompt("Why are you rejecting this checkout/payment?");
+      if (!reason?.trim()) return;
+      rejectionReason = reason.trim();
+    }
 
-      if (!session?.access_token) {
-        throw new Error("Session expired. Please sign in again.");
-      }
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error("Session expired. Please sign in again.");
 
       if (status === "approved") {
-        const { data, error } = await supabase.rpc(
-          "approve_checkout_session",
-          {
-            p_session_id: sessionId,
-          }
-        );
-
-        if (error) {
-          console.error("Checkout approval RPC failed:", error);
-          notify.error(
-            "Falha ao aprovar checkout",
-            error.message || "Failed to approve checkout session."
-          );
-          throw new Error(
-            error.message || "Failed to approve checkout session."
-          );
-        }
-
-        const saleId = Array.isArray(data)
-          ? data[0]?.sale_id
-          : data?.sale_id;
-
-        if (!saleId) {
-          notify.error(
-            "Falha ao aprovar checkout",
-            "O checkout foi processado, mas nenhuma venda foi criada."
-          );
-          throw new Error(
-            "Checkout was approved but no sale was created."
-          );
-        }
-
-        notify.success(
-          "Checkout aprovado",
-          "O checkout foi aprovado e a venda foi criada com sucesso."
-        );
+        const { data, error } = await supabase.rpc("approve_checkout_session", { p_session_id: sessionId });
+        if (error) throw new Error(error.message || "Failed to approve checkout session.");
+        const saleId = Array.isArray(data) ? data[0]?.sale_id : data?.sale_id;
+        if (!saleId) throw new Error("Checkout was processed but no sale was created.");
+        notify.success("Checkout approved", "The checkout was approved and the sale was created.");
+      } else if (status === "rejected") {
+        const { error } = await supabase.rpc("admin_reject_checkout_session", {
+          p_session_id: sessionId,
+          p_reason: rejectionReason.trim(),
+        });
+        if (error) throw new Error(error.message || "Failed to reject checkout session.");
+        notify.success("Checkout rejected", "The checkout was rejected and the reason was saved.");
       } else {
-        const response = await fetch(
-          "/api/admin/checkout-sessions/status",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({
-              session_id: sessionId,
-              status,
-              ...(status === "rejected" && rejectionReason ? { rejection_reason: rejectionReason } : {}),
-            }),
-          }
-        );
-
+        const response = await fetch("/api/admin/checkout-sessions/status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ session_id: sessionId, status }),
+        });
         const responseText = await response.text();
-
         let result: { error?: string } = {};
-
         try {
-          result = responseText
-            ? JSON.parse(responseText)
-            : {};
+          result = responseText ? JSON.parse(responseText) : {};
         } catch {
-          throw new Error(
-            `Checkout API returned an invalid response (${response.status}).`
-          );
+          throw new Error(`Checkout API returned an invalid response (${response.status}).`);
         }
-
-        if (!response.ok) {
-          notify.error(
-            status === "rejected"
-              ? "Falha ao rejeitar checkout"
-              : "Falha ao atualizar checkout",
-            result?.error || "Failed to update checkout session."
-          );
-          throw new Error(
-            result?.error || "Failed to update checkout session."
-          );
-        }
-
-        notify.success(
-          status === "rejected"
-            ? "Checkout rejeitado"
-            : "Checkout atualizado",
-          status === "rejected"
-            ? "O checkout foi rejeitado com sucesso."
-            : "O status do checkout foi atualizado com sucesso."
-        );
+        if (!response.ok) throw new Error(result?.error || "Failed to update checkout session.");
+        notify.success("Checkout updated", "The checkout status was updated successfully.");
       }
 
       setSelected(null);
       await loadSessions();
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : "Failed to update checkout session."
-      );
+      const message = e instanceof Error ? e.message : "Failed to update checkout session.";
+      setError(message);
+      notify.error("Checkout action failed", message);
     }
   }
 
