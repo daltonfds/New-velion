@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const categories = [
-  ["Health & Beauty", "Explore products"],
-  ["Home & Lifestyle", "Explore products"],
-  ["Electronics", "Explore products"],
-  ["Fitness", "Explore products"],
+  { title: "Health & Wellness", detail: "Everyday essentials" },
+  { title: "Home & Living", detail: "Made for your space" },
+  { title: "Electronics", detail: "Useful tech and accessories" },
+  { title: "Fitness", detail: "Gear for active living" },
 ];
 
 function Logo() {
@@ -18,109 +18,85 @@ function Logo() {
 
 export default function HomePage() {
   return (
-    <main className="nv-new-home">
-      <div className="nv-new-topbar">Commerce infrastructure for South Africa</div>
-
+    <main className="nv-new-home nv-conversion-home">
+      <div className="nv-new-topbar">Shop online with confidence • Delivery across South Africa</div>
       <header className="nv-new-header">
         <div className="nv-new-header-inner">
           <Logo />
-          <nav>
-            <Link href="/marketplace">Marketplace</Link>
-            <Link href="/register">For Sellers</Link>
-            <Link href="/become-supplier">For Suppliers</Link>
-            <Link href="/support">Support</Link>
+          <nav aria-label="Main navigation">
+            <Link href="/marketplace">Shop products</Link>
+            <Link href="/become-supplier">Suppliers</Link>
+            <Link href="/support">Help</Link>
           </nav>
           <div className="nv-new-header-actions">
-            <Link href="/login">Log in</Link>
-            <Link href="/register" className="nv-new-button">Sign up</Link>
+            <Link href="/login">Sign in</Link>
+            <Link href="/register/customer" className="nv-new-button">Create account</Link>
           </div>
         </div>
       </header>
 
-      <section className="nv-new-hero">
-        <div className="nv-new-hero-inner">
-          <div className="nv-new-hero-copy">
-            <span className="nv-new-kicker">THE COMMERCE PLATFORM</span>
-            <h1>Find products.<br /><span>Build sales.</span></h1>
-            <p>Newvelion connects products, suppliers, sellers and customers in one commerce ecosystem built for South Africa.</p>
-            <div className="nv-new-actions">
-              <Link href="/marketplace" className="nv-new-button nv-new-button-large">Explore marketplace</Link>
-              <Link href="/register" className="nv-new-outline">Start selling</Link>
-            </div>
-            <div className="nv-new-proof">
-              <span>✓ Products</span><span>✓ Affiliate selling</span><span>✓ Fulfillment</span>
-            </div>
+      <section className="nv-conversion-hero">
+        <div className="nv-conversion-hero-copy">
+          <span className="nv-conversion-eyebrow">THE NEWVELION MARKETPLACE</span>
+          <h1>Find what you need.<br /><em>Shop with confidence.</em></h1>
+          <p>Discover products from marketplace suppliers, compare your options and shop in one simple place.</p>
+          <div className="nv-conversion-ctas">
+            <Link href="/marketplace" className="nv-new-button nv-conversion-primary">Shop products</Link>
+            <Link href="/register" className="nv-conversion-secondary">Start selling <span aria-hidden="true">→</span></Link>
           </div>
-          <div className="nv-new-hero-card">
-            <div className="nv-new-search"><span>Search products, categories...</span><b>Search</b></div>
-            <div className="nv-new-card-head"><strong>Popular on Newvelion</strong><Link href="/marketplace">View all</Link></div>
-            <div className="nv-new-product-row">
-              <div className="nv-new-product-image">NEW</div>
-              <div><strong>Discover products ready to sell</strong><span>Choose a product and start promoting.</span><b>View marketplace →</b></div>
-            </div>
-            <div className="nv-new-mini-grid">
-              <div><span>01</span><strong>Choose</strong><small>Find products</small></div>
-              <div><span>02</span><strong>Sell</strong><small>Share your link</small></div>
-              <div><span>03</span><strong>Grow</strong><small>Track your sales</small></div>
-            </div>
+          <div className="nv-conversion-trust">
+            <span><b aria-hidden="true">✓</b> Secure checkout</span>
+            <span><b aria-hidden="true">✓</b> South Africa delivery</span>
+            <span><b aria-hidden="true">✓</b> Product details upfront</span>
           </div>
+        </div>
+        <div className="nv-conversion-visual" aria-label="Shop Newvelion products">
+          <div className="nv-conversion-visual-top"><span>NEWVELION</span><span>SHOP ONLINE</span></div>
+          <div className="nv-conversion-visual-body">
+            <span className="nv-conversion-circle nv-conversion-circle-one" />
+            <span className="nv-conversion-circle nv-conversion-circle-two" />
+            <div className="nv-conversion-package"><span className="nv-new-mark" aria-hidden="true"><i /><i /><i /></span><strong>newvelion</strong><small>GOOD FINDS. SIMPLE SHOPPING.</small></div>
+          </div>
+          <div className="nv-conversion-visual-bottom"><span>Explore the marketplace</span><Link href="/marketplace">Browse products ↗</Link></div>
         </div>
       </section>
 
-      <section className="nv-new-section">
-        <div className="nv-new-section-head">
-          <div><span className="nv-new-kicker">SHOP THE MARKETPLACE</span><h2>Explore what is selling.</h2></div>
-          <Link href="/marketplace">View marketplace →</Link>
+      <section className="nv-conversion-categories">
+        <div className="nv-conversion-section-heading">
+          <div><span className="nv-conversion-eyebrow">DISCOVER MORE</span><h2>Shop by category</h2></div>
+          <Link href="/marketplace">View all products <span aria-hidden="true">→</span></Link>
         </div>
-        <div className="nv-new-category-grid">
-          {categories.map(([title, sub]) => (
-            <Link href="/marketplace" className="nv-new-category" key={title}>
-              <span className="nv-new-category-icon">↗</span><strong>{title}</strong><small>{sub}</small>
+        <div className="nv-conversion-category-grid">
+          {categories.map((category, index) => (
+            <Link href="/marketplace" className="nv-conversion-category" key={category.title}>
+              <span className={`nv-conversion-category-art nv-conversion-art-${index + 1}`} aria-hidden="true"><i /></span>
+              <span className="nv-conversion-category-copy"><strong>{category.title}</strong><small>{category.detail}</small></span>
+              <span className="nv-conversion-arrow" aria-hidden="true">↗</span>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="nv-new-seller">
+      <section className="nv-conversion-business">
         <div>
-          <span className="nv-new-kicker">FOR SELLERS & AFFILIATES</span>
-          <h2>Turn great products into your next sale.</h2>
-          <p>Choose products from the marketplace, promote them with your affiliate link and manage your commerce activity from one place.</p>
+          <span className="nv-conversion-eyebrow">GROW WITH NEWVELION</span>
+          <h2>Have products to sell?</h2>
+          <p>Bring your products to the marketplace or build your sales through Newvelion. Manage your business from one place.</p>
+        </div>
+        <div className="nv-conversion-business-actions">
           <Link href="/register" className="nv-new-button">Become a seller</Link>
-        </div>
-        <div className="nv-new-dashboard-card">
-          <div className="nv-new-dash-top"><strong>Seller overview</strong><span>● Live</span></div>
-          <div className="nv-new-dash-number"><small>Available balance</small><strong>R 12,480</strong></div>
-          <div className="nv-new-dash-bars"><i /><i /><i /><i /><i /><i /><i /></div>
-          <div className="nv-new-dash-bottom"><span>Sales <b>+24.8%</b></span><span>Orders <b>128</b></span></div>
+          <Link href="/become-supplier" className="nv-conversion-business-link">Register as a supplier →</Link>
         </div>
       </section>
 
-      <section className="nv-new-supplier">
-        <div className="nv-new-supplier-copy">
-          <span className="nv-new-kicker">FOR SUPPLIERS</span>
-          <h2>Put your products in front of more sellers.</h2>
-          <p>Register your company, submit your catalog for approval and build a distribution channel through Newvelion.</p>
-          <Link href="/become-supplier" className="nv-new-outline nv-new-outline-dark">Become a supplier →</Link>
+      <footer className="nv-conversion-footer">
+        <div className="nv-conversion-footer-main">
+          <div className="nv-conversion-footer-brand"><Logo /><p>Products, selling and fulfillment — all in one place.</p></div>
+          <div><strong>Shop</strong><Link href="/marketplace">Marketplace</Link><Link href="/wishlist">Wishlist</Link><Link href="/cart">Cart</Link></div>
+          <div><strong>Your account</strong><Link href="/register/customer">Create customer account</Link><Link href="/login">Sign in</Link><Link href="/support">Help &amp; Support</Link></div>
+          <div><strong>Business</strong><Link href="/register">Become a seller</Link><Link href="/become-supplier">Become a supplier</Link></div>
         </div>
-        <div className="nv-new-steps">
-          <div><b>01</b><strong>Register your business</strong><span>Company and responsible-person details.</span></div>
-          <div><b>02</b><strong>Submit products</strong><span>Build your catalog and pricing.</span></div>
-          <div><b>03</b><strong>Fulfill orders</strong><span>Manage delivery and tracking.</span></div>
-        </div>
-      </section>
-
-      <section className="nv-new-final">
-        <span className="nv-new-kicker">NEWVELION</span>
-        <h2>Commerce starts with the right infrastructure.</h2>
-        <p>One platform for products, selling, orders and fulfillment.</p>
-        <div><Link href="/marketplace" className="nv-new-button">Explore marketplace</Link><Link href="/register" className="nv-new-outline">Create account</Link></div>
-      </section>
-
-      <footer className="nv-new-footer">
-        <div><Logo /><p>Commerce infrastructure.</p></div>
-        <div><strong>Platform</strong><Link href="/marketplace">Marketplace</Link><Link href="/register">For Sellers</Link><Link href="/become-supplier">For Suppliers</Link></div>
-        <div><strong>Company</strong><Link href="/support">Support</Link><Link href="/login">Log in</Link></div>
+        <div className="nv-conversion-footer-bottom"><span>© {new Date().getFullYear()} Newvelion. All rights reserved.</span><span>Commerce infrastructure</span></div>
       </footer>
     </main>
   );
