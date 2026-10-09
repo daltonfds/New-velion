@@ -94,6 +94,7 @@ export default function SellerWithdrawalsPage() {
   const [rateLoading, setRateLoading] = useState(false);
   const [rateUpdatedAt, setRateUpdatedAt] = useState<string | null>(null);
   const [rateError, setRateError] = useState("");
+  const [rateStale, setRateStale] = useState(false);
   const [configured, setConfigured] = useState<Record<Method, Details | null>>({
     bank_transfer: null,
     mpesa: null,
@@ -162,7 +163,9 @@ export default function SellerWithdrawalsPage() {
             const fx = await response.json();
             if (!response.ok || !Number.isFinite(Number(fx?.rate)) || Number(fx.rate) <= 0) throw new Error(fx?.error || "Exchange rate unavailable.");
             setExchangeRate(Number(fx.rate));
-            setRateUpdatedAt(typeof fx?.fetched_at === "string" ? fx.fetched_at : null);
+            const updatedAt = typeof fx?.fetched_at === "string" ? fx.fetched_at : null;
+            setRateUpdatedAt(updatedAt);
+            setRateStale(updatedAt ? Date.now() - new Date(updatedAt).getTime() > 48 * 60 * 60 * 1000 : false);
             setRateError("");
           } catch (e) {
             setRateError(e instanceof Error ? e.message : "Exchange rate unavailable.");
@@ -172,6 +175,7 @@ export default function SellerWithdrawalsPage() {
         } else {
           setExchangeRate(1);
           setRateUpdatedAt(new Date().toISOString());
+          setRateStale(false);
           setRateError("");
         }
 
@@ -587,7 +591,8 @@ export default function SellerWithdrawalsPage() {
                             <span className="text-amber-700">Conversion unavailable: {rateError} The withdrawal form remains available, but no local estimate can be shown.</span>
                           ) : (
                             <span>
-                              {rateUpdatedAt ? `Rate updated ${new Date(rateUpdatedAt).toLocaleString()}. ` : ""}
+                              {rateStale ? "This exchange rate may be outdated. " : ""}
+                              {rateUpdatedAt ? `Rate last updated ${new Date(rateUpdatedAt).toLocaleString()}. ` : ""}
                               Indicative estimate only; your payout provider may apply a different rate.
                             </span>
                           )}
