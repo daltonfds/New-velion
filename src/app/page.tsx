@@ -1,4 +1,5 @@
 import Link from "next/link";
+import "./newvelion-home.css";
 
 function Logo() {
   return (
