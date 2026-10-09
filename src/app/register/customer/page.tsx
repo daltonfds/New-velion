@@ -45,7 +45,12 @@ export default function CustomerRegisterPage() {
         options: { data: { role: "customer", country_code: "ZA", country_name: "South Africa", country_calling_code: "+27", phone_number: normalizedPhone, phone_e164: phoneE164, preferred_language: "en", accepted_terms_at: new Date().toISOString(), accepted_terms_version: "2026-10-09", accepted_privacy_policy: true } },
       });
       if (signupError) {
-        setError(signupError.message);
+        const detail = signupError.message.toLowerCase();
+        setError(
+          detail.includes("database error saving new user") || detail.includes("duplicate key")
+            ? "This phone number may already be linked to a Newvelion account. Please sign in or contact support."
+            : signupError.message,
+        );
         return;
       }
       router.push("/verify-email?email=" + encodeURIComponent(data.user?.email || email.trim()) + "&next=" + encodeURIComponent(nextPath));
