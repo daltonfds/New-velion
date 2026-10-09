@@ -95,7 +95,12 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (signupError) {
-      setError(signupError.message);
+      const detail = signupError.message.toLowerCase();
+      setError(
+        detail.includes("database error saving new user") || detail.includes("duplicate key")
+          ? "This phone number or WhatsApp number may already be linked to a Newvelion account. Please sign in or contact support."
+          : signupError.message,
+      );
       return;
     }
 
