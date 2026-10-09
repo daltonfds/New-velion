@@ -145,6 +145,8 @@ export default function NotificationCenter() {
     let channel:
       | ReturnType<typeof supabase.channel>
       | null = null;
+    let refreshTimer: number | null = null;
+    let focusHandler: (() => void) | null = null;
 
     let cancelled = false;
 
