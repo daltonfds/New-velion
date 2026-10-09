@@ -170,10 +170,11 @@ begin
       returning id into v_referred_user;
 
     if v_referred_user is not null then
-      insert into public.notifications(user_id,type,title,message,data)
+      insert into public.notifications(user_id,type,title,message,data,event_key)
       values(v_referred_user,'account_activated','Congratulations — your account is active',
         'Your first sale has been confirmed. Your Newvelion seller account is now active.',
-        jsonb_build_object('sale_id',new.id,'activation_status','active'));
+        jsonb_build_object('sale_id',new.id,'activation_status','active'),
+        'account_activated:'||new.id::text||':'||v_referred_user::text);
     end if;
   end if;
 
@@ -188,10 +189,11 @@ begin
       returning id into v_referred_user;
 
     if v_referred_user is not null then
-      insert into public.notifications(user_id,type,title,message,data)
+      insert into public.notifications(user_id,type,title,message,data,event_key)
       values(v_referred_user,'account_activated','Congratulations — your account is active',
         'Your product has made its first confirmed sale. Your Newvelion supplier account is now active.',
-        jsonb_build_object('sale_id',new.id,'activation_status','active'));
+        jsonb_build_object('sale_id',new.id,'activation_status','active'),
+        'account_activated:'||new.id::text||':'||v_referred_user::text);
     end if;
   end if;
 
@@ -236,10 +238,11 @@ begin
         get diagnostics v_inserted = row_count;
 
         if v_inserted > 0 then
-          insert into public.notifications(user_id,type,title,message,data)
+          insert into public.notifications(user_id,type,title,message,data,event_key)
           values(v_affiliate_id,'mystery_prize_unlocked','Mystery prize unlocked!',
             'You reached '||v_threshold||' active referrals. Contact Newvelion support to reveal your mystery prize.',
-            jsonb_build_object('milestone_count',v_threshold));
+            jsonb_build_object('milestone_count',v_threshold),
+            'mystery_prize_unlocked:'||v_affiliate_id::text||':'||v_threshold::text);
         end if;
       end if;
     end loop;
