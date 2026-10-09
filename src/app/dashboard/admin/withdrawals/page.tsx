@@ -885,7 +885,7 @@ export default function AdminWithdrawalsPage() {
                         ["Withdrawal ID", current?.id],
                         ["Seller", sellerName],
                         ["Seller email", seller?.email],
-                        ["Country", seller?.pais || seller?.country],
+                        ["Country", seller?.country_code || seller?.pais || seller?.country || profileMap[current?.vendedor_id || ""]?.country_code || profileMap[current?.vendedor_id || ""]?.pais || profileMap[current?.vendedor_id || ""]?.country],
                         ["KYC status", seller?.kyc_status],
                         ["Currency", current?.wallet_currency],
                         ["Exchange rate", current?.exchange_rate],
@@ -1000,8 +1000,8 @@ export default function AdminWithdrawalsPage() {
                         ["Email", seller?.email],
                         ["Country", seller?.pais || seller?.country],
                         ["KYC", seller?.kyc_status],
-                        ["Phone", seller?.telefone || seller?.phone],
-                        ["WhatsApp", seller?.whatsapp],
+                        ["Phone", seller?.telefone || seller?.phone || seller?.phone_e164 || seller?.phone_number || profileMap[current?.vendedor_id || ""]?.phone_e164 || profileMap[current?.vendedor_id || ""]?.phone_number],
+                        ["WhatsApp", seller?.whatsapp || seller?.whatsapp_e164 || seller?.whatsapp_number || profileMap[current?.vendedor_id || ""]?.whatsapp_e164 || profileMap[current?.vendedor_id || ""]?.whatsapp_number],
                       ].map(([label, value]) => (
                         <div key={label}>
                           <p className="text-xs text-slate-500">
