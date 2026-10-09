@@ -22,21 +22,32 @@ const Icon = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function ProfilePage() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
     async function loadRole() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-      setIsAdmin(String(data?.role || "").toLowerCase() === "admin");
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+      const { data, error } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+      setIsAdmin(!error && String(data?.role || "").toLowerCase() === "admin");
     }
     void loadRole();
   }, []);
 
+  if (isAdmin === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-6">
+        <p className="text-sm font-medium text-slate-600">Loading account settings…</p>
+      </div>
+    );
+  }
+
   return (
     <AppShell
-      area={isAdmin ? "admin" : "seller"}
+      area={isAdmin ? "admin" : "seller"
       title="Profile & Settings"
       subtitle={isAdmin ? "Manage your administrator profile, access and platform settings." : "Manage your account, profile and payout preferences."}
     >
