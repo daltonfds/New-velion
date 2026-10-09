@@ -91,7 +91,8 @@ export default function SellerWalletPage() {
   const [error, setError] = useState("");
   const [period, setPeriod] = useState<"30" | "90" | "all">("30");
   const [country, setCountry] = useState("ZA");
-  const [walletCurrency, setWalletCurrency] = useState("ZAR");
+  const [walletCurrency] = useState("ZAR");
+  const [localCurrency, setLocalCurrency] = useState("ZAR");
   const [exchangeRate, setExchangeRate] = useState(1);
 
   async function load() {
@@ -122,11 +123,11 @@ export default function SellerWalletPage() {
       setWallet(summary);
       setEntries((result.data ?? []) as Entry[]);
       const detected = String(profile.data?.country_code ?? profile.data?.pais ?? "ZA").toUpperCase();
-      const localCurrency = String(profile.data?.wallet_currency ?? currencyForCountry(detected)).toUpperCase();
+      const localCurrencyCode = currencyForCountry(detected);
       setCountry(detected);
-      setWalletCurrency(localCurrency);
-      if (localCurrency !== "ZAR") {
-        const fx = await fetch(`/api/currency/rate?base=ZAR&quote=${encodeURIComponent(localCurrency)}`).then((r) => r.json());
+      setLocalCurrency(localCurrencyCode);
+      if (localCurrencyCode !== "ZAR") {
+        const fx = await fetch(`/api/currency/rate?base=ZAR&quote=${encodeURIComponent(localCurrencyCode)}`).then((r) => r.json());
         if (Number.isFinite(Number(fx?.rate)) && Number(fx.rate) > 0) setExchangeRate(Number(fx.rate));
       }
     } catch (e) {
@@ -142,7 +143,8 @@ export default function SellerWalletPage() {
     void load();
   }, []);
 
-  const money = (value: number) => formatCurrency(value * exchangeRate, walletCurrency);
+  const money = (value: number) => formatCurrency(value, "ZAR");
+  const localMoney = (value: number) => formatCurrency(value * exchangeRate, localCurrency);
 
   const date = (value: string) =>
     new Intl.DateTimeFormat("en-US", {
@@ -310,6 +312,7 @@ export default function SellerWalletPage() {
                       <p className="mt-2 text-2xl font-semibold tracking-tight text-[#0A0440]">
                         {money(Number(value))}
                       </p>
+                      {localCurrency !== "ZAR" && <p className="mt-1 text-xs font-medium text-slate-500">≈ {localMoney(Number(value))}</p>}
                     </div>
 
                     <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#DCE3EE] bg-[#F5F8FC] text-[#60708A]">
@@ -359,7 +362,7 @@ export default function SellerWalletPage() {
                         >
                           <div className="group relative flex h-full items-end">
                             <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-[#10069F] px-2 py-1 text-[10px] font-semibold text-white group-hover:block">
-                              {money(month.value)}
+                              {money(month.value)}{localCurrency !== "ZAR" ? ` · ${localMoney(month.value)}` : ""}
                             </span>
 
                             <div
@@ -432,24 +435,24 @@ export default function SellerWalletPage() {
                   <div className="mt-6 space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-[#7C8798]">Available</span>
-                      <b>{money(wallet.disponivel)}</b>
+                      <b>{money(wallet.disponivel)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(wallet.disponivel)}</small>}</b>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-[#7C8798]">On hold</span>
-                      <b>{money(wallet.retido)}</b>
+                      <b>{money(wallet.retido)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(wallet.retido)}</small>}</b>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-[#7C8798]">Reserved</span>
-                      <b>{money(wallet.reservado)}</b>
+                      <b>{money(wallet.reservado)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(wallet.reservado)}</small>}</b>
                     </div>
 
                     <div className="flex justify-between border-t border-[#E9EEF5] pt-3">
                       <span className="font-medium text-[#405579]">
                         Total
                       </span>
-                      <b>{money(wallet.saldo_total)}</b>
+                      <b>{money(wallet.saldo_total)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(wallet.saldo_total)}</small>}</b>
                     </div>
                   </div>
                 </div>
@@ -463,7 +466,7 @@ export default function SellerWalletPage() {
                 </p>
 
                 <p className="mt-2 text-xl font-semibold text-[#18794E]">
-                  {money(chart.inflow)}
+                  {money(chart.inflow)}{localCurrency !== "ZAR" && <p className="mt-1 text-sm text-slate-500">≈ {localMoney(chart.inflow)}</p>}
                 </p>
 
                 <p className="mt-1 text-xs text-slate-400">
@@ -477,7 +480,7 @@ export default function SellerWalletPage() {
                 </p>
 
                 <p className="mt-2 text-xl font-semibold text-[#0A0440]">
-                  {money(chart.outflow)}
+                  {money(chart.outflow)}{localCurrency !== "ZAR" && <p className="mt-1 text-sm text-slate-500">≈ {localMoney(chart.outflow)}</p>}
                 </p>
 
                 <p className="mt-1 text-xs text-slate-400">
@@ -575,7 +578,7 @@ export default function SellerWalletPage() {
                             }`}
                           >
                             {entry.valor > 0 ? "+" : ""}
-                            {money(entry.valor)}
+                            {money(entry.valor)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(entry.valor)}</small>}
                           </td>
 
                           <td className="px-5 py-4">
