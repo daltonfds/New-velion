@@ -244,6 +244,8 @@ export default function RegisterPage() {
             </button>
           </form>
 
+          <p className="mt-3 text-center text-sm text-slate-500">Want to promote Newvelion instead of selling products?{" "}<Link href="/register/affiliate" className="font-semibold text-blue-600">Join as a platform affiliate</Link></p>
+
           <p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{" "}
             <Link
