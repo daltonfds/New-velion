@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const sessionId = String(body?.session_id || "").trim();
     const status = String(body?.status || "").trim();
+    const rejectionReason = String(body?.rejection_reason || body?.note || "").trim();
 
     const allowedStatuses = [
       "pending",
@@ -67,9 +68,16 @@ export async function POST(request: NextRequest) {
       .eq("id", sessionId)
       .maybeSingle();
 
-    if (sessionError || !session) {
+    if (sessionError) {
       return NextResponse.json(
-        { error: "Checkout session not found." },
+        { error: `Could not load checkout session: ${sessionError.message}` },
+        { status: 500 },
+      );
+    }
+
+    if (!session) {
+      return NextResponse.json(
+        { error: "Checkout session not found. Refresh the list and reopen the checkout." },
         { status: 404 },
       );
     }
@@ -98,6 +106,7 @@ export async function POST(request: NextRequest) {
       .from("checkout_sessions")
       .update({
         status,
+        ...(status === "rejected" && rejectionReason ? { admin_notes: rejectionReason } : {}),
         updated_at: new Date().toISOString(),
       })
       .eq("id", sessionId);
