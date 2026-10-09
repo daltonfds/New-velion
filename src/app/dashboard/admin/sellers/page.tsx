@@ -24,6 +24,7 @@ interface Seller {
   avatar_url: string | null;
   kyc_status: string | null;
   status: string | null;
+  sales_activation_status: string | null;
   primary_company_id: string | null;
   created_at: string;
   updated_at: string;
@@ -61,26 +62,26 @@ export default function AdminSellersPage() {
         return;
       }
 
-      setSellers(
-        (data ?? []).map((seller: Seller) => ({
-          ...seller,
-          sales_count: Number(seller.sales_count ?? 0),
-          gross_sales: Number(seller.gross_sales ?? 0),
-          commission_earned: Number(seller.commission_earned ?? 0),
-          commission_available: Number(
-            seller.commission_available ?? 0,
-          ),
-          guarantee_retained: Number(
-            seller.guarantee_retained ?? 0,
-          ),
-          reserved: Number(seller.reserved ?? 0),
-          withdrawn: Number(seller.withdrawn ?? 0),
-          available_balance: Number(
-            seller.available_balance ?? 0,
-          ),
-          total_balance: Number(seller.total_balance ?? 0),
-        })),
-      );
+      const baseSellers = (data ?? []).map((seller: Seller) => ({
+        ...seller,
+        sales_count: Number(seller.sales_count ?? 0),
+        gross_sales: Number(seller.gross_sales ?? 0),
+        commission_earned: Number(seller.commission_earned ?? 0),
+        commission_available: Number(seller.commission_available ?? 0),
+        guarantee_retained: Number(seller.guarantee_retained ?? 0),
+        reserved: Number(seller.reserved ?? 0),
+        withdrawn: Number(seller.withdrawn ?? 0),
+        available_balance: Number(seller.available_balance ?? 0),
+        total_balance: Number(seller.total_balance ?? 0),
+      }));
+      const { data: activationRows } = baseSellers.length
+        ? await supabase.from("profiles").select("id,sales_activation_status").in("id", baseSellers.map((seller: Seller) => seller.id))
+        : { data: [] };
+      const activationById = new Map((activationRows ?? []).map((profile: { id: string; sales_activation_status: string | null }) => [profile.id, profile.sales_activation_status]));
+      setSellers(baseSellers.map((seller: Seller) => ({
+        ...seller,
+        sales_activation_status: activationById.get(seller.id) || "inactive",
+      })));
 
       setLoading(false);
     }
@@ -121,8 +122,7 @@ export default function AdminSellersPage() {
 
       const matchesStatus =
         statusFilter === "all" ||
-        (seller.status || "").toLowerCase() ===
-          statusFilter.toLowerCase();
+        (seller.sales_activation_status || "inactive").toLowerCase() === statusFilter.toLowerCase();
 
       return matchesSearch && matchesKyc && matchesStatus;
     });
@@ -161,9 +161,7 @@ export default function AdminSellersPage() {
   ).length;
 
   const activeSellers = sellers.filter(
-    (seller) =>
-      !seller.status ||
-      seller.status.toLowerCase() === "active",
+    (seller) => (seller.sales_activation_status || "inactive").toLowerCase() === "active",
   ).length;
 
   return (
@@ -197,7 +195,7 @@ export default function AdminSellersPage() {
           </Card>
 
           <Card>
-            <p className="text-sm text-slate-500">Active Sellers</p>
+            <p className="text-sm text-slate-500">Sales-Active Sellers</p>
             <p className="mt-2 text-2xl font-semibold text-slate-900">
               {activeSellers}
             </p>
@@ -252,10 +250,9 @@ export default function AdminSellersPage() {
               }
               className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
             >
-              <option value="all">All statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="suspended">Suspended</option>
+              <option value="all">All sales activation states</option>
+              <option value="active">Active — first sale made</option>
+              <option value="inactive">Inactive — no sale yet</option>
             </select>
           </div>
         </Card>
@@ -295,7 +292,10 @@ export default function AdminSellersPage() {
                       KYC
                     </th>
                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Status
+                      Account status
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      Sales activation
                     </th>
                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wide text-slate-500">
                       Sales
@@ -367,9 +367,11 @@ export default function AdminSellersPage() {
                         </td>
 
                         <td className="px-6 py-4">
-                          <Badge>
-                            {seller.status || "Active"}
-                          </Badge>
+                          <Badge>{seller.status || "active"}</Badge>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <Badge>{(seller.sales_activation_status || "inactive") === "active" ? "Active — first sale" : "Inactive — no sale"}</Badge>
                         </td>
 
                         <td className="px-6 py-4 text-sm text-slate-700">
