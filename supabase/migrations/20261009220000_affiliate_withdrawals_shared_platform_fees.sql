@@ -51,7 +51,7 @@ begin
 
   fx := coalesce(nullif(trim(coalesce(p_data->>'exchange_rate','')),'')::numeric,1);
   if cfg.pais<>'ZA' and (fx is null or fx<=0) then raise exception 'A live exchange rate is required for this withdrawal'; end if;
-  amount_zar := round(p_amount/fx,2);
+  if role_name='platform_affiliate' then amount_zar := p_amount; else amount_zar := round(p_amount/fx,2); end if;
 
   if role_name='supplier' then
     select coalesce(sum(we.valor),0) into rows_available from public.wallet_entries we
