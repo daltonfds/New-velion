@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState } from "react";\nimport Link from "next/link";
 
 type Product = {
   id: string;
@@ -209,7 +209,7 @@ export default function ProductInfo({
                     const { supabase } = await import("@/lib/supabase");
                     const { data: { user } } = await supabase.auth.getUser();
                     if (!user) {
-                      window.location.href = "/login";
+                      const next = window.location.pathname + window.location.search;\n                      window.location.href = "/register/customer?next=" + encodeURIComponent(next);
                       return;
                     }
                     const { data: profile } = await supabase
@@ -218,7 +218,7 @@ export default function ProductInfo({
                       .eq("id", user.id)
                       .maybeSingle();
                     if (profile?.role !== "customer") {
-                      window.location.href = "/register/customer";
+                      const next = window.location.pathname + window.location.search;\n                      window.location.href = "/register/customer?next=" + encodeURIComponent(next);
                       return;
                     }
                     const { error } = await supabase
@@ -239,7 +239,7 @@ export default function ProductInfo({
                 </button>
               </div>
 
-              <div className="mt-5 grid grid-cols-3 divide-x border-y border-[#E5E7EB] py-4 text-center">
+              <Link href={"/register/customer?next=" + encodeURIComponent("/produto/" + product.slug + (affiliateLink ? "?ref=" + affiliateLink : ""))} className="mt-4 block rounded-lg px-3 py-3 text-center text-sm font-semibold text-[#003B95] underline underline-offset-4 hover:bg-[#F7FAFF]">Create a buyer account to continue shopping</Link>\n\n              <div className="mt-5 grid grid-cols-3 divide-x border-y border-[#E5E7EB] py-4 text-center">
                 <div className="px-2">
                   <p className="text-xs font-semibold text-[#1F2937]">Secure checkout</p>
                 </div>
