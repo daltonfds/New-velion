@@ -155,6 +155,7 @@ declare
   v_affiliate_id uuid;
   v_active_count integer;
   v_threshold integer;
+  v_inserted integer;
 begin
   if lower(coalesce(new.status,'')) <> 'paga'
      or (tg_op='UPDATE' and lower(coalesce(old.status,''))='paga') then
@@ -232,14 +233,9 @@ begin
         values(v_affiliate_id,'mystery_prize',0,v_threshold,'unlocked',
           'Mystery prize unlocked for reaching '||v_threshold||' active referrals')
         on conflict (affiliate_user_id,milestone_count,reward_type) do nothing;
+        get diagnostics v_inserted = row_count;
 
-        if not exists (
-          select 1 from public.platform_affiliate_rewards r
-          where r.affiliate_user_id=v_affiliate_id
-            and r.milestone_count=v_threshold
-            and r.reward_type='mystery_prize'
-            and r.created_at < now() - interval '1 second'
-        ) then
+        if v_inserted > 0 then
           insert into public.notifications(user_id,type,title,message,data)
           values(v_affiliate_id,'mystery_prize_unlocked','Mystery prize unlocked!',
             'You reached '||v_threshold||' active referrals. Contact Newvelion support to reveal your mystery prize.',
@@ -270,3 +266,48 @@ from (
 ) first_sales
 where first_sales.user_id=p.id
   and p.role='seller';
+
+
+create or replace function public.get_platform_affiliate_dashboard()
+returns table(
+  referral_code text,
+  referrals_total bigint,
+  active_referrals bigint,
+  rewards_earned numeric,
+  rewards_pending numeric,
+  mystery_prizes_unlocked integer,
+  next_milestone integer
+)
+language plpgsql
+stable
+security definer
+set search_path=''
+as $function$
+declare
+  v_user uuid := auth.uid();
+  v_active integer := 0;
+begin
+  if v_user is null or not exists(select 1 from public.platform_affiliates pa where pa.user_id=v_user) then
+    raise exception 'PLATFORM_AFFILIATE_ACCESS_REQUIRED';
+  end if;
+
+  select count(*)::integer into v_active
+  from public.profiles p
+  where p.platform_referred_by=v_user
+    and p.role in ('seller','supplier')
+    and p.sales_activation_status='active';
+
+  return query
+  select
+    pa.referral_code,
+    (select count(*) from public.profiles p where p.platform_referred_by=v_user and p.role in ('seller','supplier')),
+    v_active::bigint,
+    coalesce((select sum(r.amount) from public.platform_affiliate_rewards r where r.affiliate_user_id=v_user and r.reward_type='referral_bonus' and r.status in ('earned','paid')),0),
+    coalesce((select sum(r.amount) from public.platform_affiliate_rewards r where r.affiliate_user_id=v_user and r.reward_type='referral_bonus' and r.status='pending'),0),
+    (select count(*)::integer from public.platform_affiliate_rewards r where r.affiliate_user_id=v_user and r.reward_type='mystery_prize' and r.status='unlocked'),
+    case when v_active < 5 then 5 when v_active < 10 then 10 when v_active < 25 then 25 else null end
+  from public.platform_affiliates pa where pa.user_id=v_user;
+end;
+$function$;
+
+grant execute on function public.get_platform_affiliate_dashboard() to authenticated;
