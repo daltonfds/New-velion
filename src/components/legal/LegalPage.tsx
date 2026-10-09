@@ -74,7 +74,8 @@ export default function LegalPage({
               <Link href="/refund-policy">Refunds</Link>
               <Link href="/seller-terms">Seller Terms</Link>
               <Link href="/acceptable-use">Acceptable Use</Link>
-              <Link href="/support">Support</Link>\n              <Link href="/security">Security</Link>
+              <Link href="/support">Support</Link>
+              <Link href="/security-reporting">Security</Link>
             </div>
           </div>
 
