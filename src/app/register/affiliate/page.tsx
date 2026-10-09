@@ -11,6 +11,7 @@ export default function PlatformAffiliateRegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [countryCode, setCountryCode] = useState("ZA");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -36,6 +37,9 @@ export default function PlatformAffiliateRegisterPage() {
           full_name: fullName.trim(),
           role: "platform_affiliate",
           preferred_language: "en",
+          country_code: countryCode,
+          country_name: countryCode === "MZ" ? "Mozambique" : "South Africa",
+          country_calling_code: countryCode === "MZ" ? "+258" : "+27",
           accepted_terms_at: new Date().toISOString(),
           accepted_terms_version: "2026-10-09",
           accepted_privacy_policy: true,
@@ -67,6 +71,7 @@ export default function PlatformAffiliateRegisterPage() {
 
           <form onSubmit={submit} className="mt-7 space-y-4">
             <label className="block text-sm font-semibold text-[#001B44]">Full name<input required autoComplete="name" value={fullName} onChange={(event) => setFullName(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" /></label>
+            <label className="block text-sm font-semibold text-[#001B44]">Country<select required value={countryCode} onChange={(event) => setCountryCode(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]"><option value="ZA">South Africa</option><option value="MZ">Mozambique</option></select></label>
             <label className="block text-sm font-semibold text-[#001B44]">Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" /></label>
             <label className="block text-sm font-semibold text-[#001B44]">Password<input required minLength={8} type="password" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" /></label>
             <label className="flex items-start gap-3 text-sm leading-6 text-slate-600"><input type="checkbox" required checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} className="mt-1 h-4 w-4 accent-[#006CE5]" /><span>I agree to the <Link href="/terms" target="_blank" className="font-semibold text-[#003B95] underline">Terms of Service</Link> and acknowledge the <Link href="/privacy" target="_blank" className="font-semibold text-[#003B95] underline">Privacy Policy</Link>.</span></label>
