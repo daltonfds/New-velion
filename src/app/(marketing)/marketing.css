@@ -2,7 +2,6 @@
 .nv-site{--nv-blue:#003B95;--nv-bright:#0078E8;--nv-navy:#001B44;--nv-gold:#FFB800;
 --nv-bg:#fff;--nv-surface:#EAF3FF;--nv-text:#001B44;--nv-muted:#4B5563;--nv-line:#D3E3F8;--nv-accent:#003B95;--nv-btn-text:#fff;--nv-card:#fff;
 min-height:100vh;background:var(--nv-bg);color:var(--nv-text);font-family:var(--nv-font),Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
-@media (prefers-color-scheme:dark){.nv-site{--nv-bg:#001B44;--nv-surface:#052B63;--nv-text:#F3F8FF;--nv-muted:#B6C6E0;--nv-line:#1B4585;--nv-accent:#5AA9FF;--nv-btn-text:#001B44;--nv-card:#06306B}}
 .nv-site *,.nv-site *::before,.nv-site *::after{box-sizing:border-box}
 .nv-site a{color:inherit}
 .nv-site :focus-visible{outline:3px solid var(--nv-bright);outline-offset:2px}
