@@ -75,6 +75,7 @@ function ReviewForm() {
       let mediaUrls: string[] = [];
       if (files.length) {
         const formData = new FormData();
+        formData.append("product_id", productId);
         files.forEach((file) => formData.append("files", file));
         const uploadResponse = await fetch("/api/customer/reviews", {
           method: "POST",
