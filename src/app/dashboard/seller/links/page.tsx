@@ -405,10 +405,29 @@ export default function SellerLinksPage() {
 
                       <div className="mt-3 rounded-lg border border-[#E5E7EB] bg-[#F7F8FA] px-3 py-2">
                         <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                          Affiliate Link
+                          Sales page link
                         </p>
                         <p className="break-all text-xs text-slate-600">
                           {item.affiliateUrl}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          Opens the Newvelion product sales page.
+                        </p>
+                      </div>
+
+                      <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50/60 px-3 py-2">
+                        <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#003B95]">
+                          Direct checkout link
+                        </p>
+                        <p className="break-all text-xs text-slate-700">
+                          {(() => {
+                            const code = String(item.link_unico).replace(/^\\/+/, "").replace(/^go\\//i, "");
+                            const affiliateRef = `go/${code}`;
+                            return `${siteUrl}/entrega?ref=${encodeURIComponent(affiliateRef)}`;
+                          })()}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-600">
+                          Use this on your own store or custom product page. It skips the Newvelion sales page and goes straight to delivery details, then secure checkout. Your seller attribution stays attached.
                         </p>
                       </div>
 
@@ -441,13 +460,28 @@ export default function SellerLinksPage() {
                           Share
                         </button>
 
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const code = String(item.link_unico).replace(/^\\/+/, "").replace(/^go\\//i, "");
+                            const affiliateRef = `go/${code}`;
+                            const directCheckoutUrl = `${siteUrl}/entrega?ref=${encodeURIComponent(affiliateRef)}`;
+                            void copyLink(directCheckoutUrl, `${item.id}-checkout`);
+                          }}
+                          className="inline-flex h-9 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm font-medium text-[#003B95] hover:bg-blue-100"
+                        >
+                          {copied === `${item.id}-checkout`
+                            ? "Checkout Link Copied"
+                            : "Copy Direct Checkout"}
+                        </button>
+
                         <a
                           href={item.affiliateUrl}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm font-medium text-slate-700 hover:bg-[#F7F8FA]"
                         >
-                          Open Link
+                          Open Sales Page
                         </a>
                       </div>
                     </div>
