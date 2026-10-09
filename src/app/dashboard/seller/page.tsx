@@ -232,6 +232,32 @@ export default function SellerDashboardPage() {
             </div>
           </Card>
 
+          {leaderboards && (
+            <section className="mb-6 grid gap-5 xl:grid-cols-2">
+              {[
+                { title: "Top sellers in your country", rows: leaderboards.country, subtitle: leaderboards.country_code ? `Country: ${leaderboards.country_code}` : "Add your country to join this ranking" },
+                { title: "Newvelion platform ranking", rows: leaderboards.platform, subtitle: leaderboards.month_start ? `Monthly performance · ${new Date(leaderboards.month_start).toLocaleDateString("en-ZA", { month: "long", year: "numeric", timeZone: "UTC" })}` : "Monthly performance" },
+              ].map((ranking) => (
+                <Card key={ranking.title} className="border border-blue-100 bg-white p-5 shadow-none">
+                  <div className="mb-4"><h2 className="text-lg font-bold text-[#001B44]">{ranking.title}</h2><p className="mt-1 text-xs text-slate-500">{ranking.subtitle}</p></div>
+                  {ranking.rows.length === 0 ? (
+                    <p className="rounded-lg bg-[#F7F8FA] p-4 text-sm text-slate-500">No confirmed sales recorded this month yet.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {ranking.rows.map((row) => (
+                        <div key={row.seller_id} className="flex items-center gap-3 rounded-lg border border-slate-100 p-3">
+                          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${row.rank_position === 1 ? "bg-[#FFB800] text-[#001B44]" : "bg-[#EAF3FF] text-[#003B95]"}`}>{row.rank_position}</span>
+                          <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-slate-900">{row.seller_name}</p><p className="mt-0.5 text-xs text-slate-500">{row.country_code || "Country not set"} · {row.sales_count} {row.sales_count === 1 ? "sale" : "sales"}</p></div>
+                          <div className="text-right"><p className="text-sm font-bold text-[#003B95]">{money(Number(row.monthly_commission || 0))}</p><p className="text-[11px] text-slate-500">earned this month</p></div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </section>
+          )}
+
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {[
               {
