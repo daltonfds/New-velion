@@ -242,7 +242,7 @@ export default function ProductInfo({
                 </button>
               </div>
 
-              <Link href={"/register/customer?next=" + encodeURIComponent("/produto/" + product.slug + (affiliateLink ? "?ref=" + affiliateLink : ""))} className="mt-4 block rounded-lg px-3 py-3 text-center text-sm font-semibold text-[#003B95] underline underline-offset-4 hover:bg-[#F7FAFF]">Create a buyer account to continue shopping</Link>
+              <Link href={"/register/customer?next=" + encodeURIComponent("/produto/" + product.slug + (affiliateLink ? "?ref=" + encodeURIComponent(affiliateLink) : ""))} className="mt-4 block rounded-lg px-3 py-3 text-center text-sm font-semibold text-[#003B95] underline underline-offset-4 hover:bg-[#F7FAFF]">Create a buyer account to continue shopping</Link>
 
               <div className="mt-5 grid grid-cols-3 divide-x border-y border-[#E5E7EB] py-4 text-center">
                 <div className="px-2">
