@@ -241,7 +241,7 @@ export default function AdminCheckoutSessionsPage() {
     }
   }
 
-  async function updateStatus(sessionId: string, status: string) {
+  async function updateStatus(sessionId: string, status: string, rejectionReason = "") {
     setError("");
 
     try {
@@ -302,6 +302,7 @@ export default function AdminCheckoutSessionsPage() {
             body: JSON.stringify({
               session_id: sessionId,
               status,
+              ...(status === "rejected" && rejectionReason ? { rejection_reason: rejectionReason } : {}),
             }),
           }
         );
