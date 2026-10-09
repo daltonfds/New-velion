@@ -9,7 +9,8 @@ import { supabase } from "@/lib/supabase";
 function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get("email")?.trim().toLowerCase() || "";\n  const requestedNext = searchParams.get("next") || "/account";
+  const email = searchParams.get("email")?.trim().toLowerCase() || "";
+  const requestedNext = searchParams.get("next") || "/account";
   const nextPath = requestedNext.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/account";
 
   const [code, setCode] = useState("");
