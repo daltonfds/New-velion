@@ -40,8 +40,8 @@ export default function CustomerRegisterPage() {
     <div className="mx-auto w-full max-w-xl">
       <div className="rounded-[12px] border border-[#dde5ef] bg-white p-6 shadow-none sm:p-8">
         <div className="mb-8 flex justify-center border-b border-slate-100 pb-7"><NewvelionBrand size="md"/></div>
-        <h1 className="text-3xl font-extrabold text-[#0e1f3d]">Create your Newvelion account</h1>
-        <p className="mt-2 text-slate-500">Shop products, track orders and manage your purchases.</p>
+        <h1 className="text-3xl font-extrabold text-[#0e1f3d]">Create your customer account</h1>
+        <p className="mt-2 text-slate-500">Use your email and mobile number to create an account, shop products and track your orders.</p>
         <form onSubmit={submit} className="mt-8 space-y-5">
           <input required placeholder="Full name" value={form.fullName} onChange={e=>setForm({...form,fullName:e.target.value})} className="w-full rounded-[7px] border border-[#dde5ef] px-4 py-3.5 outline-none focus:border-blue-500"/>
           <PhoneFields allowedCountries={["ZA"]} countryCode={form.country} phone={form.phone} whatsapp={form.whatsapp} language={form.language}
