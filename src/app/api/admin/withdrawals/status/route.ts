@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Server Supabase configuration is missing." }, { status: 500 });
   }
 
-  const token = (request.headers.get("authorization") || "").replace(/^Bearer\\s+/i, "").trim();
+  const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
   if (!token) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
   const adminClient = createClient(url, serviceRoleKey, { auth: { persistSession: false, autoRefreshToken: false } });
