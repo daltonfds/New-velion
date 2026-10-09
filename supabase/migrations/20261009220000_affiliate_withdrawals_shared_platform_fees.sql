@@ -22,7 +22,7 @@ begin
   select * into prof from public.profiles where id=p_user_id;
   if prof.id is null then raise exception 'Profile not found'; end if;
   role_name := coalesce(prof.role,'');
-  country_code := upper(coalesce(nullif(prof.pais,''),nullif(prof.country_code,''),nullif(prof.country,''),''));
+  country_code := case upper(coalesce(nullif(prof.pais,''),nullif(prof.country_code,''),nullif(prof.country,''),'')) when 'SOUTH AFRICA' then 'ZA' when 'MOZAMBIQUE' then 'MZ' when 'ANGOLA' then 'AO' else upper(coalesce(nullif(prof.pais,''),nullif(prof.country_code,''),nullif(prof.country,''),'')) end;
 
   if role_name='supplier' then
     select * into sp from public.supplier_profiles where user_id=p_user_id;
@@ -137,7 +137,7 @@ declare v_user uuid:=auth.uid(); prof public.profiles%rowtype; cfg public.payout
 begin
   if v_user is null or not exists(select 1 from public.platform_affiliates pa where pa.user_id=v_user) then raise exception 'PLATFORM_AFFILIATE_ACCESS_REQUIRED'; end if;
   select * into prof from public.profiles p where p.id=v_user;
-  code:=upper(coalesce(nullif(prof.pais,''),nullif(prof.country_code,''),nullif(prof.country,''),''));
+  code:=case upper(coalesce(nullif(prof.pais,''),nullif(prof.country_code,''),nullif(prof.country,''),'')) when 'SOUTH AFRICA' then 'ZA' when 'MOZAMBIQUE' then 'MZ' when 'ANGOLA' then 'AO' else upper(coalesce(nullif(prof.pais,''),nullif(prof.country_code,''),nullif(prof.country,''),'')) end;
   select * into cfg from public.payout_methods pm where pm.pais=code;
   select * into ps from public.platform_settings limit 1;
   select coalesce(sum(r.amount),0) into earned from public.platform_affiliate_rewards r where r.affiliate_user_id=v_user and r.reward_type='referral_bonus' and r.status in ('earned','paid');
