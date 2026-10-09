@@ -29,7 +29,7 @@ interface NavItem {
   icon: IconName;
 }
 
-function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
+function countryFlag(code: string) {\n  const normalized = code.trim().toUpperCase();\n  if (!/^[A-Z]{2}$/.test(normalized)) return "";\n  return String.fromCodePoint(...normalized.split("").map((letter) => 127397 + letter.charCodeAt(0)));\n}\n\nfunction Icon({ name, size = 18 }: { name: IconName; size?: number }) {
   const props = {
     width: size,
     height: size,
@@ -171,7 +171,7 @@ export default function AppShell({
   subtitle,
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [profileInitial, setProfileInitial] = useState("U");
+  const [profileInitial, setProfileInitial] = useState("U");\n  const [countryCode, setCountryCode] = useState("");
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [pt, setPt] = useState(false);
@@ -215,7 +215,7 @@ export default function AppShell({
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name,nome_completo")
+        .select("full_name,nome_completo,country_code,pais")
         .eq("id", user.id)
         .maybeSingle();
 
