@@ -58,7 +58,11 @@ export default function AffiliateWithdrawalsPage() {
     if (summaryResult.error) setError(summaryResult.error.message);
     else if (summaryResult.data) setSummary(summaryResult.data as Summary);
     if (settingsResult.error) setError((current) => current ? current + " " + settingsResult.error!.message : settingsResult.error!.message);
-    else setPayoutSettings((settingsResult.data?.payout_methods || {}) as Record<string, PayoutDetails>);
+    else {
+      const saved = (settingsResult.data?.payout_methods || {}) as Record<string, PayoutDetails>;
+      setPayoutSettings(saved);
+      if (!saved.mpesa?.enabled && saved.emola?.enabled) setProvider("e-mola");
+    }
     if (withdrawalsResult.error) setError((current) => current ? current + " " + withdrawalsResult.error!.message : withdrawalsResult.error!.message);
     else setWithdrawals((withdrawalsResult.data || []) as Withdrawal[]);
     setLoading(false);
