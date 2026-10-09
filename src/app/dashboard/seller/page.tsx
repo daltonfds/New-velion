@@ -126,13 +126,8 @@ export default function SellerDashboardPage() {
     load();
   }, []);
 
-  const paidSales = useMemo(
-    () =>
-      sales.filter((sale) =>
-        ["paga", "paid", "approved", "completed", "success"].includes(
-          (sale.status || "").toLowerCase()
-        )
-      ),
+  const recentSales = useMemo(
+    () => [...sales].sort((a, b) => new Date(b.vendido_em || 0).getTime() - new Date(a.vendido_em || 0).getTime()),
     [sales]
   );
 
@@ -439,7 +434,7 @@ export default function SellerDashboardPage() {
                 <div className="px-6 py-10 text-sm text-[#7C8798]">
                   Loading live records…
                 </div>
-              ) : paidSales.length === 0 ? (
+              ) : recentSales.length === 0 ? (
                 <div className="px-6 py-12 text-center">
                   <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-lg border border-[#DCE3EE] bg-[#F5F8FC]">
                     <svg
@@ -472,7 +467,7 @@ export default function SellerDashboardPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#E9EEF5]">
-                      {paidSales.slice(0, 6).map((sale) => (
+                      {recentSales.slice(0, 6).map((sale) => (
                         <tr key={sale.id} className="hover:bg-[#FAFBFD]">
                           <td className="px-6 py-4 text-[#60708A]">
                             {new Date(sale.vendido_em).toLocaleDateString(
