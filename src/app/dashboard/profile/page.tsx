@@ -38,7 +38,7 @@ export default function ProfilePage() {
     <AppShell
       area={isAdmin ? "admin" : "seller"}
       title="Profile & Settings"
-      subtitle="Manage your account, profile and payout preferences."
+      subtitle={isAdmin ? "Manage your administrator profile, access and platform settings." : "Manage your account, profile and payout preferences."}
     >
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
@@ -141,7 +141,7 @@ export default function ProfilePage() {
             </Link>
 
             <Link
-              href="/dashboard/seller/settings"
+              href={isAdmin ? "/dashboard/admin/users" : "/dashboard/seller/settings"}
               className="flex items-center justify-between px-6 py-5 hover:bg-slate-50"
             >
               <div>
