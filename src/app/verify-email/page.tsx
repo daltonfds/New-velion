@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get("email")?.trim().toLowerCase() || "";
+  const email = searchParams.get("email")?.trim().toLowerCase() || "";\n  const requestedNext = searchParams.get("next") || "/account";\n  const nextPath = requestedNext.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/account";
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,7 @@ function VerifyEmailForm() {
     setSuccess("Email verified successfully. Redirecting to sign in...");
 
     setTimeout(() => {
-      router.replace("/login");
+      router.replace("/login?redirect=" + encodeURIComponent(nextPath));
     }, 900);
   }
 
