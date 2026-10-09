@@ -77,10 +77,9 @@ export default function AdminSellersPage() {
       const { data: activationRows } = baseSellers.length
         ? await supabase.from("profiles").select("id,sales_activation_status").in("id", baseSellers.map((seller: Seller) => seller.id))
         : { data: [] };
-      const activationById = new Map((activationRows ?? []).map((profile: { id: string; sales_activation_status: string | null }) => [profile.id, profile.sales_activation_status]));
       setSellers(baseSellers.map((seller: Seller) => ({
         ...seller,
-        sales_activation_status: activationById.get(seller.id) || "inactive",
+        sales_activation_status: (activationRows ?? []).find((profile: { id: string; sales_activation_status: string | null }) => profile.id === seller.id)?.sales_activation_status || "inactive",
       })));
 
       setLoading(false);
