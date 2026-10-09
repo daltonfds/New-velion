@@ -1,25 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [message, setMessage] = useState("Completing sign-in...");
 
   useEffect(() => {
     let active = true;
     async function complete() {
-      const requestedNext = searchParams.get("next") || "/account";
+      const params = new URLSearchParams(window.location.search);
+      const requestedNext = params.get("next") || "/account";
       const nextPath = requestedNext.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/account";
-      const code = searchParams.get("code");
-      const authError = searchParams.get("error_description") || searchParams.get("error");
+      const code = params.get("code");
+      const authError = params.get("error_description") || params.get("error");
       if (authError) {
         if (active) {
           setMessage(authError);
-          setTimeout(() => router.replace("/register/customer?next=" + encodeURIComponent(nextPath)), 1800);
+          window.setTimeout(() => router.replace("/register/customer?next=" + encodeURIComponent(nextPath)), 1800);
         }
         return;
       }
@@ -35,7 +35,7 @@ export default function AuthCallbackPage() {
         if (active) setMessage("Unable to complete sign-in. Please try again.");
         return;
       }
-      if (searchParams.get("intent") === "customer") {
+      if (params.get("intent") === "customer") {
         const response = await fetch("/api/auth/customer-oauth", {
           method: "POST",
           headers: { Authorization: "Bearer " + session.access_token },
@@ -50,7 +50,7 @@ export default function AuthCallbackPage() {
     }
     void complete();
     return () => { active = false; };
-  }, [router, searchParams]);
+  }, [router]);
 
   return <main className="flex min-h-screen items-center justify-center bg-[#f6f9fc] px-5"><div className="w-full max-w-md rounded-xl border border-[#dde5ef] bg-white p-8 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#003B95]" /><p role="status" className="mt-5 text-sm font-semibold text-[#003B95]">{message}</p></div></main>;
 }
