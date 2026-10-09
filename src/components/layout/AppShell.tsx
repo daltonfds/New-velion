@@ -145,6 +145,7 @@ const navigation: Record<AppArea, NavItem[]> = {
   affiliate: [
     { label: "Dashboard", href: "/dashboard/affiliate", icon: "home" },
     { label: "Referral program", href: "/dashboard/affiliate", icon: "link" },
+    { label: "Withdrawals", href: "/dashboard/affiliate/withdrawals", icon: "download" },
   ],
 
   admin: [
