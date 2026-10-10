@@ -122,15 +122,15 @@ export async function POST(request: Request) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Sale approved, but a valid customer email is missing." }, { status: 409 });
 
     let customerId: string | null = checkout.customer_id || null;
-    let existingUser: { id: string; email?: string } | null = null;
+    let existingUserId: string | null = null;
     if (!customerId) {
       for (let page = 1; page <= 20; page += 1) {
         const { data: usersPage, error: usersError } = await admin.auth.admin.listUsers({ page, perPage: 500 });
         if (usersError) return NextResponse.json({ error: "Sale approved, but customer lookup failed. Retry approval." }, { status: 500 });
-        existingUser = usersPage.users.find((candidate) => candidate.email?.toLowerCase() === email) || null;
-        if (existingUser || usersPage.users.length < 500) break;
+        existingUserId = usersPage.users.find((candidate) => candidate.email?.toLowerCase() === email)?.id || null;
+        if (existingUserId || usersPage.users.length < 500) break;
       }
-      if (existingUser) customerId = existingUser.id;
+      if (existingUserId) customerId = existingUserId;
       else {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://veliongroup.online";
         const { data: invitation, error: invitationError } = await admin.auth.admin.inviteUserByEmail(email, {
