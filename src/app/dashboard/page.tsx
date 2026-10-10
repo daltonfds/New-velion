@@ -36,9 +36,6 @@ export default function DashboardPage() {
       if (session?.user && !resolved) {
         // Defer database access until after the auth callback has returned.
         window.setTimeout(() => { if (active && !resolved) void routeUser(session.user.id); }, 0);
-      } else if (event === "INITIAL_SESSION" && !session && !resolved) {
-        resolved = true;
-        router.replace("/login?next=%2Fdashboard");
       }
     });
 
