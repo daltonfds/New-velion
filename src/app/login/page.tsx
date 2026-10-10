@@ -27,7 +27,8 @@ function LoginPageContent() {
       setGoogleLoading(false);
       return;
     }
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent(nextPath), queryParams: { prompt: "select_account" } } });
+    const intent = (searchParams.get("role") || "").toLowerCase() === "customer" || nextPath === "/account" || nextPath.startsWith("/dashboard/customer") ? "&intent=customer" : "";
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent(nextPath) + intent, queryParams: { prompt: "select_account" } } });
     if (oauthError) { setError(oauthError.message); setGoogleLoading(false); }
   }
 
