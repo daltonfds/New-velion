@@ -14,7 +14,25 @@ export default function PlatformAffiliateRegisterPage() {
   const [countryCode, setCountryCode] = useState("ZA");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
+
+  async function continueWithGoogle() {
+    setError("");
+    if (!acceptedTerms) {
+      setError("Please accept the Terms of Service and Privacy Policy before continuing with Google.");
+      return;
+    }
+    setGoogleLoading(true);
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent("/dashboard/affiliate"),
+        queryParams: { prompt: "select_account" },
+      },
+    });
+    if (oauthError) { setError(oauthError.message); setGoogleLoading(false); }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,8 +93,9 @@ export default function PlatformAffiliateRegisterPage() {
             <label className="block text-sm font-semibold text-[#001B44]">Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" /></label>
             <label className="block text-sm font-semibold text-[#001B44]">Password<input required minLength={8} type="password" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" /></label>
             <label className="flex items-start gap-3 text-sm leading-6 text-slate-600"><input type="checkbox" required checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} className="mt-1 h-4 w-4 accent-[#006CE5]" /><span>I agree to the <Link href="/terms" target="_blank" className="font-semibold text-[#003B95] underline">Terms of Service</Link> and acknowledge the <Link href="/privacy" target="_blank" className="font-semibold text-[#003B95] underline">Privacy Policy</Link>.</span></label>
+            <button type="button" onClick={continueWithGoogle} disabled={googleLoading || loading} className="flex w-full items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3.5 font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-60"><span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 font-bold text-[#4285F4]">G</span>{googleLoading ? "Connecting to Google..." : "Continue with Google"}</button>
             {error && <div role="alert" className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
-            <button type="submit" disabled={loading} className="w-full rounded-lg bg-[#003B95] px-4 py-3.5 font-semibold text-white hover:bg-[#002B70] disabled:opacity-60">{loading ? "Creating account..." : "Create affiliate account"}</button>
+            <button type="submit" disabled={loading || googleLoading} className="w-full rounded-lg bg-[#003B95] px-4 py-3.5 font-semibold text-white hover:bg-[#002B70] disabled:opacity-60">{loading ? "Creating account..." : "Create affiliate account"}</button>
           </form>
           <p className="mt-5 text-center text-sm text-slate-500">Already registered? <Link href="/login" className="font-semibold text-[#003B95]">Sign in</Link></p>
           <p className="mt-3 text-center text-xs leading-5 text-slate-400">Rewards are recorded only after a first confirmed paid sale. Registrations alone do not count as active referrals.</p>
