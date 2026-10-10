@@ -200,7 +200,7 @@ export default function ProductInfo({
               <div className="mt-4 grid gap-3">
                 <a
                   href={checkoutUrl}
-                  className="flex min-h-14 w-full items-center justify-center bg-[#10069F] px-6 text-sm font-bold uppercase tracking-[.04em] text-white hover:bg-[#0A0440]"
+                  className="flex min-h-14 w-full items-center justify-center bg-[#003B95] px-6 text-sm font-bold uppercase tracking-[.04em] text-white transition hover:bg-[#002B6F]"
                 >
                   Buy now
                 </a>
@@ -237,23 +237,44 @@ export default function ProductInfo({
                     }
                     window.location.href = "/cart";
                   }}
-                  className="flex min-h-14 w-full items-center justify-center border border-[#10069F] bg-white px-6 text-sm font-bold uppercase tracking-[.04em] text-[#10069F] hover:bg-[#E8EDFF]"
+                  className="flex min-h-14 w-full items-center justify-center border border-black bg-black px-6 text-sm font-bold uppercase tracking-[.04em] text-white transition hover:bg-[#222222]"
                 >
                   Add to cart
                 </button>
               </div>
 
+              <div className="mt-5">
+                <p className="mb-3 text-center text-xs font-semibold text-[#6B7280]">Secure payments accepted</p>
+                <div className="flex flex-wrap items-center justify-center gap-2" aria-label="Accepted payment methods">
+                  <div className="flex h-10 min-w-[66px] items-center justify-center rounded-md border border-[#E5E7EB] bg-white px-3" aria-label="Visa">
+                    <svg viewBox="0 0 64 24" className="h-6 w-14" role="img" aria-label="Visa"><text x="2" y="19" fill="#1A1F71" fontSize="22" fontWeight="900" fontStyle="italic">VISA</text></svg>
+                  </div>
+                  <div className="flex h-10 min-w-[66px] items-center justify-center rounded-md border border-[#E5E7EB] bg-white px-3" aria-label="Mastercard">
+                    <svg viewBox="0 0 52 32" className="h-7 w-12" role="img" aria-label="Mastercard"><circle cx="20" cy="16" r="12" fill="#EB001B"/><circle cx="32" cy="16" r="12" fill="#F79E1B"/><path d="M26 6.4a12 12 0 0 1 0 19.2 12 12 0 0 1 0-19.2" fill="#FF5F00"/></svg>
+                  </div>
+                  <div className="flex h-10 min-w-[78px] items-center justify-center rounded-md border border-[#E5E7EB] bg-white px-3" aria-label="Apple Pay">
+                    <svg viewBox="0 0 86 26" className="h-6 w-[72px]" role="img" aria-label="Apple Pay"><text x="1" y="19" fill="#111827" fontSize="18" fontWeight="600"> Pay</text><path d="M13 5c2-2 2-4 2-4s-3 0-4 2-2 4-2 4 2 0 4-2zm3 6c-1-2-3-3-5-3-3 0-4 2-6 2-1 0-3-2-5-2v1c0 5 3 12 6 12 2 0 2-1 5-1 2 0 3 1 4 1 2 0 4-4 5-6-2 0-4-2-4-4z" transform="translate(1 2) scale(.8)" fill="#111827"/></svg>
+                  </div>
+                  <div className="flex h-10 min-w-[82px] items-center justify-center rounded-md border border-[#E5E7EB] bg-white px-3" aria-label="Google Pay">
+                    <svg viewBox="0 0 94 26" className="h-6 w-[78px]" role="img" aria-label="Google Pay"><text x="1" y="19" fontSize="19" fontWeight="700" fill="#4285F4">G</text><text x="19" y="18" fontSize="14" fontWeight="600" fill="#3C4043">Pay</text><path d="M10 4a8 8 0 0 0 0 16" fill="none" stroke="#34A853" strokeWidth="2.5"/><path d="M3 8a8 8 0 0 1 12-3" fill="none" stroke="#EA4335" strokeWidth="2.5"/><path d="M3 16a8 8 0 0 0 12 3" fill="none" stroke="#FBBC04" strokeWidth="2.5"/></svg>
+                  </div>
+                </div>
+              </div>
+
               <Link href={"/register/customer?next=" + encodeURIComponent("/produto/" + product.slug + (affiliateLink ? "?ref=" + encodeURIComponent(affiliateLink) : ""))} className="mt-4 block rounded-lg px-3 py-3 text-center text-sm font-semibold text-[#003B95] underline underline-offset-4 hover:bg-[#F7FAFF]">Create a buyer account to continue shopping</Link>
 
-              <div className="mt-5 grid grid-cols-3 divide-x border-y border-[#E5E7EB] py-4 text-center">
-                <div className="px-2">
-                  <p className="text-xs font-semibold text-[#1F2937]">Secure checkout</p>
+              <div className="mt-5 grid grid-cols-3 gap-2 border-y border-[#E5E7EB] py-4 text-center">
+                <div className="flex flex-col items-center gap-2 px-1">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-xl" aria-hidden="true">🚚</span>
+                  <p className="text-[11px] font-semibold leading-4 text-[#1F2937]">Delivery across South Africa</p>
                 </div>
-                <div className="px-2">
-                  <p className="text-xs font-semibold text-[#1F2937]">South Africa delivery</p>
+                <div className="flex flex-col items-center gap-2 px-1">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-xl" aria-hidden="true">↻</span>
+                  <p className="text-[11px] font-semibold leading-4 text-[#1F2937]">60-day money-back guarantee</p>
                 </div>
-                <div className="px-2">
-                  <p className="text-xs font-semibold text-[#1F2937]">Customer support</p>
+                <div className="flex flex-col items-center gap-2 px-1">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-xl" aria-hidden="true">💬</span>
+                  <p className="text-[11px] font-semibold leading-4 text-[#1F2937]">Customer support</p>
                 </div>
               </div>
 
