@@ -36,7 +36,7 @@ export default function WhyChooseSection({
                 key={`${benefit}-${index}`}
                 className="border border-[#E5E7EB] bg-white p-6"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A0440] text-sm font-bold text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white">
                   ✓
                 </div>
 
