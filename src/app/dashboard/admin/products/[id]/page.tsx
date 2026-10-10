@@ -27,6 +27,7 @@ interface ProductForm {
   categoria_id: string;
   preco: string;
   preco_promocional: string;
+  preco_custo: string;
   moeda: string;
   comissao_tipo: string;
   comissao_valor: string;
@@ -112,6 +113,9 @@ export default function AdminProductPage() {
           product.preco_promocional == null
             ? ""
             : String(product.preco_promocional),
+        preco_custo: product.preco_custo == null
+          ? (product.supplier_cost_amount == null ? "" : String(product.supplier_cost_amount))
+          : String(product.preco_custo),
         moeda: product.moeda ?? "ZAR",
         comissao_tipo: product.comissao_tipo ?? "percentual",
         comissao_valor: String(product.comissao_valor ?? ""),
@@ -222,6 +226,9 @@ export default function AdminProductPage() {
             ? Math.round(Number(form.preco_promocional))
             : Number(form.preco_promocional)
           : null,
+        preco_custo: form.preco_custo.trim() ? Number(form.preco_custo) : null,
+        supplier_cost_amount: form.preco_custo.trim() ? Number(form.preco_custo) : null,
+        supplier_cost_currency: form.preco_custo.trim() ? "ZAR" : null,
         moeda: form.moeda,
         comissao_tipo: form.comissao_tipo,
         comissao_valor: Number(form.comissao_valor || 0),
@@ -522,6 +529,18 @@ export default function AdminProductPage() {
                 onChange={(event) =>
                   updateField("preco_promocional", event.target.value)
                 }
+              />
+
+              <Input
+                label="Supplier Cost (ZAR)"
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.preco_custo}
+                onChange={(event) =>
+                  updateField("preco_custo", event.target.value)
+                }
+                helperText="Enter the actual price charged by the supplier, not the marketplace selling price."
               />
 
               <div>
