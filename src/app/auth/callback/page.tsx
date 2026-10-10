@@ -35,6 +35,13 @@ export default function AuthCallbackPage() {
         if (active) setMessage("Unable to complete sign-in. Please try again.");
         return;
       }
+      const provider = String(session.user.app_metadata?.provider || "");
+      const { data: existingProfile } = await supabase.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
+      if (provider === "google" && existingProfile?.role === "supplier") {
+        await supabase.auth.signOut();
+        if (active) setMessage("Google sign-in is not available for supplier / producer accounts. Please sign in with email and password.");
+        return;
+      }
       if (params.get("intent") === "customer") {
         const response = await fetch("/api/auth/customer-oauth", {
           method: "POST",
