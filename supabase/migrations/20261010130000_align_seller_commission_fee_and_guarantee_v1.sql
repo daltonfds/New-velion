@@ -83,8 +83,7 @@ begin
 
   return new;
 end;
-$function$
-
+$function$;
 
 create or replace function private.post_sale_to_ledger()
  RETURNS trigger
@@ -131,8 +130,7 @@ begin
 
   return new;
 end;
-$function$
-
+$function$;
 
 create or replace function private.release_due_guarantees()
  RETURNS integer
@@ -159,8 +157,7 @@ begin
  end loop;
  return released;
 end;
-$function$
-
+$function$;
 
 create or replace function public.calculate_payjsr_split(p_sale_amount numeric, p_supplier_cost numeric, p_pricing_model text)
  RETURNS jsonb
@@ -207,8 +204,7 @@ begin
     'supplier_fee_percentage', 0
   );
 end;
-$function$
-
+$function$;
 
 create or replace function public.calculate_payjsr_split(p_sale_amount numeric, p_supplier_cost numeric, p_pricing_model text, p_commission_percentage numeric)
  RETURNS jsonb
@@ -259,8 +255,7 @@ begin
     'supplier_fee_percentage', 0
   );
 end;
-$function$
-
+$function$;
 
 -- Release due guarantees every five minutes. Reusing the job name updates the existing schedule.
 do $schedule$
