@@ -540,8 +540,10 @@ export default function AdminProductPage() {
                 onChange={(event) =>
                   updateField("preco_custo", event.target.value)
                 }
-                helperText="Enter the actual price charged by the supplier, not the marketplace selling price."
               />
+              <p className="text-xs text-slate-500">
+                Enter the actual price charged by the supplier, not the marketplace selling price.
+              </p>
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">
