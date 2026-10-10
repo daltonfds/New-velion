@@ -31,7 +31,7 @@ async function sendEmail(n: any, to: string) {
   if (!resend) throw Error("RESEND_API_KEY is not configured.");
 
   const data = n.data || {};
-  const isSale = n.type === "sale_confirmed";
+  const isSale = ["sale_confirmed", "supplier_sale_confirmed", "admin_sale_confirmed"].includes(n.type);
   const isWithdrawal = n.type === "withdrawal_approved" || n.type === "withdrawal_rejected" || n.type === "withdrawal_paid";
   const product = data.product_name || data.product || "—";
   const amount = data.amount;
