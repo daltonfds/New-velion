@@ -130,6 +130,7 @@ export default function SellerDashboardPage() {
       const activationKey = `newvelion-seller-activation-popup:${user.id}`;
       setActivationPopupKey(activationKey);
       if (profile?.sales_activation_status === "active" && profile?.first_sale_at && !window.localStorage.getItem(activationKey)) {
+        window.localStorage.setItem(activationKey, "1");
         setActivationPopupOpen(true);
       }
 
