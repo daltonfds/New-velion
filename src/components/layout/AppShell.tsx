@@ -186,6 +186,7 @@ export default function AppShell({
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileInitial, setProfileInitial] = useState("U");
+  const [accountRole, setAccountRole] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -229,7 +230,11 @@ export default function AppShell({
     router.replace("/login");
   }
 
-  const items = navigation[area];
+  const items = area === "affiliate" && accountRole === "seller"
+    ? [...navigation.affiliate, { label: "Seller dashboard", href: "/dashboard/seller", icon: "home" as IconName }]
+    : area === "affiliate" && accountRole === "supplier"
+      ? [...navigation.affiliate, { label: "Supplier dashboard", href: "/dashboard/supplier", icon: "home" as IconName }]
+      : navigation[area];
 
   useEffect(() => {
     let active = true;
@@ -243,7 +248,7 @@ export default function AppShell({
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name,nome_completo,country_code,pais")
+        .select("full_name,nome_completo,country_code,pais,role")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -260,6 +265,7 @@ export default function AppShell({
         setProfileInitial(name.trim().charAt(0).toUpperCase());
       }
       if (active) setCountryCode(String(profile?.country_code || profile?.pais || "").trim().toUpperCase());
+      if (active) setAccountRole(String(profile?.role || ""));
     }
 
     loadProfileInitial();
@@ -324,7 +330,7 @@ export default function AppShell({
                   <Icon name={item.icon} />
                 </span>
 
-                <span>{t(item.label, ({Dashboard:"Painel",Marketplace:"Mercado", "My Products":"Meus produtos","Orders & Sales":"Pedidos e vendas",Commissions:"Comissões",Wallet:"Carteira",Analytics:"Análises",Integrations:"Integrações",Links:"Links",Withdrawals:"Levantamentos",Products:"Produtos","Orders & Fulfillment":"Pedidos e logística",Shipping:"Envio",Settings:"Definições",Profile:"Perfil",Users:"Utilizadores",Sellers:"Vendedores",Suppliers:"Fornecedores","Business Settings":"Definições da plataforma","Product Review":"Revisão de produtos","Customer Reviews":"Avaliações de clientes",Categories:"Categorias",Orders:"Pedidos",Transactions:"Transações",Disputes:"Disputas",KYC:"KYC","Become affiliate":"Tornar-se afiliado"} as Record<string,string>)[item.label] || item.label)}</span>
+                <span>{t(item.label, ({Dashboard:"Painel",Marketplace:"Mercado", "My Products":"Meus produtos","Orders & Sales":"Pedidos e vendas",Commissions:"Comissões",Wallet:"Carteira",Analytics:"Análises",Integrations:"Integrações",Links:"Links",Withdrawals:"Levantamentos",Products:"Produtos","Orders & Fulfillment":"Pedidos e logística",Shipping:"Envio",Settings:"Definições",Profile:"Perfil",Users:"Utilizadores",Sellers:"Vendedores",Suppliers:"Fornecedores","Business Settings":"Definições da plataforma","Product Review":"Revisão de produtos","Customer Reviews":"Avaliações de clientes",Categories:"Categorias",Orders:"Pedidos",Transactions:"Transações",Disputes:"Disputas",KYC:"KYC","Become affiliate":"Tornar-se afiliado","Seller dashboard":"Painel do vendedor","Supplier dashboard":"Painel do fornecedor"} as Record<string,string>)[item.label] || item.label)}</span>
               </Link>
             ))}
           </div>
