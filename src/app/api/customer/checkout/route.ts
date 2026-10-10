@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const postalCode = String(body?.postal_code || "").trim() || null;
     const address = String(body?.address || "").trim();
     const addressReference = String(body?.address_reference || "").trim() || null;
-    if (!productId || !fullName || !email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !phone || !province || !city || !address) {
+    if (!productId || !fullName || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !phone || !province || !city || !address) {
       return NextResponse.json({ error: "Enter a valid email and complete all required delivery fields." }, { status: 400 });
     }
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 50) return NextResponse.json({ error: "Invalid quantity." }, { status: 400 });
@@ -28,11 +28,11 @@ export async function POST(request: Request) {
       p_address_reference: addressReference, p_email: email, p_quantity: quantity,
     });
     if (error) {
-      const msg = error.message || "";
-      if (/CUSTOMER_ACCOUNT_REQUIRED/i.test(msg)) return NextResponse.json({ error: "Please use guest checkout or sign in with a customer account." }, { status: 403 });
-      if (/OUT_OF_STOCK/i.test(msg)) return NextResponse.json({ error: "Not enough stock for this quantity." }, { status: 409 });
-      if (/PRODUCT_UNAVAILABLE|PRODUCT_NOT_AVAILABLE_FOR_CHECKOUT/i.test(msg)) return NextResponse.json({ error: "Product unavailable." }, { status: 409 });
-      if (/SUPPLIER_FX_RATE_REQUIRED|SUPPLIER_COUNTRY_NOT_SUPPORTED/i.test(msg)) return NextResponse.json({ error: "This product is temporarily unavailable for delivery." }, { status: 409 });
+      const message = error.message || "";
+      if (/OUT_OF_STOCK/i.test(message)) return NextResponse.json({ error: "Not enough stock for this quantity." }, { status: 409 });
+      if (/PRODUCT_UNAVAILABLE|PRODUCT_NOT_AVAILABLE_FOR_CHECKOUT/i.test(message)) return NextResponse.json({ error: "Product unavailable." }, { status: 409 });
+      if (/SUPPLIER_FX_RATE_REQUIRED|SUPPLIER_COUNTRY_NOT_SUPPORTED/i.test(message)) return NextResponse.json({ error: "This product is temporarily unavailable for delivery." }, { status: 409 });
+      console.error("Guest checkout session creation failed:", message);
       return NextResponse.json({ error: "Could not create checkout session." }, { status: 500 });
     }
     const session = Array.isArray(data) ? data[0] : data;
