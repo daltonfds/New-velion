@@ -47,7 +47,7 @@ export default function ProfilePage() {
 
   return (
     <AppShell
-      area={isAdmin ? "admin" : "seller"
+      area={isAdmin ? "admin" : "seller"}
       title="Profile & Settings"
       subtitle={isAdmin ? "Manage your administrator profile, access and platform settings." : "Manage your account, profile and payout preferences."}
     >
