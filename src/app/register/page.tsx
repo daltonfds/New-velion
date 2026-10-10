@@ -272,6 +272,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
+          <p className="mt-3 text-center text-sm text-slate-500">Are you a supplier or producer?{" "}<Link href="/register/supplier" className="font-semibold text-[#003B95] underline">Create a supplier / producer account</Link></p>
           <p className="mt-3 text-center text-sm text-slate-500">Want to promote Newvelion instead of selling products?{" "}<Link href="/register/affiliate" className="font-semibold text-blue-600">Join as a platform affiliate</Link></p>
 
           <p className="mt-6 text-center text-sm text-slate-500">
