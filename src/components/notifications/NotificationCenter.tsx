@@ -265,7 +265,7 @@ export default function NotificationCenter() {
 
     console.log("[Newvelion Push] 2. Push APIs available");
 
-    const publicKey = "BOXBAcFbNi2ex8YdHZZuXd-Afl3Ub0-E305V3xF4CkyoSDeVHtnAN9e4MnEsBxAIGKJ4BwwJbGul644A33zTuV0";
+    const publicKey = "BDgJ5VnxCyPsp3ps1B_u5TM2ieZ3iMqf-VRppgZTUxW1w10s1tLEqvKyMLqoW94Hj0XNhexKL3voffy8D69Sgso";
     console.log("[Newvelion Push] 3. VAPID public key configured");
 
     let permission = window.Notification.permission;
