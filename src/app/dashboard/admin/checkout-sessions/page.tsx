@@ -255,11 +255,14 @@ export default function AdminCheckoutSessionsPage() {
       if (!session?.access_token) throw new Error("Session expired. Please sign in again.");
 
       if (status === "approved") {
-        const { data, error } = await supabase.rpc("approve_checkout_session", { p_session_id: sessionId });
-        if (error) throw new Error(error.message || "Failed to approve checkout session.");
-        const saleId = Array.isArray(data) ? data[0]?.sale_id : data?.sale_id;
-        if (!saleId) throw new Error("Checkout was processed but no sale was created.");
-        notify.success("Checkout approved", "The checkout was approved and the sale was created.");
+        const response = await fetch("/api/admin/checkout-sessions/approve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
+          body: JSON.stringify({ session_id: sessionId }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Failed to approve checkout session.");
+        notify.success("Checkout approved", "The sale was approved and the customer account was linked. Supabase sends the invitation for new accounts.");
       } else {
         const response = await fetch("/api/admin/checkout-sessions/status", {
           method: "POST",
