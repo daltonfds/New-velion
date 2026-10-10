@@ -175,6 +175,7 @@ function LoginPageContent() {
             </Link>
           </p>
 
+          <p className="mt-4 text-center text-sm text-slate-500">Are you a supplier or producer?{" "}<Link href="/register/supplier" className="font-semibold text-[#003B95] hover:underline">Create a supplier / producer account</Link></p>
           <p className="mt-4 text-center text-sm text-slate-500">Want to promote Newvelion?{" "}<Link href="/register/affiliate" className="font-semibold text-blue-600 hover:text-blue-700">Join as a platform affiliate</Link></p>
           <div className="mt-6 border-t border-slate-100 pt-6 text-center text-sm text-slate-500">
 
