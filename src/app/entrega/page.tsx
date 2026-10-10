@@ -274,7 +274,7 @@ function DeliveryForm() {
             </button>
 
             <div className="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-slate-500">
-              <span className="text-[#10069F]">✓</span>
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>
               Your delivery details are sent securely to checkout.
             </div>
           </form>
@@ -337,9 +337,9 @@ function DeliveryForm() {
         </div>
 
         <div className="mt-8 grid gap-3 text-center text-xs font-bold text-slate-500 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">✓ South African delivery</div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">✓ Price protected for this offer</div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">✓ Secure payment handoff</div>
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>South African delivery</div>
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>Price protected for this offer</div>
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>Secure payment handoff</div>
         </div>
       </div>
     </main>
