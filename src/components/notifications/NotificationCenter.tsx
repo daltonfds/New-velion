@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type NotificationItem = {
@@ -133,6 +134,8 @@ export default function NotificationCenter() {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushError, setPushError] = useState("");
+  const router = useRouter();
 
   const unread = useMemo(
     () =>
@@ -152,8 +155,9 @@ export default function NotificationCenter() {
 
     async function start() {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
 
       if (!user || cancelled) return;
 
@@ -180,7 +184,7 @@ export default function NotificationCenter() {
         if (!cancelled && !error) setItems((latest || []) as NotificationItem[]);
       };
 
-      refreshTimer = window.setInterval(() => void refreshNotifications(), 15000);
+      refreshTimer = window.setInterval(() => void refreshNotifications(), 30000);
       focusHandler = () => void refreshNotifications();
       window.addEventListener("focus", focusHandler);
 
@@ -230,6 +234,8 @@ export default function NotificationCenter() {
   }, []);
 
   async function enablePush() {
+    setPushError("");
+    try {
     console.log("[Newvelion Push] 1. Starting");
 
     const hasNotification = "Notification" in window;
@@ -252,24 +258,14 @@ export default function NotificationCenter() {
         ServiceWorker: hasServiceWorker,
         PushManager: hasPushManager,
       });
+      setPushError("External notifications are not supported by this browser. Try Chrome and allow notifications for this site.");
       return;
     }
 
     console.log("[Newvelion Push] 2. Push APIs available");
 
-    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-
-    if (!publicKey) {
-      console.error(
-        "[Newvelion Push] 3. NEXT_PUBLIC_VAPID_PUBLIC_KEY is missing",
-      );
-      return;
-    }
-
-    console.log(
-      "[Newvelion Push] 3. VAPID public key exists",
-      publicKey.slice(0, 12) + "...",
-    );
+    const publicKey = "BOXBAcFbNi2ex8YdHZZuXd-Afl3Ub0-E305V3xF4CkyoSDeVHtnAN9e4MnEsBxAIGKJ4BwwJbGul644A33zTuV0";
+    console.log("[Newvelion Push] 3. VAPID public key configured");
 
     let permission = window.Notification.permission;
     console.log(
@@ -289,6 +285,7 @@ export default function NotificationCenter() {
       console.error(
         "[Newvelion Push] 6. Permission was not granted",
       );
+      setPushError("Notification permission was not granted. Allow notifications in your browser settings and try again.");
       return;
     }
 
@@ -296,6 +293,7 @@ export default function NotificationCenter() {
 
     const registration =
       await navigator.serviceWorker.register("/sw.js");
+    await navigator.serviceWorker.ready;
 
     console.log(
       "[Newvelion Push] 7. Service worker registered:",
@@ -367,14 +365,21 @@ export default function NotificationCenter() {
         "[Newvelion Push] 12. Failed to save subscription",
       );
       setPushEnabled(false);
+      setPushError("Your device allowed notifications, but Newvelion could not save the subscription. Please retry.");
       return;
     }
 
     setPushEnabled(true);
+    setPushError("");
 
     console.log(
       "[Newvelion Push] 12. Push subscription saved successfully",
     );
+    } catch (error) {
+      console.error("[Newvelion Push] Subscription setup failed:", error);
+      setPushEnabled(false);
+      setPushError(error instanceof Error ? error.message : "Could not activate external notifications. Please try again.");
+    }
   }
 
   async function markRead(id: string) {
@@ -470,6 +475,12 @@ export default function NotificationCenter() {
           )}
 
           <div className="max-h-[500px] overflow-y-auto">
+            {pushError && (
+              <p role="alert" className="mx-3 mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs leading-5 text-red-700">
+                {pushError}
+              </p>
+            )}
+
             {items.length === 0 ? (
               <div className="px-5 py-10 text-center text-sm text-slate-500">
                 No notifications yet.
@@ -479,7 +490,12 @@ export default function NotificationCenter() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => void markRead(item.id)}
+                  onClick={() => {
+                    void markRead(item.id);
+                    const target = typeof item.data?.target_url === "string" ? item.data.target_url : "";
+                    setOpen(false);
+                    if (target.startsWith("/") && !target.startsWith("//")) router.push(target);
+                  }}
                   className={`block w-full border-b border-slate-100 px-4 py-4 text-left ${
                     item.read_at
                       ? "bg-white"
