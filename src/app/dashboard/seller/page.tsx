@@ -70,54 +70,54 @@ export default function SellerDashboardPage() {
     async function load() {
       setLoading(true);
 
-      const {
-        data: { user },
-      } = await db.auth.getUser();
+      const { data: { session } } = await db.auth.getSession();
+      const user = session?.user;
 
       if (!user) {
         setLoading(false);
         return;
       }
 
-      try {
-        const { data: { session } } = await db.auth.getSession();
-        if (session?.access_token) {
+      const leaderboardPromise = (async () => {
+        try {
+          if (!session.access_token) return null;
           const response = await fetch("/api/seller/leaderboards", {
             headers: { Authorization: `Bearer ${session.access_token}` },
             cache: "no-store",
           });
-          if (response.ok) setLeaderboards(await response.json());
+          return response.ok ? await response.json() : null;
+        } catch (leaderboardError) {
+          console.error("Seller leaderboards:", leaderboardError);
+          return null;
         }
-      } catch (leaderboardError) {
-        console.error("Seller leaderboards:", leaderboardError);
-      }
+      })();
 
       const [
+        leaderboardData,
         { data: profile },
         { data: salesData },
         { data: dailyData, error: dailyError },
+        financialSummary,
       ] = await Promise.all([
+        leaderboardPromise,
         supabase
           .from("profiles")
           .select("full_name,nome_completo,sales_activation_status,first_sale_at")
           .eq("id", user.id)
           .maybeSingle(),
-
         supabase
           .from("sales")
-          .select(
-            "id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id",
-          )
+          .select("id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id")
           .eq("vendedor_id", user.id)
           .order("vendido_em", { ascending: false }),
-
         supabase.rpc("get_seller_daily_performance", {
           p_vendedor_id: user.id,
           p_days: 30,
         }),
+        getSellerFinancialSummary(user.id),
       ]);
 
-      const financialSummary = await getSellerFinancialSummary(user.id);
+      if (leaderboardData) setLeaderboards(leaderboardData);
 
       const name =
         profile?.full_name ||
