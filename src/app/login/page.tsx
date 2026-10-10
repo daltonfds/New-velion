@@ -20,8 +20,10 @@ function LoginPageContent() {
   async function continueWithGoogle() {
     setError("");
     setGoogleLoading(true);
-    const requestedNext = searchParams.get("redirect") || searchParams.get("next") || "/dashboard";
-    const nextPath = requestedNext.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/dashboard";
+    const requestedRole = (searchParams.get("role") || "").toLowerCase();
+    const roleDefault = requestedRole === "customer" ? "/account" : requestedRole === "affiliate" ? "/dashboard/affiliate" : "/dashboard";
+    const requestedNext = searchParams.get("redirect") || searchParams.get("next") || roleDefault;
+    const nextPath = requestedNext.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : roleDefault;
     if (["supplier", "producer"].includes((searchParams.get("role") || "").toLowerCase()) || nextPath.includes("/dashboard/supplier")) {
       setError("Google sign-in is available for sellers, affiliates and customers, but not supplier / producer accounts. Please use email and password.");
       setGoogleLoading(false);
@@ -73,7 +75,8 @@ function LoginPageContent() {
         return;
       }
 
-      router.push(searchParams.get("redirect") || "/dashboard");
+      const loginRole = (searchParams.get("role") || "").toLowerCase();
+      router.push(searchParams.get("redirect") || (loginRole === "customer" ? "/account" : loginRole === "affiliate" ? "/dashboard/affiliate" : "/dashboard"));
       router.refresh();
     } catch {
       setError("Unable to sign in right now. Please try again.");
