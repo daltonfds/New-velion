@@ -270,6 +270,7 @@ export default function SellerDashboardPage() {
             </section>
           )}
 
+          <p className="mb-3 text-sm font-semibold text-[#003B95]">Seller sales wallet · separate from affiliate rewards</p>
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {[
               {
