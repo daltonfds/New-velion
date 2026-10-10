@@ -100,7 +100,7 @@ BEGIN
     RETURN NEW;
   END IF;
 
-  SELECT coalesce(p.full_name,p.nome_completo,p.email,'User')
+  SELECT coalesce(p.full_name,p.nome_completo,'User')
     INTO v_requester_name
     FROM public.profiles p
     WHERE p.id=NEW.vendedor_id;
