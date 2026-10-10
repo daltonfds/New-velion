@@ -268,7 +268,7 @@ function DeliveryForm() {
             <button
               type="submit"
               disabled={loading || !affiliateLink || previewLoading}
-              className="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0A0440] px-5 py-4 text-sm font-black text-white transition hover:bg-[#0e1d38] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DC2626] px-5 py-4 text-sm font-black text-white transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? "SECURING YOUR ORDER..." : "CONTINUE TO SECURE PAYMENT →"}
             </button>
@@ -347,7 +347,7 @@ function DeliveryForm() {
 }
 
 const inputClass =
-  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#0A0440] focus:ring-2 focus:ring-[#0A0440]/10";
+  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#0078E8] focus:ring-2 focus:ring-[#0078E8]/15";
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
