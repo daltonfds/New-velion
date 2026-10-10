@@ -761,12 +761,12 @@ export default function AdminCheckoutSessionsPage() {
                 type="button"
                 disabled={
                   selected.payment_comparison_status !== "matched" ||
-                  selected.status !== "paid_pending_review"
+                  !["paid_pending_review", "approved"].includes(selected.status)
                 }
                 onClick={() => updateStatus(selected.id, "approved")}
                 className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Approve sale
+                {selected.status === "approved" ? "Finish customer setup" : "Approve sale"}
               </button>
 
               <button
