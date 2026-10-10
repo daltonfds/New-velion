@@ -375,3 +375,106 @@ h3 { font-weight:600; line-height:1.3; color:var(--color-primary-dark); }
   .nv-conversion-footer-main { padding:30px 20px; gap:26px 18px; }
   .nv-conversion-footer-bottom { margin:0 20px; }
 }
+
+
+/* Global typography standard — Newvelion / ChatGPT-inspired readability */
+:root {
+  --nv-font-body: 16px;
+  --nv-font-secondary: 14px;
+  --nv-font-caption: 12px;
+  --nv-font-button: 15px;
+  --nv-line-body: 1.6;
+}
+
+html,
+body {
+  font-family: var(--font-inter), Inter, Arial, sans-serif;
+  font-size: var(--nv-font-body);
+  line-height: var(--nv-line-body);
+}
+
+body {
+  font-weight: 400;
+}
+
+h1 {
+  font-size: clamp(28px, 2.4vw, 30px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(22px, 2vw, 24px);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(18px, 1.7vw, 20px);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+p {
+  line-height: 1.6;
+}
+
+small,
+figcaption,
+caption {
+  font-size: var(--nv-font-caption);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+button {
+  font-size: var(--nv-font-button);
+  font-weight: 500;
+}
+
+pre,
+code,
+kbd,
+samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+}
+
+.nv-button,
+.nv-new-button,
+.nv-new-outline,
+.nv-conversion-primary {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.nv-dashboard table th {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+@media (max-width: 767px) {
+  html,
+  body {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+}
