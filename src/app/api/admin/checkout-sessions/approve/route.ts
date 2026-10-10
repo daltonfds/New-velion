@@ -127,7 +127,8 @@ export async function POST(request: Request) {
       for (let page = 1; page <= 20; page += 1) {
         const { data: usersPage, error: usersError } = await admin.auth.admin.listUsers({ page, perPage: 500 });
         if (usersError) return NextResponse.json({ error: "Sale approved, but customer lookup failed. Retry approval." }, { status: 500 });
-        existingUserId = usersPage.users.find((candidate) => candidate.email?.toLowerCase() === email)?.id || null;
+        const users = usersPage.users as unknown as Array<{ id: string; email?: string }>;
+        existingUserId = users.find((candidate) => candidate.email?.toLowerCase() === email)?.id || null;
         if (existingUserId || usersPage.users.length < 500) break;
       }
       if (existingUserId) customerId = existingUserId;
