@@ -330,9 +330,9 @@ export default function NotificationCenter() {
     } = await supabase.auth.getSession();
 
     if (!session?.access_token) {
-      console.error(
-        "[Newvelion Push] 10. No authenticated session",
-      );
+      console.error("[Newvelion Push] 10. No authenticated session");
+      setPushEnabled(false);
+      setPushError("Your browser permission is enabled, but you are signed out. Sign in and enable notifications again.");
       return;
     }
 
