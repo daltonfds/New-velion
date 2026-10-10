@@ -50,12 +50,6 @@ export default function SupplierDashboardPage() {
     <AppShell area="supplier">
       <div className="space-y-7">
         {supplierStatus !== "approved" && <div className="rounded-[10px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"><b>Supplier status:</b> {supplierStatus}. Your products cannot enter the marketplace until your supplier account is approved.</div>}
-        <Card className={"border p-4 shadow-none " + (salesActivationStatus === "active" ? "border-emerald-200 bg-emerald-50" : "border-blue-100 bg-[#EAF3FF]")}>
-          <p className="text-sm font-semibold text-[#001B44]">{salesActivationStatus === "active" ? "Account active — congratulations!" : "Your account is waiting for its first sale"}</p>
-          <p className="mt-1 text-sm text-slate-600">{salesActivationStatus === "active" ? "Your product has recorded a confirmed sale, activating your sales status." : "Registration creates your account, but sales activation happens only after one of your products records its first confirmed paid sale."}</p>
-          <span className={"mt-2 inline-flex rounded-full px-3 py-1 text-xs font-bold " + (salesActivationStatus === "active" ? "bg-emerald-100 text-emerald-800" : "bg-white text-[#003B95]")}>{salesActivationStatus === "active" ? "ACTIVE" : "INACTIVE"}</span>
-        </Card>
-
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#10069F]">Supplier Center</p>
@@ -86,19 +80,13 @@ export default function SupplierDashboardPage() {
           ))}
         </div>
 
-        <Card className="border border-blue-100 bg-white p-5 shadow-none">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-            <div><p className="text-sm font-semibold text-[#003B95]">Newvelion Partner Program</p><h2 className="mt-1 text-lg font-bold text-[#001B44]">Earn R50 when a referred business makes its first sale</h2><p className="mt-1 max-w-2xl text-sm text-slate-600">Create a separate platform affiliate account to share referral links and unlock mystery prizes at 5, 10 and 25 active referrals. Registration alone does not count as active.</p></div>
-            <Link href="/register/affiliate" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[#003B95] px-4 py-3 text-sm font-semibold text-white hover:bg-[#002B70]">Become an affiliate</Link>
-          </div>
-        </Card>
-
         <Card className="border-blue-100 bg-blue-50/40 p-5">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[#10069F]">Supplier balance</p>
               <p className="mt-1 text-3xl font-bold text-[#0A0440]">{loading ? "—" : finance.total.toLocaleString()}</p>
               <p className="mt-1 text-sm text-slate-500">Available funds can be withdrawn after KYC approval and the configured hold period.</p>
+              <p className="mt-1 text-xs font-semibold text-[#003B95]">Supplier earnings only — affiliate rewards are tracked separately.</p>
             </div>
             <Link href="/dashboard/supplier/withdrawals" className="rounded-lg bg-[#0A0440] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">Manage withdrawals</Link>
           </div>
