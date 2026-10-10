@@ -22,6 +22,11 @@ function LoginPageContent() {
     setGoogleLoading(true);
     const requestedNext = searchParams.get("redirect") || searchParams.get("next") || "/dashboard";
     const nextPath = requestedNext.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/dashboard";
+    if (["supplier", "producer"].includes((searchParams.get("role") || "").toLowerCase()) || nextPath.includes("/dashboard/supplier")) {
+      setError("Google sign-in is available for sellers, affiliates and customers, but not supplier / producer accounts. Please use email and password.");
+      setGoogleLoading(false);
+      return;
+    }
     const { error: oauthError } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent(nextPath), queryParams: { prompt: "select_account" } } });
     if (oauthError) { setError(oauthError.message); setGoogleLoading(false); }
   }
@@ -94,7 +99,8 @@ function LoginPageContent() {
             Sign in to your Newvelion account.
           </p>
 
-          <button type="button" onClick={continueWithGoogle} disabled={googleLoading || loading} className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-3.5 font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-60"><svg aria-hidden="true" viewBox="0 0 48 48" className="h-5 w-5"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.5 13.3l7.8 6.1C12.2 13.4 17.6 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.6 2.9-2.2 5.4-4.6 7.1l7.4 5.7c4.3-4 6.9-9.9 6.9-17.3Z"/><path fill="#FBBC05" d="M10.3 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6.1A24 24 0 0 0 0 24c0 3.9.9 7.6 2.5 10.8l7.8-6.1Z"/><path fill="#34A853" d="M24 48c6.5 0 12-2.1 16-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.6 2.3-6.4 0-11.8-3.9-13.7-9.5l-7.8 6.1C6.5 43.1 14.6 48 24 48Z"/></svg>{googleLoading ? "Connecting to Google..." : "Continue with Google"}</button>
+          {!["supplier", "producer"].includes((searchParams.get("role") || "").toLowerCase()) && !((searchParams.get("redirect") || searchParams.get("next") || "").includes("/dashboard/supplier")) && (<button type="button" onClick={continueWithGoogle} disabled={googleLoading || loading} className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-3.5 font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-60"><svg aria-hidden="true" viewBox="0 0 48 48" className="h-5 w-5"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.5 13.3l7.8 6.1C12.2 13.4 17.6 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.6 2.9-2.2 5.4-4.6 7.1l7.4 5.7c4.3-4 6.9-9.9 6.9-17.3Z"/><path fill="#FBBC05" d="M10.3 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6.1A24 24 0 0 0 0 24c0 3.9.9 7.6 2.5 10.8l7.8-6.1Z"/><path fill="#34A853" d="M24 48c6.5 0 12-2.1 16-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.6 2.3-6.4 0-11.8-3.9-13.7-9.5l-7.8 6.1C6.5 43.1 14.6 48 24 48Z"/></svg>{googleLoading ? "Connecting to Google..." : "Continue with Google"}</button>)}
+
           <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-400"><span className="h-px flex-1 bg-slate-200" />or sign in with email<span className="h-px flex-1 bg-slate-200" /></div>
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
