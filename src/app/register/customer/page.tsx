@@ -96,7 +96,7 @@ export default function CustomerRegisterPage() {
             {error && <div role="alert" className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
             <button type="submit" disabled={loading || googleLoading} className="w-full rounded-lg bg-[#003B95] py-3.5 font-bold text-white transition hover:bg-[#0078E8] disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Creating account..." : "Create buyer account"}</button>
           </form>
-          <p className="mt-6 text-center text-sm text-slate-500">Already have an account? <Link href={"/login?redirect=" + encodeURIComponent(nextPath)} className="font-bold text-[#0078E8]">Sign in</Link></p>
+          <p className="mt-6 text-center text-sm text-slate-500">Already have an account? <Link href={"/login?role=customer&redirect=" + encodeURIComponent(nextPath)} className="font-bold text-[#0078E8]">Sign in</Link></p>
           <p className="mt-4 text-center text-sm text-slate-500">Want to sell instead? <Link href="/register" className="font-semibold text-[#003B95] underline">Create a seller account</Link></p>
         </div>
       </div>
