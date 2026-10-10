@@ -76,14 +76,13 @@ function LoginPageContent() {
       }
 
       const loginRole = (searchParams.get("role") || "").toLowerCase();
-      router.push(searchParams.get("redirect") || (loginRole === "customer" ? "/account" : loginRole === "affiliate" ? "/dashboard/affiliate" : "/dashboard"));
+      router.replace(searchParams.get("redirect") || searchParams.get("next") || (loginRole === "customer" ? "/account" : loginRole === "affiliate" ? "/dashboard/affiliate" : "/dashboard"));
       router.refresh();
     } catch {
       setError("Unable to sign in right now. Please try again.");
     } finally {
       setLoading(false);
     }
-    router.refresh();
   }
 
 
