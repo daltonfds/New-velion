@@ -53,7 +53,7 @@ export default function AffiliateWithdrawalsPage() {
     const [summaryResult, settingsResult, withdrawalsResult] = await Promise.all([
       supabase.rpc("get_platform_affiliate_withdrawal_summary"),
       supabase.from("account_settings").select("payout_methods").eq("user_id", user.id).maybeSingle(),
-      supabase.from("withdrawals").select("id,valor_solicitado,taxa_percentual,taxa_fixa,valor_liquido,metodo,status,created_at,payout_currency,valor_convertido").eq("vendedor_id", user.id).order("created_at", { ascending: false }).limit(25),
+      supabase.from("withdrawals").select("id,valor_solicitado,taxa_percentual,taxa_fixa,valor_liquido,metodo,status,created_at,payout_currency,valor_convertido,withdrawal_source").eq("vendedor_id", user.id).eq("withdrawal_source", "affiliate").order("created_at", { ascending: false }).limit(25),
     ]);
     if (summaryResult.error) setError(summaryResult.error.message);
     else if (summaryResult.data) setSummary(summaryResult.data as Summary);
@@ -127,6 +127,7 @@ export default function AffiliateWithdrawalsPage() {
       holder_name: selectedDetails?.holder_name || "",
       provider: method === "mobile_wallet" ? provider : undefined,
       exchange_rate: exchangeRate,
+      wallet_type: "affiliate",
     };
     const result = await supabase.rpc("server_request_withdrawal", {
       p_user_id: user.id,
