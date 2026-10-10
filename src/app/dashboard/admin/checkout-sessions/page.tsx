@@ -255,11 +255,14 @@ export default function AdminCheckoutSessionsPage() {
       if (!session?.access_token) throw new Error("Session expired. Please sign in again.");
 
       if (status === "approved") {
-        const { data, error } = await supabase.rpc("approve_checkout_session", { p_session_id: sessionId });
-        if (error) throw new Error(error.message || "Failed to approve checkout session.");
-        const saleId = Array.isArray(data) ? data[0]?.sale_id : data?.sale_id;
-        if (!saleId) throw new Error("Checkout was processed but no sale was created.");
-        notify.success("Checkout approved", "The checkout was approved and the sale was created.");
+        const response = await fetch("/api/admin/checkout-sessions/approve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
+          body: JSON.stringify({ session_id: sessionId }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Failed to approve checkout session.");
+        notify.success("Checkout approved", "The sale was approved and the customer account was linked. Supabase sends the invitation for new accounts.");
       } else {
         const response = await fetch("/api/admin/checkout-sessions/status", {
           method: "POST",
@@ -758,12 +761,12 @@ export default function AdminCheckoutSessionsPage() {
                 type="button"
                 disabled={
                   selected.payment_comparison_status !== "matched" ||
-                  selected.status !== "paid_pending_review"
+                  !["paid_pending_review", "approved"].includes(selected.status)
                 }
                 onClick={() => updateStatus(selected.id, "approved")}
                 className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Approve sale
+                {selected.status === "approved" ? "Finish customer setup" : "Approve sale"}
               </button>
 
               <button
