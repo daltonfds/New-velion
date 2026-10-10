@@ -24,11 +24,29 @@ export default function RegisterPage() {
 
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [done, setDone] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
+
+  async function continueWithGoogle() {
+    setError("");
+    if (!acceptedTerms) {
+      setError("Please accept the Terms of Service and Privacy Policy before continuing with Google.");
+      return;
+    }
+    setGoogleLoading(true);
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent("/dashboard/seller"),
+        queryParams: { prompt: "select_account" },
+      },
+    });
+    if (oauthError) { setError(oauthError.message); setGoogleLoading(false); }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -234,6 +252,11 @@ export default function RegisterPage() {
               </span>
             </label>
 
+            <button type="button" onClick={continueWithGoogle} disabled={googleLoading || loading} className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-3.5 font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-60">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 font-bold text-[#4285F4]">G</span>
+              {googleLoading ? "Connecting to Google..." : "Continue with Google"}
+            </button>
+
             {error && (
               <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-600">
                 {error}
@@ -242,7 +265,7 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || googleLoading}
               className="w-full rounded-xl bg-blue-600 py-3.5 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Creating account..." : "Create seller account"}
