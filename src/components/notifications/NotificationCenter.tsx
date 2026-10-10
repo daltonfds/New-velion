@@ -362,11 +362,24 @@ export default function NotificationCenter() {
     );
 
     if (!response.ok) {
+      let serverMessage = "";
+      try {
+        const payload = JSON.parse(responseText) as { error?: unknown };
+        if (typeof payload.error === "string") serverMessage = payload.error;
+      } catch {
+        serverMessage = responseText;
+      }
       console.error(
         "[Newvelion Push] 12. Failed to save subscription",
+        response.status,
+        serverMessage,
       );
       setPushEnabled(false);
-      setPushError("Your device allowed notifications, but Newvelion could not save the subscription. Please retry.");
+      setPushError(
+        serverMessage
+          ? `Could not save notification subscription (${response.status}): ${serverMessage.slice(0, 220)}`
+          : `Could not save notification subscription (HTTP ${response.status}). Please retry.`,
+      );
       return;
     }
 
