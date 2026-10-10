@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { dispatchNotification } from "@/lib/notifications/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -175,24 +174,7 @@ export async function POST(request: Request) {
       if (addressInsertError) return NextResponse.json({ error: "Sale approved, but delivery details could not be saved. Retry approval." }, { status: 500 });
     }
 
-    if (saleId) {
-      const { data: notification } = await admin
-        .from("notifications")
-        .select("id")
-        .eq("event_key", `sale_confirmed:${saleId}`)
-        .maybeSingle();
-
-      if (notification?.id) {
-        try {
-          await dispatchNotification(notification.id);
-        } catch (notificationError) {
-          console.error(
-            "Sale notification dispatch failed:",
-            notificationError
-          );
-        }
-      }
-    }
+    // Notification records are delivered by the rate-limited queue worker.
 
     return NextResponse.json({
       success: true,
