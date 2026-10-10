@@ -138,8 +138,7 @@ begin
     coalesce(ps.withdrawal_fee_fixed,cfg.taxa_fixa),
     greatest(round(p_amount-(p_amount*coalesce(ps.withdrawal_fee_percent,cfg.taxa_percentual)/100)-coalesce(ps.withdrawal_fee_fixed,cfg.taxa_fixa),2),0);
 end;
-$function$
-
+$function$;
 
 CREATE OR REPLACE FUNCTION public.server_request_withdrawal(p_user_id uuid, p_amount numeric, p_method text, p_data jsonb)
  RETURNS withdrawals
@@ -179,8 +178,7 @@ begin
   insert into public.withdrawal_audit_log(withdrawal_id,actor_id,from_status,to_status,note) values(v.id,p_user_id,null,'solicitado','Withdrawal requested in ZAR wallet; converted to local payout currency');
   return v;
 end;
-$function$
-
+$function$;
 
 CREATE OR REPLACE FUNCTION public.get_platform_affiliate_withdrawal_summary()
  RETURNS jsonb
@@ -222,8 +220,7 @@ begin
     'allowed_methods',coalesce(cfg.metodos,'{}'::jsonb)
   );
 end;
-$function$
-
+$function$;
 
 revoke all on function private.validate_withdrawal_payload(uuid,numeric,text,jsonb) from public,anon;
 grant execute on function private.validate_withdrawal_payload(uuid,numeric,text,jsonb) to service_role;
