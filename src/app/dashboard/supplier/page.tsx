@@ -16,7 +16,6 @@ export default function SupplierDashboardPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [finance, setFinance] = useState<Finance>({ available: 0, retained: 0, total: 0 });
   const [supplierStatus, setSupplierStatus] = useState("pending");
-  const [salesActivationStatus, setSalesActivationStatus] = useState("inactive");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -31,11 +30,7 @@ export default function SupplierDashboardPage() {
       setFinance(financeResult.data);
       const profileResult = await supplierFetch<{ data: { approval_status?: string } }>("/api/supplier/profile");
       setSupplierStatus(profileResult.data?.approval_status ?? "pending");
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase.from("profiles").select("sales_activation_status").eq("id", user.id).maybeSingle();
-        setSalesActivationStatus(profile?.sales_activation_status || "inactive");
-      }
+
     }).catch((err) => setError(err instanceof Error ? err.message : "Could not load dashboard."))
       .finally(() => setLoading(false));
   }, []);
