@@ -34,6 +34,12 @@ export default function PlatformAffiliateDashboardPage() {
       setLoading(false);
       return;
     }
+    const { error: enrollmentError } = await supabase.rpc("join_platform_affiliate_program");
+    if (enrollmentError) {
+      setError(enrollmentError.message);
+      setLoading(false);
+      return;
+    }
     const [{ data: dashboardData, error: dashboardError }, { data: rewardData, error: rewardError }] = await Promise.all([
       supabase.rpc("get_platform_affiliate_dashboard"),
       supabase.from("platform_affiliate_rewards").select("id,reward_type,amount,status,description,created_at,milestone_count").eq("affiliate_user_id", user.id).order("created_at", { ascending: false }).limit(25),
@@ -78,6 +84,7 @@ export default function PlatformAffiliateDashboardPage() {
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0078E8]">Partner program</p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#001B44]">Your affiliate dashboard</h1>
             <p className="mt-2 text-sm text-slate-600">Share your referral links. A signup is a registration; an account becomes active only after its first confirmed sale.</p>
+            <p className="mt-2 rounded-lg border border-blue-100 bg-[#EAF3FF] px-4 py-3 text-sm font-medium text-[#003B95]">Affiliate rewards balance — separate from your seller sales wallet or supplier balance.</p>
           </div>
 
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
