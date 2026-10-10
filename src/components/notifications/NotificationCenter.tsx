@@ -55,9 +55,10 @@ function detailLabel(value: unknown) {
 function NotificationDetails({ item }: { item: NotificationItem }) {
   const data = item.data || {};
   const isWithdrawal =
+    item.type === "withdrawal_requested" ||
     item.type === "withdrawal_approved" ||
     item.type === "withdrawal_rejected";
-  const isSale = item.type === "sale_confirmed";
+  const isSale = ["sale_confirmed", "supplier_sale_confirmed", "admin_sale_confirmed"].includes(item.type);
 
   if (!isWithdrawal && !isSale) return null;
 
