@@ -205,7 +205,8 @@ export default function AppShell({
   useEffect(() => {
     if (!["seller", "supplier", "affiliate"].includes(area)) return;
     let active = true;
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user;
       if (!active || !user || sessionStorage.getItem("newvelion-referral-popup-shown") === "1") return;
       sessionStorage.setItem("newvelion-referral-popup-shown", "1");
       setReferralPopupOpen(true);
@@ -241,8 +242,9 @@ export default function AppShell({
 
     async function loadProfileInitial() {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
 
       if (!user || !active) return;
 
