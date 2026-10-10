@@ -1,6 +1,8 @@
 -- Guest checkout: customer accounts are provisioned only after admin approval.
 -- Keeps the existing pricing, stock, shipping and checkout snapshot logic.
-create or replace function public.create_customer_checkout_session(p_product_id uuid,p_full_name text,p_phone text,p_province text,p_city text,p_postal_code text,p_address text,p_address_reference text,p_email text,p_quantity integer default 1)
+drop function if exists public.create_customer_checkout_session(uuid,text,text,text,text,text,text,text,integer);
+
+create function public.create_customer_checkout_session(p_product_id uuid,p_full_name text,p_phone text,p_province text,p_city text,p_postal_code text,p_address text,p_address_reference text,p_email text,p_quantity integer default 1)
 returns table(session_id uuid,checkout_url text)
 language plpgsql security definer set search_path=''
 as $$
