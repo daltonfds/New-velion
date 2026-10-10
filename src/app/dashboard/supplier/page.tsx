@@ -5,7 +5,6 @@ import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { supplierFetch } from "@/lib/supplier-client";
-import { supabase } from "@/lib/supabase";
 
 type Product = { id: string; nome: string; estoque: number; reserved_estoque: number; supplier_status: string; created_at: string };
 type Order = { id: string; status: string; total: number; currency: string; created_at: string };
