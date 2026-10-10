@@ -55,6 +55,6 @@ export default function SupplierRegisterPage() {
       <button disabled={loading} className="w-full rounded-xl bg-blue-600 py-3.5 font-bold text-white disabled:opacity-60">{loading?"Creating account...":"Create supplier account"}</button>
     </form>
     <p className="mt-3 text-center text-sm text-slate-500">Want to promote Newvelion instead? <Link href="/register/affiliate" className="font-semibold text-blue-600">Join as a platform affiliate</Link></p>
-    <p className="mt-6 text-center text-sm text-slate-500">Already have an account? <Link href="/login" className="font-semibold text-blue-600">Sign in</Link></p>
+    <p className="mt-6 text-center text-sm text-slate-500">Already have an account? <Link href="/login?role=supplier" className="font-semibold text-blue-600">Sign in</Link></p>
   </div></div></main>;
 }
