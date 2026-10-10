@@ -1,7 +1,6 @@
 -- Queue outbound notifications to avoid provider rate limits and notify all stakeholders.
-select vault.create_secret('BOXBAcFbNi2ex8YdHZZuXd-Afl3Ub0-E305V3xF4CkyoSDeVHtnAN9e4MnEsBxAIGKJ4BwwJbGul644A33zTuV0','newvelion_vapid_public_key','Web Push VAPID public key',null::uuid)
+-- VAPID keys are provisioned in Supabase Vault out-of-band; never commit private keys.
 where not exists (select 1 from vault.secrets where name='newvelion_vapid_public_key');
-select vault.create_secret('HLlcAIJlqYcXwWSiRmp13ot8dMZf8ELwNZMLLhBmUWs','newvelion_vapid_private_key','Web Push VAPID private key',null::uuid)
 where not exists (select 1 from vault.secrets where name='newvelion_vapid_private_key');
 
 CREATE OR REPLACE FUNCTION private.dispatch_newvelion_notification()
