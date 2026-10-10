@@ -201,7 +201,8 @@ export default function AdminProductsPage() {
                 <thead>
                   <tr className="border-b border-slate-100 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
                     <th className="px-6 py-4">Product</th>
-                    <th className="px-6 py-4">Price</th>
+                    <th className="px-6 py-4">Selling Price</th>
+                    <th className="px-6 py-4">Supplier Cost</th>
                     <th className="px-6 py-4">Commission</th>
                     <th className="px-6 py-4">Stock</th>
                     <th className="px-6 py-4">Status</th>
@@ -242,6 +243,12 @@ export default function AdminProductsPage() {
                         {Number(
                           product.preco_promocional ?? product.preco,
                         ).toFixed(2)}
+                      </td>
+
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        {product.supplier_cost_amount != null || product.preco_custo != null
+                          ? `ZAR ${Number(product.supplier_cost_amount ?? product.preco_custo).toFixed(2)}`
+                          : <span className="text-amber-700">Not set</span>}
                       </td>
 
                       <td className="px-6 py-4 text-sm text-slate-700">
@@ -317,12 +324,21 @@ export default function AdminProductsPage() {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="rounded-lg bg-[#F7F8FA] p-3">
-                        <p className="text-xs text-slate-500">Price</p>
+                        <p className="text-xs text-slate-500">Selling Price</p>
                         <p className="mt-1 font-semibold text-slate-900">
                           {product.moeda}{" "}
                           {Number(
                             product.preco_promocional ?? product.preco,
                           ).toFixed(2)}
+                        </p>
+                      </div>
+
+                      <div className="rounded-lg bg-[#F7F8FA] p-3">
+                        <p className="text-xs text-slate-500">Supplier Cost</p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {product.supplier_cost_amount != null || product.preco_custo != null
+                            ? `ZAR ${Number(product.supplier_cost_amount ?? product.preco_custo).toFixed(2)}`
+                            : "Not set"}
                         </p>
                       </div>
 
