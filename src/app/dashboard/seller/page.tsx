@@ -52,7 +52,6 @@ export default function SellerDashboardPage() {
     saldo_total: 0,
   });
   const [userName, setUserName] = useState("Seller");
-  const [salesActivationStatus, setSalesActivationStatus] = useState("inactive");
   const [activationPopupOpen, setActivationPopupOpen] = useState(false);
   const [activationPopupKey, setActivationPopupKey] = useState("");
   const [goalTarget, setGoalTarget] = useState(10000);
@@ -128,7 +127,6 @@ export default function SellerDashboardPage() {
         "Seller";
 
       setUserName(name);
-      setSalesActivationStatus(profile?.sales_activation_status || "inactive");
       const activationKey = `newvelion-seller-activation-popup:${user.id}`;
       setActivationPopupKey(activationKey);
       if (profile?.sales_activation_status === "active" && profile?.first_sale_at && !window.localStorage.getItem(activationKey)) {
