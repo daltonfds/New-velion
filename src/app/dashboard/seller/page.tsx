@@ -197,7 +197,8 @@ export default function SellerDashboardPage() {
 
 
   return (
-    {activationPopupOpen && (
+    <AppShell area="seller">
+      {activationPopupOpen && (
       <div className="fixed inset-0 z-[95] flex items-center justify-center bg-[#001B44]/60 px-4 py-6">
         <section role="dialog" aria-modal="true" aria-labelledby="seller-activation-title" className="w-full max-w-md rounded-2xl border border-emerald-100 bg-white p-7 text-center shadow-2xl">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-3xl text-emerald-700">✓</div>
@@ -207,7 +208,6 @@ export default function SellerDashboardPage() {
         </section>
       </div>
     )}
-    <AppShell area="seller">
       <main className="min-h-screen bg-[#F5F8FC]">
         <div className="mx-auto max-w-[1500px] px-5 py-6 lg:px-8 lg:py-8">
           <div className="mb-7 flex flex-col justify-between gap-5 md:flex-row md:items-end">
