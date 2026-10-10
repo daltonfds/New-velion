@@ -13,7 +13,7 @@ export default function Footer() {
       <div className="nv-retail-footer-benefits" aria-label="Newvelion shopping benefits">
         {trustItems.map((item) => (
           <div className="nv-retail-benefit" key={item.title}>
-            <span className="nv-retail-benefit-icon" aria-hidden="true">{item.icon}</span>
+            <span className={item.icon === "✓" ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white" : "nv-retail-benefit-icon"} aria-hidden="true">{item.icon}</span>
             <div><b>{item.title}</b><span>{item.detail}</span></div>
           </div>
         ))}
