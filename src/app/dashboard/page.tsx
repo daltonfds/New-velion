@@ -32,7 +32,7 @@ export default function DashboardPage() {
       else router.replace("/dashboard/seller");
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user && !resolved) {
         // Defer database access until after the auth callback has returned.
         window.setTimeout(() => { if (active && !resolved) void routeUser(session.user.id); }, 0);
