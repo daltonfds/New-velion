@@ -130,6 +130,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Integrations", href: "/dashboard/seller/integrations", icon: "link" },
     { label: "Links", href: "/dashboard/seller/links", icon: "sales" },
     { label: "Withdrawals", href: "/dashboard/seller/withdrawals", icon: "download" },
+    { label: "Become affiliate", href: "/dashboard/affiliate", icon: "link" },
   ],
 
   supplier: [
@@ -140,6 +141,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Withdrawals", href: "/dashboard/supplier/withdrawals", icon: "download" },
     { label: "Settings", href: "/dashboard/supplier/settings", icon: "chart" },
     { label: "Profile", href: "/dashboard/supplier/profile", icon: "users" },
+    { label: "Become affiliate", href: "/dashboard/affiliate", icon: "link" },
   ],
 
   affiliate: [
@@ -188,6 +190,7 @@ export default function AppShell({
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [pt, setPt] = useState(false);
+  const [referralPopupOpen, setReferralPopupOpen] = useState(false);
 
   useEffect(() => {
     const sync = () => setPt(localStorage.getItem("newvelion-language") === "pt");
@@ -197,11 +200,23 @@ export default function AppShell({
   }, []);
 
   const t = (en: string, ptText: string) => pt ? ptText : en;
+
+  useEffect(() => {
+    if (!["seller", "supplier", "affiliate"].includes(area)) return;
+    let active = true;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!active || !user || sessionStorage.getItem("newvelion-referral-popup-shown") === "1") return;
+      sessionStorage.setItem("newvelion-referral-popup-shown", "1");
+      setReferralPopupOpen(true);
+    }).catch((error) => console.error("Referral popup:", error));
+    return () => { active = false; };
+  }, [area]);
   const pathname = usePathname();
   const router = useRouter();
 
   async function handleLogout() {
     setLoggingOut(true);
+    sessionStorage.removeItem("newvelion-referral-popup-shown");
 
     const { error } = await supabase.auth.signOut();
 
@@ -391,6 +406,21 @@ export default function AppShell({
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {referralPopupOpen && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-[#001B44]/55 px-4 py-6" role="presentation">
+          <section role="dialog" aria-modal="true" aria-labelledby="referral-popup-title" className="w-full max-w-md rounded-2xl border border-[#DCE3EE] bg-white p-6 shadow-2xl sm:p-8">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#EAF3FF] text-[#003B95]"><Icon name="link" size={22} /></div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0078E8]">Newvelion Partner Program</p>
+            <h2 id="referral-popup-title" className="mt-2 text-2xl font-bold text-[#001B44]">Earn R50 for every successful referral</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">Invite a seller or supplier. When their first sale is confirmed, you earn R50. Unlock mystery prizes at 5, 10 and 25 active referrals. Your affiliate rewards stay separate from your sales or supplier balance.</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/dashboard/affiliate" onClick={() => setReferralPopupOpen(false)} className="flex-1 rounded-lg bg-[#003B95] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#0078E8]">Become affiliate</Link>
+              <button type="button" onClick={() => setReferralPopupOpen(false)} className="rounded-lg border border-[#DCE3EE] px-4 py-3 text-sm font-semibold text-[#003B95] hover:bg-[#F7FAFF]">Maybe later</button>
+            </div>
+          </section>
         </div>
       )}
 
