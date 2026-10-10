@@ -53,6 +53,8 @@ export default function SellerDashboardPage() {
   });
   const [userName, setUserName] = useState("Seller");
   const [salesActivationStatus, setSalesActivationStatus] = useState("inactive");
+  const [activationPopupOpen, setActivationPopupOpen] = useState(false);
+  const [activationPopupKey, setActivationPopupKey] = useState("");
   const [goalTarget, setGoalTarget] = useState(10000);
   const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
   const [leaderboards, setLeaderboards] = useState<{ month_start: string; country_code: string | null; platform: LeaderboardEntry[]; country: LeaderboardEntry[]; country_leaders: LeaderboardEntry[] } | null>(null);
@@ -127,6 +129,11 @@ export default function SellerDashboardPage() {
 
       setUserName(name);
       setSalesActivationStatus(profile?.sales_activation_status || "inactive");
+      const activationKey = `newvelion-seller-activation-popup:${user.id}`;
+      setActivationPopupKey(activationKey);
+      if (profile?.sales_activation_status === "active" && profile?.first_sale_at && !window.localStorage.getItem(activationKey)) {
+        setActivationPopupOpen(true);
+      }
 
       const canonicalWallet = {
         disponivel: Number(financialSummary.available_balance ?? 0),
@@ -190,6 +197,16 @@ export default function SellerDashboardPage() {
 
 
   return (
+    {activationPopupOpen && (
+      <div className="fixed inset-0 z-[95] flex items-center justify-center bg-[#001B44]/60 px-4 py-6">
+        <section role="dialog" aria-modal="true" aria-labelledby="seller-activation-title" className="w-full max-w-md rounded-2xl border border-emerald-100 bg-white p-7 text-center shadow-2xl">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-3xl text-emerald-700">✓</div>
+          <h2 id="seller-activation-title" className="mt-4 text-2xl font-bold text-[#001B44]">Congratulations — your account is active!</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">Your first confirmed sale has activated your Newvelion seller account. You can now continue growing your business.</p>
+          <button type="button" onClick={() => { if (activationPopupKey) window.localStorage.setItem(activationPopupKey, "1"); setActivationPopupOpen(false); }} className="mt-6 w-full rounded-lg bg-[#003B95] px-4 py-3 text-sm font-bold text-white hover:bg-[#0078E8]">Continue to dashboard</button>
+        </section>
+      </div>
+    )}
     <AppShell area="seller">
       <main className="min-h-screen bg-[#F5F8FC]">
         <div className="mx-auto max-w-[1500px] px-5 py-6 lg:px-8 lg:py-8">
@@ -214,23 +231,6 @@ export default function SellerDashboardPage() {
               Browse marketplace
             </Link>
           </div>
-
-          <Card className={"mb-6 border p-4 shadow-none " + (salesActivationStatus === "active" ? "border-emerald-200 bg-emerald-50" : "border-blue-100 bg-[#EAF3FF]")}>
-            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-              <div>
-                <p className="text-sm font-semibold text-[#001B44]">{salesActivationStatus === "active" ? "Account active — congratulations!" : "Your account is waiting for its first sale"}</p>
-                <p className="mt-1 text-sm text-slate-600">{salesActivationStatus === "active" ? "Your first confirmed sale activated your sales account." : "Your account is registered, but it becomes sales-active only after your first confirmed paid sale."}</p>
-              </div>
-              <span className={"w-fit rounded-full px-3 py-1 text-xs font-bold " + (salesActivationStatus === "active" ? "bg-emerald-100 text-emerald-800" : "bg-white text-[#003B95]")}>{salesActivationStatus === "active" ? "ACTIVE" : "INACTIVE"}</span>
-            </div>
-          </Card>
-
-          <Card className="mb-6 border border-blue-100 bg-white p-5 shadow-none">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <div><p className="text-sm font-semibold text-[#003B95]">Grow with Newvelion</p><h2 className="mt-1 text-lg font-bold text-[#001B44]">Earn R50 for every referred seller’s first sale</h2><p className="mt-1 max-w-2xl text-sm text-slate-600">Join the platform affiliate program, share your referral link and unlock mystery prizes when you reach 5, 10 or 25 active referrals.</p></div>
-              <Link href="/register/affiliate" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[#003B95] px-4 py-3 text-sm font-semibold text-white hover:bg-[#002B70]">Become an affiliate</Link>
-            </div>
-          </Card>
 
           {leaderboards && (
             <section className="mb-6 grid gap-5 xl:grid-cols-2">
