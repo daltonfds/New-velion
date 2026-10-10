@@ -163,7 +163,7 @@ export default function ProductInfo({
                       key={`${benefit}-${index}`}
                       className="flex items-start gap-2 text-sm leading-6 text-[#4B5563]"
                     >
-                      <span className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#10069F] text-[10px] font-bold text-white">
+                      <span className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-600 text-[10px] font-bold text-white">
                         ✓
                       </span>
                       <span>{benefit}</span>
