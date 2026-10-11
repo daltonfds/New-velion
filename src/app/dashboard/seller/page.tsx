@@ -7,16 +7,6 @@ import Card from "@/components/ui/Card";
 import { supabase } from "@/lib/supabase";
 import { getSellerFinancialSummary } from "@/lib/services/seller-financials";
 
-type LeaderboardEntry = {
-  seller_id: string;
-  seller_name: string;
-  country_code: string | null;
-  sales_count: number;
-  monthly_sales: number;
-  monthly_commission: number;
-  rank_position: number;
-};
-
 type Sale = {
   id: string;
   vendido_em: string;
@@ -56,8 +46,6 @@ export default function SellerDashboardPage() {
   const [activationPopupKey, setActivationPopupKey] = useState("");
   const [goalTarget, setGoalTarget] = useState(10000);
   const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
-  const [leaderboards, setLeaderboards] = useState<{ month_start: string; country_code: string | null; platform: LeaderboardEntry[]; country: LeaderboardEntry[]; country_leaders: LeaderboardEntry[] }>({ month_start: "", country_code: null, platform: [], country: [], country_leaders: [] });
-  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
   const [dailyPerformance, setDailyPerformance] = useState<
     { day: string; commission: number; sales_count: number; gross_sales: number }[]
   >([]);
@@ -79,54 +67,21 @@ export default function SellerDashboardPage() {
         return;
       }
 
-      const leaderboardPromise = (async () => {
-        try {
-          if (!session.access_token) return null;
-          const response = await fetch("/api/seller/leaderboards", {
-            headers: { Authorization: `Bearer ${session.access_token}` },
-            cache: "no-store",
-          });
-          if (!response.ok) {
-            const detail = await response.text();
-            console.error("Seller leaderboards request failed:", response.status, detail);
-            setLeaderboardError(`Request failed (${response.status}): ${detail.slice(0, 180)}`);
-            return null;
-          }
-          setLeaderboardError(null);
-          return await response.json();
-        } catch (error) {
-          console.error("Seller leaderboards:", error);
-          setLeaderboardError(error instanceof Error ? error.message : "Network error while loading rankings.");
-          return null;
-        }
-      })();
-
       const [
-        leaderboardData,
         { data: profile },
         { data: salesData },
         { data: dailyData, error: dailyError },
         financialSummary,
       ] = await Promise.all([
-        leaderboardPromise,
-        supabase
-          .from("profiles")
+        supabase.from("profiles")
           .select("full_name,nome_completo,sales_activation_status,first_sale_at")
-          .eq("id", user.id)
-          .maybeSingle(),
-        supabase
-          .from("sales")
+          .eq("id", user.id).maybeSingle(),
+        supabase.from("sales")
           .select("id,vendido_em,status,valor_venda,comissao_vendedor,valor_garantia,vendedor_id,product_id")
-          .eq("vendedor_id", user.id)
-          .order("vendido_em", { ascending: false }),
-        supabase.rpc("get_seller_daily_performance", {
-          p_vendedor_id: user.id,
-          p_days: 30,
-        }),
+          .eq("vendedor_id", user.id).order("vendido_em", { ascending: false }),
+        supabase.rpc("get_seller_daily_performance", { p_vendedor_id: user.id, p_days: 30 }),
         getSellerFinancialSummary(user.id),
       ]);
-
-      if (leaderboardData) setLeaderboards(leaderboardData);
 
       const name =
         profile?.full_name ||
@@ -239,47 +194,6 @@ export default function SellerDashboardPage() {
               Browse marketplace
             </Link>
           </div>
-
-          {(
-            <section className="mb-6 grid gap-5 xl:grid-cols-2">
-              {leaderboardError && <p className="xl:col-span-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">Ranking temporarily unavailable: {leaderboardError}</p>}
-              {[
-                { title: "Best seller in each country", rows: leaderboards.country_leaders, subtitle: "Monthly leader by country" },
-                { title: "Newvelion platform ranking", rows: leaderboards.platform, subtitle: leaderboards.month_start ? `Monthly performance · ${new Date(leaderboards.month_start).toLocaleDateString("en-ZA", { month: "long", year: "numeric", timeZone: "UTC" })}` : "Monthly performance" },
-              ].map((ranking) => (
-                <Card key={ranking.title} className="border border-blue-100 bg-white p-5 shadow-none">
-                  <div className="mb-4"><h2 className="text-lg font-bold text-[#001B44]">{ranking.title}</h2><p className="mt-1 text-xs text-slate-500">{ranking.subtitle}</p></div>
-                  {ranking.rows.length === 0 ? (
-                    <p className="rounded-lg bg-[#F7F8FA] p-4 text-sm text-slate-500">No confirmed sales recorded this month yet.</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {ranking.rows.map((row) => (
-                        <div key={row.seller_id} className="flex items-center gap-3 rounded-lg border border-slate-100 p-3">
-                          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${row.rank_position === 1 ? "bg-[#FFB800] text-[#001B44]" : "bg-[#EAF3FF] text-[#003B95]"}`}>{row.rank_position}</span>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-slate-900">{row.seller_name}</p>
-                            <p className="mt-0.5 text-xs text-slate-500">{row.country_code || "Country not set"} · Rank #{row.rank_position}</p>
-                            <div className="mt-3 grid grid-cols-2 gap-3">
-                              <div className="rounded-md bg-[#F7FAFF] px-3 py-2">
-                                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Monthly sales</p>
-                                <p className="mt-1 text-sm font-bold text-[#003B95]">{money(Number(row.monthly_sales || 0))}</p>
-                                <p className="text-[11px] text-slate-500">{row.sales_count} {row.sales_count === 1 ? "completed sale" : "completed sales"}</p>
-                              </div>
-                              <div className="rounded-md bg-[#F0FDF4] px-3 py-2">
-                                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Commission earned</p>
-                                <p className="mt-1 text-sm font-bold text-[#18794E]">{money(Number(row.monthly_commission || 0))}</p>
-                                <p className="text-[11px] text-slate-500">This month</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </Card>
-              ))}
-            </section>
-          )}
 
           <p className="mb-3 text-sm font-semibold text-[#003B95]">Seller sales wallet · separate from affiliate rewards</p>
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
