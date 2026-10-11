@@ -16,6 +16,7 @@ type IconName =
   | "sales"
   | "wallet"
   | "chart"
+  | "trophy"
   | "link"
   | "download"
   | "users"
@@ -83,6 +84,10 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
       <rect x="11" y="8" width="2.5" height="8" rx=".5" />
       <rect x="15" y="5" width="2.5" height="11" rx=".5" />
     </>,
+    trophy: <>
+      <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z" />
+      <path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4" />
+    </>,
     link: <>
       <path d="M10 13.5 8.5 15a3.5 3.5 0 0 1-5-5l2-2a3.5 3.5 0 0 1 5 0" />
       <path d="M14 10.5 15.5 9a3.5 3.5 0 0 1 5 5l-2 2a3.5 3.5 0 0 1-5 0" />
@@ -127,6 +132,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Commissions", href: "/dashboard/seller/commissions", icon: "wallet" },
     { label: "Wallet", href: "/dashboard/seller/wallet", icon: "wallet" },
     { label: "Analytics", href: "/dashboard/seller/performance", icon: "chart" },
+    { label: "Ranking", href: "/dashboard/seller/ranking", icon: "trophy" },
     { label: "Integrations", href: "/dashboard/seller/integrations", icon: "link" },
     { label: "Links", href: "/dashboard/seller/links", icon: "sales" },
     { label: "Withdrawals", href: "/dashboard/seller/withdrawals", icon: "download" },
@@ -332,7 +338,7 @@ export default function AppShell({
                   <Icon name={item.icon} />
                 </span>
 
-                <span>{t(item.label, ({Dashboard:"Painel",Marketplace:"Mercado", "My Products":"Meus produtos","Orders & Sales":"Pedidos e vendas",Commissions:"Comissões",Wallet:"Carteira",Analytics:"Análises",Integrations:"Integrações",Links:"Links",Withdrawals:"Levantamentos",Products:"Produtos","Orders & Fulfillment":"Pedidos e logística",Shipping:"Envio",Settings:"Definições",Profile:"Perfil",Users:"Utilizadores",Sellers:"Vendedores",Suppliers:"Fornecedores","Business Settings":"Definições da plataforma","Product Review":"Revisão de produtos","Customer Reviews":"Avaliações de clientes",Categories:"Categorias",Orders:"Pedidos",Transactions:"Transações",Disputes:"Disputas",KYC:"KYC","Become affiliate":"Tornar-se afiliado","Seller dashboard":"Painel do vendedor","Supplier dashboard":"Painel do fornecedor"} as Record<string,string>)[item.label] || item.label)}</span>
+                <span>{t(item.label, ({Dashboard:"Painel",Marketplace:"Mercado", "My Products":"Meus produtos","Orders & Sales":"Pedidos e vendas",Commissions:"Comissões",Wallet:"Carteira",Analytics:"Análises",Ranking:"Classificação",Integrations:"Integrações",Links:"Links",Withdrawals:"Levantamentos",Products:"Produtos","Orders & Fulfillment":"Pedidos e logística",Shipping:"Envio",Settings:"Definições",Profile:"Perfil",Users:"Utilizadores",Sellers:"Vendedores",Suppliers:"Fornecedores","Business Settings":"Definições da plataforma","Product Review":"Revisão de produtos","Customer Reviews":"Avaliações de clientes",Categories:"Categorias",Orders:"Pedidos",Transactions:"Transações",Disputes:"Disputas",KYC:"KYC","Become affiliate":"Tornar-se afiliado","Seller dashboard":"Painel do vendedor","Supplier dashboard":"Painel do fornecedor"} as Record<string,string>)[item.label] || item.label)}</span>
               </Link>
             ))}
           </div>
