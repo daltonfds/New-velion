@@ -21,6 +21,31 @@ const nextConfig: NextConfig = {
         hostname: "ndtitpmkfbouvaiforfx.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.dischem.co.za",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "clicks.co.za",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.clicks.co.za",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "m.media-amazon.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "http2.mlstatic.com",
+        pathname: "/**",
+      },
     ],
   },
 };
