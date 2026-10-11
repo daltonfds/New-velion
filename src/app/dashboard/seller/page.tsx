@@ -56,7 +56,8 @@ export default function SellerDashboardPage() {
   const [activationPopupKey, setActivationPopupKey] = useState("");
   const [goalTarget, setGoalTarget] = useState(10000);
   const [financialSummary, setFinancialSummary] = useState<Awaited<ReturnType<typeof getSellerFinancialSummary>> | null>(null);
-  const [leaderboards, setLeaderboards] = useState<{ month_start: string; country_code: string | null; platform: LeaderboardEntry[]; country: LeaderboardEntry[]; country_leaders: LeaderboardEntry[] } | null>(null);
+  const [leaderboards, setLeaderboards] = useState<{ month_start: string; country_code: string | null; platform: LeaderboardEntry[]; country: LeaderboardEntry[]; country_leaders: LeaderboardEntry[] }>({ month_start: "", country_code: null, platform: [], country: [], country_leaders: [] });
+  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
   const [dailyPerformance, setDailyPerformance] = useState<
     { day: string; commission: number; sales_count: number; gross_sales: number }[]
   >([]);
@@ -86,9 +87,12 @@ export default function SellerDashboardPage() {
             cache: "no-store",
           });
           if (!response.ok) {
-            console.error("Seller leaderboards request failed:", response.status, await response.text());
+            const detail = await response.text();
+            console.error("Seller leaderboards request failed:", response.status, detail);
+            setLeaderboardError(`Request failed (${response.status}): ${detail.slice(0, 180)}`);
             return null;
           }
+          setLeaderboardError(null);
           return await response.json();
         } catch (leaderboardError) {
           console.error("Seller leaderboards:", leaderboardError);
@@ -235,8 +239,9 @@ export default function SellerDashboardPage() {
             </Link>
           </div>
 
-          {leaderboards ? (
+          {(
             <section className="mb-6 grid gap-5 xl:grid-cols-2">
+              {leaderboardError && <p className="xl:col-span-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">Ranking temporarily unavailable: {leaderboardError}</p>}
               {[
                 { title: "Best seller in each country", rows: leaderboards.country_leaders, subtitle: "Monthly leader by country" },
                 { title: "Newvelion platform ranking", rows: leaderboards.platform, subtitle: leaderboards.month_start ? `Monthly performance · ${new Date(leaderboards.month_start).toLocaleDateString("en-ZA", { month: "long", year: "numeric", timeZone: "UTC" })}` : "Monthly performance" },
