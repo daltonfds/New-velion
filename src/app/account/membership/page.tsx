@@ -48,15 +48,17 @@ export default function MembershipPage() {
   useEffect(() => { void load(); }, [load]);
 
   async function requestPlan(plan: Plan) {
+    const paymentWindow = window.open("about:blank", "_blank");
     setBusy(true); setError(""); setMessage("");
     try {
       const response = await fetch("/api/customer/membership", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${await token()}` }, body: JSON.stringify({ action: "request", plan_code: plan.code }) });
       const json = await response.json();
       if (!response.ok) throw new Error(json.error || "Unable to start membership.");
       await load();
-      window.open(json.membership.payment_url, "_blank", "noopener,noreferrer");
+      if (paymentWindow) paymentWindow.location.href = json.membership.payment_url;
+      else setMessage("Your request is ready. Open the payment link below to complete payment, then confirm it here.");
       setMessage("Your request is ready. Complete payment in the new tab, then confirm it below.");
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to start membership."); }
+    } catch (e) { if (paymentWindow && !paymentWindow.closed) paymentWindow.close(); setError(e instanceof Error ? e.message : "Unable to start membership."); }
     finally { setBusy(false); }
   }
 
