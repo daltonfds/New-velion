@@ -29,6 +29,7 @@ const formatMoney = (value: number) =>
 
 const productName = (product: Sale["product"]) =>
   Array.isArray(product) ? product[0]?.nome || "Product" : product?.nome || "Product";
+const keyMonth = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
 export default function SellerPerformancePage() {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -136,7 +137,6 @@ export default function SellerPerformancePage() {
   }, [paidSales]);
 
   const maxCommission = Math.max(1, ...chart.map((point) => point.commission));
-  const keyMonth = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
   return (
     <AppShell area="seller">
