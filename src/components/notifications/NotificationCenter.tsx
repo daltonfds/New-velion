@@ -363,51 +363,47 @@ export default function NotificationCenter() {
       "[Newvelion Push] 10. Authenticated session exists",
     );
 
-    const response = await fetch(
-      "/api/notifications/push/subscribe",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify(subscription.toJSON()),
-      },
-    );
+    const subscriptionJson = subscription.toJSON();
+    const subscriptionKeys = subscriptionJson.keys;
 
-    const responseText =
-      await response.text().catch(() => "");
-
-    console.log(
-      "[Newvelion Push] 11. Subscribe API response:",
-      response.status,
-      responseText,
-    );
-
-    if (!response.ok) {
-      let serverMessage = "";
-      try {
-        const payload = JSON.parse(responseText) as { error?: unknown };
-        if (typeof payload.error === "string") serverMessage = payload.error;
-      } catch {
-        serverMessage = responseText;
-      }
-      console.error(
-        "[Newvelion Push] 12. Failed to save subscription",
-        response.status,
-        serverMessage,
-      );
+    if (!subscriptionJson.endpoint || !subscriptionKeys?.p256dh || !subscriptionKeys?.auth) {
       setPushEnabled(false);
-      setPushError(
-        serverMessage
-          ? `Could not save notification subscription (${response.status}): ${serverMessage.slice(0, 220)}`
-          : `Could not save notification subscription (HTTP ${response.status}). Please retry.`,
-      );
+      setPushError("The browser returned an incomplete push subscription. Please retry.");
       return;
     }
 
-    setPushEnabled(true);
-    setPushError("");
+    const {
+      data: { session: currentSession },
+    } = await supabase.auth.getSession();
+
+    if (!currentSession?.user?.id) {
+      setPushEnabled(false);
+      setPushError("Your browser permission is enabled, but you are signed out. Sign in and enable notifications again.");
+      return;
+    }
+
+    // Save through Supabase directly. This avoids Vercel's security checkpoint
+    // intercepting the same-origin API request with an HTML 403 response.
+    const { error: saveError } = await supabase
+      .from("push_subscriptions")
+      .upsert(
+        {
+          user_id: currentSession.user.id,
+          endpoint: subscriptionJson.endpoint,
+          p256dh: subscriptionKeys.p256dh,
+          auth: subscriptionKeys.auth,
+          user_agent: navigator.userAgent,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "endpoint" },
+      );
+
+    if (saveError) {
+      console.error("[Newvelion Push] Failed to save subscription in Supabase", saveError);
+      setPushEnabled(false);
+      setPushError(`Could not save notification subscription: ${saveError.message.slice(0, 220)}`);
+      return;
+    }
 
     console.log(
       "[Newvelion Push] 12. Push subscription saved successfully",
