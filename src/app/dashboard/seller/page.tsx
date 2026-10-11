@@ -85,7 +85,11 @@ export default function SellerDashboardPage() {
             headers: { Authorization: `Bearer ${session.access_token}` },
             cache: "no-store",
           });
-          return response.ok ? await response.json() : null;
+          if (!response.ok) {
+            console.error("Seller leaderboards request failed:", response.status, await response.text());
+            return null;
+          }
+          return await response.json();
         } catch (leaderboardError) {
           console.error("Seller leaderboards:", leaderboardError);
           return null;
@@ -231,7 +235,7 @@ export default function SellerDashboardPage() {
             </Link>
           </div>
 
-          {leaderboards && (
+          {leaderboards ? (
             <section className="mb-6 grid gap-5 xl:grid-cols-2">
               {[
                 { title: "Best seller in each country", rows: leaderboards.country_leaders, subtitle: "Monthly leader by country" },
@@ -268,6 +272,15 @@ export default function SellerDashboardPage() {
                   )}
                 </Card>
               ))}
+            </section>
+          ) : (
+            <section className="mb-6">
+              <Card className="border border-blue-100 bg-white p-5 shadow-none">
+                <h2 className="text-lg font-bold text-[#001B44]">Seller rankings</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  The monthly platform and country rankings could not be loaded. Please refresh the dashboard to try again.
+                </p>
+              </Card>
             </section>
           )}
 
