@@ -231,7 +231,7 @@ export default function AdminWithdrawalsPage() {
 
         result.requested += requested;
         result.net += net;
-        result.fees += percentageFee + fixedFee;
+        result.fees += Math.max(requested - net, 0);
 
         if (withdrawal.status === "solicitado") {
           result.requestedCount += 1;
@@ -847,9 +847,10 @@ export default function AdminWithdrawalsPage() {
                       Platform fee
                     </p>
                     <p className="mt-2 text-xl font-semibold text-slate-900">
-                      R{(
-                        Number(current?.taxa_percentual || 0) +
-                        Number(current?.taxa_fixa || 0)
+                      R{Math.max(
+                        Number(current?.valor_solicitado || 0) -
+                          Number(current?.valor_liquido || 0),
+                        0,
                       ).toFixed(2)}
                     </p>
                   </Card>
