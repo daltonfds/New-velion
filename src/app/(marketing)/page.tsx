@@ -23,6 +23,8 @@ export default function HomePage() {
           <div className="nv-cta">
             <Link className="nv-btn" href="/get-started">Become a supplier</Link>
             <Link className="nv-btn nv-alt" href="/get-started">Become a seller</Link>
+            <Link className="nv-btn" href="/register/affiliate">Become an affiliate</Link>
+            <Link className="nv-btn nv-alt" href="/login">Log in / Sign in</Link>
           </div>
           <p className="nv-slogan">The climbing starts here.</p>
         </div>
