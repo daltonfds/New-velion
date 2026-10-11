@@ -121,7 +121,7 @@ export default function AdminWithdrawalsPage() {
           supabase
             .from("profiles")
             .select(
-              "id, nome_completo, full_name, email, pais, country, country_code, phone, telefone, phone_e164, phone_number, whatsapp, whatsapp_e164, whatsapp_number, kyc_status",
+              "id, nome_completo, full_name, pais, country, country_code, telefone, phone_e164, phone_number, whatsapp_e164, whatsapp_number, kyc_status",
             ),
         ]);
 
