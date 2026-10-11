@@ -170,6 +170,7 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Transactions", href: "/dashboard/admin/transactions", icon: "sales" },
     { label: "Commissions", href: "/dashboard/admin/commissions", icon: "wallet" },
     { label: "Withdrawals", href: "/dashboard/admin/withdrawals", icon: "download" },
+    { label: "Club memberships", href: "/dashboard/admin/club-memberships", icon: "users" },
     { label: "Disputes", href: "/dashboard/admin/disputes", icon: "download" },
     { label: "KYC", href: "/dashboard/admin/kyc", icon: "users" },
     { label: "Analytics", href: "/dashboard/admin/analytics", icon: "chart" },
@@ -338,7 +339,7 @@ export default function AppShell({
                   <Icon name={item.icon} />
                 </span>
 
-                <span>{t(item.label, ({Dashboard:"Painel",Marketplace:"Mercado", "My Products":"Meus produtos","Orders & Sales":"Pedidos e vendas",Commissions:"Comissões",Wallet:"Carteira",Analytics:"Análises",Ranking:"Classificação",Integrations:"Integrações",Links:"Links",Withdrawals:"Levantamentos",Products:"Produtos","Orders & Fulfillment":"Pedidos e logística",Shipping:"Envio",Settings:"Definições",Profile:"Perfil",Users:"Utilizadores",Sellers:"Vendedores",Suppliers:"Fornecedores","Business Settings":"Definições da plataforma","Product Review":"Revisão de produtos","Customer Reviews":"Avaliações de clientes",Categories:"Categorias",Orders:"Pedidos",Transactions:"Transações",Disputes:"Disputas",KYC:"KYC","Become affiliate":"Tornar-se afiliado","Seller dashboard":"Painel do vendedor","Supplier dashboard":"Painel do fornecedor"} as Record<string,string>)[item.label] || item.label)}</span>
+                <span>{t(item.label, ({Dashboard:"Painel",Marketplace:"Mercado", "My Products":"Meus produtos","Orders & Sales":"Pedidos e vendas",Commissions:"Comissões",Wallet:"Carteira",Analytics:"Análises",Ranking:"Classificação",Integrations:"Integrações",Links:"Links",Withdrawals:"Levantamentos",Products:"Produtos","Orders & Fulfillment":"Pedidos e logística",Shipping:"Envio",Settings:"Definições",Profile:"Perfil",Users:"Utilizadores",Sellers:"Vendedores",Suppliers:"Fornecedores","Business Settings":"Definições da plataforma","Product Review":"Revisão de produtos","Customer Reviews":"Avaliações de clientes",Categories:"Categorias",Orders:"Pedidos",Transactions:"Transações",Disputes:"Disputas",KYC:"KYC","Become affiliate":"Tornar-se afiliado","Club memberships":"Adesões ao clube","Seller dashboard":"Painel do vendedor","Supplier dashboard":"Painel do fornecedor"} as Record<string,string>)[item.label] || item.label)}</span>
               </Link>
             ))}
           </div>
