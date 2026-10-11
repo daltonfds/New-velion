@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeLanguageProvider } from "@/components/layout/ThemeLanguageProvider";
 import PublicFooter from "@/components/layout/PublicFooter";
 import CookieConsentBanner from "@/components/legal/CookieConsentBanner";
+import NavigationHistory from "@/components/navigation/NavigationHistory";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning className={inter.variable}>
       <body className={inter.className}>
         <ThemeLanguageProvider>
+          <NavigationHistory />
           <ToastProvider>{children}<PublicFooter /><CookieConsentBanner /></ToastProvider>
         </ThemeLanguageProvider>
       </body>
