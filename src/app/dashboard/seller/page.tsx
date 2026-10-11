@@ -278,15 +278,6 @@ export default function SellerDashboardPage() {
                 </Card>
               ))}
             </section>
-          ) : (
-            <section className="mb-6">
-              <Card className="border border-blue-100 bg-white p-5 shadow-none">
-                <h2 className="text-lg font-bold text-[#001B44]">Seller rankings</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  The monthly platform and country rankings could not be loaded. Please refresh the dashboard to try again.
-                </p>
-              </Card>
-            </section>
           )}
 
           <p className="mb-3 text-sm font-semibold text-[#003B95]">Seller sales wallet · separate from affiliate rewards</p>
