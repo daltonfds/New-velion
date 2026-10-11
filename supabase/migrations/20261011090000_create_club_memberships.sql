@@ -19,7 +19,6 @@ create index if not exists club_memberships_customer_created_idx on public.club_
 create index if not exists club_memberships_status_created_idx on public.club_memberships(status, created_at desc);
 alter table public.club_memberships enable row level security;
 revoke all on public.club_memberships from anon, authenticated;
-grant select, insert, update on public.club_memberships to authenticated;
 drop policy if exists "Customers read own club memberships" on public.club_memberships;
 create policy "Customers read own club memberships" on public.club_memberships for select to authenticated using ((select auth.uid()) = customer_id);
 drop policy if exists "Customers create own club membership requests" on public.club_memberships;
