@@ -265,7 +265,7 @@ export default function NotificationCenter() {
 
     console.log("[Newvelion Push] 2. Push APIs available");
 
-    const publicKey = "BDgJ5VnxCyPsp3ps1B_u5TM2ieZ3iMqf-VRppgZTUxW1w10s1tLEqvKyMLqoW94Hj0XNhexKL3voffy8D69Sgso";
+    const publicKey = "BJwV4pEUrIWmevnq9bU2W-Ol1OMwdGE4LuUwFejnArqefozD_sL7H0d0bZrXEVqN27tqOMmefVDhc2Umzp5YK-M";
     console.log("[Newvelion Push] 3. VAPID public key configured");
 
     let permission = window.Notification.permission;
@@ -301,23 +301,46 @@ export default function NotificationCenter() {
       registration.scope,
     );
 
+    const expectedApplicationServerKey =
+      base64ToUint8Array(publicKey);
     let subscription =
       await registration.pushManager.getSubscription();
 
     if (subscription) {
+      const currentApplicationServerKey =
+        subscription.options.applicationServerKey;
+      const currentKey = currentApplicationServerKey
+        ? new Uint8Array(currentApplicationServerKey)
+        : null;
+      const keyMatches =
+        currentKey !== null &&
+        currentKey.length === expectedApplicationServerKey.length &&
+        expectedApplicationServerKey.every(
+          (value, index) => value === currentKey[index],
+        );
+
+      if (!keyMatches) {
+        console.warn(
+          "[Newvelion Push] Existing subscription uses an old VAPID key; renewing it",
+        );
+        await subscription.unsubscribe();
+        subscription = null;
+      } else {
+        console.log(
+          "[Newvelion Push] 8. Existing push subscription uses the current VAPID key",
+        );
+      }
+    }
+
+    if (!subscription) {
       console.log(
-        "[Newvelion Push] 8. Existing push subscription found",
-      );
-    } else {
-      console.log(
-        "[Newvelion Push] 8. Creating new push subscription",
+        "[Newvelion Push] 8. Creating push subscription with current VAPID key",
       );
 
       subscription =
         await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey:
-            base64ToUint8Array(publicKey),
+          applicationServerKey: expectedApplicationServerKey,
         });
 
       console.log(
