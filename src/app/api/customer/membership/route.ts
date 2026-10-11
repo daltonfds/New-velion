@@ -23,9 +23,12 @@ async function context(request: Request) {
 export async function GET(request: Request) {
   const ctx = await context(request);
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
-  const { data, error } = await ctx.db.from("club_memberships").select("id,plan_code,amount_zar,status,payment_url,payment_reference,customer_note,created_at,starts_at,expires_at,reviewed_at").eq("customer_id", ctx.user.id).order("created_at", { ascending: false }).limit(10);
-  if (error) return NextResponse.json({ error: "Unable to load membership history." }, { status: 500 });
-  const plans = Object.entries(PLANS).map(([code, plan]) => ({ code, name: plan.name, amount: plan.amount, paymentUrl: process.env[plan.env] || null }));
+  const [{ data, error }, { data: planRows, error: planError }] = await Promise.all([
+    ctx.db.from("club_memberships").select("id,plan_code,amount_zar,status,payment_url,payment_reference,customer_note,created_at,starts_at,expires_at,reviewed_at").eq("customer_id", ctx.user.id).order("created_at", { ascending: false }).limit(10),
+    ctx.db.from("club_membership_plans").select("plan_code,name,amount_zar,payment_url,benefits,active").eq("active", true).order("amount_zar")
+  ]);
+  if (error || planError) return NextResponse.json({ error: "Unable to load membership history." }, { status: 500 });
+  const plans = (planRows || []).map((p: any) => ({ code: p.plan_code, name: p.name, amount: Number(p.amount_zar), paymentUrl: p.payment_url, benefits: p.benefits }));
   return NextResponse.json({ memberships: data || [], plans });
 }
 
@@ -35,14 +38,14 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const action = String(body?.action || "request");
   if (action === "request") {
-    const planCode = String(body?.plan_code || "") as keyof typeof PLANS;
-    const plan = PLANS[planCode];
-    if (!plan) return NextResponse.json({ error: "Choose a valid plan." }, { status: 400 });
-    const paymentUrl = process.env[plan.env];
-    if (!paymentUrl || !/^https:\/\//i.test(paymentUrl)) return NextResponse.json({ error: "The payment link for this plan has not been configured yet. Please contact Newvelion support." }, { status: 503 });
+    const planCode = String(body?.plan_code || "");
+    const { data: plan, error: planError } = await ctx.db.from("club_membership_plans").select("plan_code,amount_zar,payment_url,active").eq("plan_code", planCode).eq("active", true).maybeSingle();
+    if (planError || !plan) return NextResponse.json({ error: "Choose a valid plan." }, { status: 400 });
+    const paymentUrl = plan.payment_url;
+    if (!paymentUrl || !/^https:\/\//i.test(paymentUrl)) return NextResponse.json({ error: "The payment link for this plan has not been configured by an administrator yet." }, { status: 503 });
     const { data: existing } = await ctx.db.from("club_memberships").select("id,status").eq("customer_id", ctx.user.id).in("status", ["pending_payment","pending_review","active"]).limit(1);
     if (existing?.length) return NextResponse.json({ error: "You already have a pending or active membership. Open your membership page to continue." }, { status: 409 });
-    const { data, error } = await ctx.db.from("club_memberships").insert({ customer_id: ctx.user.id, plan_code: planCode, amount_zar: plan.amount, payment_url: paymentUrl, status: "pending_payment" }).select("id,payment_url,status,amount_zar,plan_code").single();
+    const { data, error } = await ctx.db.from("club_memberships").insert({ customer_id: ctx.user.id, plan_code: planCode, amount_zar: plan.amount_zar, payment_url: paymentUrl, status: "pending_payment" }).select("id,payment_url,status,amount_zar,plan_code").single();
     if (error) return NextResponse.json({ error: "Unable to create membership request." }, { status: 500 });
     return NextResponse.json({ membership: data });
   }
