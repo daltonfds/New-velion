@@ -46,6 +46,11 @@ const nextConfig: NextConfig = {
         hostname: "http2.mlstatic.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.vitamed.co.za",
+        pathname: "/**",
+      },
     ],
   },
 };
