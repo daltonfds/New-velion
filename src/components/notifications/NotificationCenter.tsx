@@ -405,6 +405,7 @@ export default function NotificationCenter() {
       return;
     }
 
+    setPushEnabled(true);
     console.log(
       "[Newvelion Push] 12. Push subscription saved successfully",
     );
