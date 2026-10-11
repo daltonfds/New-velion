@@ -94,8 +94,9 @@ export default function SellerDashboardPage() {
           }
           setLeaderboardError(null);
           return await response.json();
-        } catch (leaderboardError) {
-          console.error("Seller leaderboards:", leaderboardError);
+        } catch (error) {
+          console.error("Seller leaderboards:", error);
+          setLeaderboardError(error instanceof Error ? error.message : "Network error while loading rankings.");
           return null;
         }
       })();
