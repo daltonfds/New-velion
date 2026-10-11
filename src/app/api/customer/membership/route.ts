@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const PLANS = {
-  club_399: { amount: 399, env: "NEWVELION_CLUB_LINK_399", name: "Essential" },
-  club_499: { amount: 499, env: "NEWVELION_CLUB_LINK_499", name: "Plus" },
-  club_599: { amount: 599, env: "NEWVELION_CLUB_LINK_599", name: "Premium" },
-} as const;
-
 async function context(request: Request) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
