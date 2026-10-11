@@ -16,17 +16,29 @@ async function adminContext(request: Request) {
 export async function GET(request: Request) {
   const ctx = await adminContext(request);
   if (!ctx) return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
-  const { data, error } = await ctx.db.from("club_memberships").select("id,customer_id,plan_code,amount_zar,status,payment_reference,customer_note,created_at,starts_at,expires_at,profiles:profiles!club_memberships_customer_id_fkey(full_name,nome_completo,country_code)").order("created_at", { ascending: false }).limit(250);
-  if (error) return NextResponse.json({ error: "Unable to load membership requests." }, { status: 500 });
-  return NextResponse.json({ memberships: data || [] });
+  const [{ data, error }, { data: plans, error: planError }] = await Promise.all([
+    ctx.db.from("club_memberships").select("id,customer_id,plan_code,amount_zar,status,payment_reference,customer_note,created_at,starts_at,expires_at,profiles:profiles!club_memberships_customer_id_fkey(full_name,nome_completo,country_code)").order("created_at", { ascending: false }).limit(250),
+    ctx.db.from("club_membership_plans").select("plan_code,name,amount_zar,payment_url,active").order("amount_zar")
+  ]);
+  if (error || planError) return NextResponse.json({ error: "Unable to load membership requests." }, { status: 500 });
+  return NextResponse.json({ memberships: data || [], plans: plans || [] });
 }
 
 export async function POST(request: Request) {
   const ctx = await adminContext(request);
   if (!ctx) return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
   const body = await request.json().catch(() => null);
-  const id = String(body?.id || "");
   const action = String(body?.action || "");
+  if (action === "save_link") {
+    const code = String(body?.plan_code || "");
+    const paymentUrl = String(body?.payment_url || "").trim();
+    if (!["club_399","club_499","club_599"].includes(code)) return NextResponse.json({ error: "Invalid plan." }, { status: 400 });
+    if (paymentUrl && (!/^https:\/\//i.test(paymentUrl) || paymentUrl.length > 2000)) return NextResponse.json({ error: "Enter a valid HTTPS payment link." }, { status: 400 });
+    const { error } = await ctx.db.from("club_membership_plans").update({ payment_url: paymentUrl || null, updated_at: new Date().toISOString() }).eq("plan_code", code);
+    if (error) return NextResponse.json({ error: "Unable to save payment link." }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+  const id = String(body?.id || "");
   if (!id || !["approve","reject"].includes(action)) return NextResponse.json({ error: "Invalid membership action." }, { status: 400 });
   const { data: item, error: findError } = await ctx.db.from("club_memberships").select("id,status").eq("id", id).maybeSingle();
   if (findError || !item) return NextResponse.json({ error: "Membership request not found." }, { status: 404 });
