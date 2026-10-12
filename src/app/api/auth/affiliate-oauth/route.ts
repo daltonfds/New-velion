@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
   if (profileError) return NextResponse.json({ error: "Unable to load your account profile." }, { status: 500 });
   if (!profile) return NextResponse.json({ error: "Your account profile is not ready yet. Please try signing in again." }, { status: 409 });
-  if (profile.role === "admin" || profile.role === "supplier" || profile.role === "seller" || profile.role === "customer") {
+  if (profile.role === "admin" || profile.role === "supplier" || profile.role === "seller") {
     return NextResponse.json({ error: "This Google account is not registered as a platform affiliate. Please use the correct sign-in method." }, { status: 403 });
   }
 
