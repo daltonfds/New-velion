@@ -42,6 +42,17 @@ export default function AuthCallbackPage() {
         if (active) setMessage("Google sign-in is not available for seller or supplier / producer accounts. Please sign in with email and password.");
         return;
       }
+      if (params.get("intent") === "affiliate") {
+        const response = await fetch("/api/auth/affiliate-oauth", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + session.access_token },
+        });
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          if (active) setMessage(body.error || "Unable to finish setting up your affiliate account.");
+          return;
+        }
+      }
       if (params.get("intent") === "customer") {
         const response = await fetch("/api/auth/customer-oauth", {
           method: "POST",
