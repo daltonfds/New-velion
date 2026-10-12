@@ -150,6 +150,22 @@ export default function ProductInfo({
                   Special price
                 </p>
               )}
+              <div className="mt-5 grid gap-3 rounded-xl border border-[#D8E7FA] bg-[#F5F9FF] p-4 sm:grid-cols-2">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-xl" aria-hidden="true">🚚</span>
+                  <div>
+                    <p className="text-sm font-bold text-[#003B95]">Free delivery nationwide</p>
+                    <p className="mt-1 text-xs leading-5 text-[#52627A]">Free delivery across South Africa</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-xl" aria-hidden="true">📦</span>
+                  <div>
+                    <p className="text-sm font-bold text-[#003B95]">Delivered in 1–5 days</p>
+                    <p className="mt-1 text-xs leading-5 text-[#52627A]">Estimated delivery time after order confirmation</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {product.beneficios?.length > 0 && (
@@ -266,11 +282,11 @@ export default function ProductInfo({
               <div className="mt-5 grid grid-cols-3 gap-2 border-y border-[#E5E7EB] py-4 text-center">
                 <div className="flex flex-col items-center gap-2 px-1">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-xl" aria-hidden="true">🚚</span>
-                  <p className="text-[11px] font-semibold leading-4 text-[#1F2937]">Delivery across South Africa</p>
+                  <p className="text-[11px] font-semibold leading-4 text-[#1F2937]">Free delivery nationwide</p>
                 </div>
                 <div className="flex flex-col items-center gap-2 px-1">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-xl" aria-hidden="true">↻</span>
-                  <p className="text-[11px] font-semibold leading-4 text-[#1F2937]">60-day money-back guarantee</p>
+                  <p className="text-[11px] font-semibold leading-4 text-[#1F2937]">Delivery in 1–5 days</p>
                 </div>
                 <div className="flex flex-col items-center gap-2 px-1">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-xl" aria-hidden="true">💬</span>
