@@ -37,9 +37,9 @@ export default function AuthCallbackPage() {
       }
       const provider = String(session.user.app_metadata?.provider || "");
       const { data: existingProfile } = await supabase.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
-      if (provider === "google" && existingProfile?.role === "supplier") {
+      if (provider === "google" && ["seller", "supplier"].includes(String(existingProfile?.role || ""))) {
         await supabase.auth.signOut();
-        if (active) setMessage("Google sign-in is not available for supplier / producer accounts. Please sign in with email and password.");
+        if (active) setMessage("Google sign-in is not available for seller or supplier / producer accounts. Please sign in with email and password.");
         return;
       }
       if (params.get("intent") === "customer") {
