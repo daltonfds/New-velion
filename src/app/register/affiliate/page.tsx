@@ -27,7 +27,7 @@ export default function PlatformAffiliateRegisterPage() {
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent("/dashboard/affiliate"),
+        redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent("/dashboard/affiliate") + "&intent=affiliate",
         queryParams: { prompt: "select_account" },
       },
     });
