@@ -14,7 +14,30 @@ type Review = {
   created_at: string;
 };
 
-export default function ReviewsSection({ reviews }: { reviews: Review[] }) {
+const THE_HERBALIST_TESTIMONIAL_IMAGES = [
+  "/the-herbalist-photos/GrXguk2wL__1_.jpg",
+  "/the-herbalist-photos/zoSHYhk9e.jpg",
+  "/the-herbalist-photos/2CpxeomDh.jpg",
+  "/the-herbalist-photos/VnZ7va1tD.jpg",
+  "/the-herbalist-photos/SPciSUlGh.jpg",
+  "/the-herbalist-photos/mHeEVfbXW__1_.jpg",
+  "/the-herbalist-photos/6NpYkDqsz_mid.jpg",
+  "/the-herbalist-photos/XXLl1AY_E.jpg",
+  "/the-herbalist-photos/Tak4gqhNWm__1_.jpg",
+  "/the-herbalist-photos/NvyxDkowia.jpg",
+  "/the-herbalist-photos/pkiiMaxYX.jpg",
+  "/the-herbalist-photos/_X3ZodHqt.jpg",
+  "/the-herbalist-photos/KgkC21diP__1_.jpg",
+  "/the-herbalist-photos/yzCPYHT1J__1_.jpg",
+  "/the-herbalist-photos/Y9Q6E5R6ia__1_.jpg",
+  "/the-herbalist-photos/mGYpE0QYf.jpg",
+  "/the-herbalist-photos/CY0hYq8OB__1_.jpg",
+  "/the-herbalist-photos/7AN9vEmSu.jpg",
+  "/the-herbalist-photos/7PtjPmt-3_mid.jpg",
+  "/the-herbalist-photos/eObdHNWsI.jpg",
+];
+
+export default function ReviewsSection({ reviews, sharedTestimonials = false }: { reviews: Review[]; sharedTestimonials?: boolean }) {
   const average = reviews.length ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : 0;
   const roundedAverage = Math.max(0, Math.min(5, Math.round(average)));
 
@@ -30,6 +53,27 @@ export default function ReviewsSection({ reviews }: { reviews: Review[] }) {
             <span className="text-sm text-slate-400">({reviews.length} reviews)</span>
           </div>
         </div>
+        {sharedTestimonials && (
+          <div className="mt-10">
+            <div className="mx-auto max-w-2xl text-center">
+              <h3 className="text-2xl font-bold text-slate-950">The Herbalist customer testimonials</h3>
+              <p className="mt-2 text-sm text-slate-600">Shared customer testimonials shown across The Herbalist product pages. These photos are not assigned to a specific product.</p>
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {THE_HERBALIST_TESTIMONIAL_IMAGES.map((src) => (
+                <article key={src} className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+                  <a href={src} target="_blank" rel="noreferrer" className="block">
+                    <img src={src} alt="The Herbalist customer testimonial" loading="lazy" className="aspect-[3/4] w-full object-contain bg-slate-50" />
+                  </a>
+                  <div className="flex items-center gap-2 border-t border-slate-100 px-3 py-2">
+                    <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">✓</span>
+                    <span className="text-xs font-semibold text-emerald-800">Verified buyer</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="mt-10 rounded-2xl border border-[#DCE8F7] bg-[#F7FAFF] p-6">
           <p className="text-lg font-black text-[#001B44]">Share your experience</p>
           <p className="mt-1 text-sm text-slate-500">Verified reviews are available after a delivered purchase. You can attach up to 4 photos.</p>
