@@ -103,7 +103,7 @@ export default function ProdutoPage() {
     <WhyChooseSection product={product} />
     <ProductDetails product={product} />
     <StoreFeatures />
-    <ReviewsSection reviews={data.reviews || []} />
+    <ReviewsSection reviews={data.reviews || []} sharedTestimonials={String(raw.supplier?.name || "").toLowerCase().includes("the herbalist")} />
     <RelatedProducts products={(data.related || []).map((p: any) => ({ id:p.id, slug:p.slug, nome:p.name, fotos:p.images, preco:p.price, preco_promocional:p.compareAtPrice, moeda:p.currency, avaliacao_media:p.rating, total_avaliacoes:p.reviewCount }))} />
     <Newsletter />
     <Footer />
