@@ -36,6 +36,8 @@ export default function MarketplacePage() {
   const [subcategoryId, setSubcategoryId] = useState("all");
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [newOnly, setNewOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<"best_selling" | "highest_commission" | "newest">("best_selling");
+  const [salesByProduct, setSalesByProduct] = useState<Record<string, number>>({});
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const [affiliating, setAffiliating] = useState<string | null>(null);
@@ -102,6 +104,31 @@ export default function MarketplacePage() {
         setProducts(productData.filter((product) => product.moeda === "ZAR"));
         setCategories((categoryResult.data ?? []) as Category[]);
 
+        // Rank best sellers from real fulfillment records, never from fabricated counters.
+        const { data: saleItems, error: saleItemsError } = await supabase
+          .from("fulfillment_order_items")
+          .select("product_id, quantity, fulfillment_order_id");
+        if (!saleItemsError && saleItems?.length) {
+          const orderIds = [...new Set(saleItems.map((item) => item.fulfillment_order_id).filter(Boolean))];
+          if (orderIds.length) {
+            const { data: saleOrders, error: saleOrdersError } = await supabase
+              .from("fulfillment_orders")
+              .select("id, status")
+              .in("id", orderIds)
+              .in("status", ["confirmed", "processing", "packed", "shipped", "delivered"]);
+            if (!saleOrdersError && saleOrders) {
+              const confirmedOrderIds = new Set(saleOrders.map((order) => order.id));
+              const totals: Record<string, number> = {};
+              for (const item of saleItems) {
+                if (confirmedOrderIds.has(item.fulfillment_order_id) && item.product_id) {
+                  totals[item.product_id] = (totals[item.product_id] ?? 0) + Number(item.quantity ?? 0);
+                }
+              }
+              setSalesByProduct(totals);
+            }
+          }
+        }
+
         const { data: affiliations, error: affiliationError } = await supabase
           .from("affiliations")
           .select("product_id, link_unico")
@@ -153,7 +180,7 @@ export default function MarketplacePage() {
 const filteredProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
-    return products.filter((product) => {
+    const filtered = products.filter((product) => {
       const matchesSearch =
         !normalizedSearch ||
         product.nome.toLowerCase().includes(normalizedSearch) ||
@@ -177,6 +204,28 @@ const filteredProducts = useMemo(() => {
         matchesNew
       );
     });
+
+    const estimatedCommission = (product: Product) => {
+      const price = Number(product.preco_promocional ?? product.preco ?? 0);
+      const rate = Number(product.supplier_commission_rate ?? (
+        product.comissao_tipo === "percentual" ? product.comissao_valor : 0
+      ));
+      if (rate > 0) return Math.max(price * rate / 100, 0);
+      return product.comissao_tipo === "fixo" && product.pricing_mode === "fixed"
+        ? Math.max(Number(product.comissao_valor ?? 0), 0)
+        : 0;
+    };
+
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "highest_commission") {
+        return estimatedCommission(b) - estimatedCommission(a);
+      }
+      if (sortBy === "newest") {
+        return new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime();
+      }
+      return (salesByProduct[b.id] ?? 0) - (salesByProduct[a.id] ?? 0)
+        || new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime();
+    });
   }, [
     products,
     search,
@@ -184,6 +233,8 @@ const filteredProducts = useMemo(() => {
     subcategoryId,
     featuredOnly,
     newOnly,
+    sortBy,
+    salesByProduct,
   ]);
 
   async function handleAffiliate(productId: string) {
@@ -393,6 +444,17 @@ const filteredProducts = useMemo(() => {
                   className="w-full rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white"
                 />
               </div>
+              <select
+                id="marketplace-sort"
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value as "best_selling" | "highest_commission" | "newest")}
+                aria-label="Sort products"
+                className="rounded-lg border border-[#DDE5EF] bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 lg:w-56"
+              >
+                <option value="best_selling">Best selling</option>
+                <option value="highest_commission">Highest commission</option>
+                <option value="newest">Newest</option>
+              </select>
               <select
                 id="marketplace-category"
                 value={categoryId}
