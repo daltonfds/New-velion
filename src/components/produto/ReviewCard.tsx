@@ -24,7 +24,7 @@ export default function ReviewCard({ review }: { review: Review }) {
       <p className="mt-5 text-sm leading-7 text-slate-700">“{review.review_text}”</p>
       {review.media_urls?.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {review.media_urls.map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-lg border border-slate-200"><img src={url} alt="Customer review photo" loading="lazy" className="h-32 w-full object-cover" /></a>)}
+          {review.media_urls.map((url) => /\\.(mp4|webm|mov)(\\?|$)/i.test(url) ? <video key={url} src={url} controls className="max-h-48 rounded-lg border border-slate-200" /> : <a key={url} href={url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-lg border border-slate-200"><img src={url} alt="Customer review photo" loading="lazy" className="h-32 w-full object-cover" /></a>)}
         </div>
       )}
       <div className="mt-6 flex items-center gap-3">
