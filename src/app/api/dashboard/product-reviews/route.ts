@@ -105,7 +105,8 @@ export async function POST(request: NextRequest) {
     review_date: reviewDate,
     status: "approved",
     verified_buyer: false,
-    created_by_admin: true,
+    created_by_admin: ctx.role === "admin",
+    created_manually: true,
     is_anonymous: false,
   };
   if (action === "update") {
