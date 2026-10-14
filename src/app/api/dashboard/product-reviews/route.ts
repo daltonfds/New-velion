@@ -103,11 +103,6 @@ export async function POST(request: NextRequest) {
     media_urls: mediaUrls,
     photo_urls: mediaUrls,
     review_date: reviewDate,
-    status: "approved",
-    verified_buyer: false,
-    created_by_admin: ctx.role === "admin",
-    created_manually: true,
-    is_anonymous: false,
   };
   if (action === "update") {
     if (!reviewId) return jsonError("Depoimento inválido.", 400);
@@ -115,7 +110,15 @@ export async function POST(request: NextRequest) {
     if (error) return jsonError("Não foi possível atualizar o depoimento.", 500);
   } else {
     const { error } = await ctx.db.from("product_reviews").insert({
-      product_id: productId, reviewer_id: null, purchase_session_id: null, ...values,
+      product_id: productId,
+      reviewer_id: null,
+      purchase_session_id: null,
+      ...values,
+      status: "approved",
+      verified_buyer: false,
+      created_by_admin: ctx.role === "admin",
+      created_manually: true,
+      is_anonymous: false,
     });
     if (error) {
       console.error("Manual product review failed:", error.message);
