@@ -104,6 +104,7 @@ export async function POST(request: Request) {
     rating,
     review_text: reviewText,
     media_urls: mediaUrls,
+    photo_urls: mediaUrls,
     status: "pending",
     verified_buyer: false,
   });
