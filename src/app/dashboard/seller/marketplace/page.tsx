@@ -478,7 +478,13 @@ const filteredProducts = useMemo(() => {
                 disabled={!categoryId || categoryId === "all" || visibleSubcategories.length === 0}
                 className="rounded-lg border border-[#DDE5EF] bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:bg-[#F6F9FC] disabled:text-slate-400 lg:w-64"
               >
-                <option value="">\n                  {!categoryId || categoryId === "all"\n                    ? "Subcategory (optional)"\n                    : visibleSubcategories.length === 0\n                      ? "No subcategories"\n                      : "All subcategories"}\n                </option>
+                <option value="">
+                  {!categoryId || categoryId === "all"
+                    ? "Subcategory (optional)"
+                    : visibleSubcategories.length === 0
+                      ? "No subcategories"
+                      : "All subcategories"}
+                </option>
 
                 {visibleSubcategories.map((subcategory) => (
                   <option key={subcategory.id} value={subcategory.id}>
