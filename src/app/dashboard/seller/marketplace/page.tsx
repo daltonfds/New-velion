@@ -506,7 +506,7 @@ const filteredProducts = useMemo(() => {
               New
             </button>
             {(search || categoryId !== "" && categoryId !== "all" || subcategoryId !== "" && subcategoryId !== "all" || featuredOnly || newOnly) && (
-              <button type="button" onClick={() => { setSearch(""); setCategoryId("all"); setSubcategoryId(""); setFeaturedOnly(false); setNewOnly(false); }}
+              <button type="button" onClick={() => { setSearch(""); setCategoryId(""); setSubcategoryId(""); setFeaturedOnly(false); setNewOnly(false); }}
                 className="ml-auto px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700">
                 Clear filters
               </button>
