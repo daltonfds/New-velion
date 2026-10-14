@@ -107,7 +107,7 @@ export default function ManualProductReviews({ productId }: { productId: string 
       form.set("email", draft.email);
       form.set("rating", String(draft.rating));
       form.set("review_text", draft.review_text);
-      form.set("review_date", new Date(draft.review_date + "T12:00:00").toISOString());
+      form.set("review_date", new Date((draft.review_date || new Date().toISOString().slice(0, 10)) + "T12:00:00").toISOString());
       form.set("media_urls", JSON.stringify(mediaUrls));
       const response = await fetch("/api/dashboard/product-reviews", {
         method: "POST", headers: { Authorization: `Bearer ${accessToken}` }, body: form,
