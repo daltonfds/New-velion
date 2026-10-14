@@ -1,6 +1,7 @@
 -- Manual seller/admin testimonials for product catalog management.
 alter table public.product_reviews
   add column if not exists created_by_admin boolean not null default false,
+  add column if not exists created_manually boolean not null default false,
   add column if not exists review_date timestamptz;
 
 update public.product_reviews
