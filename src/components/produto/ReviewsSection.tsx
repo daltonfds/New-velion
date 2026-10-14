@@ -8,6 +8,8 @@ type Review = {
   review_text: string;
   media_urls: string[];
   verified_buyer: boolean;
+  created_manually?: boolean;
+  review_date?: string | null;
   created_at: string;
 };
 
