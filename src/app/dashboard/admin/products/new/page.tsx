@@ -139,6 +139,12 @@ export default function NewProductPage() {
       return;
     }
 
+    if (initialReviews.some((review) => !review.reviewer_name.trim() || review.review_text.trim().length < 3 || review.files.length > 4)) {
+      setError("Cada depoimento inicial precisa de nome e comentário (mínimo de 3 caracteres), com até 4 ficheiros.");
+      setSaving(false);
+      return;
+    }
+
     const { data: createdProduct, error: insertError } = await supabase.from("products").insert({
       nome: form.nome.trim(),
       slug: form.slug.trim() || generateSlug(form.nome),
