@@ -67,7 +67,6 @@ export default function ReviewSubmissionModal({ productId }: Props) {
       setEmail("");
       setFiles([]);
       setRating(0);
-      setStep(1);
       window.setTimeout(() => { setOpen(false); setMessage(""); }, 2200);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not submit your review.");
