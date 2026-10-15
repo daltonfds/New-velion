@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import ProductImageUploader from "@/components/products/ProductImageUploader";
 import ProductSalesContentEditor from "@/components/products/ProductSalesContentEditor";
+import ManualProductReviews from "@/components/products/ManualProductReviews";
 import { supabase } from "@/lib/supabase";
 import { notify } from "@/lib/notify";
 
@@ -707,6 +708,7 @@ export default function AdminProductPage() {
             </div>
           </div>
         </form>
+        <Card><div className="p-6"><ManualProductReviews productId={productId} /></div></Card>
       </div>
     </AppShell>
   );

@@ -32,11 +32,11 @@ export default function MarketplacePage() {
   const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
-  const [categoryId, setCategoryId] = useState("all");
-  const [subcategoryId, setSubcategoryId] = useState("all");
+  const [categoryId, setCategoryId] = useState("");
+  const [subcategoryId, setSubcategoryId] = useState("");
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [newOnly, setNewOnly] = useState(false);
-  const [sortBy, setSortBy] = useState<"best_selling" | "highest_commission" | "newest">("best_selling");
+  const [sortBy, setSortBy] = useState<"best_selling" | "highest_commission" | "newest">("newest");
   const [salesByProduct, setSalesByProduct] = useState<Record<string, number>>({});
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
@@ -187,10 +187,10 @@ const filteredProducts = useMemo(() => {
         product.descricao?.toLowerCase().includes(normalizedSearch);
 
       const matchesCategory =
-        categoryId === "all" || product.categoria_id === categoryId;
+        !categoryId || categoryId === "all" || product.categoria_id === categoryId;
 
       const matchesSubcategory =
-        subcategoryId === "all" ||
+        !subcategoryId || subcategoryId === "all" ||
         product.subcategoria_id === subcategoryId;
 
       const matchesFeatured = !featuredOnly || product.destaque;
@@ -460,11 +460,11 @@ const filteredProducts = useMemo(() => {
                 value={categoryId}
                 onChange={(event) => {
                   setCategoryId(event.target.value);
-                  setSubcategoryId("all");
+                  setSubcategoryId("");
                 }}
                 className="rounded-lg border border-[#DDE5EF] bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 lg:w-56"
               >
-                <option value="all">All categories</option>
+                <option value="">Category (optional)</option>
                 {parentCategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.nome}
@@ -475,12 +475,12 @@ const filteredProducts = useMemo(() => {
                 id="marketplace-subcategory"
                 value={subcategoryId}
                 onChange={(event) => setSubcategoryId(event.target.value)}
-                disabled={categoryId === "all" || visibleSubcategories.length === 0}
+                disabled={!categoryId || categoryId === "all" || visibleSubcategories.length === 0}
                 className="rounded-lg border border-[#DDE5EF] bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:bg-[#F6F9FC] disabled:text-slate-400 lg:w-64"
               >
-                <option value="all">
-                  {categoryId === "all"
-                    ? "Select a category first"
+                <option value="">
+                  {!categoryId || categoryId === "all"
+                    ? "Subcategory (optional)"
                     : visibleSubcategories.length === 0
                       ? "No subcategories"
                       : "All subcategories"}
@@ -505,8 +505,8 @@ const filteredProducts = useMemo(() => {
               className={`rounded-md border px-3.5 py-2 text-sm font-medium transition ${newOnly ? "border-indigo-600 bg-indigo-600 text-white" : "border-[#DDE5EF] bg-white text-slate-600 hover:bg-[#F6F9FC]"}`}>
               New
             </button>
-            {(search || categoryId !== "all" || featuredOnly || newOnly) && (
-              <button type="button" onClick={() => { setSearch(""); setCategoryId("all"); setSubcategoryId("all"); setFeaturedOnly(false); setNewOnly(false); }}
+            {(search || categoryId !== "" && categoryId !== "all" || subcategoryId !== "" && subcategoryId !== "all" || featuredOnly || newOnly) && (
+              <button type="button" onClick={() => { setSearch(""); setCategoryId(""); setSubcategoryId(""); setFeaturedOnly(false); setNewOnly(false); }}
                 className="ml-auto px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700">
                 Clear filters
               </button>

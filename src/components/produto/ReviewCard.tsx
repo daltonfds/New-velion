@@ -5,12 +5,14 @@ type Review = {
   review_text: string;
   media_urls: string[];
   verified_buyer: boolean;
+  created_manually?: boolean;
+  review_date?: string | null;
   created_at: string;
 };
 
 export default function ReviewCard({ review }: { review: Review }) {
   const rating = Math.max(0, Math.min(5, Math.round(review.rating)));
-  const date = new Date(review.created_at);
+  const date = new Date(review.review_date || review.created_at);
   const formattedDate = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 
   return (
@@ -22,14 +24,14 @@ export default function ReviewCard({ review }: { review: Review }) {
       <p className="mt-5 text-sm leading-7 text-slate-700">“{review.review_text}”</p>
       {review.media_urls?.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {review.media_urls.map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-lg border border-slate-200"><img src={url} alt="Customer review photo" loading="lazy" className="h-32 w-full object-cover" /></a>)}
+          {review.media_urls.map((url) => /\\.(mp4|webm|mov)(\\?|$)/i.test(url) ? <video key={url} src={url} controls className="max-h-48 rounded-lg border border-slate-200" /> : <a key={url} href={url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-lg border border-slate-200"><img src={url} alt="Customer review photo" loading="lazy" className="h-32 w-full object-cover" /></a>)}
         </div>
       )}
       <div className="mt-6 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-[#0A0440]">{(review.reviewer_name || "N").charAt(0).toUpperCase()}</div>
         <div>
           <p className="text-sm font-bold text-slate-950">{review.reviewer_name || "Newvelion customer"}</p>
-          {review.verified_buyer && <p className="mt-0.5 text-xs font-semibold text-emerald-700">Verified Buyer</p>}
+          {review.verified_buyer ? <p className="mt-0.5 text-xs font-semibold text-emerald-700">Verified Buyer</p> : review.created_manually ? <p className="mt-0.5 text-xs font-medium text-slate-500">Seller-provided testimonial · not purchase-verified</p> : null}
         </div>
       </div>
     </article>

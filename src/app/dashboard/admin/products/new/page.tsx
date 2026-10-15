@@ -12,6 +12,15 @@ import ProductSalesContentEditor from "@/components/products/ProductSalesContent
 import { supabase } from "@/lib/supabase";
 import { notify } from "@/lib/notify";
 
+interface InitialReviewDraft {
+  reviewer_name: string;
+  email: string;
+  rating: number;
+  review_text: string;
+  review_date: string;
+  files: File[];
+}
+
 interface Category {
   id: string;
   nome: string;
@@ -26,6 +35,7 @@ export default function NewProductPage() {
   const [subcategoriaId, setSubcategoriaId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [initialReviews, setInitialReviews] = useState<InitialReviewDraft[]>([]);
 
   const [form, setForm] = useState({
     nome: "",
@@ -129,7 +139,13 @@ export default function NewProductPage() {
       return;
     }
 
-    const { error: insertError } = await supabase.from("products").insert({
+    if (initialReviews.some((review) => !review.reviewer_name.trim() || review.review_text.trim().length < 3 || review.files.length > 4)) {
+      setError("Cada depoimento inicial precisa de nome e comentário (mínimo de 3 caracteres), com até 4 ficheiros.");
+      setSaving(false);
+      return;
+    }
+
+    const { data: createdProduct, error: insertError } = await supabase.from("products").insert({
       nome: form.nome.trim(),
       slug: form.slug.trim() || generateSlug(form.nome),
       descricao: form.descricao.trim(),
@@ -178,7 +194,7 @@ export default function NewProductPage() {
       destaque: form.destaque,
       novo: form.novo,
       created_by: user.id,
-    });
+    }).select("id").single();
 
     if (insertError) {
       setError(insertError.message);
@@ -187,9 +203,58 @@ export default function NewProductPage() {
       return;
     }
 
+    if (createdProduct?.id && initialReviews.length) {
+      const { data: { session } } = await supabase.auth.getSession();
+      for (const review of initialReviews) {
+        const mediaUrls: string[] = [];
+        for (const file of review.files.slice(0, 4)) {
+          const upload = new FormData();
+          upload.set("action", "upload");
+          upload.set("product_id", createdProduct.id);
+          upload.set("file", file);
+          const uploadResponse = await fetch("/api/dashboard/product-reviews", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + (session?.access_token || "") },
+            body: upload,
+          });
+          const uploadBody = await uploadResponse.json().catch(() => ({}));
+          if (!uploadResponse.ok) {
+            setError("Produto criado, mas a mídia de um depoimento não foi enviada: " + (uploadBody.error || "erro de upload"));
+            setSaving(false);
+            router.push("/dashboard/admin/products/" + createdProduct.id);
+            return;
+          }
+          mediaUrls.push(uploadBody.url);
+        }
+        const payload = new FormData();
+        payload.set("action", "create");
+        payload.set("product_id", createdProduct.id);
+        payload.set("reviewer_name", review.reviewer_name);
+        payload.set("email", review.email);
+        payload.set("rating", String(review.rating));
+        payload.set("review_text", review.review_text);
+        payload.set("review_date", new Date((review.review_date || new Date().toISOString().slice(0, 10)) + "T12:00:00").toISOString());
+        payload.set("media_urls", JSON.stringify(mediaUrls));
+        const reviewResponse = await fetch("/api/dashboard/product-reviews", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + (session?.access_token || "") },
+          body: payload,
+        });
+        const reviewBody = await reviewResponse.json().catch(() => ({}));
+        if (!reviewResponse.ok) {
+          setError("Produto criado, mas um depoimento não foi guardado: " + (reviewBody.error || "erro ao guardar"));
+          setSaving(false);
+          router.push("/dashboard/admin/products/" + createdProduct.id);
+          return;
+        }
+      }
+    }
+
     notify.success(
       "Produto criado",
-      "O produto foi criado com sucesso."
+      initialReviews.length
+        ? "Produto e depoimentos iniciais guardados com sucesso."
+        : "O produto foi criado com sucesso."
     );
 
     router.push("/dashboard/admin/products");
@@ -509,6 +574,29 @@ ${item.answer}`,
                   updateField("estoque", event.target.value)
                 }
               />
+            </div>
+          </Card>
+
+          <Card>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4">
+              <div>
+                <h2 className="font-semibold text-slate-900">Depoimentos Iniciais (Opcional)</h2>
+                <p className="mt-1 text-sm text-slate-500">Depoimentos adicionados manualmente são publicados como não verificados.</p>
+              </div>
+              <Button type="button" variant="secondary" onClick={() => setInitialReviews(items => [...items, { reviewer_name: "", email: "", rating: 5, review_text: "", review_date: new Date().toISOString().slice(0, 10), files: [] }])}>+ Adicionar depoimento</Button>
+            </div>
+            <div className="space-y-5 p-6">
+              {initialReviews.length === 0 ? <p className="text-sm text-slate-500">Nenhum depoimento inicial adicionado.</p> : initialReviews.map((review, index) => <div key={index} className="space-y-4 rounded-lg border border-slate-200 p-4">
+                <div className="flex items-center justify-between"><h3 className="font-medium text-slate-900">Depoimento {index + 1}</h3><button type="button" onClick={() => setInitialReviews(items => items.filter((_, i) => i !== index))} className="text-sm text-red-600">Remover</button></div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Input label="Nome do cliente" value={review.reviewer_name} onChange={e => setInitialReviews(items => items.map((item,i) => i===index ? {...item,reviewer_name:e.target.value} : item))} required />
+                  <Input label="E-mail (opcional)" type="email" value={review.email} onChange={e => setInitialReviews(items => items.map((item,i) => i===index ? {...item,email:e.target.value} : item))} />
+                  <label className="text-sm font-medium text-slate-700">Nota / Estrelas<select value={review.rating} onChange={e => setInitialReviews(items => items.map((item,i) => i===index ? {...item,rating:Number(e.target.value)} : item))} className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5">{[5,4,3,2,1].map(n => <option key={n} value={n}>{n} {n===1?"estrela":"estrelas"}</option>)}</select></label>
+                  <Input label="Data da avaliação" type="date" value={review.review_date} onChange={e => setInitialReviews(items => items.map((item,i) => i===index ? {...item,review_date:e.target.value} : item))} />
+                  <label className="text-sm font-medium text-slate-700 sm:col-span-2">Texto da avaliação<textarea required minLength={3} maxLength={5000} rows={3} value={review.review_text} onChange={e => setInitialReviews(items => items.map((item,i) => i===index ? {...item,review_text:e.target.value} : item))} className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5" /></label>
+                  <label className="text-sm font-medium text-slate-700 sm:col-span-2">Fotos ou vídeos (opcional; até 4 ficheiros de 4 MB cada)<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" onChange={e => setInitialReviews(items => items.map((item,i) => i===index ? {...item,files:Array.from(e.target.files || []).slice(0,4)} : item))} className="mt-1.5 block w-full text-sm" /></label>
+                </div>
+              </div>)}
             </div>
           </Card>
 
