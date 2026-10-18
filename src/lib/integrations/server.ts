@@ -309,7 +309,7 @@ async function postWebhookSafely(rawUrl: string, headers: Record<string, string>
       hostname.endsWith(".local") || hostname.endsWith(".internal") || isIP(hostname) !== 0) {
     throw new Error("Webhook hostname is not allowed.");
   }
-  const records = await dnsLookup(hostname, { all: true, verbatim: true });
+  const records = await dnsLookup(hostname, { all: true, verbatim: true, family: 4 });
   if (!records.length || records.some((record) => !isPublicIPv4(record.address))) {
     throw new Error("Webhook hostname resolves to a non-public or unsupported address.");
   }
