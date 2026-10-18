@@ -6,6 +6,7 @@ import { ThemeLanguageProvider } from "@/components/layout/ThemeLanguageProvider
 import PublicFooter from "@/components/layout/PublicFooter";
 import CookieConsentBanner from "@/components/legal/CookieConsentBanner";
 import NavigationHistory from "@/components/navigation/NavigationHistory";
+import MobileBottomNavigation from "@/components/navigation/MobileBottomNavigation";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={inter.className}>
         <ThemeLanguageProvider>
           <NavigationHistory />
+          <MobileBottomNavigation />
           <ToastProvider>{children}<PublicFooter /><CookieConsentBanner /></ToastProvider>
         </ThemeLanguageProvider>
       </body>
