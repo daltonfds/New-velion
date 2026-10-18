@@ -13,31 +13,6 @@ as $function$
 declare
   v_now timestamptz := clock_timestamp();
   v_bucket public.integration_rate_limit_buckets%rowtype;
-  v_monthly_limit integer;
-  v_monthly_count bigint;
-begin
-  if p_platform_id is null or p_limit <= 0 or p_window_seconds <= 0 then
-    return false;
-  end if;
-
-  select coalesce(ps.api_monthly_order_limit, 0)
-    into v_monthly_limit
-    from public.platform_settings ps
-  limit 1;
-
-  if coalesce(v_monthly_limit, 0) > 0 then
-    select count(*)
-      into v_monthly_count
-      from public.integration_orders io
-     where io.platform_id = p_platform_id
-       and io.created_at >= date_trunc('month', v_now)
-       and io.created_at < date_trunc('month', v_now) + interval '1 month';
-
-    if v_monthly_count >= v_monthly_limit then
-      return false;
-    end if;
-  end if;
-
   insert into public.integration_rate_limit_buckets(
     platform_id, window_started_at, request_count
   )
