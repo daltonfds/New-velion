@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm install
       - name: TypeScript
         run: npx tsc --noEmit
       - name: Production build
