@@ -13,6 +13,11 @@ as $function$
 declare
   v_now timestamptz := clock_timestamp();
   v_bucket public.integration_rate_limit_buckets%rowtype;
+begin
+  if p_platform_id is null or p_limit <= 0 or p_window_seconds <= 0 then
+    return false;
+  end if;
+
   insert into public.integration_rate_limit_buckets(
     platform_id, window_started_at, request_count
   )
