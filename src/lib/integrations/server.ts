@@ -347,22 +347,37 @@ export async function deliverIntegrationWebhook(eventId: string) {
   if (!event) return { delivered: false, reason: "not_found" as const };
   if (event.status === "delivered") return { delivered: true, reason: "already_delivered" as const };
 
-  const platform = event.platform as IntegrationPlatform | null;
+  const { data: claimed, error: claimError } = await client.rpc("claim_integration_webhook", {
+    p_event_id: event.id,
+  });
+  if (claimError) throw claimError;
+  if (claimed !== true) return { delivered: false, reason: "already_claimed_or_not_due" as const };
+
+  const { data: claimedEvent, error: claimedEventError } = await client
+    .from("integration_webhook_events")
+    .select("*,platform:integration_platforms(*)")
+    .eq("id", eventToDeliver.id)
+    .maybeSingle();
+  if (claimedEventError) throw claimedEventError;
+  if (!claimedEvent) return { delivered: false, reason: "not_found" as const };
+
+  const eventToDeliver = claimedEvent;
+  const platform = eventToDeliver.platform as IntegrationPlatform | null;
   if (!platform?.webhook_url || !platform.webhook_secret_encrypted) {
     await client
       .from("integration_webhook_events")
       .update({
         status: "failed",
-        attempts: Number(event.attempts ?? 0) + 1,
+        attempts: Number(eventToDeliver.attempts ?? 0) + 1,
         last_attempt_at: new Date().toISOString(),
         next_attempt_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         error: "Webhook URL or secret is not configured.",
       })
-      .eq("id", event.id);
+      .eq("id", eventToDeliver.id);
     return { delivered: false, reason: "not_configured" as const };
   }
 
-  const body = JSON.stringify(event.payload);
+  const body = JSON.stringify(eventToDeliver.payload);
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const secret = decryptSecret(platform.webhook_secret_encrypted);
   const signature = webhookSignature(secret, timestamp, body);
@@ -371,10 +386,10 @@ export async function deliverIntegrationWebhook(eventId: string) {
     const responseStatus = await postWebhookSafely(platform.webhook_url, {
       "content-type": "application/json",
       "user-agent": "Newvelion-IntegrationAPI/1.0",
-      "x-newvelion-event": event.event_type,
+      "x-newvelion-event": eventToDeliver.event_type,
       "x-newvelion-timestamp": timestamp,
       "x-newvelion-signature": signature,
-      "x-newvelion-event-id": event.event_id,
+      "x-newvelion-event-id": eventToDeliver.event_id,
     }, body);
 
     if (responseStatus >= 200 && responseStatus < 300) {
@@ -382,20 +397,20 @@ export async function deliverIntegrationWebhook(eventId: string) {
         .from("integration_webhook_events")
         .update({
           status: "delivered",
-          attempts: Number(event.attempts ?? 0) + 1,
+          attempts: Number(eventToDeliver.attempts ?? 0) + 1,
           last_attempt_at: new Date().toISOString(),
           next_attempt_at: new Date().toISOString(),
           response_status: responseStatus,
           error: null,
         })
-        .eq("id", event.id);
+        .eq("id", eventToDeliver.id);
 
       return { delivered: true, reason: "delivered" as const };
     }
 
     throw new Error(`Webhook endpoint returned HTTP ${response.status}.`);
   } catch (error) {
-    const attempts = Number(event.attempts ?? 0) + 1;
+    const attempts = Number(eventToDeliver.attempts ?? 0) + 1;
     const backoffSeconds = Math.min(3600, Math.max(30, 2 ** Math.min(attempts, 8) * 5));
 
     await client
@@ -407,7 +422,7 @@ export async function deliverIntegrationWebhook(eventId: string) {
         next_attempt_at: new Date(Date.now() + backoffSeconds * 1000).toISOString(),
         error: error instanceof Error ? error.message.slice(0, 500) : "Webhook delivery failed.",
       })
-      .eq("id", event.id);
+      .eq("id", eventToDeliver.id);
 
     return { delivered: false, reason: "retry" as const };
   }
