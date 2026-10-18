@@ -182,13 +182,27 @@ export async function authenticateIntegrationRequest(request: Request) {
     return { ok: false as const, id, error: apiError("UNAUTHORIZED", "Authentication failed.", 401, id) };
   }
 
-  const { data: allowed } = await client.rpc("consume_integration_rate_limit", {
+  const { data: allowed, error: rateLimitError } = await client.rpc("consume_integration_rate_limit", {
     p_platform_id: platform.id,
     p_limit: 120,
     p_window_seconds: 60,
   });
 
-  if (allowed === false) {
+  // Fail closed: an unavailable/broken rate-limit RPC must never bypass API limits.
+  if (rateLimitError || typeof allowed !== "boolean") {
+    console.error("Integration rate-limit check failed.", {
+      requestId: id,
+      platformId: platform.id,
+      code: rateLimitError?.code ?? "INVALID_RATE_LIMIT_RESULT",
+    });
+    return {
+      ok: false as const,
+      id,
+      error: apiError("RATE_LIMIT_UNAVAILABLE", "Integration API temporarily unavailable.", 503, id),
+    };
+  }
+
+  if (!allowed) {
     return {
       ok: false as const,
       id,
