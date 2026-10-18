@@ -16,64 +16,64 @@ type Item = { label: string; href: string; icon: typeof LayoutDashboard };
 const item = (label: string, href: string, icon: Item["icon"]): Item => ({ label, href, icon });
 
 const sellerMain = [
-  item("Painel", "/dashboard/seller", LayoutDashboard),
-  item("Vendas", "/dashboard/seller/sales", ShoppingBag),
-  item("Produtos", "/dashboard/seller/products", Package),
-  item("Carteira", "/dashboard/seller/wallet", Wallet),
+  item("Dashboard", "/dashboard/seller", LayoutDashboard),
+  item("Sales", "/dashboard/seller/sales", ShoppingBag),
+  item("Products", "/dashboard/seller/products", Package),
+  item("Wallet", "/dashboard/seller/wallet", Wallet),
 ];
 const sellerMore = [
   item("Marketplace", "/dashboard/seller/marketplace", Store),
-  item("Comissões", "/dashboard/seller/commissions", CreditCard),
-  item("Análises", "/dashboard/seller/performance", ChartNoAxesCombined),
+  item("Commissions", "/dashboard/seller/commissions", CreditCard),
+  item("Analytics", "/dashboard/seller/performance", ChartNoAxesCombined),
   item("Top Scale", "/top-scale", BarChart3),
-  item("Classificação", "/dashboard/seller/ranking", Trophy),
-  item("Integrações", "/dashboard/seller/integrations", Plug),
-  item("Links de venda", "/dashboard/seller/links", Link2),
-  item("Levantamentos", "/dashboard/seller/withdrawals", Wallet),
-  item("Afiliados", "/dashboard/affiliate", Users),
+  item("Ranking", "/dashboard/seller/ranking", Trophy),
+  item("Integrations", "/dashboard/seller/integrations", Plug),
+  item("Sales Links", "/dashboard/seller/links", Link2),
+  item("Withdrawals", "/dashboard/seller/withdrawals", Wallet),
+  item("Affiliates", "/dashboard/affiliate", Users),
 ];
 const supplierMain = [
-  item("Painel", "/dashboard/supplier", LayoutDashboard),
-  item("Produtos", "/dashboard/supplier/products", Package),
-  item("Pedidos", "/dashboard/supplier/orders", ClipboardList),
-  item("Envios", "/dashboard/supplier/shipping", Truck),
+  item("Dashboard", "/dashboard/supplier", LayoutDashboard),
+  item("Products", "/dashboard/supplier/products", Package),
+  item("Orders", "/dashboard/supplier/orders", ClipboardList),
+  item("Shipments", "/dashboard/supplier/shipping", Truck),
 ];
 const supplierMore = [
-  item("Levantamentos", "/dashboard/supplier/withdrawals", Wallet),
-  item("Definições", "/dashboard/supplier/settings", Settings),
-  item("Perfil empresarial", "/dashboard/supplier/profile", UserRound),
-  item("Programa de afiliados", "/dashboard/affiliate", Users),
+  item("Withdrawals", "/dashboard/supplier/withdrawals", Wallet),
+  item("Settings", "/dashboard/supplier/settings", Settings),
+  item("Business Profile", "/dashboard/supplier/profile", UserRound),
+  item("Affiliate Program", "/dashboard/affiliate", Users),
 ];
 const affiliateMain = [
-  item("Painel", "/dashboard/affiliate", LayoutDashboard),
-  item("Indicações", "/dashboard/affiliate", Link2),
-  item("Levantamentos", "/dashboard/affiliate/withdrawals", Wallet),
+  item("Dashboard", "/dashboard/affiliate", LayoutDashboard),
+  item("Referrals", "/dashboard/affiliate", Link2),
+  item("Withdrawals", "/dashboard/affiliate/withdrawals", Wallet),
 ];
 const affiliateMore = [
-  item("Painel de vendas", "/dashboard/seller", Store),
-  item("Painel de fornecedor", "/dashboard/supplier", Truck),
+  item("Sales Dashboard", "/dashboard/seller", Store),
+  item("Supplier Dashboard", "/dashboard/supplier", Truck),
 ];
 const adminMain = [
-  item("Painel", "/dashboard/admin", LayoutDashboard),
-  item("Utilizadores", "/dashboard/admin/users", Users),
-  item("Produtos", "/dashboard/admin/products", Package),
-  item("Pedidos", "/dashboard/admin/checkout-sessions", ClipboardList),
+  item("Dashboard", "/dashboard/admin", LayoutDashboard),
+  item("Users", "/dashboard/admin/users", Users),
+  item("Products", "/dashboard/admin/products", Package),
+  item("Orders", "/dashboard/admin/checkout-sessions", ClipboardList),
 ];
 const adminMore = [
-  item("Vendedores", "/dashboard/admin/sellers", Store),
-  item("Fornecedores / produtores", "/dashboard/admin/suppliers", Truck),
-  item("Definições da plataforma", "/dashboard/admin/platform-settings", SlidersHorizontal),
-  item("Revisão de produtos", "/dashboard/admin/products/review", BadgeCheck),
-  item("Avaliações", "/dashboard/admin/product-reviews", MessageSquare),
-  item("Categorias", "/dashboard/admin/categories", Tags),
-  item("Transações", "/dashboard/admin/transactions", Receipt),
-  item("Comissões", "/dashboard/admin/commissions", CreditCard),
-  item("Levantamentos", "/dashboard/admin/withdrawals", Wallet),
-  item("Adesões ao clube", "/dashboard/admin/club-memberships", Users),
-  item("Disputas", "/dashboard/admin/disputes", ShieldCheck),
-  item("Verificação KYC", "/dashboard/admin/kyc", FileCheck),
-  item("Análises", "/dashboard/admin/analytics", ChartNoAxesCombined),
-  item("Perfil", "/dashboard/profile", UserRound),
+  item("Sellers", "/dashboard/admin/sellers", Store),
+  item("Suppliers / Producers", "/dashboard/admin/suppliers", Truck),
+  item("Platform Settings", "/dashboard/admin/platform-settings", SlidersHorizontal),
+  item("Product Review", "/dashboard/admin/products/review", BadgeCheck),
+  item("Reviews", "/dashboard/admin/product-reviews", MessageSquare),
+  item("Categories", "/dashboard/admin/categories", Tags),
+  item("Transactions", "/dashboard/admin/transactions", Receipt),
+  item("Commissions", "/dashboard/admin/commissions", CreditCard),
+  item("Withdrawals", "/dashboard/admin/withdrawals", Wallet),
+  item("Club Memberships", "/dashboard/admin/club-memberships", Users),
+  item("Disputes", "/dashboard/admin/disputes", ShieldCheck),
+  item("KYC Verification", "/dashboard/admin/kyc", FileCheck),
+  item("Analytics", "/dashboard/admin/analytics", ChartNoAxesCombined),
+  item("Profile", "/dashboard/profile", UserRound),
 ];
 
 export default function MobileBottomNavigation() {
@@ -106,12 +106,12 @@ export default function MobileBottomNavigation() {
   const mainItems = roleArea === "admin" ? adminMain
     : roleArea === "supplier" ? supplierMain
     : roleArea === "affiliate" ? affiliateMain
-    : roleArea === "account" ? [item("Conta", "/account", UserRound), item("Painel", "/dashboard", LayoutDashboard)]
+    : roleArea === "account" ? [item("Account", "/account", UserRound), item("Dashboard", "/dashboard", LayoutDashboard)]
     : sellerMain;
   const moreItems = roleArea === "admin" ? adminMore
     : roleArea === "supplier" ? supplierMore
     : roleArea === "affiliate" ? affiliateMore
-    : roleArea === "account" ? [item("Perfil", "/dashboard/profile", UserRound), item("Ajuda", "/support", CircleHelp)]
+    : roleArea === "account" ? [item("Profile", "/dashboard/profile", UserRound), item("Help", "/support", CircleHelp)]
     : sellerMore;
 
   const active = (href: string) => pathname === href || (href !== "/dashboard" && pathname.startsWith(href + "/"));
@@ -120,10 +120,10 @@ export default function MobileBottomNavigation() {
     <>
       {open && (
         <div className="nv-mobile-more-backdrop" onClick={() => setOpen(false)}>
-          <section className="nv-mobile-more-sheet" role="dialog" aria-modal="true" aria-label="Mais funções" onClick={(event) => event.stopPropagation()}>
+          <section className="nv-mobile-more-sheet" role="dialog" aria-modal="true" aria-label="More options" onClick={(event) => event.stopPropagation()}>
             <div className="nv-mobile-more-heading">
-              <div><span>Newvelion · {roleArea === "admin" ? "Administração" : roleArea === "supplier" ? "Fornecedor / Produtor" : roleArea === "affiliate" ? "Afiliado" : roleArea === "account" ? "Conta" : "Vendedor"}</span><h2>Mais funções</h2></div>
-              <button type="button" aria-label="Fechar menu" onClick={() => setOpen(false)}><X size={21} /></button>
+              <div><span>Newvelion · {roleArea === "admin" ? "Administration" : roleArea === "supplier" ? "Supplier / Producer" : roleArea === "affiliate" ? "Affiliate" : roleArea === "account" ? "Account" : "Seller"}</span><h2>More options</h2></div>
+              <button type="button" aria-label="Close menu" onClick={() => setOpen(false)}><X size={21} /></button>
             </div>
             <div className="nv-mobile-more-grid">
               {moreItems.map(({ label, href, icon: Icon }) => (
@@ -136,16 +136,16 @@ export default function MobileBottomNavigation() {
           </section>
         </div>
       )}
-      <nav className={`nv-mobile-bottom-nav nv-mobile-bottom-nav-${roleArea}`} aria-label="Navegação principal mobile">
+      <nav className={`nv-mobile-bottom-nav nv-mobile-bottom-nav-${roleArea}`} aria-label="Mobile primary navigation">
         {mainItems.map(({ label, href, icon: Icon }) => (
           <Link key={label + href} href={href} aria-current={active(href) ? "page" : undefined} className={active(href) ? "active" : ""}>
             <Icon size={21} strokeWidth={active(href) ? 2.2 : 1.8} />
             <span>{label}</span>
           </Link>
         ))}
-        <button type="button" aria-expanded={open} aria-label={open ? "Fechar mais funções" : "Abrir mais funções"} className={open ? "active" : ""} onClick={() => setOpen(value => !value)}>
+        <button type="button" aria-expanded={open} aria-label={open ? "Close more options" : "Open more options"} className={open ? "active" : ""} onClick={() => setOpen(value => !value)}>
           {open ? <X size={21} /> : <MoreHorizontal size={22} />}
-          <span>Mais</span>
+          <span>More</span>
         </button>
       </nav>
     </>
