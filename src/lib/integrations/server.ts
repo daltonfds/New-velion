@@ -408,7 +408,7 @@ export async function deliverIntegrationWebhook(eventId: string) {
       return { delivered: true, reason: "delivered" as const };
     }
 
-    throw new Error(`Webhook endpoint returned HTTP ${response.status}.`);
+    throw new Error(`Webhook endpoint returned HTTP ${responseStatus}.`);
   } catch (error) {
     const attempts = Number(eventToDeliver.attempts ?? 0) + 1;
     const backoffSeconds = Math.min(3600, Math.max(30, 2 ** Math.min(attempts, 8) * 5));
