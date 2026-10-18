@@ -8,7 +8,7 @@ import {
   LayoutDashboard, ShoppingBag, Package, Users, Wallet, Settings, UserRound,
   CircleHelp, Plug, MoreHorizontal, X, ClipboardList, Store, ChartNoAxesCombined,
   Truck, BadgeCheck, BarChart3, Link2, Trophy, Tags, CreditCard, ShieldCheck,
-  FileCheck, MessageSquare, Receipt, Boxes, Globe, UserCog, SlidersHorizontal
+  FileCheck, MessageSquare, Receipt, SlidersHorizontal
 } from "lucide-react";
 
 type Item = { label: string; href: string; icon: typeof LayoutDashboard };
@@ -136,7 +136,7 @@ export default function MobileBottomNavigation() {
           </section>
         </div>
       )}
-      <nav className="nv-mobile-bottom-nav" aria-label="Navegação principal mobile">
+      <nav className={`nv-mobile-bottom-nav nv-mobile-bottom-nav-${roleArea}`} aria-label="Navegação principal mobile">
         {mainItems.map(({ label, href, icon: Icon }) => (
           <Link key={label + href} href={href} aria-current={active(href) ? "page" : undefined} className={active(href) ? "active" : ""}>
             <Icon size={21} strokeWidth={active(href) ? 2.2 : 1.8} />
