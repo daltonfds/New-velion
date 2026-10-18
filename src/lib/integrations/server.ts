@@ -356,7 +356,7 @@ export async function deliverIntegrationWebhook(eventId: string) {
   const { data: claimedEvent, error: claimedEventError } = await client
     .from("integration_webhook_events")
     .select("*,platform:integration_platforms(*)")
-    .eq("id", eventToDeliver.id)
+    .eq("id", event.id)
     .maybeSingle();
   if (claimedEventError) throw claimedEventError;
   if (!claimedEvent) return { delivered: false, reason: "not_found" as const };
