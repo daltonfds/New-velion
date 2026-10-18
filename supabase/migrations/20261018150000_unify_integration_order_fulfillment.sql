@@ -133,7 +133,7 @@ begin
 
   return query select v_order.id,v_order.status,v_order.total,v_order.currency;
 end;
-$function$
+$function$;
 
 
 revoke execute on function public.create_integration_order(uuid, text, uuid, text, jsonb, jsonb, jsonb, numeric, jsonb, text)
