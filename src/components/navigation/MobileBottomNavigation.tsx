@@ -5,8 +5,8 @@ import "./MobileBottomNavigation.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, LayoutDashboard, ShoppingBag, Package, Users, Wallet,
-  Settings, UserRound, CircleHelp, Plug, MoreHorizontal, X, Plus,
+  LayoutDashboard, ShoppingBag, Package, Users, Wallet,
+  Settings, UserRound, CircleHelp, Plug, MoreHorizontal, X,
   ClipboardList, Store, ChartNoAxesCombined
 } from "lucide-react";
 
@@ -36,7 +36,7 @@ export default function MobileBottomNavigation() {
   useEffect(() => {
     const media = window.matchMedia("(max-width: 767px)");
     const sync = () => {
-      const pathIsApp = /^\\/(dashboard|admin|seller|affiliate|account|orders|products|marketplace|integrations|settings|payouts|support)(\\/|$)/.test(window.location.pathname);
+      const pathIsApp = ["/dashboard", "/admin", "/seller", "/affiliate", "/account", "/orders", "/products", "/marketplace", "/integrations", "/settings", "/payouts", "/support"].some((prefix) => window.location.pathname === prefix || window.location.pathname.startsWith(prefix + "/"));
       document.body.classList.toggle("nv-has-mobile-nav", media.matches && pathIsApp);
     };
     sync();
