@@ -139,7 +139,7 @@ export async function POST(request: Request) {
         !Number.isInteger(item.quantity) ||
         item.quantity <= 0 ||
         !Number.isFinite(item.sale_price) ||
-        item.sale_price < 0,
+        item.sale_price <= 0,
     )
   ) {
     return apiError("INVALID_ORDER", "Each item requires external_product_id, positive integer quantity and a valid sale_price.", 400, auth.id);
@@ -228,7 +228,49 @@ export async function POST(request: Request) {
   const { data: result, error } = await auth.client.rpc(rpcName, rpcParams);
 
   if (error) {
-    console.error("Integration order creation failed:", error);
+    // A concurrent retry can pass the preflight lookup before another request commits.
+    // Recover the committed order after a unique-key conflict instead of returning a false 400.
+    if (error.code === "23505" || /duplicate key|unique constraint/i.test(error.message || "")) {
+      let duplicateQuery = auth.client
+        .from("integration_orders")
+        .select("id,status,total,currency,external_order_id")
+        .eq("platform_id", auth.platform.id)
+        .eq("external_order_id", externalOrderId);
+      let { data: duplicate } = await duplicateQuery.maybeSingle();
+
+      if (!duplicate && idempotencyKey) {
+        const resultByKey = await auth.client
+          .from("integration_orders")
+          .select("id,status,total,currency,external_order_id")
+          .eq("platform_id", auth.platform.id)
+          .eq("idempotency_key", idempotencyKey)
+          .maybeSingle();
+        duplicate = resultByKey.data;
+      }
+
+      if (duplicate) {
+        await logIntegrationRequest({
+          platformId: auth.platform.id,
+          requestId: auth.id,
+          method: "POST",
+          path,
+          statusCode: 200,
+          durationMs: Date.now() - started,
+        });
+        return apiOk({
+          data: {
+            id: duplicate.id,
+            external_order_id: duplicate.external_order_id,
+            status: duplicate.status,
+            total: Number(duplicate.total),
+            currency: duplicate.currency,
+            duplicate: true,
+          },
+        }, 200, auth.id);
+      }
+    }
+
+    console.error("Integration order creation failed:", { code: error.code, message: error.message });
     const [code, message, status] = mapOrderError(error.message || "");
 
     await logIntegrationRequest({
