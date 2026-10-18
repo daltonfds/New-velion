@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import "./MobileBottomNavigation.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -32,6 +33,16 @@ export default function MobileBottomNavigation() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+    const sync = () => {
+      const pathIsApp = /^\\/(dashboard|admin|seller|affiliate|account|orders|products|marketplace|integrations|settings|payouts|support)(\\/|$)/.test(window.location.pathname);
+      document.body.classList.toggle("nv-has-mobile-nav", media.matches && pathIsApp);
+    };
+    sync();
+    media.addEventListener("change", sync);
+    return () => { media.removeEventListener("change", sync); document.body.classList.remove("nv-has-mobile-nav"); };
+  }, [pathname]);
 
   // Keep the mobile app navigation out of public storefront, product, cart and auth pages.
   const isAppArea = /^\/(dashboard|admin|seller|affiliate|account|orders|products|marketplace|integrations|settings|payouts|support)(\/|$)/.test(pathname || "");
