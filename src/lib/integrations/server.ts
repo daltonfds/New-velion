@@ -1,4 +1,7 @@
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { lookup as dnsLookup } from "node:dns/promises";
+import { request as httpsRequest } from "node:https";
+import { isIP } from "node:net";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -277,6 +280,61 @@ function webhookSignature(secret: string, timestamp: string, body: string) {
     .digest("hex");
 }
 
+
+function isPublicIPv4(address: string): boolean {
+  if (isIP(address) !== 4) return false;
+  const octets = address.split(".").map(Number);
+  const [a, b, c] = octets;
+  if (octets.length !== 4 || octets.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return false;
+  return !(
+    a === 0 || a === 10 || a === 127 || a >= 224 ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 0 && (c === 0 || c === 2)) ||
+    (a === 192 && b === 168) ||
+    (a === 198 && (b === 18 || b === 19 || (b === 51 && c === 100))) ||
+    (a === 203 && b === 0 && c === 113)
+  );
+}
+
+async function postWebhookSafely(rawUrl: string, headers: Record<string, string>, body: string): Promise<number> {
+  let url: URL;
+  try { url = new URL(rawUrl); } catch { throw new Error("Webhook URL is invalid."); }
+  if (url.protocol !== "https:" || url.username || url.password || (url.port && url.port !== "443")) {
+    throw new Error("Webhook URL must use HTTPS on the standard port.");
+  }
+  const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
+  if (!hostname || hostname === "localhost" || hostname.endsWith(".localhost") ||
+      hostname.endsWith(".local") || hostname.endsWith(".internal") || isIP(hostname) !== 0) {
+    throw new Error("Webhook hostname is not allowed.");
+  }
+  const records = await dnsLookup(hostname, { all: true, verbatim: true });
+  if (!records.length || records.some((record) => !isPublicIPv4(record.address))) {
+    throw new Error("Webhook hostname resolves to a non-public or unsupported address.");
+  }
+  const pinnedAddress = records[0].address;
+  return await new Promise<number>((resolve, reject) => {
+    const req = httpsRequest({
+      protocol: "https:", hostname, port: 443, method: "POST",
+      path: `${url.pathname}${url.search}`,
+      headers: { ...headers, "content-length": Buffer.byteLength(body) },
+      servername: hostname, rejectUnauthorized: true, timeout: 15_000,
+      lookup: (_host, _options, callback) => callback(null, pinnedAddress, 4),
+    }, (res) => {
+      res.resume();
+      res.on("end", () => {
+        const status = res.statusCode ?? 0;
+        if (status >= 200 && status < 300) resolve(status);
+        else reject(new Error(`Webhook endpoint returned HTTP ${status}.`));
+      });
+    });
+    req.on("timeout", () => req.destroy(new Error("Webhook request timed out.")));
+    req.on("error", reject);
+    req.end(body);
+  });
+}
+
 export async function deliverIntegrationWebhook(eventId: string) {
   const client = adminClient();
   const { data: event, error } = await client
@@ -310,22 +368,16 @@ export async function deliverIntegrationWebhook(eventId: string) {
   const signature = webhookSignature(secret, timestamp, body);
 
   try {
-    const response = await fetch(platform.webhook_url, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "user-agent": "Newvelion-IntegrationAPI/1.0",
-        "x-newvelion-event": event.event_type,
-        "x-newvelion-timestamp": timestamp,
-        "x-newvelion-signature": signature,
-        "x-newvelion-event-id": event.event_id,
-      },
-      body,
-      cache: "no-store",
-      signal: AbortSignal.timeout(15_000),
-    });
+    const responseStatus = await postWebhookSafely(platform.webhook_url, {
+      "content-type": "application/json",
+      "user-agent": "Newvelion-IntegrationAPI/1.0",
+      "x-newvelion-event": event.event_type,
+      "x-newvelion-timestamp": timestamp,
+      "x-newvelion-signature": signature,
+      "x-newvelion-event-id": event.event_id,
+    }, body);
 
-    if (response.ok) {
+    if (responseStatus >= 200 && responseStatus < 300) {
       await client
         .from("integration_webhook_events")
         .update({
@@ -333,7 +385,7 @@ export async function deliverIntegrationWebhook(eventId: string) {
           attempts: Number(event.attempts ?? 0) + 1,
           last_attempt_at: new Date().toISOString(),
           next_attempt_at: new Date().toISOString(),
-          response_status: response.status,
+          response_status: responseStatus,
           error: null,
         })
         .eq("id", event.id);
