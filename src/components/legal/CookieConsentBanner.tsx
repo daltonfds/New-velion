@@ -5,6 +5,42 @@ import { useEffect, useState } from "react";
 
 type Consent = { necessary: true; analytics: boolean; savedAt: string };
 const CONSENT_KEY = "newvelion-cookie-consent-v1";
+const CONSENT_COOKIE = "newvelion_cookie_consent";
+
+function readStoredConsent(): Partial<Consent> | null {
+  try {
+    const stored = window.localStorage.getItem(CONSENT_KEY);
+    if (stored) return JSON.parse(stored) as Partial<Consent>;
+  } catch {
+    // Fall back to a first-party cookie when WebView storage is unavailable.
+  }
+
+  try {
+    const item = document.cookie
+      .split("; ")
+      .find((entry) => entry.startsWith(`${CONSENT_COOKIE}=`));
+    if (!item) return null;
+    return JSON.parse(decodeURIComponent(item.slice(CONSENT_COOKIE.length + 1))) as Partial<Consent>;
+  } catch {
+    return null;
+  }
+}
+
+function persistConsent(consent: Consent) {
+  const value = JSON.stringify(consent);
+  try {
+    window.localStorage.setItem(CONSENT_KEY, value);
+  } catch {
+    // The persistent cookie below is the fallback.
+  }
+
+  try {
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `${CONSENT_COOKIE}=${encodeURIComponent(value)}; Path=/; Max-Age=15552000; SameSite=Lax${secure}`;
+  } catch {
+    // If both storage mechanisms are unavailable, the banner will be shown again.
+  }
+}
 
 export default function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
@@ -12,16 +48,9 @@ export default function CookieConsentBanner() {
   const [analytics, setAnalytics] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(CONSENT_KEY);
-      if (!stored) setVisible(true);
-      else {
-        const parsed = JSON.parse(stored) as Partial<Consent>;
-        setAnalytics(parsed.analytics === true);
-      }
-    } catch {
-      setVisible(true);
-    }
+    const stored = readStoredConsent();
+    if (!stored) setVisible(true);
+    else setAnalytics(stored.analytics === true);
 
     const openPreferences = () => {
       setPreferencesOpen(true);
@@ -37,11 +66,7 @@ export default function CookieConsentBanner() {
       analytics: allowAnalytics,
       savedAt: new Date().toISOString(),
     };
-    try {
-      localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
-    } catch {
-      // The banner still closes if browser storage is disabled.
-    }
+    persistConsent(consent);
     setAnalytics(allowAnalytics);
     setVisible(false);
     setPreferencesOpen(false);
