@@ -478,3 +478,40 @@ samp {
     font-size: 18px;
   }
 }
+
+
+/* Compact Android/mobile experience: denser typography and product imagery. */
+@media (max-width: 767px) {
+  html,
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  h1 { font-size: 23px; line-height: 1.25; }
+  h2 { font-size: 19px; line-height: 1.3; }
+  h3 { font-size: 16px; line-height: 1.35; }
+
+  .nv-dashboard h1 { font-size: 23px !important; line-height: 1.25 !important; }
+  .nv-dashboard h2 { font-size: 19px !important; line-height: 1.3 !important; }
+  .nv-dashboard h3 { font-size: 16px !important; line-height: 1.35 !important; }
+  .nv-dashboard p,
+  .nv-dashboard label,
+  .nv-dashboard td { font-size: 13px; line-height: 1.45; }
+  .nv-dashboard button,
+  .nv-dashboard input,
+  .nv-dashboard select,
+  .nv-dashboard textarea { font-size: 14px; }
+
+  .nv-dashboard .nv-product-card img,
+  .nv-dashboard .nv-product-image,
+  .nv-dashboard [class*="product-card"] img,
+  .nv-dashboard [class*="ProductCard"] img {
+    max-height: 150px;
+    width: 100%;
+    object-fit: contain;
+  }
+
+  .nv-dashboard .rounded-2xl { border-radius: 10px; }
+  .nv-dashboard .rounded-xl { border-radius: 9px; }
+}
