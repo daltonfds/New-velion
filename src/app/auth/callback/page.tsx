@@ -36,7 +36,7 @@ export default function AuthCallbackPage() {
         return;
       }
       const provider = String(session.user.app_metadata?.provider || "");
-      const { data: existingProfile } = await supabase.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
+      const { data: existingProfile } = await supabase.from("profiles").select("role,full_name,phone_number,country_code").eq("id", session.user.id).maybeSingle();
       if (provider === "google" && ["seller", "supplier"].includes(String(existingProfile?.role || ""))) {
         await supabase.auth.signOut();
         if (active) setMessage("Google sign-in is not available for seller or supplier / producer accounts. Please sign in with email and password.");
@@ -61,6 +61,13 @@ export default function AuthCallbackPage() {
         if (!response.ok) {
           const body = await response.json().catch(() => ({}));
           if (active) setMessage(body.error || "Unable to finish setting up your buyer account.");
+          return;
+        }
+      }
+      if (params.get("intent") === "customer") {
+        const { data: completedProfile } = await supabase.from("profiles").select("full_name,phone_number,country_code").eq("id", session.user.id).maybeSingle();
+        if (!String(completedProfile?.full_name || "").trim() || !String(completedProfile?.phone_number || "").trim() || !String(completedProfile?.country_code || "").trim()) {
+          if (active) router.replace("/auth/complete-profile?next=" + encodeURIComponent(nextPath));
           return;
         }
       }
