@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 
@@ -17,7 +17,6 @@ function safeNext(value: string | null) {
 
 export default function CompleteProfilePage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [fullName, setFullName] = useState("");
   const [countryCode, setCountryCode] = useState("ZA");
   const [phone, setPhone] = useState("");
@@ -63,7 +62,7 @@ export default function CompleteProfilePage() {
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) { setError(body.error || "Unable to save your profile. Please try again."); return; }
-      router.replace(safeNext(searchParams.get("next")));
+      router.replace(safeNext(new URLSearchParams(window.location.search).get("next")));
       router.refresh();
     } catch {
       setError("Unable to save your profile right now. Please try again.");
