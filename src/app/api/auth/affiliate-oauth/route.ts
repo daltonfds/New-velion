@@ -20,11 +20,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Google sign-in required." }, { status: 403 });
   }
 
-  const createdAt = new Date(user.created_at).getTime();
-  if (!Number.isFinite(createdAt) || Date.now() - createdAt > 10 * 60 * 1000 || createdAt > Date.now() + 60_000) {
-    return NextResponse.json({ ok: true });
-  }
-
   const { data: profile, error: profileError } = await admin
     .from("profiles")
     .select("id,role")
