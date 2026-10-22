@@ -29,7 +29,7 @@ declare
 begin
   if v_user is null then raise exception 'AUTHENTICATION_REQUIRED'; end if;
   select p.role into v_role from public.profiles p where p.id=v_user;
-  if v_role not in ('platform_affiliate','seller','admin') then
+  if coalesce(v_role,'') not in ('platform_affiliate','seller','admin') then
     raise exception 'INVITATION_NOT_ALLOWED';
   end if;
   insert into public.platform_affiliate_invitations(inviter_user_id)
@@ -53,7 +53,7 @@ begin
   if v_user is null then raise exception 'AUTHENTICATION_REQUIRED'; end if;
   select p.role into v_role from public.profiles p where p.id=v_user;
   if v_role is null then raise exception 'PROFILE_REQUIRED'; end if;
-  if v_role='admin' then raise exception 'ADMIN_CANNOT_ACCEPT_AFFILIATE_INVITE'; end if;
+  if coalesce(v_role,'') not in ('seller','customer') then raise exception 'ACCOUNT_ROLE_NOT_ELIGIBLE_FOR_AFFILIATE_INVITE'; end if;
   select * into v_invitation
   from public.platform_affiliate_invitations i
   where i.token=p_token
@@ -96,7 +96,7 @@ declare
 begin
   if v_user is null then raise exception 'Authentication required'; end if;
   select p.role into v_role from public.profiles p where p.id=v_user;
-  if v_role <> 'platform_affiliate' then
+  if coalesce(v_role,'') <> 'platform_affiliate' then
     raise exception 'AFFILIATE_INVITATION_REQUIRED';
   end if;
   insert into public.platform_affiliates as existing_affiliate(user_id)
