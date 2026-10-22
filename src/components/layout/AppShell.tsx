@@ -21,6 +21,7 @@ type IconName =
   | "download"
   | "users"
   | "bell"
+  | "globe"
   | "menu"
   | "logout";
 
@@ -107,6 +108,10 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
     bell: <>
       <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
       <path d="M10 21h4" />
+    </>,
+    globe: <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
     </>,
     menu: <>
       <path d="M4 6h16" />
@@ -466,7 +471,26 @@ export default function AppShell({
           </div>
 
           <div className="flex items-center gap-2">
-<NotificationCenter />
+            <label className="relative flex h-10 items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-2 text-sm text-[#374151] transition hover:bg-[#F7F8FA]" title={t("Choose language", "Escolher idioma")}>
+              <Icon name="globe" size={17} />
+              <span className="sr-only">{t("Language", "Idioma")}</span>
+              <select
+                aria-label={t("Choose language", "Escolher idioma")}
+                value={pt ? "pt" : "en"}
+                onChange={(event) => {
+                  const language = event.target.value === "pt" ? "pt" : "en";
+                  localStorage.setItem("newvelion-language", language);
+                  setPt(language === "pt");
+                  document.documentElement.lang = language;
+                  window.dispatchEvent(new Event("newvelion-language-change"));
+                }}
+                className="max-w-[92px] cursor-pointer appearance-none border-0 bg-transparent py-1 pr-1 text-xs font-semibold outline-none"
+              >
+                <option value="en">English</option>
+                <option value="pt">Português</option>
+              </select>
+            </label>
+            <NotificationCenter />
 
             <Link
               href="/dashboard/profile"
