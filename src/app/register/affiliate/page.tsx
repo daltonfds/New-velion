@@ -1,107 +1,73 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import { supabase } from "@/lib/supabase";
 
-export default function PlatformAffiliateRegisterPage() {
+export default function PlatformAffiliateInvitePage() {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [language, setLanguage] = useState<"en" | "pt">("en");
-  const [password, setPassword] = useState("");
-  const [countryCode, setCountryCode] = useState("ZA");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [invite, setInvite] = useState("");
+  const [status, setStatus] = useState<"loading" | "ready" | "accepting" | "accepted" | "error">("loading");
+  const [message, setMessage] = useState("");
 
-  async function continueWithGoogle() {
-    setError("");
-    if (!acceptedTerms) {
-      setError("Please accept the Terms of Service and Privacy Policy before continuing with Google.");
-      return;
+  useEffect(() => {
+    let active = true;
+    const token = new URLSearchParams(window.location.search).get("invite") || "";
+    setInvite(token);
+    if (!token) {
+      setStatus("ready");
+      return () => { active = false; };
     }
-    setGoogleLoading(true);
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent("/dashboard/affiliate") + "&intent=affiliate",
-        queryParams: { prompt: "select_account" },
-      },
-    });
-    if (oauthError) { setError(oauthError.message); setGoogleLoading(false); }
-  }
+    if (!/^[0-9a-f-]{36}$/i.test(token)) {
+      setMessage("This invitation link is invalid.");
+      setStatus("error");
+      return () => { active = false; };
+    }
+    async function checkSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!active) return;
+      if (!session) {
+        setStatus("ready");
+        return;
+      }
+      setStatus("accepting");
+      const { error } = await supabase.rpc("accept_platform_affiliate_invitation", { p_token: token });
+      if (!active) return;
+      if (error) {
+        const reason = error.message || "";
+        setMessage(reason.includes("INVITATION_EXPIRED") ? "This invitation has expired. Ask an affiliate, seller, or administrator for a new one."
+          : reason.includes("INVITATION_ALREADY_USED") ? "This invitation has already been used."
+          : reason.includes("SELF_INVITATION_NOT_ALLOWED") ? "You cannot accept an invitation you created."
+          : reason.includes("INVITATION_NOT_FOUND") ? "This invitation is invalid or no longer available."
+          : "We could not accept this invitation. Make sure you are signed in to the account you want to use.");
+        setStatus("error");
+        return;
+      }
+      setStatus("accepted");
+      router.replace("/dashboard/affiliate");
+      router.refresh();
+    }
+    void checkSession();
+    return () => { active = false; };
+  }, [router]);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
-    if (!acceptedTerms) {
-      setError("Please accept the Terms of Service and Privacy Policy.");
-      return;
-    }
-    if (password.length < 8) {
-      setError("Use a password with at least 8 characters.");
-      return;
-    }
-
-    setLoading(true);
-    const { data, error: signupError } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        data: {
-          full_name: fullName.trim(),
-          role: "platform_affiliate",
-          preferred_language: language,
-          country_code: countryCode,
-          country_name: countryCode === "MZ" ? "Mozambique" : "South Africa",
-          country_calling_code: countryCode === "MZ" ? "+258" : "+27",
-          accepted_terms_at: new Date().toISOString(),
-          accepted_terms_version: "2026-10-09",
-          accepted_privacy_policy: true,
-        },
-      },
-    });
-    setLoading(false);
-
-    if (signupError) {
-      setError(signupError.message);
-      return;
-    }
-    router.push("/verify-email?email=" + encodeURIComponent(data.user?.email || email.trim()));
-  }
+  const loginHref = "/login?redirect=" + encodeURIComponent("/register/affiliate?invite=" + invite);
+  const registerHref = "/register?affiliate_invite=" + encodeURIComponent(invite);
 
   return (
-    <main className="min-h-screen bg-[#F5F8FC] px-5 py-10">
-      <div className="mx-auto w-full max-w-xl">
-        <div className="rounded-2xl border border-[#DCE3EE] bg-white p-6 shadow-sm sm:p-9">
-          <div className="mb-6 flex items-center justify-between gap-3 border-b border-slate-100 pb-5"><NewvelionBrand size="md" /><label className="flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2 py-2 text-xs font-semibold text-slate-600"><span className="sr-only">Preferred language</span><select aria-label="Preferred language" value={language} onChange={(event) => { const value = event.target.value === "pt" ? "pt" : "en"; setLanguage(value); localStorage.setItem("newvelion-language", value); document.documentElement.lang = value; window.dispatchEvent(new Event("newvelion-language-change")); }} className="max-w-[105px] bg-transparent outline-none"><option value="en">English</option><option value="pt">Português</option></select></label></div>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0078E8]">Newvelion Partner Program</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#001B44]">Become a platform affiliate</h1>
-          <p className="mt-3 text-sm leading-6 text-slate-600">Refer sellers and suppliers to Newvelion. Earn R50 when each referred business makes its first confirmed sale, and unlock mystery prizes as your active referrals grow.</p>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-blue-100 bg-[#EAF3FF] p-4"><p className="text-xs font-semibold uppercase tracking-wide text-[#003B95]">Referral reward</p><p className="mt-1 text-2xl font-bold text-[#001B44]">R50</p><p className="mt-1 text-xs text-slate-600">After the first confirmed sale</p></div>
-            <div className="rounded-xl border border-amber-100 bg-amber-50 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Milestone reward</p><p className="mt-1 text-2xl font-bold text-[#001B44]">Mystery prize</p><p className="mt-1 text-xs text-slate-600">At 5, 10 and 25 active referrals</p></div>
-          </div>
-
-          <form onSubmit={submit} className="mt-7 space-y-4">
-            <label className="block text-sm font-semibold text-[#001B44]">Full name<input required autoComplete="name" value={fullName} onChange={(event) => setFullName(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" /></label>
-            <label className="block text-sm font-semibold text-[#001B44]">Country<select required value={countryCode} onChange={(event) => setCountryCode(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]"><option value="ZA">South Africa</option><option value="MZ">Mozambique</option></select></label>
-            <label className="block text-sm font-semibold text-[#001B44]">Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" /></label>
-            <label className="block text-sm font-semibold text-[#001B44]">Password<input required minLength={8} type="password" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" /></label>
-            <label className="flex items-start gap-3 text-sm leading-6 text-slate-600"><input type="checkbox" required checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} className="mt-1 h-4 w-4 accent-[#006CE5]" /><span>I agree to the <Link href="/terms" target="_blank" className="font-semibold text-[#003B95] underline">Terms of Service</Link> and acknowledge the <Link href="/privacy" target="_blank" className="font-semibold text-[#003B95] underline">Privacy Policy</Link>.</span></label>
-            <button type="button" onClick={continueWithGoogle} disabled={googleLoading || loading} className="flex w-full items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3.5 font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-60"><span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 font-bold text-[#4285F4]">G</span>{googleLoading ? "Connecting to Google..." : "Continue with Google"}</button>
-            {error && <div role="alert" className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
-            <button type="submit" disabled={loading || googleLoading} className="w-full rounded-lg bg-[#003B95] px-4 py-3.5 font-semibold text-white hover:bg-[#002B70] disabled:opacity-60">{loading ? "Creating account..." : "Create affiliate account"}</button>
-          </form>
-          <p className="mt-5 text-center text-sm text-slate-500">Already registered? <Link href="/login" className="font-semibold text-[#003B95]">Sign in</Link></p>
-          <p className="mt-3 text-center text-xs leading-5 text-slate-400">Rewards are recorded only after a first confirmed paid sale. Registrations alone do not count as active referrals.</p>
-        </div>
-      </div>
+    <main className="flex min-h-screen items-center justify-center bg-[#F5F8FC] px-5 py-10">
+      <section className="w-full max-w-lg rounded-2xl border border-[#DCE3EE] bg-white p-7 text-center shadow-sm sm:p-9">
+        <div className="mb-7 flex justify-center border-b border-slate-100 pb-6"><NewvelionBrand size="md" /></div>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0078E8]">Newvelion Partner Program</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#001B44]">Affiliate access is by invitation</h1>
+        {status === "loading" || status === "accepting" ? <p className="mt-4 text-sm text-slate-600">{status === "accepting" ? "Accepting your invitation…" : "Checking your invitation…"}</p>
+          : status === "accepted" ? <p className="mt-4 text-sm text-slate-600">Invitation accepted. Opening your dashboard…</p>
+          : status === "error" ? <p role="alert" className="mt-5 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">{message}</p>
+          : invite ? <><p className="mt-4 text-sm leading-6 text-slate-600">You have an invitation to join Newvelion as a platform affiliate. Sign in to the account you want to use, or create an account first. After email verification, reopen this invitation link to accept it.</p><div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center"><Link href={loginHref} className="rounded-lg bg-[#003B95] px-5 py-3 font-semibold text-white hover:bg-[#002B70]">Sign in and accept</Link><Link href={registerHref} className="rounded-lg border border-slate-200 px-5 py-3 font-semibold text-[#003B95] hover:bg-slate-50">Create an account</Link></div></>
+          : <><p className="mt-4 text-sm leading-6 text-slate-600">Platform affiliate accounts cannot be created publicly. Ask an existing Newvelion affiliate, seller, or administrator to send you a personal invitation link.</p><div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center"><Link href="/login" className="rounded-lg bg-[#003B95] px-5 py-3 font-semibold text-white hover:bg-[#002B70]">Sign in</Link><Link href="/" className="rounded-lg border border-slate-200 px-5 py-3 font-semibold text-[#003B95] hover:bg-slate-50">Back to Newvelion</Link></div></>}
+      </section>
     </main>
   );
 }

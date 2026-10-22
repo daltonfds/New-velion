@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
@@ -10,6 +10,8 @@ import { supabase } from "@/lib/supabase";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [affiliateInviteMode, setAffiliateInviteMode] = useState(false);
+  useEffect(() => { setAffiliateInviteMode(new URLSearchParams(window.location.search).has("affiliate_invite")); }, []);
   const [form, setForm] = useState({
     fullName: "",
     country: "",
@@ -36,6 +38,8 @@ export default function RegisterPage() {
 
     setError("");
     setSuccess("");
+
+    if (form.fullName.trim().length < 2) { setError("Please enter your full name."); return; }
 
     if (form.password !== form.confirm) {
       setError("Passwords do not match.");
@@ -107,9 +111,9 @@ export default function RegisterPage() {
 
     const registeredEmail = data.user?.email || form.email.trim();
 
-    router.push(
-      `/verify-email?email=${encodeURIComponent(registeredEmail)}`
-    );
+    const inviteToken = new URLSearchParams(window.location.search).get("affiliate_invite")?.trim() || "";
+    const nextPath = inviteToken ? "/register/affiliate?invite=" + encodeURIComponent(inviteToken) : "/account";
+    router.push("/verify-email?email=" + encodeURIComponent(registeredEmail) + "&next=" + encodeURIComponent(nextPath));
   }
 
 
@@ -122,11 +126,11 @@ export default function RegisterPage() {
           </div>
 
           <h1 className="text-3xl font-bold text-[#0A0440]">
-            Create your seller account
+            {affiliateInviteMode ? "Create your Newvelion account" : "Create your seller account"}
           </h1>
 
           <p className="mt-2 text-slate-500">
-            Start selling with Newvelion.
+            {new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).has("affiliate_invite") ? "Create an account to accept your personal affiliate invitation." : "Start selling with Newvelion."}
           </p>
 
           <form onSubmit={submit} className="mt-8 space-y-5">
@@ -254,7 +258,6 @@ export default function RegisterPage() {
           </form>
 
           <p className="mt-3 text-center text-sm text-slate-500">Are you a supplier or producer?{" "}<Link href="/register/supplier" className="font-semibold text-[#003B95] underline">Create a supplier / producer account</Link></p>
-          <p className="mt-3 text-center text-sm text-slate-500">Want to promote Newvelion instead of selling products?{" "}<Link href="/register/affiliate" className="font-semibold text-blue-600">Join as a platform affiliate</Link></p>
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{" "}

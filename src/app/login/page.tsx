@@ -34,7 +34,8 @@ function LoginPageContent() {
       setGoogleLoading(false);
       return;
     }
-    const intent = (searchParams.get("role") || "").toLowerCase() === "customer" || nextPath === "/account" || nextPath.startsWith("/dashboard/customer") ? "&intent=customer" : "";
+    const requestedIntentRole = (searchParams.get("role") || "").toLowerCase();
+    const intent = requestedIntentRole === "customer" || nextPath === "/account" || nextPath.startsWith("/dashboard/customer") ? "&intent=customer" : ["affiliate", "platform_affiliate"].includes(requestedIntentRole) ? "&intent=affiliate" : "";
     const { error: oauthError } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent(nextPath) + intent, queryParams: { prompt: "select_account" } } });
     if (oauthError) { setError(oauthError.message); setGoogleLoading(false); }
   }
@@ -81,7 +82,7 @@ function LoginPageContent() {
       }
 
       const loginRole = (searchParams.get("role") || "").toLowerCase();
-      router.replace(searchParams.get("redirect") || searchParams.get("next") || (loginRole === "customer" ? "/account" : ["affiliate", "platform_affiliate"].includes(loginRole) ? "/dashboard/affiliate" : "/dashboard"));
+      router.replace(searchParams.get("redirect") || searchParams.get("next") || (loginRole === "customer" ? "/account" : "/dashboard"));
       router.refresh();
     } catch {
       setError("Unable to sign in right now. Please try again.");
@@ -181,7 +182,6 @@ function LoginPageContent() {
           </p>
 
           <p className="mt-4 text-center text-sm text-slate-500">Are you a supplier or producer?{" "}<Link href="/register/supplier" className="font-semibold text-[#003B95] hover:underline">Create a supplier / producer account</Link></p>
-          <p className="mt-4 text-center text-sm text-slate-500">Want to promote Newvelion?{" "}<Link href="/register/affiliate" className="font-semibold text-blue-600 hover:text-blue-700">Join as a platform affiliate</Link></p>
           <div className="mt-6 border-t border-slate-100 pt-6 text-center text-sm text-slate-500">
 
           </div>
