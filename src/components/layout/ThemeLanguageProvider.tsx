@@ -133,32 +133,97 @@ const translations: Record<string, string> = {
   "Unable to sign in right now. Please try again.":"Não foi possível iniciar sessão neste momento. Tente novamente.",
   "Google sign-in is available only for buyer and affiliate accounts. Sellers and suppliers must use email and password.":"O início de sessão com Google está disponível apenas para clientes e afiliados. Vendedores e fornecedores devem usar o e-mail e a palavra-passe.",
   "Continue with Google":"Continuar com o Google","Email or password":"E-mail ou palavra-passe",
-};
-
-const wordTranslations: Record<string, string> = {
-  dashboard:"painel", marketplace:"mercado", supplier:"fornecedor", suppliers:"fornecedores", seller:"vendedor", sellers:"vendedores",
-  affiliate:"afiliado", customer:"cliente", customers:"clientes", admin:"administrador", product:"produto", products:"produtos",
-  order:"pedido", orders:"pedidos", sale:"venda", sales:"vendas", commission:"comissão", commissions:"comissões", withdrawal:"levantamento",
-  withdrawals:"levantamentos", payment:"pagamento", payments:"pagamentos", shipping:"envio", delivery:"entrega", settings:"definições",
-  profile:"perfil", account:"conta", users:"utilizadores", user:"utilizador", category:"categoria", categories:"categorias",
-  status:"estado", active:"ativo", inactive:"inativo", pending:"pendente", approved:"aprovado", rejected:"rejeitado", published:"publicado",
-  draft:"rascunho", enabled:"ativado", disabled:"desativado", total:"total", price:"preço", cost:"custo", quantity:"quantidade",
-  description:"descrição", name:"nome", email:"e-mail", phone:"telefone", mobile:"telemóvel", country:"país", company:"empresa",
-  address:"morada", city:"cidade", state:"província", "postal":"postal", code:"código", revenue:"receita", profit:"lucro", margin:"margem",
-  rate:"taxa", amount:"valor", balance:"saldo", wallet:"carteira", analytics:"análises", report:"relatório", reports:"relatórios",
-  performance:"desempenho", clicks:"cliques", conversions:"conversões", views:"visualizações", visitors:"visitantes", conversion:"conversão",
-    inventory:"inventário", stock:"stock", catalog:"catálogo", fulfillment:"logística",
-   offer:"oferta", offers:"ofertas", review:"avaliação", reviews:"avaliações", rating:"avaliação", verified:"verificado",
-  available:"disponível", unavailable:"indisponível", "in":"em", "out":"fora", secure:"seguro", checkout:"checkout", 
-  details:"detalhes", information:"informação", general:"geral", business:"negócio", personal:"pessoal", notification:"notificação",
-  notifications:"notificações", search:"pesquisar", save:"guardar", cancel:"cancelar", delete:"eliminar", edit:"editar", add:"adicionar",
-  remove:"remover", back:"voltar", next:"seguinte", previous:"anterior", submit:"enviar", confirm:"confirmar", close:"fechar",
-  open:"abrir", select:"selecionar", selected:"selecionado", choose:"escolher", upload:"carregar", download:"transferir", export:"exportar",
-  import:"importar", copy:"copiar", create:"criar", update:"atualizar", apply:"aplicar", reset:"repor", filter:"filtrar", filters:"filtros",
-  sort:"ordenar", "by":"por", view:"ver", manage:"gerir", new:"novo", old:"antigo", yes:"sim", no:"não", required:"obrigatório",
-  optional:"opcional", date:"data", time:"hora", today:"hoje", yesterday:"ontem", week:"semana", month:"mês", year:"ano",
-  "this":"este", "last":"último", "recent":"recente", "top":"principais", "all":"todos",  "data":"dados", 
-  "loading":"a carregar", "saving":"a guardar", "deleting":"a eliminar", "updating":"a atualizar", "creating":"a criar",
+  // Contextual translations reviewed against the English source UI.
+  "Create your seller account": "Crie a sua conta de vendedor",
+  "Create your buyer account": "Crie a sua conta de cliente",
+  "Create your supplier account": "Crie a sua conta de fornecedor",
+  "Create your affiliate account": "Crie a sua conta de afiliado",
+  "Start selling with Newvelion.": "Comece a vender com a Newvelion.",
+  "Use your email, mobile number and password to shop and track your orders.": "Utilize o seu e-mail, número de telemóvel e palavra-passe para comprar e acompanhar os seus pedidos.",
+  "Refer sellers and suppliers to Newvelion. Earn R50 when each referred business makes its first confirmed sale, and unlock mystery prizes as your active referrals grow.": "Recomende a Newvelion a vendedores e fornecedores. Ganhe R50 quando cada negócio recomendado realizar a sua primeira venda confirmada e desbloqueie prémios surpresa à medida que aumentam as suas referências ativas.",
+  "Newvelion Partner Program": "Programa de parceiros Newvelion",
+  "Become a platform affiliate": "Torne-se afiliado da plataforma",
+  "Referral reward": "Prémio por referência",
+  "After the first confirmed sale": "Após a primeira venda confirmada",
+  "Milestone reward": "Prémio por objetivo",
+  "Mystery prize": "Prémio surpresa",
+  "At 5, 10 and 25 active referrals": "Ao atingir 5, 10 e 25 referências ativas",
+  "Full name": "Nome completo",
+  "Company name": "Nome da empresa",
+  "Email address": "Endereço de e-mail",
+  "Email": "E-mail",
+  "Mobile number": "Número de telemóvel",
+  "Password": "Palavra-passe",
+  "Confirm password": "Confirmar palavra-passe",
+  "Preferred language": "Idioma preferido",
+  "I agree to the": "Concordo com os",
+  "Terms of Service": "Termos de Serviço",
+  "and acknowledge the": "e declaro que tomei conhecimento da",
+  "Privacy Policy": "Política de Privacidade",
+  "I have read and agree to the": "Li e aceito os",
+  "Please accept the Terms of Service and Privacy Policy before continuing with Google.": "Aceite os Termos de Serviço e a Política de Privacidade antes de continuar com o Google.",
+  "Please accept the Terms of Service and Privacy Policy.": "Aceite os Termos de Serviço e a Política de Privacidade.",
+  "Please accept the Terms of Service and Privacy Policy to create an account.": "Aceite os Termos de Serviço e a Política de Privacidade para criar uma conta.",
+  "Use a password with at least 8 characters.": "Utilize uma palavra-passe com pelo menos 8 caracteres.",
+  "Password must contain at least 6 characters.": "A palavra-passe deve ter pelo menos 6 caracteres.",
+  "Passwords do not match.": "As palavras-passe não coincidem.",
+  "Please select your country.": "Selecione o seu país.",
+  "Please enter your phone number.": "Introduza o seu número de telefone.",
+  "Country and phone are required.": "O país e o número de telefone são obrigatórios.",
+  "Creating account...": "A criar conta...",
+  "Connecting to Google...": "A estabelecer ligação ao Google...",
+  "Already have an account?": "Já tem uma conta?",
+  "Already registered?": "Já está registado?",
+  "New customer?": "É um novo cliente?",
+  "Want to sell instead?": "Prefere vender?",
+  "Want to sell?": "Quer vender?",
+  "Create a seller account": "Criar uma conta de vendedor",
+  "Create a buyer account": "Criar uma conta de cliente",
+  "Create a supplier / producer account": "Criar uma conta de fornecedor/produtor",
+  "Join as a platform affiliate": "Aderir como afiliado da plataforma",
+  "Want to promote Newvelion?": "Quer promover a Newvelion?",
+  "Want to promote Newvelion instead of selling products?": "Quer promover a Newvelion em vez de vender produtos?",
+  "Are you a supplier or producer?": "É fornecedor ou produtor?",
+  "or use email": "ou utilize o e-mail",
+  "or sign in with email": "ou inicie sessão com o e-mail",
+  "Unable to establish your session. Please try again.": "Não foi possível iniciar a sua sessão. Tente novamente.",
+  "Supplier / Producer": "Fornecedor/produtor",
+  "List your products, manage inventory and fulfill orders through Newvelion.": "Publique os seus produtos, gira o inventário e processe pedidos através da Newvelion.",
+  "Supplier": "Fornecedor",
+  "Rewards are recorded only after a first confirmed paid sale. Registrations alone do not count as active referrals.": "Os prémios só são registados após a primeira venda paga e confirmada. O simples registo não conta como referência ativa.",
+  "Terms governing your use of the Newvelion platform, marketplace and related services.": "Termos que regem a utilização da plataforma Newvelion, do mercado e dos serviços associados.",
+  "How Newvelion collects, uses, protects and shares personal information.": "Como a Newvelion recolhe, utiliza, protege e partilha informações pessoais.",
+  "About Newvelion": "Sobre a Newvelion",
+  "Acceptance": "Aceitação",
+  "Eligibility": "Elegibilidade",
+  "Accounts": "Contas",
+  "Sellers and affiliate links": "Vendedores e ligações de afiliados",
+  "Orders and payments": "Pedidos e pagamentos",
+  "Commissions": "Comissões",
+  "Withdrawals": "Levantamentos",
+  "Buyer protection and refunds": "Proteção do comprador e reembolsos",
+  "Prohibited conduct": "Condutas proibidas",
+  "Intellectual property": "Propriedade intelectual",
+  "Third-party services": "Serviços de terceiros",
+  "Suspension and termination": "Suspensão e rescisão",
+  "Availability": "Disponibilidade",
+  "Limitation of liability": "Limitação de responsabilidade",
+  "Changes": "Alterações",
+  "Governing law": "Lei aplicável",
+  "Contact": "Contacto",
+  "Our commitment": "O nosso compromisso",
+  "Information we collect": "Informações que recolhemos",
+  "How we use information": "Como utilizamos as informações",
+  "Legal bases": "Fundamentos jurídicos",
+  "Sharing information": "Partilha de informações",
+  "Customer delivery information": "Informações de entrega do cliente",
+  "International transfers": "Transferências internacionais",
+  "Retention": "Conservação dos dados",
+  "Your rights": "Os seus direitos",
+  "Cookies and tracking": "Cookies e rastreamento",
+  "Marketing": "Marketing",
+  "Children": "Crianças",
+  "Privacy questions and requests can be sent to": "As questões e os pedidos relativos à privacidade podem ser enviados para",
 };
 
 const reverseTranslations = Object.fromEntries(Object.entries(translations).map(([en, pt]) => [pt, en]));
@@ -178,12 +243,13 @@ function replaceWords(value: string, toPortuguese: boolean) {
 function translateValue(value: string, toPortuguese: boolean) {
   const trimmed = value.trim();
   if (!trimmed) return value;
-  if (toPortuguese) {
-    if (translations[trimmed]) return value.replace(trimmed, translations[trimmed]);
-    return value.replace(trimmed, replaceWords(trimmed, true));
-  }
-  if (reverseTranslations[trimmed]) return value.replace(trimmed, reverseTranslations[trimmed]);
-  return value.replace(trimmed, replaceWords(trimmed, false));
+  const translated = toPortuguese
+    ? translations[trimmed]
+    : reverseTranslations[trimmed];
+  // Translate complete contextual phrases only. Never translate individual words:
+  // doing so corrupts English phrases, grammar, product names and user-generated text.
+  if (!translated) return value;
+  return value.replace(trimmed, translated);
 }
 
 function translatePage(toPortuguese: boolean) {
@@ -201,7 +267,7 @@ function translatePage(toPortuguese: boolean) {
     if (next !== value) text.textContent = next;
   }
 
-  const attrs = ["placeholder","aria-label","title","alt","value"];
+  const attrs = ["placeholder","aria-label","title","alt"];
   document.querySelectorAll<HTMLElement>("[" + attrs.join("],[") + "]").forEach((el) => {
     for (const attr of attrs) {
       const value = el.getAttribute(attr);
