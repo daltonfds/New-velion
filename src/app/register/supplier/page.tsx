@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function SupplierRegisterPage() {
   const router = useRouter();
-  const [form,setForm]=useState({fullName:"",companyName:"",country:"",callingCode:"",phone:"",whatsapp:"",email:"",password:"",confirm:""});
+  const [form,setForm]=useState({fullName:"",companyName:"",country:"",callingCode:"",phone:"",whatsapp:"",email:"",password:"",confirm:"",language:"en" as "en" | "pt"});
   const [acceptedTerms,setAcceptedTerms]=useState(false); const [loading,setLoading]=useState(false); const [error,setError]=useState("");
 
   async function submit(event:FormEvent){event.preventDefault();setError("");
@@ -23,7 +23,7 @@ export default function SupplierRegisterPage() {
     const {data,error:signupError}=await supabase.auth.signUp({email:form.email.trim(),password:form.password,options:{data:{
       full_name:form.fullName.trim(),country_code:form.country,country_name:country?.name||"",country_calling_code:form.callingCode,
       phone_number:form.phone,phone_e164:composeE164(form.callingCode,form.phone),whatsapp_number:form.whatsapp,
-      whatsapp_e164:form.whatsapp?composeE164(form.callingCode,form.whatsapp):"",preferred_language:"en",role:"supplier",platform_referral_code:new URLSearchParams(window.location.search).get("ref")?.trim().toUpperCase()||"",
+      whatsapp_e164:form.whatsapp?composeE164(form.callingCode,form.whatsapp):"",preferred_language:form.language,role:"supplier",platform_referral_code:new URLSearchParams(window.location.search).get("ref")?.trim().toUpperCase()||"",
       supplier_company_name:form.companyName.trim(),accepted_terms_at:new Date().toISOString(),accepted_terms_version:"2026-10-09",accepted_privacy_policy:true
     }}});
     setLoading(false);
@@ -47,7 +47,7 @@ export default function SupplierRegisterPage() {
     <form onSubmit={submit} className="mt-8 space-y-5">
       <label className="block text-sm font-semibold text-[#16294F]">Full name<input required value={form.fullName} onChange={e=>setForm({...form,fullName:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label>
       <label className="block text-sm font-semibold text-[#16294F]">Company name<input required value={form.companyName} onChange={e=>setForm({...form,companyName:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label>
-      <PhoneFields countryCode={form.country} phone={form.phone} whatsapp={form.whatsapp} language="en" onCountryChange={(country,callingCode)=>setForm({...form,country,callingCode})} onPhoneChange={phone=>setForm({...form,phone})} onWhatsappChange={whatsapp=>setForm({...form,whatsapp})} onLanguageChange={()=>{}} allowedCountries={["ZA","CN"]}/>
+      <PhoneFields countryCode={form.country} phone={form.phone} whatsapp={form.whatsapp} language={form.language} onCountryChange={(country,callingCode)=>setForm({...form,country,callingCode})} onPhoneChange={phone=>setForm({...form,phone})} onWhatsappChange={whatsapp=>setForm({...form,whatsapp})} onLanguageChange={language=>setForm({...form,language})} allowedCountries={["ZA","CN"]}/>
       <label className="block text-sm font-semibold text-[#16294F]">Email<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label>
       <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold text-[#16294F]">Password<input required minLength={6} type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label><label className="text-sm font-semibold text-[#16294F]">Confirm password<input required minLength={6} type="password" value={form.confirm} onChange={e=>setForm({...form,confirm:e.target.value})} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3.5"/></label></div>
       <label className="flex items-start gap-3 text-sm leading-6 text-slate-600"><input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[#006CE5]"/><span>I agree to the <Link href="/terms" target="_blank" className="font-semibold text-[#003B95] underline">Terms of Service</Link> and acknowledge the <Link href="/privacy" target="_blank" className="font-semibold text-[#003B95] underline">Privacy Policy</Link>.</span></label>
