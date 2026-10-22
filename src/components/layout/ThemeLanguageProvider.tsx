@@ -198,19 +198,34 @@ export function ThemeLanguageProvider({ children }: { children: React.ReactNode 
   const [pt, setPt] = useState(false);
 
   useEffect(() => {
-    const nextPt = false;
-    localStorage.setItem("newvelion-language", "en");
-    setPt(false);
+    const initialLanguage = localStorage.getItem("newvelion-language") === "pt" ? "pt" : "en";
+    setPt(initialLanguage === "pt");
+    document.documentElement.lang = initialLanguage;
     document.documentElement.classList.remove("dark");
-    document.documentElement.lang = "en";
 
+    let scheduled = false;
+    const applyLanguage = () => {
+      scheduled = false;
+      translatePage(localStorage.getItem("newvelion-language") === "pt");
+    };
     const observer = new MutationObserver(() => {
-      const current = localStorage.getItem("newvelion-language") === "pt";
-      translatePage(current);
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(applyLanguage);
     });
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-    translatePage(nextPt);
-    return () => observer.disconnect();
+    const onLanguageChange = () => {
+      const language = localStorage.getItem("newvelion-language") === "pt" ? "pt" : "en";
+      setPt(language === "pt");
+      document.documentElement.lang = language;
+      translatePage(language === "pt");
+    };
+    window.addEventListener("newvelion-language-change", onLanguageChange);
+    translatePage(initialLanguage === "pt");
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("newvelion-language-change", onLanguageChange);
+    };
   }, []);
 
   useEffect(() => {
