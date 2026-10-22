@@ -252,6 +252,9 @@ function translateValue(value: string, toPortuguese: boolean) {
   return value.replace(trimmed, translated);
 }
 
+const originalTextNodes = new WeakMap<Text, { source: string; translated: string }>();
+const originalAttributes = new WeakMap<Element, Map<string, { source: string; translated: string }>>();
+
 function translatePage(toPortuguese: boolean) {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   const nodes: Text[] = [];
@@ -261,19 +264,34 @@ function translatePage(toPortuguese: boolean) {
     if (!parent || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|INPUT|CODE|PRE)$/i.test(parent.tagName)) continue;
     nodes.push(node as Text);
   }
+
   for (const text of nodes) {
-    const value = text.textContent ?? "";
-    const next = translateValue(value, toPortuguese);
-    if (next !== value) text.textContent = next;
+    const current = text.textContent ?? "";
+    const cached = originalTextNodes.get(text);
+    const source = cached && current === cached.translated ? cached.source : current;
+    const next = toPortuguese ? translateValue(source, true) : source;
+    if (next !== current) text.textContent = next;
+    if (next !== source || cached) {
+      originalTextNodes.set(text, { source, translated: next });
+    }
   }
 
-  const attrs = ["placeholder","aria-label","title","alt"];
+  // Never translate input values: they may contain names, addresses or other user data.
+  const attrs = ["placeholder", "aria-label", "title", "alt"];
   document.querySelectorAll<HTMLElement>("[" + attrs.join("],[") + "]").forEach((el) => {
+    let elementCache = originalAttributes.get(el);
+    if (!elementCache) {
+      elementCache = new Map();
+      originalAttributes.set(el, elementCache);
+    }
     for (const attr of attrs) {
-      const value = el.getAttribute(attr);
-      if (!value) continue;
-      const next = translateValue(value, toPortuguese);
-      if (next !== value) el.setAttribute(attr, next);
+      const current = el.getAttribute(attr);
+      if (!current) continue;
+      const cached = elementCache.get(attr);
+      const source = cached && current === cached.translated ? cached.source : current;
+      const next = toPortuguese ? translateValue(source, true) : source;
+      if (next !== current) el.setAttribute(attr, next);
+      if (next !== source || cached) elementCache.set(attr, { source, translated: next });
     }
   });
 }
