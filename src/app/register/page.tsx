@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
@@ -10,6 +10,8 @@ import { supabase } from "@/lib/supabase";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [affiliateInviteMode, setAffiliateInviteMode] = useState(false);
+  useEffect(() => { setAffiliateInviteMode(new URLSearchParams(window.location.search).has("affiliate_invite")); }, []);
   const [form, setForm] = useState({
     fullName: "",
     country: "",
@@ -124,7 +126,7 @@ export default function RegisterPage() {
           </div>
 
           <h1 className="text-3xl font-bold text-[#0A0440]">
-            {new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).has("affiliate_invite") ? "Create your Newvelion account" : "Create your seller account"}
+            {affiliateInviteMode ? "Create your Newvelion account" : "Create your seller account"}
           </h1>
 
           <p className="mt-2 text-slate-500">
