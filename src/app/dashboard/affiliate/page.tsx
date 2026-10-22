@@ -24,6 +24,8 @@ export default function PlatformAffiliateDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
+  const [invitationUrl, setInvitationUrl] = useState("");
+  const [creatingInvitation, setCreatingInvitation] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -74,6 +76,25 @@ export default function PlatformAffiliateDashboardPage() {
     }
   };
 
+  const createInvitation = async () => {
+    setCreatingInvitation(true);
+    setError("");
+    const { data, error: inviteError } = await supabase.rpc("create_platform_affiliate_invitation");
+    setCreatingInvitation(false);
+    if (inviteError) {
+      setError(inviteError.message.includes("INVITATION_NOT_ALLOWED")
+        ? "Only an existing affiliate, seller, or administrator can invite a platform affiliate."
+        : "Could not create an invitation. Please try again.");
+      return;
+    }
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row?.invitation_token) {
+      setError("The invitation could not be created. Please try again.");
+      return;
+    }
+    setInvitationUrl(window.location.origin + "/register/affiliate?invite=" + encodeURIComponent(row.invitation_token));
+  };
+
   const progress = stats?.next_milestone ? Math.min(100, stats.active_referrals / stats.next_milestone * 100) : 100;
 
   return (
@@ -115,6 +136,13 @@ export default function PlatformAffiliateDashboardPage() {
           </Card>
 
           {error && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+          <Card className="border-[#DCE3EE] bg-white p-6 shadow-none">
+            <h2 className="text-lg font-bold text-[#001B44]">Invite a new platform affiliate</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Invitations are single-use and expire after seven days. The invited person must sign in or create a Newvelion account, then accept the invitation link.</p>
+            <button type="button" onClick={() => void createInvitation()} disabled={creatingInvitation} className="mt-4 rounded-lg bg-[#003B95] px-4 py-3 text-sm font-semibold text-white hover:bg-[#002B70] disabled:opacity-60">{creatingInvitation ? "Creating invitation…" : "Create affiliate invitation"}</button>
+            {invitationUrl && <div className="mt-4 space-y-3"><p className="break-all rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">{invitationUrl}</p><button type="button" onClick={async () => { try { await navigator.clipboard.writeText(invitationUrl); setCopied("affiliate-invite"); } catch { setError("Copy this invitation link manually."); } }} className="rounded-lg border border-[#BFD7F8] px-4 py-2 text-sm font-semibold text-[#003B95]">{copied === "affiliate-invite" ? "Invitation link copied" : "Copy invitation link"}</button></div>}
+          </Card>
 
           <Card className="border-[#DCE3EE] bg-white p-0 shadow-none">
             <div className="border-b border-slate-100 px-5 py-4"><h2 className="font-semibold text-[#001B44]">Reward history</h2><p className="mt-1 text-xs text-slate-500">Rewards are created from confirmed sales and active-referral milestones.</p></div>
