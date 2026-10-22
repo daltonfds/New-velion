@@ -10,6 +10,7 @@ export default function PlatformAffiliateRegisterPage() {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [language, setLanguage] = useState<"en" | "pt">("en");
   const [password, setPassword] = useState("");
   const [countryCode, setCountryCode] = useState("ZA");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -54,7 +55,7 @@ export default function PlatformAffiliateRegisterPage() {
         data: {
           full_name: fullName.trim(),
           role: "platform_affiliate",
-          preferred_language: "en",
+          preferred_language: language,
           country_code: countryCode,
           country_name: countryCode === "MZ" ? "Mozambique" : "South Africa",
           country_calling_code: countryCode === "MZ" ? "+258" : "+27",
@@ -77,7 +78,7 @@ export default function PlatformAffiliateRegisterPage() {
     <main className="min-h-screen bg-[#F5F8FC] px-5 py-10">
       <div className="mx-auto w-full max-w-xl">
         <div className="rounded-2xl border border-[#DCE3EE] bg-white p-6 shadow-sm sm:p-9">
-          <div className="mb-8 flex justify-center border-b border-slate-100 pb-7"><NewvelionBrand size="md" /></div>
+          <div className="mb-6 flex items-center justify-between gap-3 border-b border-slate-100 pb-5"><NewvelionBrand size="md" /><label className="flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2 py-2 text-xs font-semibold text-slate-600"><span className="sr-only">Preferred language</span><select aria-label="Preferred language" value={language} onChange={(event) => setLanguage(event.target.value === "pt" ? "pt" : "en")} className="max-w-[105px] bg-transparent outline-none"><option value="en">English</option><option value="pt">Português</option></select></label></div>
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0078E8]">Newvelion Partner Program</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#001B44]">Become a platform affiliate</h1>
           <p className="mt-3 text-sm leading-6 text-slate-600">Refer sellers and suppliers to Newvelion. Earn R50 when each referred business makes its first confirmed sale, and unlock mystery prizes as your active referrals grow.</p>
