@@ -33,16 +33,10 @@ export async function POST(request: Request) {
 
   if (profileError) return NextResponse.json({ error: "Unable to load your account profile." }, { status: 500 });
   if (!profile) return NextResponse.json({ error: "Your account profile is not ready yet. Please try signing in again." }, { status: 409 });
-  if (profile.role === "admin" || profile.role === "supplier" || profile.role === "seller") {
-    return NextResponse.json({ error: "This Google account is not registered as a platform affiliate. Please use the correct sign-in method." }, { status: 403 });
-  }
-
+  // OAuth must never grant affiliate privileges. A platform affiliate must
+  // already have been provisioned through the invitation/admin workflow.
   if (profile.role !== "platform_affiliate") {
-    const { error: updateError } = await admin.from("profiles").update({
-      role: "platform_affiliate",
-      preferred_language: "en",
-    }).eq("id", user.id);
-    if (updateError) return NextResponse.json({ error: "Unable to finish setting up your affiliate account." }, { status: 500 });
+    return NextResponse.json({ error: "Affiliate accounts are invitation-only. Ask an existing affiliate, seller, or administrator for an invitation." }, { status: 403 });
   }
 
   return NextResponse.json({ ok: true });
