@@ -210,7 +210,11 @@ export default function AppShell({
     const sync = () => setPt(localStorage.getItem("newvelion-language") === "pt");
     sync();
     window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    window.addEventListener("newvelion-language-change", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("newvelion-language-change", sync);
+    };
   }, []);
 
   const t = (en: string, ptText: string) => pt ? ptText : en;
