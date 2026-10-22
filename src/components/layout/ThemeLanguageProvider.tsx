@@ -228,17 +228,6 @@ const translations: Record<string, string> = {
 
 const reverseTranslations = Object.fromEntries(Object.entries(translations).map(([en, pt]) => [pt, en]));
 
-function replaceWords(value: string, toPortuguese: boolean) {
-  const source = toPortuguese ? wordTranslations : Object.fromEntries(Object.entries(wordTranslations).map(([en, pt]) => [pt, en]));
-  return value.replace(/\b[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'-]*\b/g, (word) => {
-    const key = word.toLowerCase();
-    const replacement = source[key];
-    if (!replacement) return word;
-    if (word === word.toUpperCase()) return replacement.toUpperCase();
-    if (word[0] === word[0].toUpperCase()) return replacement.charAt(0).toUpperCase() + replacement.slice(1);
-    return replacement;
-  });
-}
 
 function translateValue(value: string, toPortuguese: boolean) {
   const trimmed = value.trim();
