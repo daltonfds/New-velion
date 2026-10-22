@@ -206,7 +206,9 @@ export function ThemeLanguageProvider({ children }: { children: React.ReactNode 
     let scheduled = false;
     const applyLanguage = () => {
       scheduled = false;
+      observer.disconnect();
       translatePage(localStorage.getItem("newvelion-language") === "pt");
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     };
     const observer = new MutationObserver(() => {
       if (scheduled) return;
