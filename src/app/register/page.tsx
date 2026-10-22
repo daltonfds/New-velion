@@ -109,9 +109,9 @@ export default function RegisterPage() {
 
     const registeredEmail = data.user?.email || form.email.trim();
 
-    router.push(
-      `/verify-email?email=${encodeURIComponent(registeredEmail)}`
-    );
+    const inviteToken = new URLSearchParams(window.location.search).get("affiliate_invite")?.trim() || "";
+    const nextPath = inviteToken ? "/register/affiliate?invite=" + encodeURIComponent(inviteToken) : "/account";
+    router.push("/verify-email?email=" + encodeURIComponent(registeredEmail) + "&next=" + encodeURIComponent(nextPath));
   }
 
 
@@ -124,11 +124,11 @@ export default function RegisterPage() {
           </div>
 
           <h1 className="text-3xl font-bold text-[#0A0440]">
-            Create your seller account
+            {new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).has("affiliate_invite") ? "Create your Newvelion account" : "Create your seller account"}
           </h1>
 
           <p className="mt-2 text-slate-500">
-            Start selling with Newvelion.
+            {new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).has("affiliate_invite") ? "Create an account to accept your personal affiliate invitation." : "Start selling with Newvelion."}
           </p>
 
           <form onSubmit={submit} className="mt-8 space-y-5">
