@@ -37,7 +37,7 @@ export default function AuthCallbackPage() {
       }
       const provider = String(session.user.app_metadata?.provider || "");
       const { data: existingProfile } = await supabase.from("profiles").select("role,full_name,phone_number,country_code").eq("id", session.user.id).maybeSingle();
-      if (provider === "google" && ["seller", "supplier"].includes(String(existingProfile?.role || ""))) {
+      if (provider === "google" && params.get("intent") !== "customer" && ["seller", "supplier"].includes(String(existingProfile?.role || ""))) {
         await supabase.auth.signOut();
         if (active) setMessage("Google sign-in is not available for seller or supplier / producer accounts. Please sign in with email and password.");
         return;
@@ -61,6 +61,12 @@ export default function AuthCallbackPage() {
         if (!response.ok) {
           const body = await response.json().catch(() => ({}));
           if (active) setMessage(body.error || "Unable to finish setting up your buyer account.");
+          return;
+        }
+        const { data: customerRoleProfile } = await supabase.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
+        if (customerRoleProfile?.role !== "customer") {
+          await supabase.auth.signOut();
+          if (active) setMessage("Google sign-in is available only for buyer accounts. Please use the sign-in method assigned to your account.");
           return;
         }
       }
