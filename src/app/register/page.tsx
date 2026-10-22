@@ -159,9 +159,12 @@ export default function RegisterPage() {
               onWhatsappChange={(whatsapp) =>
                 setForm({ ...form, whatsapp })
               }
-              onLanguageChange={(language) =>
-                setForm({ ...form, language })
-              }
+              onLanguageChange={(language) => {
+                setForm({ ...form, language });
+                localStorage.setItem("newvelion-language", language);
+                document.documentElement.lang = language;
+                window.dispatchEvent(new Event("newvelion-language-change"));
+              }}
             />
 
             <div>
