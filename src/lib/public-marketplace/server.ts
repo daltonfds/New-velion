@@ -93,7 +93,7 @@ async function productRows(database: SupabaseClient) {
     .eq("supplier_status", "approved")
     .eq("moeda", "ZAR")
     .order("destaque", { ascending: false })
-    .order("created_at", { ascending: false });
+    .order("review_date", { ascending: false });
 
   if (error) throw error;
   return data ?? [];
@@ -227,7 +227,7 @@ export async function getPublicProduct(slug: string, affiliateRef?: string) {
   // reviews table must never make an otherwise valid product unavailable.
   const { data: reviews } = await database
     .from("product_reviews")
-    .select("id,reviewer_name,rating,review_text,media_urls,verified_buyer,created_at")
+    .select("id,reviewer_name,rating,review_text,media_urls,verified_buyer,created_manually,review_date,created_at")
     .eq("product_id", product.id)
     .eq("status", "approved")
     .order("created_at", { ascending: false })
