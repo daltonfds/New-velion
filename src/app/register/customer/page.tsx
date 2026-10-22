@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 export default function CustomerRegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [language, setLanguage] = useState<"en" | "pt">("en");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -42,7 +43,7 @@ export default function CustomerRegisterPage() {
       const { data, error: signupError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
-        options: { data: { role: "customer", country_code: "ZA", country_name: "South Africa", country_calling_code: "+27", phone_number: normalizedPhone, phone_e164: phoneE164, preferred_language: "en", accepted_terms_at: new Date().toISOString(), accepted_terms_version: "2026-10-09", accepted_privacy_policy: true } },
+        options: { data: { role: "customer", country_code: "ZA", country_name: "South Africa", country_calling_code: "+27", phone_number: normalizedPhone, phone_e164: phoneE164, preferred_language: language, accepted_terms_at: new Date().toISOString(), accepted_terms_version: "2026-10-09", accepted_privacy_policy: true } },
       });
       if (signupError) {
         const detail = signupError.message.toLowerCase();
@@ -80,7 +81,7 @@ export default function CustomerRegisterPage() {
     <main className="min-h-screen bg-[#f6f9fc] px-5 py-10">
       <div className="mx-auto w-full max-w-md">
         <div className="rounded-xl border border-[#dde5ef] bg-white p-6 shadow-none sm:p-8">
-          <div className="mb-8 flex justify-center border-b border-slate-100 pb-7"><NewvelionBrand size="md" /></div>
+          <div className="mb-6 flex items-center justify-between gap-3 border-b border-slate-100 pb-5"><NewvelionBrand size="md" /><label className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#dde5ef] px-2 py-2 text-xs font-semibold text-slate-600"><span className="sr-only">Preferred language</span><select aria-label="Preferred language" value={language} onChange={(event) => setLanguage(event.target.value === "pt" ? "pt" : "en")} className="max-w-[105px] bg-transparent outline-none"><option value="en">English</option><option value="pt">Português</option></select></label></div>
           <h1 className="text-3xl font-extrabold text-[#003B95]">Create your buyer account</h1>
           <p className="mt-2 text-slate-500">Use your email, mobile number and password to shop and track your orders.</p>
           <button type="button" onClick={continueWithGoogle} disabled={googleLoading || loading} className="mt-8 flex w-full items-center justify-center gap-3 rounded-lg border border-[#cbd5e1] bg-white py-3.5 font-semibold text-[#1f2937] hover:bg-[#f8fafc] disabled:opacity-60">
