@@ -82,11 +82,11 @@ export default function CookieConsentBanner() {
     >
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-3xl">
-          <p className="text-base font-bold text-[#001B44]">Your privacy matters</p>
+          <p className="text-base font-bold text-ink-900">Your privacy matters</p>
           <p className="mt-1 text-sm leading-6 text-slate-600">
             Newvelion uses essential storage for security and core features. With your permission, optional analytics may help us understand platform usage. You can reject optional cookies or change your choice later.
           </p>
-          <div className="mt-2 flex flex-wrap gap-4 text-sm font-semibold text-[#003B95]">
+          <div className="mt-2 flex flex-wrap gap-4 text-sm font-semibold text-brand-600">
             <Link href="/cookies" className="underline underline-offset-2">Cookie Policy</Link>
             <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>
           </div>
@@ -96,7 +96,7 @@ export default function CookieConsentBanner() {
                 type="checkbox"
                 checked={analytics}
                 onChange={(event) => setAnalytics(event.target.checked)}
-                className="mt-1 h-4 w-4 accent-[#006CE5]"
+                className="mt-1 h-4 w-4 accent-brand-600"
               />
               <span>
                 <span className="block font-semibold">Optional analytics</span>
@@ -107,18 +107,18 @@ export default function CookieConsentBanner() {
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
           {preferencesOpen ? (
-            <button type="button" onClick={() => saveConsent(analytics)} className="rounded-lg bg-[#003B95] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#001B44]">
+            <button type="button" onClick={() => saveConsent(analytics)} className="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-800 transition duration-150">
               Save preferences
             </button>
           ) : (
-            <button type="button" onClick={() => setPreferencesOpen(true)} className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <button type="button" onClick={() => setPreferencesOpen(true)} className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition duration-150">
               Manage
             </button>
           )}
-          <button type="button" onClick={() => saveConsent(false)} className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+          <button type="button" onClick={() => saveConsent(false)} className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition duration-150">
             Reject optional
           </button>
-          <button type="button" onClick={() => saveConsent(true)} className="rounded-lg bg-[#006CE5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#003B95]">
+          <button type="button" onClick={() => saveConsent(true)} className="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition duration-150">
             Accept all
           </button>
         </div>

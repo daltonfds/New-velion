@@ -1,5 +1,9 @@
 "use client";
 
+import Skeleton from "@/components/ui/Skeleton";
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import SmartImage from "@/components/ui/SmartImage";
+import { Check } from "lucide-react";
 import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -148,7 +152,7 @@ function DeliveryForm() {
         <div className="mx-auto max-w-6xl">
           <Brand />
           <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-10 text-center">
-            <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-[#0A0440]" />
+            <Skeleton className="mx-auto h-6 w-32" />
             <p className="mt-4 text-sm font-medium text-slate-500">
               Preparing your secure checkout...
             </p>
@@ -181,7 +185,7 @@ function DeliveryForm() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
-      <div className="bg-[#0A0440] px-4 py-3 text-center text-xs font-bold text-white">
+      <div className="bg-brand-900 px-4 py-3 text-center text-xs font-bold text-white">
         Secure checkout · South Africa · ZAR
       </div>
 
@@ -194,10 +198,10 @@ function DeliveryForm() {
             className="rounded-3xl border border-slate-200 bg-white p-5 md:p-8"
           >
             <div className="mb-8 border-b border-slate-100 pb-6">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#10069F]">
+              <p className="text-xs font-black uppercase tracking-wide text-brand-600">
                 Step 1 of 2
               </p>
-              <h1 className="mt-2 text-3xl font-black tracking-tight text-[#0A0440]">
+              <h1 className="mt-2 text-3xl font-black tracking-tight text-ink-900">
                 Delivery information
               </h1>
               <p className="mt-2 text-sm leading-6 text-slate-500">
@@ -274,13 +278,13 @@ function DeliveryForm() {
             </button>
 
             <div className="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-slate-500">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand-600 text-white"><Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /></span>
               Your delivery details are sent securely to checkout.
             </div>
           </form>
 
           <aside className="rounded-3xl border border-slate-200 bg-white p-5 md:p-6 lg:sticky lg:top-6">
-            <div className="mb-5 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#10069F]">
+            <div className="mb-5 flex items-center gap-2 text-xs font-black uppercase tracking-wide text-brand-600">
               Order summary
               {previewLoading ? <span className="text-slate-400">Updating…</span> : null}
             </div>
@@ -288,13 +292,13 @@ function DeliveryForm() {
             <div className="flex gap-4 border-b border-slate-100 pb-5">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
                 {preview.product.image ? (
-                  <img src={preview.product.image} alt={preview.product.name} className="h-full w-full object-cover" />
+                  <SmartImage src={preview.product.image} alt={preview.product.name} className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full items-center justify-center text-xs font-bold text-slate-400">Product</div>
                 )}
               </div>
               <div className="min-w-0">
-                <h2 className="line-clamp-2 font-black leading-5 text-[#0A0440]">{preview.product.name}</h2>
+                <h2 className="line-clamp-2 font-black leading-5 text-ink-900">{preview.product.name}</h2>
                 <p className="mt-2 text-sm text-slate-500">
                   Quantity: <span className="font-bold text-slate-700">{preview.quantity}</span>
                 </p>
@@ -312,7 +316,7 @@ function DeliveryForm() {
               </div>
               <div className="flex justify-between gap-4 text-slate-500">
                 <span>Delivery</span>
-                <span className="font-bold text-[#0A0440]">
+                <span className="font-bold text-ink-900">
                   {formatZar(preview.shipping)}
                 </span>
               </div>
@@ -320,14 +324,14 @@ function DeliveryForm() {
 
             <div className="flex items-end justify-between gap-4 pt-5">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Total</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Total</p>
                 <p className="mt-1 text-xs text-slate-400">ZAR</p>
               </div>
-              <p className="text-xl font-black text-[#0A0440]">{totalLabel}</p>
+              <p className="text-xl font-black text-ink-900">{totalLabel}</p>
             </div>
 
             <div className="mt-6 rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm font-black text-[#0A0440]">Secure checkout</p>
+              <p className="text-sm font-black text-ink-900">Secure checkout</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
                 Your seller price is locked for this order. Delivery is
                 calculated from the Newvelion supplier shipping configuration.
@@ -337,9 +341,9 @@ function DeliveryForm() {
         </div>
 
         <div className="mt-8 grid gap-3 text-center text-xs font-bold text-slate-500 sm:grid-cols-3">
-          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>South African delivery</div>
-          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>Price protected for this offer</div>
-          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>Secure payment handoff</div>
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand-600 text-white"><Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /></span>South African delivery</div>
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand-600 text-white"><Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /></span>Price protected for this offer</div>
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand-600 text-white"><Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /></span>Secure payment handoff</div>
         </div>
       </div>
     </main>
@@ -347,7 +351,7 @@ function DeliveryForm() {
 }
 
 const inputClass =
-  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#0078E8] focus:ring-2 focus:ring-[#0078E8]/15";
+  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-brand-700 focus:ring-2 focus:ring-brand-700/15";
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
@@ -365,13 +369,13 @@ function Brand() {
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-end gap-1" aria-hidden="true">
-        <span className="h-3 w-1.5 rounded-full bg-[#10069F]" />
-        <span className="h-4.5 w-1.5 rounded-full bg-[#10069F]" />
-        <span className="h-6 w-1.5 rounded-full bg-[#10069F]" />
+        <span className="h-3 w-1.5 rounded-full bg-brand-600" />
+        <span className="h-4.5 w-1.5 rounded-full bg-brand-600" />
+        <span className="h-6 w-1.5 rounded-full bg-brand-600" />
       </div>
       <div>
-        <div className="text-xl font-black tracking-tight text-[#0A0440]">Newvelion</div>
-        <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A8570]">Commerce infrastructure</div>
+        <div className="text-xl font-black tracking-tight text-ink-900">Newvelion</div>
+        <div className="text-xs font-bold uppercase tracking-wide text-[#8A8570]">Commerce infrastructure</div>
       </div>
     </div>
   );
@@ -384,7 +388,7 @@ export default function CheckoutPage() {
         <main className="min-h-screen bg-slate-50 px-4 py-10">
           <div className="mx-auto max-w-2xl text-center">
             <Brand />
-            <p className="mt-6 text-slate-500">Loading secure checkout...</p>
+            <LoadingBlock label="Loading secure checkout..." className="mt-6" />
           </div>
         </main>
       }

@@ -1,5 +1,6 @@
 "use client";
 
+import { FileText } from "lucide-react";
 import { useState } from "react";
 
 type FaqItem = {
@@ -27,10 +28,10 @@ type Props = {
 };
 
 const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#16294F] focus:ring-2 focus:ring-[#16294F]/10";
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-ink-800 focus:ring-2 focus:ring-ink-800/10";
 
 const textareaClass =
-  "w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition focus:border-[#16294F] focus:ring-2 focus:ring-[#16294F]/10";
+  "w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition focus:border-ink-800 focus:ring-2 focus:ring-ink-800/10";
 
 export default function ProductSalesContentEditor({
   beneficios,
@@ -93,14 +94,14 @@ export default function ProductSalesContentEditor({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-[#16294F]/10 bg-[#16294F]/[0.03] p-5">
+      <div className="rounded-2xl border border-ink-800/10 bg-ink-800/[0.03] p-5">
         <div className="flex items-start gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#16294F] text-sm font-bold text-white">
-            ✦
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ink-800 text-white">
+            <FileText aria-hidden className="h-5 w-5" strokeWidth={1.75} />
           </div>
 
           <div>
-            <h3 className="font-semibold text-[#16294F]">
+            <h3 className="font-semibold text-ink-800">
               Sales Page Content
             </h3>
             <p className="mt-1 text-sm leading-6 text-slate-500">
@@ -116,7 +117,7 @@ export default function ProductSalesContentEditor({
         <button
           type="button"
           onClick={() => toggle("benefits")}
-          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50"
+          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition duration-150"
         >
           <div>
             <p className="font-semibold text-slate-900">Benefits</p>
@@ -135,7 +136,7 @@ export default function ProductSalesContentEditor({
             <div className="space-y-3">
               {beneficios.map((benefit, index) => (
                 <div key={index} className="flex gap-2">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-sm font-semibold text-[#16294F]">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-sm font-semibold text-ink-800">
                     {index + 1}
                   </div>
 
@@ -151,7 +152,7 @@ export default function ProductSalesContentEditor({
                   <button
                     type="button"
                     onClick={() => removeBenefit(index)}
-                    className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                    className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition duration-150"
                     aria-label="Remove benefit"
                   >
                     ×
@@ -168,7 +169,7 @@ export default function ProductSalesContentEditor({
               <button
                 type="button"
                 onClick={addBenefit}
-                className="rounded-xl border border-[#16294F] px-4 py-2.5 text-sm font-semibold text-[#16294F] hover:bg-[#16294F] hover:text-white"
+                className="rounded-xl border border-ink-800 px-4 py-2.5 text-sm font-semibold text-ink-800 hover:bg-ink-800 hover:text-white transition duration-150"
               >
                 + Add benefit
               </button>
@@ -181,7 +182,7 @@ export default function ProductSalesContentEditor({
         <button
           type="button"
           onClick={() => toggle("ingredients")}
-          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50"
+          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition duration-150"
         >
           <div>
             <p className="font-semibold text-slate-900">
@@ -214,7 +215,7 @@ export default function ProductSalesContentEditor({
         <button
           type="button"
           onClick={() => toggle("usage")}
-          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50"
+          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition duration-150"
         >
           <div>
             <p className="font-semibold text-slate-900">How to Use</p>
@@ -245,7 +246,7 @@ export default function ProductSalesContentEditor({
         <button
           type="button"
           onClick={() => toggle("guarantee")}
-          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50"
+          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition duration-150"
         >
           <div>
             <p className="font-semibold text-slate-900">Guarantee</p>
@@ -276,7 +277,7 @@ export default function ProductSalesContentEditor({
         <button
           type="button"
           onClick={() => toggle("faq")}
-          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50"
+          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition duration-150"
         >
           <div>
             <p className="font-semibold text-slate-900">
@@ -301,14 +302,14 @@ export default function ProductSalesContentEditor({
                   className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
                 >
                   <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#16294F]">
+                    <span className="text-xs font-bold uppercase tracking-wide text-ink-800">
                       Question {index + 1}
                     </span>
 
                     <button
                       type="button"
                       onClick={() => removeFaq(index)}
-                      className="text-xs font-medium text-red-500 hover:text-red-700"
+                      className="text-xs font-medium text-red-500 hover:text-red-700 transition duration-150"
                     >
                       Remove
                     </button>
@@ -346,7 +347,7 @@ export default function ProductSalesContentEditor({
               <button
                 type="button"
                 onClick={addFaq}
-                className="rounded-xl border border-[#16294F] px-4 py-2.5 text-sm font-semibold text-[#16294F] hover:bg-[#16294F] hover:text-white"
+                className="rounded-xl border border-ink-800 px-4 py-2.5 text-sm font-semibold text-ink-800 hover:bg-ink-800 hover:text-white transition duration-150"
               >
                 + Add FAQ
               </button>
@@ -359,7 +360,7 @@ export default function ProductSalesContentEditor({
         <button
           type="button"
           onClick={() => toggle("supplier")}
-          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50"
+          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition duration-150"
         >
           <div>
             <p className="font-semibold text-slate-900">
@@ -426,7 +427,7 @@ export default function ProductSalesContentEditor({
       </div>
 
       <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
-        <p className="text-sm font-semibold text-[#16294F]">
+        <p className="text-sm font-semibold text-ink-800">
           Sales page structure
         </p>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -63,10 +64,7 @@ export default function DashboardPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50">
-      <div className="flex items-center gap-3 text-sm text-slate-500">
-        <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#DCE3EE] border-t-[#0078E8]" />
-        Loading your Newvelion workspace…
-      </div>
+      <LoadingBlock page label="Loading your Newvelion workspace…" />
     </main>
   );
 }

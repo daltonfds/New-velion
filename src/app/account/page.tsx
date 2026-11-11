@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -31,7 +32,7 @@ export default function AccountPage() {
     return () => { active = false; };
   }, [router]);
 
-  if (loading) return <main className="grid min-h-screen place-items-center text-sm text-slate-500">Loading account…</main>;
+  if (loading) return <LoadingBlock label="Loading account…" page />;
 
   const links = [
     { title: "My orders", description: "See every purchase, status and delivery tracking.", href: "/account/orders", metric: String(summary.orders), action: "View orders" },
@@ -43,27 +44,27 @@ export default function AccountPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F5F8FC]">
+    <main className="min-h-screen bg-ink-50">
       <CustomerNav name={profile?.full_name} />
       <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8 lg:py-10">
-        <section className="rounded-3xl bg-[#003B95] p-7 text-white sm:p-10">
-          <p className="text-sm font-semibold text-blue-100">My Newvelion account</p>
+        <section className="rounded-3xl bg-brand-600 p-7 text-white sm:p-10">
+          <p className="text-sm font-semibold text-brand-100">My Newvelion account</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Welcome, {profile?.full_name || "Customer"}</h1>
-          <p className="mt-3 max-w-2xl text-sm text-blue-100 sm:text-base">Your purchases, product reviews and membership — all in one place.</p>
+          <p className="mt-3 max-w-2xl text-sm text-brand-100 sm:text-base">Orders, reviews and membership status.</p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <Link href="/account/orders" className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#003B95] hover:bg-blue-50">View my purchases</Link>
-            <Link href="/account/membership" className="rounded-xl border border-white/50 px-5 py-3 text-sm font-bold text-white hover:bg-white/10">Explore club membership</Link>
+            <Link href="/account/orders" className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-brand-600 hover:bg-brand-50 transition duration-150">View my purchases</Link>
+            <Link href="/account/membership" className="rounded-xl border border-white/50 px-5 py-3 text-sm font-bold text-white hover:bg-white/10 transition duration-150">Explore club membership</Link>
           </div>
         </section>
         <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {links.map((item) => (
-            <Link key={item.href} href={item.href} className="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-[#0078E8] hover:shadow-sm">
+            <Link key={item.href} href={item.href} className="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-brand-700 hover:shadow-sm">
               <div className="flex items-start justify-between gap-3">
-                <h2 className="font-bold text-[#001B44]">{item.title}</h2>
-                <span className="rounded-lg bg-[#EAF3FF] px-3 py-1 text-xs font-bold text-[#003B95]">{item.metric}</span>
+                <h2 className="font-bold text-ink-900">{item.title}</h2>
+                <span className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-600">{item.metric}</span>
               </div>
               <p className="mt-3 min-h-10 text-sm leading-6 text-slate-500">{item.description}</p>
-              <p className="mt-5 text-sm font-bold text-[#0078E8] group-hover:text-[#003B95]">{item.action} →</p>
+              <p className="mt-5 text-sm font-bold text-brand-600 group-hover:text-brand-700 transition duration-150">{item.action} →</p>
             </Link>
           ))}
         </div>

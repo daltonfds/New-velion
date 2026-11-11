@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -262,7 +263,7 @@ export default function AdminAnalyticsPage() {
           <select
             value={period}
             onChange={(event) => setPeriod(event.target.value)}
-            className="h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+            className="h-10 rounded-lg border border-ink-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-brand-600"
           >
             <option value="all">All time</option>
             <option value="7d">Last 7 days</option>
@@ -279,9 +280,7 @@ export default function AdminAnalyticsPage() {
 
         {loading ? (
           <Card>
-            <div className="py-12 text-center text-sm text-slate-500">
-              Loading analytics...
-            </div>
+            <LoadingBlock label="Loading analytics..." className="py-12" />
           </Card>
         ) : (
           <>

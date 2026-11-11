@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 export default function WhyChooseSection({
   product,
 }: {
@@ -11,10 +12,10 @@ export default function WhyChooseSection({
   const benefits = product.beneficios?.filter(Boolean) || [];
 
   return (
-    <section className="border-y border-[#E7EDF5] bg-white">
+    <section className="border-y border-ink-200 bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0A0440]">
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-900">
             Why choose this product?
           </p>
 
@@ -34,10 +35,10 @@ export default function WhyChooseSection({
             {benefits.slice(0, 8).map((benefit, index) => (
               <div
                 key={`${benefit}-${index}`}
-                className="border border-[#E5E7EB] bg-white p-6"
+                className="border border-ink-200 bg-white p-6"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white">
-                  ✓
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                  <Check aria-hidden className="h-5 w-5" strokeWidth={2} />
                 </div>
 
                 <h3 className="mt-5 text-sm font-bold text-slate-950">
@@ -49,7 +50,7 @@ export default function WhyChooseSection({
         )}
 
         {product.ingredientes && (
-          <div className="mt-10 border-t border-[#E7EDF5] pt-8">
+          <div className="mt-10 border-t border-ink-200 pt-8">
             <h3 className="text-lg font-bold text-slate-950">
               Product composition
             </h3>

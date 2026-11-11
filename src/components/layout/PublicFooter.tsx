@@ -25,37 +25,37 @@ export default function PublicFooter() {
       <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Link href="/" className="text-lg font-extrabold tracking-tight text-[#003B95]">Newvelion</Link>
+            <Link href="/" className="text-lg font-extrabold tracking-tight text-brand-600">Newvelion</Link>
             <p className="mt-3 max-w-xs text-sm leading-6">Commerce infrastructure connecting products, sellers and customers.</p>
             <p className="mt-3 text-xs text-slate-400">The climbing starts here.</p>
           </div>
           <div>
-            <h2 className="text-sm font-bold text-[#001B44]">Explore</h2>
+            <h2 className="text-sm font-bold text-ink-900">Explore</h2>
             <ul className="mt-3 space-y-2 text-sm">
-              <li><Link className="hover:text-[#006CE5]" href="/marketplace">Marketplace</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/fornecedores">Suppliers</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/register">Start selling</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/marketplace">Marketplace</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/fornecedores">Suppliers</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/register">Start selling</Link></li>
             </ul>
           </div>
           <div>
-            <h2 className="text-sm font-bold text-[#001B44]">Help & support</h2>
+            <h2 className="text-sm font-bold text-ink-900">Help & support</h2>
             <ul className="mt-3 space-y-2 text-sm">
-              <li><Link className="hover:text-[#006CE5]" href="/support">Contact support</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/refund-policy">Returns & refunds</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/security-reporting">Report a security issue</Link></li>
-              <li><a className="hover:text-[#006CE5]" href="mailto:contact@newvelion.com">contact@newvelion.com</a></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/support">Contact support</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/refund-policy">Returns & refunds</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/security-reporting">Report a security issue</Link></li>
+              <li><a className="hover:text-brand-700 transition duration-150" href="mailto:contact@newvelion.com">contact@newvelion.com</a></li>
             </ul>
           </div>
           <div>
-            <h2 className="text-sm font-bold text-[#001B44]">Legal & privacy</h2>
+            <h2 className="text-sm font-bold text-ink-900">Legal & privacy</h2>
             <ul className="mt-3 space-y-2 text-sm">
-              <li><Link className="hover:text-[#006CE5]" href="/terms">Terms of Service</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/privacy">Privacy Policy</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/cookies">Cookie Policy</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/seller-terms">Seller & affiliate terms</Link></li>
-              <li><Link className="hover:text-[#006CE5]" href="/acceptable-use">Acceptable Use</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/terms">Terms of Service</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/privacy">Privacy Policy</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/cookies">Cookie Policy</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/seller-terms">Seller & affiliate terms</Link></li>
+              <li><Link className="hover:text-brand-700 transition duration-150" href="/acceptable-use">Acceptable Use</Link></li>
               <li>
-                <button type="button" onClick={() => window.dispatchEvent(new Event("newvelion:open-cookie-settings"))} className="text-left font-semibold text-[#003B95] underline underline-offset-2 hover:text-[#006CE5]">
+                <button type="button" onClick={() => window.dispatchEvent(new Event("newvelion:open-cookie-settings"))} className="text-left font-semibold text-brand-600 underline underline-offset-2 hover:text-brand-700 transition duration-150">
                   Cookie settings
                 </button>
               </li>

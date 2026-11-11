@@ -1,3 +1,4 @@
+import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ThemeLanguageProvider>
           <NavigationHistory />
           <MobileBottomNavigation />
-          <ToastProvider>{children}<PublicFooter /><CookieConsentBanner /></ToastProvider>
+          <ToastProvider><ConfirmProvider>{children}<PublicFooter /><CookieConsentBanner /></ConfirmProvider></ToastProvider>
         </ThemeLanguageProvider>
       </body>
     </html>

@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import Dialog from "@/components/ui/Dialog";
 import { useEffect, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import { supabase } from "@/lib/supabase";
@@ -323,7 +325,7 @@ export default function AdminCheckoutSessionsPage() {
     <AppShell area="admin">
       <div className="space-y-6">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Commerce
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
@@ -342,7 +344,7 @@ export default function AdminCheckoutSessionsPage() {
           ].map(([label, value]) => (
             <div
               key={label}
-              className="rounded-[10px] border border-[#E5E7EB] bg-white p-5"
+              className="rounded-[10px] border border-ink-200 bg-white p-5"
             >
               <p className="text-sm text-slate-500">{label}</p>
               <p className="mt-2 text-2xl font-semibold text-slate-950">
@@ -352,7 +354,7 @@ export default function AdminCheckoutSessionsPage() {
           ))}
         </div>
 
-        <div className="grid gap-3 rounded-[10px] border border-[#E5E7EB] bg-white p-4 sm:grid-cols-3">
+        <div className="grid gap-3 rounded-[10px] border border-ink-200 bg-white p-4 sm:grid-cols-3">
           <label className="text-xs font-semibold text-slate-600">Filter by status
             <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="mt-1.5 h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal">
               <option value="all">All statuses</option><option value="pending">Pending</option><option value="paid_pending_review">Paid / Review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option>
@@ -372,11 +374,9 @@ export default function AdminCheckoutSessionsPage() {
           </div>
         )}
 
-        <div className="overflow-hidden rounded-[10px] border border-[#E5E7EB] bg-white">
+        <div className="overflow-hidden rounded-[10px] border border-ink-200 bg-white">
           {loading ? (
-            <div className="p-8 text-sm text-slate-500">
-              Loading checkout sessions...
-            </div>
+            <LoadingBlock label="Loading checkout sessions..." className="p-8" />
           ) : sessions.length === 0 ? (
             <div className="p-10 text-center">
               <p className="text-sm font-semibold text-slate-800">
@@ -391,7 +391,7 @@ export default function AdminCheckoutSessionsPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] text-left text-sm">
-                <thead className="border-b border-[#E5E7EB] bg-[#F7F8FA]">
+                <thead className="border-b border-ink-200 bg-ink-50">
                   <tr>
                     <th className="px-5 py-4 font-semibold text-slate-700">
                       Customer
@@ -419,7 +419,7 @@ export default function AdminCheckoutSessionsPage() {
                   {filteredSessions.map((session) => (
                     <tr
                       key={session.id}
-                      className="hover:bg-[#F7F8FA]"
+                      className="hover:bg-ink-100 transition duration-150"
                     >
                       <td className="px-5 py-4">
                         <div className="font-medium text-slate-900">
@@ -452,7 +452,7 @@ export default function AdminCheckoutSessionsPage() {
                                 ? "border-red-200 bg-red-50 text-red-700"
                                 : session.payment_comparison_status === "review"
                                   ? "border-amber-200 bg-amber-50 text-amber-700"
-                                  : "border-[#E5E7EB] bg-[#F7F8FA] text-slate-600"
+                                  : "border-ink-200 bg-ink-50 text-slate-600"
                           }`}
                         >
                           {session.payment_comparison_status === "matched"
@@ -466,7 +466,7 @@ export default function AdminCheckoutSessionsPage() {
                       </td>
 
                       <td className="px-5 py-4">
-                        <span className="inline-flex rounded-full border border-[#E5E7EB] px-2.5 py-1 text-xs font-medium text-slate-700">
+                        <span className="inline-flex rounded-full border border-ink-200 px-2.5 py-1 text-xs font-medium text-slate-700">
                           {session.status}
                         </span>
                       </td>
@@ -479,7 +479,7 @@ export default function AdminCheckoutSessionsPage() {
                         <button
                           type="button"
                           onClick={() => openSession(session)}
-                          className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-[#F7F8FA]"
+                          className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-ink-100 transition duration-150"
                         >
                           View details
                         </button>
@@ -494,29 +494,7 @@ export default function AdminCheckoutSessionsPage() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-[10px] border border-[#E5E7EB] bg-white">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] px-6 py-5">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  Checkout session
-                </p>
-                <h2 className="mt-1 text-xl font-semibold text-slate-950">
-                  {selected.product?.nome || "Product"}
-                </h2>
-                <p className="mt-1 break-all text-xs text-slate-500">
-                  {selected.id}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSelected(null)}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-[#F7F8FA]"
-              >
-                Close
-              </button>
-            </div>
+<Dialog open onClose={() => setSelected(null)} title={selected.product?.nome || "Product"} description={`Checkout session · ${selected.id}`} padded={false} className="sm:max-w-4xl">
 
             <div className="space-y-6 p-6">
               <section>
@@ -542,7 +520,7 @@ export default function AdminCheckoutSessionsPage() {
                   ].map(([label, value]) => (
                     <div
                       key={label}
-                      className="rounded-lg border border-[#E5E7EB] p-4"
+                      className="rounded-lg border border-ink-200 p-4"
                     >
                       <p className="text-xs text-slate-500">{label}</p>
                       <p className="mt-1 break-words text-sm font-medium text-slate-900">
@@ -551,7 +529,7 @@ export default function AdminCheckoutSessionsPage() {
                     </div>
                   ))}
 
-                  <div className="rounded-lg border border-[#E5E7EB] p-4 sm:col-span-2 lg:col-span-3">
+                  <div className="rounded-lg border border-ink-200 p-4 sm:col-span-2 lg:col-span-3">
                     <p className="text-xs text-slate-500">
                       Delivery address
                     </p>
@@ -567,10 +545,10 @@ export default function AdminCheckoutSessionsPage() {
                 </div>
               </section>
 
-              <section className="rounded-[10px] border border-[#E5E7EB] bg-[#F7F8FA] p-5">
+              <section className="rounded-[10px] border border-ink-200 bg-ink-50 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                       Payment verification
                     </p>
                     <h3 className="mt-1 text-lg font-semibold text-slate-950">
@@ -582,7 +560,7 @@ export default function AdminCheckoutSessionsPage() {
                     </p>
                   </div>
 
-                  <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
+                  <span className="rounded-full border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
                     {selected.payment_comparison_status === "matched"
                       ? "Matched"
                       : selected.payment_comparison_status === "mismatch"
@@ -594,7 +572,7 @@ export default function AdminCheckoutSessionsPage() {
                 </div>
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-lg border border-[#E5E7EB] bg-white p-4">
+                  <div className="rounded-lg border border-ink-200 bg-white p-4">
                     <p className="text-xs text-slate-500">
                       Newvelion order
                     </p>
@@ -603,7 +581,7 @@ export default function AdminCheckoutSessionsPage() {
                     </p>
                   </div>
 
-                  <div className="rounded-lg border border-[#E5E7EB] bg-white p-4">
+                  <div className="rounded-lg border border-ink-200 bg-white p-4">
                     <p className="text-xs text-slate-500">
                       External payment
                     </p>
@@ -618,7 +596,7 @@ export default function AdminCheckoutSessionsPage() {
                     </p>
                   </div>
 
-                  <div className="rounded-lg border border-[#E5E7EB] bg-white p-4">
+                  <div className="rounded-lg border border-ink-200 bg-white p-4">
                     <p className="text-xs text-slate-500">
                       Payment reference
                     </p>
@@ -664,7 +642,7 @@ export default function AdminCheckoutSessionsPage() {
                                   ? selected.currency
                                   : undefined
                         }
-                        className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                        className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500 focus-visible:ring-2 focus-visible:ring-brand-600"
                       />
                     </label>
                   ))}
@@ -680,7 +658,7 @@ export default function AdminCheckoutSessionsPage() {
                           paidAt: e.target.value,
                         })
                       }
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500 focus-visible:ring-2 focus-visible:ring-brand-600"
                     />
                   </label>
 
@@ -696,7 +674,7 @@ export default function AdminCheckoutSessionsPage() {
                         })
                       }
                       placeholder="Optional payment verification notes"
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500 focus-visible:ring-2 focus-visible:ring-brand-600"
                     />
                   </label>
                 </div>
@@ -712,14 +690,14 @@ export default function AdminCheckoutSessionsPage() {
                       const reason = window.prompt("Why are you rejecting this checkout/payment?");
                       if (reason?.trim()) void updateStatus(selected.id, "rejected", reason.trim());
                     }}
-                    className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 transition duration-150"
                   >
                     Reject payment / checkout
                   </button>
                 </div>
               </section>
 
-              <section className="border-t border-[#E5E7EB] pt-6">
+              <section className="border-t border-ink-200 pt-6">
                 <h3 className="text-sm font-semibold text-slate-950">
                   Attribution & order
                 </h3>
@@ -756,7 +734,7 @@ export default function AdminCheckoutSessionsPage() {
               </section>
             </div>
 
-            <div className="flex flex-wrap gap-3 border-t border-[#E5E7EB] p-6">
+            <div className="flex flex-wrap gap-3 border-t border-ink-200 p-6">
               <button
                 type="button"
                 disabled={
@@ -775,13 +753,12 @@ export default function AdminCheckoutSessionsPage() {
                   const reason = window.prompt("Why are you rejecting this checkout/payment?");
                   if (reason?.trim()) void updateStatus(selected.id, "rejected", reason.trim());
                 }}
-                className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50"
+                className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 transition duration-150"
               >
                 Reject
               </button>
             </div>
-          </div>
-        </div>
+</Dialog>
       )}
     </AppShell>
   );

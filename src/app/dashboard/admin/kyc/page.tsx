@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -184,7 +185,7 @@ export default function AdminKycPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-ink-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               <option value="all">
                 All KYC statuses
@@ -208,7 +209,7 @@ export default function AdminKycPage() {
               onChange={(event) =>
                 setRoleFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-ink-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               <option value="all">All Users</option>
               <option value="seller">Sellers</option>
@@ -227,9 +228,7 @@ export default function AdminKycPage() {
 
         <Card>
           {loading ? (
-            <div className="py-12 text-center text-sm text-slate-500">
-              Loading KYC records...
-            </div>
+            <LoadingBlock label="Loading KYC records..." className="py-12" />
           ) : filteredProfiles.length === 0 ? (
             <div className="py-12 text-center">
               <p className="font-medium text-slate-900">
@@ -287,7 +286,7 @@ export default function AdminKycPage() {
                     return (
                       <tr
                         key={profile.id}
-                        className="hover:bg-[#F7F8FA]"
+                        className="hover:bg-ink-100 transition duration-150"
                       >
                         <td className="px-6 py-4">
                           <div className="font-medium text-slate-900">

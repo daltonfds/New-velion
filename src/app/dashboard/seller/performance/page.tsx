@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -140,25 +141,25 @@ export default function SellerPerformancePage() {
 
   return (
     <AppShell area="seller">
-      <div className="min-h-screen bg-[#F5F8FC]">
+      <div className="min-h-screen bg-ink-50">
         <div className="mx-auto max-w-[1500px] space-y-6 px-5 py-6 lg:px-8 lg:py-8">
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
             <div>
-              <p className="mb-2 text-sm font-semibold text-[#0078E8]">Sales performance</p>
-              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#001B44]">Your earnings over time</h1>
+              <p className="mb-2 text-sm font-semibold text-brand-600">Sales performance</p>
+              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-ink-900">Your earnings over time</h1>
               <p className="mt-2 text-sm text-slate-500">Commission earned from confirmed paid sales. Choose a period or set exact dates.</p>
             </div>
-            <button onClick={() => void load()} disabled={loading} className="h-10 rounded-lg border border-[#003B95] px-4 text-sm font-semibold text-[#003B95] hover:bg-[#EAF3FF] disabled:opacity-50">
+            <button onClick={() => void load()} disabled={loading} className="h-10 rounded-lg border border-brand-600 px-4 text-sm font-semibold text-brand-600 hover:bg-brand-100 disabled:opacity-50 transition duration-150">
               {loading ? "Refreshing…" : "Refresh data"}
             </button>
           </div>
 
-          <Card className="border border-blue-100 bg-white p-5 shadow-none">
+          <Card className="border border-brand-100 bg-white p-5 shadow-none">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Choose analytics period">
               {([
                 ["day", "Day"], ["week", "Week"], ["month", "Month"], ["year", "Year"], ["custom", "Custom dates"],
               ] as [Period, string][]).map(([value, label]) => (
-                <button key={value} onClick={() => setPeriod(value)} className={`rounded-lg px-4 py-2 text-sm font-semibold ${period === value ? "bg-[#003B95] text-white" : "border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
+                <button key={value} onClick={() => setPeriod(value)} className={`rounded-lg px-4 py-2 text-sm font-semibold ${period === value ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
                   {label}
                 </button>
               ))}
@@ -174,7 +175,7 @@ export default function SellerPerformancePage() {
 
           {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
 
-          {loading ? <Card className="p-10 text-center text-sm text-slate-500">Loading sales performance…</Card> : (
+          {loading ? <Card className="p-6"><LoadingBlock label="Loading sales performance…" /></Card> : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
                 {[
@@ -183,22 +184,22 @@ export default function SellerPerformancePage() {
                   ["Commission earned", formatMoney(metrics.commission)],
                   ["Average order", formatMoney(metrics.average)],
                   ["Products sold", String(metrics.products)],
-                ].map(([label, value]) => <Card key={label} className="border border-blue-100 bg-white p-5 shadow-none"><p className="text-sm text-slate-500">{label}</p><p className="mt-2 text-2xl font-bold text-[#003B95]">{value}</p></Card>)}
+                ].map(([label, value]) => <Card key={label} className="border border-brand-100 bg-white p-5 shadow-none"><p className="text-sm text-slate-500">{label}</p><p className="mt-2 text-2xl font-bold text-brand-600">{value}</p></Card>)}
               </div>
 
-              <Card className="border border-blue-100 bg-white p-5 shadow-none sm:p-7">
+              <Card className="border border-brand-100 bg-white p-5 shadow-none sm:p-7">
                 <div className="mb-6 flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
-                  <div><h2 className="text-lg font-bold text-[#001B44]">Commission earned</h2><p className="mt-1 text-sm text-slate-500">Each bar represents your commission for the selected time bucket.</p></div>
-                  <div className="text-left sm:text-right"><p className="text-xs text-slate-500">Total for selected period</p><p className="text-2xl font-bold text-[#003B95]">{formatMoney(metrics.commission)}</p></div>
+                  <div><h2 className="text-lg font-bold text-ink-900">Commission earned</h2><p className="mt-1 text-sm text-slate-500">Each bar represents your commission for the selected time bucket.</p></div>
+                  <div className="text-left sm:text-right"><p className="text-xs text-slate-500">Total for selected period</p><p className="text-2xl font-bold text-brand-600">{formatMoney(metrics.commission)}</p></div>
                 </div>
-                {chart.every((point) => point.commission === 0) ? <div className="grid min-h-56 place-items-center rounded-xl bg-[#F7FAFF] text-sm text-slate-500">No paid commissions in this period yet.</div> : (
+                {chart.every((point) => point.commission === 0) ? <div className="grid min-h-56 place-items-center rounded-xl bg-brand-50 text-sm text-slate-500">No paid commissions in this period yet.</div> : (
                   <div className="overflow-x-auto">
                     <div className="flex h-64 min-w-[620px] items-end gap-2 border-b border-slate-200 px-2 pt-4">
                       {chart.map((point, index) => (
                         <div key={point.label + index} className="group flex h-full min-w-0 flex-1 flex-col justify-end">
-                          <div className="mb-2 text-center text-[10px] font-semibold text-[#003B95] opacity-0 group-hover:opacity-100">{formatMoney(point.commission)}</div>
-                          <div title={`${point.label}: ${formatMoney(point.commission)} commission · ${point.sales} sales`} className="mx-auto w-full max-w-12 rounded-t-md bg-[#0078E8] transition hover:bg-[#003B95]" style={{ height: `${Math.max(point.commission > 0 ? 3 : 0, (point.commission / maxCommission) * 72)}%` }} />
-                          <p className="mt-2 h-8 overflow-hidden text-center text-[10px] text-slate-500">{chart.length <= 14 || index % Math.ceil(chart.length / 12) === 0 ? point.label : ""}</p>
+                          <div className="mb-2 text-center text-xs font-semibold text-brand-600 opacity-0 group-hover:opacity-100 transition duration-150">{formatMoney(point.commission)}</div>
+                          <div title={`${point.label}: ${formatMoney(point.commission)} commission · ${point.sales} sales`} className="mx-auto w-full max-w-12 rounded-t-md bg-brand-600 transition hover:bg-brand-700" style={{ height: `${Math.max(point.commission > 0 ? 3 : 0, (point.commission / maxCommission) * 72)}%` }} />
+                          <p className="mt-2 h-8 overflow-hidden text-center text-xs text-slate-500">{chart.length <= 14 || index % Math.ceil(chart.length / 12) === 0 ? point.label : ""}</p>
                         </div>
                       ))}
                     </div>
@@ -207,13 +208,13 @@ export default function SellerPerformancePage() {
               </Card>
 
               <div className="grid gap-6 lg:grid-cols-2">
-                <Card className="border border-blue-100 bg-white p-5 shadow-none">
-                  <h2 className="font-bold text-[#001B44]">Top products</h2><p className="mt-1 text-sm text-slate-500">Ranked by commission earned in this period.</p>
-                  {topProducts.length === 0 ? <p className="py-8 text-sm text-slate-500">No paid sales in this period.</p> : <div className="mt-5 space-y-4">{topProducts.map((product, index) => <div key={product.name + index} className="flex items-center justify-between gap-4"><div className="flex min-w-0 items-center gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#003B95]">{index + 1}</span><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-900">{product.name}</p><p className="text-xs text-slate-500">{product.sales} paid sales</p></div></div><div className="text-right"><p className="text-sm font-bold text-[#003B95]">{formatMoney(product.commission)}</p><p className="text-xs text-slate-500">commission</p></div></div>)}</div>}
+                <Card className="border border-brand-100 bg-white p-5 shadow-none">
+                  <h2 className="font-bold text-ink-900">Top products</h2><p className="mt-1 text-sm text-slate-500">Ranked by commission earned in this period.</p>
+                  {topProducts.length === 0 ? <p className="py-8 text-sm text-slate-500">No paid sales in this period.</p> : <div className="mt-5 space-y-4">{topProducts.map((product, index) => <div key={product.name + index} className="flex items-center justify-between gap-4"><div className="flex min-w-0 items-center gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-600">{index + 1}</span><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-900">{product.name}</p><p className="text-xs text-slate-500">{product.sales} paid sales</p></div></div><div className="text-right"><p className="text-sm font-bold text-brand-600">{formatMoney(product.commission)}</p><p className="text-xs text-slate-500">commission</p></div></div>)}</div>}
                 </Card>
-                <Card className="border border-blue-100 bg-white p-5 shadow-none">
-                  <h2 className="font-bold text-[#001B44]">Daily breakdown</h2><p className="mt-1 text-sm text-slate-500">Sales and commission included in the selected period.</p>
-                  {chart.filter((point) => point.sales > 0).length === 0 ? <p className="py-8 text-sm text-slate-500">No paid sales in this period.</p> : <div className="mt-5 max-h-96 space-y-2 overflow-y-auto">{chart.filter((point) => point.sales > 0).slice().reverse().map((point) => <div key={point.label} className="flex items-center justify-between gap-4 rounded-lg bg-[#F7FAFF] px-4 py-3"><div><p className="text-sm font-semibold text-slate-800">{point.label}</p><p className="text-xs text-slate-500">{point.sales} paid {point.sales === 1 ? "sale" : "sales"} · {formatMoney(point.revenue)} sales value</p></div><p className="shrink-0 text-sm font-bold text-[#003B95]">{formatMoney(point.commission)}</p></div>)}</div>}
+                <Card className="border border-brand-100 bg-white p-5 shadow-none">
+                  <h2 className="font-bold text-ink-900">Daily breakdown</h2><p className="mt-1 text-sm text-slate-500">Sales and commission included in the selected period.</p>
+                  {chart.filter((point) => point.sales > 0).length === 0 ? <p className="py-8 text-sm text-slate-500">No paid sales in this period.</p> : <div className="mt-5 max-h-96 space-y-2 overflow-y-auto">{chart.filter((point) => point.sales > 0).slice().reverse().map((point) => <div key={point.label} className="flex items-center justify-between gap-4 rounded-lg bg-brand-50 px-4 py-3"><div><p className="text-sm font-semibold text-slate-800">{point.label}</p><p className="text-xs text-slate-500">{point.sales} paid {point.sales === 1 ? "sale" : "sales"} · {formatMoney(point.revenue)} sales value</p></div><p className="shrink-0 text-sm font-bold text-brand-600">{formatMoney(point.commission)}</p></div>)}</div>}
                 </Card>
               </div>
             </>

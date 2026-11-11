@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import Dialog from "@/components/ui/Dialog";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import { supabase } from "@/lib/supabase";
@@ -128,7 +130,7 @@ export default function AdminSalesPage() {
       <div className="space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               Commerce
             </p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
@@ -142,7 +144,7 @@ export default function AdminSalesPage() {
           <button
             type="button"
             onClick={loadSales}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition duration-150"
           >
             Refresh
           </button>
@@ -186,9 +188,7 @@ export default function AdminSalesPage() {
 
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           {loading ? (
-            <div className="p-8 text-sm text-slate-500">
-              Loading sales...
-            </div>
+            <LoadingBlock label="Loading sales..." className="p-8" />
           ) : sales.length === 0 ? (
             <div className="p-10 text-center">
               <p className="text-sm font-semibold text-slate-800">
@@ -236,13 +236,13 @@ export default function AdminSalesPage() {
                     return (
                       <tr
                         key={sale.id}
-                        className="hover:bg-slate-50"
+                        className="hover:bg-slate-50 transition duration-150"
                       >
                         <td className="px-5 py-4">
                           <div className="font-medium text-slate-900">
                             {sale.product?.nome || "Product"}
                           </div>
-                          <div className="mt-1 font-mono text-[11px] text-slate-400">
+                          <div className="mt-1 font-mono text-xs text-slate-400">
                             {sale.product_id.slice(0, 8)}...
                           </div>
                         </td>
@@ -290,7 +290,7 @@ export default function AdminSalesPage() {
                           <button
                             type="button"
                             onClick={() => setSelected(sale)}
-                            className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
+                            className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 transition duration-150"
                           >
                             Details
                           </button>
@@ -306,26 +306,7 @@ export default function AdminSalesPage() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-slate-200 bg-white">
-            <div className="flex items-center justify-between border-b border-slate-200 p-6">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  Sale
-                </p>
-                <h2 className="mt-1 text-xl font-semibold text-slate-950">
-                  {selected.product?.nome || "Product"}
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSelected(null)}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700"
-              >
-                Close
-              </button>
-            </div>
+<Dialog open onClose={() => setSelected(null)} title={selected.product?.nome || "Product"} description="Sale" padded={false} className="sm:max-w-2xl">
 
             <div className="grid gap-4 p-6 sm:grid-cols-2">
               {[
@@ -392,8 +373,7 @@ export default function AdminSalesPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+</Dialog>
       )}
     </AppShell>
   );

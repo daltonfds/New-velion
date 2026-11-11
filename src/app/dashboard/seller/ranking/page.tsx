@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useCallback, useEffect, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -35,20 +36,20 @@ function RankingList({ title, subtitle, rows }: {
   rows: RankingEntry[];
 }) {
   return (
-    <Card className="border border-blue-100 bg-white p-5 shadow-none">
+    <Card className="border border-brand-100 bg-white p-5 shadow-none">
       <div className="mb-4">
-        <h2 className="text-lg font-bold text-[#001B44]">{title}</h2>
+        <h2 className="text-lg font-bold text-ink-900">{title}</h2>
         <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
       </div>
       {rows.length === 0 ? (
-        <p className="rounded-lg bg-[#F7F8FA] p-4 text-sm text-slate-500">
+        <p className="rounded-lg bg-ink-50 p-4 text-sm text-slate-500">
           No confirmed sales recorded this month yet.
         </p>
       ) : (
         <ol className="space-y-3">
           {rows.map((row) => (
             <li key={row.seller_id} className="flex items-start gap-3 rounded-xl border border-slate-100 p-3">
-              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${row.rank_position === 1 ? "bg-[#FFB800] text-[#001B44]" : "bg-[#EAF3FF] text-[#003B95]"}`}>
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${row.rank_position === 1 ? "bg-[#FFB800] text-ink-900" : "bg-brand-50 text-brand-600"}`}>
                 {row.rank_position}
               </span>
               <div className="min-w-0 flex-1">
@@ -60,12 +61,12 @@ function RankingList({ title, subtitle, rows }: {
                   {row.sales_count} {row.sales_count === 1 ? "confirmed sale" : "confirmed sales"}
                 </p>
                 <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <div className="rounded-lg bg-[#F7FAFF] px-3 py-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Sales value</p>
-                    <p className="mt-1 text-sm font-bold text-[#003B95]">{money(row.monthly_sales)}</p>
+                  <div className="rounded-lg bg-brand-50 px-3 py-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Sales value</p>
+                    <p className="mt-1 text-sm font-bold text-brand-600">{money(row.monthly_sales)}</p>
                   </div>
                   <div className="rounded-lg bg-[#F0FDF4] px-3 py-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Commission</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Commission</p>
                     <p className="mt-1 text-sm font-bold text-[#18794E]">{money(row.monthly_commission)}</p>
                   </div>
                 </div>
@@ -116,17 +117,17 @@ export default function SellerRankingPage() {
 
   return (
     <AppShell area="seller" title="Seller ranking" subtitle="Monthly rankings across Newvelion and by country.">
-      <main className="min-h-screen bg-[#F5F8FC]">
+      <main className="min-h-screen bg-ink-50">
         <div className="mx-auto max-w-[1500px] px-5 py-6 lg:px-8 lg:py-8">
           <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="mb-2 text-sm font-medium text-[#003B95]">Performance</p>
-              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#001B44]">Seller ranking</h1>
-              <p className="mt-2 max-w-2xl text-sm text-[#60708A]">
+              <p className="mb-2 text-sm font-medium text-brand-600">Performance</p>
+              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-ink-900">Seller ranking</h1>
+              <p className="mt-2 max-w-2xl text-sm text-ink-500">
                 See the top sellers in each country and across the Newvelion platform, based on confirmed sales for {monthLabel}.
               </p>
             </div>
-            <button onClick={() => void loadRanking()} disabled={loading} className="inline-flex h-10 items-center justify-center rounded-lg border border-[#003B95] px-4 text-sm font-semibold text-[#003B95] hover:bg-[#EAF3FF] disabled:opacity-50">
+            <button onClick={() => void loadRanking()} disabled={loading} className="inline-flex h-10 items-center justify-center rounded-lg border border-brand-600 px-4 text-sm font-semibold text-brand-600 hover:bg-brand-100 disabled:opacity-50 transition duration-150">
               {loading ? "Refreshing…" : "Refresh ranking"}
             </button>
           </div>
@@ -139,25 +140,25 @@ export default function SellerRankingPage() {
           )}
 
           {loading && !data ? (
-            <Card className="border border-blue-100 bg-white p-6 shadow-none">
-              <p className="text-sm text-slate-500">Loading seller rankings…</p>
+            <Card className="border border-brand-100 bg-white p-6 shadow-none">
+              <LoadingBlock label="Loading seller rankings…" />
             </Card>
           ) : data ? (
             <>
               <div className="mb-5 grid gap-4 sm:grid-cols-3">
-                <Card className="border border-blue-100 bg-white p-5 shadow-none">
+                <Card className="border border-brand-100 bg-white p-5 shadow-none">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Platform leaderboard</p>
-                  <p className="mt-2 text-2xl font-bold text-[#003B95]">{data.platform.length}</p>
+                  <p className="mt-2 text-2xl font-bold text-brand-600">{data.platform.length}</p>
                   <p className="mt-1 text-sm text-slate-500">Ranked sellers this month</p>
                 </Card>
-                <Card className="border border-blue-100 bg-white p-5 shadow-none">
+                <Card className="border border-brand-100 bg-white p-5 shadow-none">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Country leaders</p>
-                  <p className="mt-2 text-2xl font-bold text-[#003B95]">{data.country_leaders.length}</p>
+                  <p className="mt-2 text-2xl font-bold text-brand-600">{data.country_leaders.length}</p>
                   <p className="mt-1 text-sm text-slate-500">Countries with confirmed sales</p>
                 </Card>
-                <Card className="border border-blue-100 bg-white p-5 shadow-none">
+                <Card className="border border-brand-100 bg-white p-5 shadow-none">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Your country</p>
-                  <p className="mt-2 text-2xl font-bold text-[#003B95]">{data.country_code || "—"}</p>
+                  <p className="mt-2 text-2xl font-bold text-brand-600">{data.country_code || "—"}</p>
                   <p className="mt-1 text-sm text-slate-500">{data.country.length ? `Your country's top ${data.country.length} sellers` : "No country ranking available yet"}</p>
                 </Card>
               </div>
@@ -170,7 +171,7 @@ export default function SellerRankingPage() {
               </div>
             </>
           ) : !error ? (
-            <Card className="border border-blue-100 bg-white p-6 shadow-none">
+            <Card className="border border-brand-100 bg-white p-6 shadow-none">
               <p className="text-sm text-slate-500">No ranking data is available yet.</p>
             </Card>
           ) : null}

@@ -8,10 +8,10 @@ export default function IntegrationDocsPage() {
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-5xl px-6 py-14 lg:px-10">
         <div className="mb-12">
-          <Link href="/" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+          <Link href="/" className="text-sm font-semibold text-brand-600 hover:text-brand-700 transition duration-150">
             ← Newvelion
           </Link>
-          <p className="mt-8 text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
+          <p className="mt-8 text-sm font-semibold uppercase tracking-wide text-brand-600">
             Integration API v1
           </p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight">

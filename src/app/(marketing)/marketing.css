@@ -1,6 +1,6 @@
 /* Newvelion marketing site. Everything is scoped to .nv-site so it cannot affect the rest of the app. */
-.nv-site{--nv-blue:#003B95;--nv-bright:#0078E8;--nv-navy:#001B44;--nv-gold:#FFB800;
---nv-bg:#fff;--nv-surface:#EAF3FF;--nv-text:#001B44;--nv-muted:#4B5563;--nv-line:#D3E3F8;--nv-accent:#003B95;--nv-btn-text:#fff;--nv-card:#fff;
+.nv-site{--nv-blue:#10069F;--nv-bright:#3A2DB8;--nv-navy:#0A0440;--nv-gold:#FFB800;
+--nv-bg:#fff;--nv-surface:#F4F3FD;--nv-text:#0A0440;--nv-muted:#4A4E66;--nv-line:#E6E7EE;--nv-accent:#10069F;--nv-btn-text:#fff;--nv-card:#fff;
 min-height:100vh;background:var(--nv-bg);color:var(--nv-text);font-family:var(--nv-font),Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
 .nv-site *,.nv-site *::before,.nv-site *::after{box-sizing:border-box}
 .nv-site a{color:inherit}
@@ -58,13 +58,13 @@ min-height:100vh;background:var(--nv-bg);color:var(--nv-text);font-family:var(--
 .nv-price b{display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;text-align:center;padding:0 8px}
 .nv-price b:nth-child(1){flex:5;background:var(--nv-navy);border-right:1px solid rgba(255,255,255,.2)}
 .nv-price b:nth-child(2){flex:3;background:var(--nv-bright)}
-.nv-price b:nth-child(3){flex:2;background:repeating-linear-gradient(135deg,var(--nv-surface) 0 8px,var(--nv-card) 8px 16px);color:var(--nv-accent)}
+.nv-price b:nth-child(3){flex:2;background:var(--nv-line);color:var(--nv-accent)}
 .nv-legend{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--nv-muted);margin-bottom:34px}
 .nv-two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .nv-panel{border:1px solid var(--nv-line);border-radius:12px;padding:30px;background:var(--nv-card)}
 .nv-panel p{color:var(--nv-muted);margin-bottom:22px}
 .nv-panel.nv-k{background:var(--nv-blue);border-color:var(--nv-blue);color:#fff}
-.nv-panel.nv-k p{color:#CFE0FA}
+.nv-panel.nv-k p{color:#CFCBF4}
 .nv-site .nv-panel.nv-k .nv-btn{background:#fff;color:var(--nv-blue);border-color:#fff}
 .nv-footer{padding:26px 0;font-size:13px;color:var(--nv-muted);border-top:1px solid var(--nv-line)}
 .nv-footer .nv-wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}

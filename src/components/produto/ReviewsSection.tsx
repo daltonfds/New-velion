@@ -1,5 +1,8 @@
 "use client";
 
+import SmartImage from "@/components/ui/SmartImage";
+import Stars from "@/components/ui/Stars";
+import { Check, Star } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import ReviewCard from "./ReviewCard";
@@ -104,10 +107,10 @@ export default function ReviewsSection({ reviews, sharedTestimonials = false }: 
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#003B95]">Customer reviews</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-600">Customer reviews</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">What customers are saying</h2>
           <div className="mt-5 flex items-center justify-center gap-3">
-            <span className="tracking-widest text-[#0078E8]" aria-label={`${roundedAverage} out of 5 stars`}>{ "★".repeat(roundedAverage) }{ "☆".repeat(5 - roundedAverage) }</span>
+            <Stars rating={roundedAverage} size={18} />
             <span className="text-sm font-semibold text-slate-600">{average ? average.toFixed(1) : "0.0"} / 5</span>
             <span className="text-sm text-slate-400">({reviews.length} reviews)</span>
           </div>
@@ -120,12 +123,12 @@ export default function ReviewsSection({ reviews, sharedTestimonials = false }: 
             </div>
             <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {THE_HERBALIST_TESTIMONIAL_IMAGES.map((src) => (
-                <article key={src} className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+                <article key={src} className="overflow-hidden rounded-xl border border-ink-200 bg-white">
                   <a href={src} target="_blank" rel="noreferrer" className="block">
-                    <img src={src} alt="The Herbalist customer testimonial" loading="lazy" className="aspect-[3/4] w-full object-contain bg-slate-50" />
+                    <SmartImage src={src} alt="The Herbalist customer testimonial" loading="lazy" className="aspect-[3/4] w-full object-contain bg-slate-50" />
                   </a>
                   <div className="flex items-center gap-2 border-t border-slate-100 px-3 py-2">
-                    <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">✓</span>
+                    <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-100 text-emerald-700"><Check className="h-3.5 w-3.5" strokeWidth={3} /></span>
                     <span className="text-xs font-semibold text-emerald-800">Verified buyer</span>
                   </div>
                 </article>
@@ -133,10 +136,10 @@ export default function ReviewsSection({ reviews, sharedTestimonials = false }: 
             </div>
           </div>
         )}
-        <div className="mt-10 rounded-2xl border border-[#DCE8F7] bg-[#F7FAFF] p-6">
-          <p className="text-lg font-black text-[#001B44]">Share your experience</p>
+        <div className="mt-10 rounded-2xl border border-[#DCE8F7] bg-brand-50 p-6">
+          <p className="text-lg font-black text-ink-900">Share your experience</p>
           <p className="mt-1 text-sm text-slate-500">Verified reviews are available after a delivered purchase. You can attach up to 4 photos.</p>
-          <p className="mt-2 text-sm text-slate-600">New to Newvelion? <Link href="/register/customer" className="font-bold text-[#10069F] underline underline-offset-2">Create a customer account</Link> with your mobile number and email.</p>
+          <p className="mt-2 text-sm text-slate-600">New to Newvelion? <Link href="/register/customer" className="font-bold text-brand-600 underline underline-offset-2">Create a customer account</Link> with your mobile number and email.</p>
           <ReviewForm />
         </div>
         {reviews.length > 0 ? (
@@ -144,7 +147,7 @@ export default function ReviewsSection({ reviews, sharedTestimonials = false }: 
             {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
           </div>
         ) : (
-          <div className="mx-auto mt-10 max-w-xl border border-[#E5E7EB] bg-[#F7F8FA] p-8 text-center">
+          <div className="mx-auto mt-10 max-w-xl border border-ink-200 bg-ink-50 p-8 text-center">
             <p className="text-sm font-semibold text-slate-700">No customer reviews yet.</p>
             <p className="mt-2 text-sm leading-6 text-slate-500">Reviews will appear here once approved for this product.</p>
           </div>
@@ -211,8 +214,8 @@ function ReviewForm() {
 
   return (
     <form onSubmit={submit} className="mt-4">
-      <div className="flex gap-1">{[1, 2, 3, 4, 5].map((value) => <button key={value} type="button" onClick={() => setRating(value)} className={`text-2xl ${value <= rating ? "text-[#FFB800]" : "text-slate-300"}`} aria-label={`${value} stars`}>★</button>)}</div>
-      <textarea required minLength={5} maxLength={5000} rows={4} value={text} onChange={(event) => setText(event.target.value)} placeholder="Tell other customers about your experience..." className="mt-3 w-full rounded-xl border border-[#CBD8E8] bg-white p-3 text-sm outline-none focus:border-[#0078E8] focus:ring-2 focus:ring-[#EAF3FF]" />
+      <div className="flex gap-1">{[1, 2, 3, 4, 5].map((value) => <button key={value} type="button" onClick={() => setRating(value)} className="rounded-md p-0.5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600" aria-label={`${value} stars`}><Star aria-hidden width={28} height={28} strokeWidth={1.75} className={value <= rating ? "fill-amber-500 text-amber-500" : "fill-transparent text-ink-300 hover:text-amber-500"} /></button>)}</div>
+      <textarea required minLength={5} maxLength={5000} rows={4} value={text} onChange={(event) => setText(event.target.value)} placeholder="Tell other customers about your experience..." className="mt-3 w-full rounded-xl border border-[#CBD8E8] bg-white p-3 text-sm outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100" />
       <div className="mt-4">
         <label htmlFor="review-photos" className="block text-sm font-semibold text-slate-700">Add photos (up to 4)</label>
         <input id="review-photos" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={(event) => {
@@ -221,11 +224,11 @@ function ReviewForm() {
           if (selected.some((file) => file.size > 5 * 1024 * 1024)) { setStatus("Each photo must be 5 MB or smaller."); event.target.value = ""; setFiles([]); return; }
           setStatus("");
           setFiles(selected);
-        }} className="mt-2 block w-full rounded-xl border border-[#CBD8E8] bg-white p-3 text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-[#EAF3FF] file:px-4 file:py-2 file:font-bold file:text-[#003B95]" />
+        }} className="mt-2 block w-full rounded-xl border border-[#CBD8E8] bg-white p-3 text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:font-bold file:text-brand-600" />
         {files.length > 0 && <div className="mt-3 flex flex-wrap gap-3">{files.map((file) => <div key={file.name + file.lastModified} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-2"><span className="max-w-40 truncate text-xs text-slate-600">{file.name}</span><button type="button" onClick={() => setFiles((current) => current.filter((item) => item !== file))} className="text-xs font-bold text-red-600" aria-label={`Remove ${file.name}`}>Remove</button></div>)}</div>}
       </div>
       <label className="mt-3 flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} /> Post anonymously</label>
-      <button disabled={submitting} className="mt-4 rounded-xl bg-[#0078E8] px-5 py-3 text-sm font-black text-white hover:bg-[#006CE5] disabled:opacity-50">{submitting ? "Submitting..." : "SUBMIT REVIEW"}</button>
+      <button disabled={submitting} className="mt-4 rounded-xl bg-brand-600 px-5 py-3 text-sm font-black text-white hover:bg-brand-700 disabled:opacity-50 transition duration-150">{submitting ? "Submitting..." : "SUBMIT REVIEW"}</button>
       {status && <p className="mt-3 text-sm font-semibold text-slate-600" role="status">{status}</p>}
     </form>
   );

@@ -1,10 +1,11 @@
+import { Briefcase, ShieldCheck, Store, Truck } from "lucide-react";
 import Link from "next/link";
 
 const trustItems = [
-  { title: "Secure checkout", detail: "Protected payments", icon: "✓" },
-  { title: "South Africa delivery", detail: "Verified suppliers", icon: "↗" },
-  { title: "Business buying", detail: "Built for sourcing", icon: "▦" },
-  { title: "Real marketplace data", detail: "Real products and listings", icon: "●" },
+  { title: "Secure checkout", detail: "Protected payments", Icon: ShieldCheck },
+  { title: "South Africa delivery", detail: "Verified suppliers", Icon: Truck },
+  { title: "Business buying", detail: "Built for sourcing", Icon: Briefcase },
+  { title: "Real marketplace data", detail: "Real products and listings", Icon: Store },
 ];
 
 export default function Footer() {
@@ -13,7 +14,7 @@ export default function Footer() {
       <div className="nv-retail-footer-benefits" aria-label="Newvelion shopping benefits">
         {trustItems.map((item) => (
           <div className="nv-retail-benefit" key={item.title}>
-            <span className={item.icon === "✓" ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white" : "nv-retail-benefit-icon"} aria-hidden="true">{item.icon}</span>
+            <span className="nv-retail-benefit-icon" aria-hidden="true"><item.Icon className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
             <div><b>{item.title}</b><span>{item.detail}</span></div>
           </div>
         ))}

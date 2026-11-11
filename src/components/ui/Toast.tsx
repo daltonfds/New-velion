@@ -1,6 +1,7 @@
 "use client";
 
 import { notify } from "@/lib/notify";
+import { AlertTriangle, Check, Info, X, XCircle, type LucideIcon } from "lucide-react";
 import {
   createContext,
   useCallback,
@@ -61,18 +62,18 @@ const styles: Record<
     icon: "text-amber-600",
   },
   info: {
-    border: "border-blue-200",
-    background: "bg-blue-50",
-    iconBackground: "bg-blue-100",
-    icon: "text-blue-600",
+    border: "border-brand-200",
+    background: "bg-brand-50",
+    iconBackground: "bg-brand-100",
+    icon: "text-brand-600",
   },
 };
 
-const icons: Record<ToastType, string> = {
-  success: "✓",
-  error: "!",
-  warning: "!",
-  info: "i",
+const icons: Record<ToastType, LucideIcon> = {
+  success: Check,
+  error: XCircle,
+  warning: AlertTriangle,
+  info: Info,
 };
 
 function ToastCard({
@@ -83,6 +84,7 @@ function ToastCard({
   onClose: (id: number) => void;
 }) {
   const style = styles[toast.type];
+  const Icon = icons[toast.type];
 
   useEffect(() => {
     const timer = window.setTimeout(
@@ -96,12 +98,12 @@ function ToastCard({
   return (
     <div
       role={toast.type === "error" ? "alert" : "status"}
-      className={`pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-xl border ${style.border} ${style.background} p-4 text-slate-900`}
+      className={`pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-lg border shadow-lg ${style.border} ${style.background} p-4 text-slate-900`}
     >
       <div
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.iconBackground} ${style.icon} text-sm font-bold`}
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${style.iconBackground} ${style.icon}`}
       >
-        {icons[toast.type]}
+        <Icon aria-hidden className="h-5 w-5" strokeWidth={2} />
       </div>
 
       <div className="min-w-0 flex-1 pt-0.5">
@@ -117,9 +119,9 @@ function ToastCard({
         type="button"
         onClick={() => onClose(toast.id)}
         aria-label="Close notification"
-        className="shrink-0 text-lg leading-none text-slate-400 hover:text-slate-700"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-slate-500 transition-colors duration-150 hover:bg-black/5 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
       >
-        ×
+        <X aria-hidden className="h-4 w-4" />
       </button>
     </div>
   );

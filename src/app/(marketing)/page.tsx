@@ -3,11 +3,11 @@ import type { CSSProperties } from "react";
 import { Section } from "./_components/ui";
 
 const STEPS = [
-  { label: "Source", h: 28, c: "#0078E8" },
-  { label: "Approve", h: 46, c: "#0066D1" },
-  { label: "Promote", h: 64, c: "#0052B3" },
-  { label: "Sell", h: 82, c: "#003B95" },
-  { label: "Deliver", h: 100, c: "#001B44" },
+  { label: "Source", h: 28, c: "#6F63D6" },
+  { label: "Approve", h: 46, c: "#3A2DB8" },
+  { label: "Promote", h: 64, c: "#10069F" },
+  { label: "Sell", h: 82, c: "#0D0580" },
+  { label: "Deliver", h: 100, c: "#0A0440" },
 ];
 
 export default function HomePage() {

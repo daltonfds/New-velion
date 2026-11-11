@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
@@ -143,65 +144,65 @@ export default function AffiliateWithdrawalsPage() {
   }
 
   const statusLabel = (status: string) => status === "pago" ? "Paid" : status === "em_processamento" ? "Processing" : status === "rejeitado" ? "Rejected" : status === "cancelado" ? "Cancelled" : "Pending review";
-  const statusClass = (status: string) => status === "pago" ? "bg-emerald-50 text-emerald-700" : status === "em_processamento" ? "bg-amber-50 text-amber-700" : status === "rejeitado" || status === "cancelado" ? "bg-red-50 text-red-700" : "bg-blue-50 text-[#003B95]";
+  const statusClass = (status: string) => status === "pago" ? "bg-emerald-50 text-emerald-700" : status === "em_processamento" ? "bg-amber-50 text-amber-700" : status === "rejeitado" || status === "cancelado" ? "bg-red-50 text-red-700" : "bg-brand-50 text-brand-600";
 
   return (
     <AppShell area="affiliate" title="Withdrawals" subtitle="Request payout of your confirmed platform affiliate rewards.">
-      <main className="min-h-screen bg-[#F5F8FC]">
+      <main className="min-h-screen bg-ink-50">
         <div className="mx-auto max-w-[1250px] space-y-6 px-5 py-7 lg:px-8">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0078E8]">Affiliate finance</p><h1 className="mt-2 text-3xl font-bold text-[#001B44]">Withdrawals</h1><p className="mt-2 text-sm text-slate-600">The same Newvelion withdrawal fees and administrator approval process apply.</p></div>
-            <Link href="/dashboard/affiliate" className="text-sm font-semibold text-[#003B95] hover:underline">Back to affiliate dashboard</Link>
+            <div><p className="text-xs font-bold uppercase tracking-wide text-brand-600">Affiliate finance</p><h1 className="mt-2 text-3xl font-bold text-ink-900">Withdrawals</h1><p className="mt-2 text-sm text-slate-600">The same Newvelion withdrawal fees and administrator approval process apply.</p></div>
+            <Link href="/dashboard/affiliate" className="text-sm font-semibold text-brand-600 hover:underline transition duration-150">Back to affiliate dashboard</Link>
           </div>
 
           {error && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
           {success && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</div>}
 
-          {loading ? <Card className="p-10 text-center text-sm text-slate-500">Loading your affiliate balance and payout rules…</Card> : !summary ? <Card className="p-6 text-sm text-slate-600">Could not load affiliate withdrawal settings.</Card> : <>
+          {loading ? <Card className="p-6"><LoadingBlock label="Loading your affiliate balance and payout rules…" /></Card> : !summary ? <Card className="p-6 text-sm text-slate-600">Could not load affiliate withdrawal settings.</Card> : <>
             <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 ["Available rewards", money(Number(summary.available_balance)), "Eligible for a withdrawal request"],
                 ["On hold", money(Number(summary.reserved_balance)), "Already requested; awaiting review"],
                 ["Paid out", money(Number(summary.withdrawn_balance)), "Previously paid withdrawals"],
                 ["Platform fee", Number(summary.fee_percent) + "% + " + money(Number(summary.fee_fixed)), "Same fees configured by Newvelion"],
-              ].map(([label, value, note]) => <Card key={String(label)} className="border-[#DCE3EE] bg-white p-5 shadow-none"><p className="text-sm text-slate-500">{label}</p><p className="mt-3 text-2xl font-bold text-[#001B44]">{value}</p><p className="mt-1 text-xs text-slate-500">{note}</p></Card>)}
+              ].map(([label, value, note]) => <Card key={String(label)} className="border-ink-200 bg-white p-5 shadow-none"><p className="text-sm text-slate-500">{label}</p><p className="mt-3 text-2xl font-bold text-ink-900">{value}</p><p className="mt-1 text-xs text-slate-500">{note}</p></Card>)}
             </section>
 
             <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)]">
-              <Card className="border-[#DCE3EE] bg-white p-6 shadow-none">
-                <h2 className="text-lg font-bold text-[#001B44]">Request a withdrawal</h2>
+              <Card className="border-ink-200 bg-white p-6 shadow-none">
+                <h2 className="text-lg font-bold text-ink-900">Request a withdrawal</h2>
                 <p className="mt-1 text-sm text-slate-500">Country: {country || "Not set"} · Payout currency: {payoutCurrency}</p>
                 {summary.kyc_status !== "approved" && <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">KYC approval is required before withdrawals can be requested.</div>}
-                {!configuredMethods.length && <div className="mt-4 rounded-lg border border-blue-100 bg-[#EAF3FF] p-3 text-sm text-[#003B95]">No eligible payout method is configured for your country. Open account settings and configure a supported method with the KYC-verified account holder name.</div>}
+                {!configuredMethods.length && <div className="mt-4 rounded-lg border border-brand-100 bg-brand-50 p-3 text-sm text-brand-600">No eligible payout method is configured for your country. Open account settings and configure a supported method with the KYC-verified account holder name.</div>}
                 <div className="mt-5 space-y-4">
-                  <label className="block text-sm font-semibold text-[#001B44]">Amount to withdraw (ZAR)
-                    <input type="number" min={summary.minimum_withdrawal} max={summary.available_balance} step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0078E8]" placeholder="100.00" />
+                  <label className="block text-sm font-semibold text-ink-900">Amount to withdraw (ZAR)
+                    <input type="number" min={summary.minimum_withdrawal} max={summary.available_balance} step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-brand-700 focus-visible:ring-2 focus-visible:ring-brand-600" placeholder="100.00" />
                   </label>
-                  {configuredMethods.length > 0 && <label className="block text-sm font-semibold text-[#001B44]">Payout method
+                  {configuredMethods.length > 0 && <label className="block text-sm font-semibold text-ink-900">Payout method
                     <select value={method} onChange={(event) => setMethod(event.target.value as Method)} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3">
                       {configuredMethods.map((item) => <option key={item} value={item}>{item === "bank_transfer" ? "Bank transfer / EFT" : "Mobile wallet"}</option>)}
                     </select>
                   </label>}
-                  {method === "mobile_wallet" && configuredMethods.includes("mobile_wallet") && <label className="block text-sm font-semibold text-[#001B44]">Wallet provider
+                  {method === "mobile_wallet" && configuredMethods.includes("mobile_wallet") && <label className="block text-sm font-semibold text-ink-900">Wallet provider
                     <select value={provider} onChange={(event) => setProvider(event.target.value as "m-pesa" | "e-mola")} className="mt-2 w-full rounded-lg border border-slate-200 px-4 py-3">
                       {payoutSettings.mpesa?.enabled && <option value="m-pesa">M-Pesa</option>}
                       {payoutSettings.emola?.enabled && <option value="e-mola">e-Mola</option>}
                     </select>
                   </label>}
-                  <div className="rounded-lg bg-[#F8FAFD] p-4 text-sm">
-                    <div className="flex justify-between gap-3"><span className="text-slate-500">Withdrawal fee</span><span className="font-semibold text-[#001B44]">{money(fee)}</span></div>
-                    <div className="mt-2 flex justify-between gap-3"><span className="text-slate-500">Estimated net amount</span><span className="font-bold text-[#001B44]">{money(net)}</span></div>
-                    {country !== "ZA" && <div className="mt-2 flex justify-between gap-3"><span className="text-slate-500">Estimated local payout</span><span className="font-semibold text-[#001B44]">{rateLoading ? "Loading exchange rate…" : new Intl.NumberFormat("en-US",{maximumFractionDigits:2}).format(net * exchangeRate) + " " + payoutCurrency}</span></div>}
+                  <div className="rounded-lg bg-ink-50 p-4 text-sm">
+                    <div className="flex justify-between gap-3"><span className="text-slate-500">Withdrawal fee</span><span className="font-semibold text-ink-900">{money(fee)}</span></div>
+                    <div className="mt-2 flex justify-between gap-3"><span className="text-slate-500">Estimated net amount</span><span className="font-bold text-ink-900">{money(net)}</span></div>
+                    {country !== "ZA" && <div className="mt-2 flex justify-between gap-3"><span className="text-slate-500">Estimated local payout</span><span className="font-semibold text-ink-900">{rateLoading ? "Loading exchange rate…" : new Intl.NumberFormat("en-US",{maximumFractionDigits:2}).format(net * exchangeRate) + " " + payoutCurrency}</span></div>}
                     <p className="mt-3 text-xs leading-5 text-slate-500">Final fees, available balance, country eligibility and payout details are validated by Newvelion before the request is recorded.</p>
                   </div>
-                  <button type="button" disabled={submitting || rateLoading || !configuredMethods.length || summary.kyc_status !== "approved" || numeric <= 0} onClick={() => void requestWithdrawal()} className="w-full rounded-lg bg-[#003B95] px-4 py-3 font-semibold text-white hover:bg-[#002B70] disabled:cursor-not-allowed disabled:opacity-50">{submitting ? "Submitting request…" : "Request withdrawal"}</button>
-                  <Link href="/dashboard/profile" className="block text-center text-sm font-semibold text-[#003B95] hover:underline">Manage profile and payout settings</Link>
+                  <button type="button" disabled={submitting || rateLoading || !configuredMethods.length || summary.kyc_status !== "approved" || numeric <= 0} onClick={() => void requestWithdrawal()} className="w-full rounded-lg bg-brand-600 px-4 py-3 font-semibold text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-50 transition duration-150">{submitting ? "Submitting request…" : "Request withdrawal"}</button>
+                  <Link href="/dashboard/profile" className="block text-center text-sm font-semibold text-brand-600 hover:underline transition duration-150">Manage profile and payout settings</Link>
                 </div>
               </Card>
 
-              <Card className="overflow-hidden border-[#DCE3EE] bg-white p-0 shadow-none">
-                <div className="border-b border-slate-100 px-5 py-4"><h2 className="font-bold text-[#001B44]">Withdrawal history</h2><p className="mt-1 text-xs text-slate-500">All requests are reviewed by the Newvelion administrator.</p></div>
-                {!withdrawals.length ? <div className="px-5 py-12 text-center text-sm text-slate-500">No withdrawal requests yet.</div> : <div className="divide-y divide-slate-100">{withdrawals.map((item) => <div key={item.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold text-[#001B44]">{money(Number(item.valor_solicitado))} · {item.metodo === "mobile_wallet" ? "Mobile wallet" : "Bank transfer"}</p><p className="mt-1 text-xs text-slate-500">{new Date(item.created_at).toLocaleString()} · Net {money(Number(item.valor_liquido))}</p>{item.valor_convertido != null && item.payout_currency && item.payout_currency !== "ZAR" && <p className="mt-1 text-xs text-slate-500">Estimated payout: {Number(item.valor_convertido).toLocaleString(undefined,{maximumFractionDigits:2})} {item.payout_currency}</p>}</div><span className={"w-fit rounded-full px-3 py-1 text-xs font-semibold " + statusClass(item.status)}>{statusLabel(item.status)}</span></div>)}</div>}
+              <Card className="overflow-hidden border-ink-200 bg-white p-0 shadow-none">
+                <div className="border-b border-slate-100 px-5 py-4"><h2 className="font-bold text-ink-900">Withdrawal history</h2><p className="mt-1 text-xs text-slate-500">All requests are reviewed by the Newvelion administrator.</p></div>
+                {!withdrawals.length ? <div className="px-5 py-12 text-center text-sm text-slate-500">No withdrawal requests yet.</div> : <div className="divide-y divide-slate-100">{withdrawals.map((item) => <div key={item.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold text-ink-900">{money(Number(item.valor_solicitado))} · {item.metodo === "mobile_wallet" ? "Mobile wallet" : "Bank transfer"}</p><p className="mt-1 text-xs text-slate-500">{new Date(item.created_at).toLocaleString()} · Net {money(Number(item.valor_liquido))}</p>{item.valor_convertido != null && item.payout_currency && item.payout_currency !== "ZAR" && <p className="mt-1 text-xs text-slate-500">Estimated payout: {Number(item.valor_convertido).toLocaleString(undefined,{maximumFractionDigits:2})} {item.payout_currency}</p>}</div><span className={"w-fit rounded-full px-3 py-1 text-xs font-semibold " + statusClass(item.status)}>{statusLabel(item.status)}</span></div>)}</div>}
               </Card>
             </div>
           </>}

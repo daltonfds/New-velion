@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
@@ -79,7 +80,7 @@ export default function SellerIntegrationsPage() {
     <AppShell area="seller" title="Integrations" subtitle="Connect Newvelion to the platforms you use to sell.">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-[#003B95]">Seller</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Seller</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Integrations</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
             Connect your store directly or use the Newvelion Integration API to bring product, inventory, order and tracking data from external platforms into one commerce workflow.
@@ -91,18 +92,18 @@ export default function SellerIntegrationsPage() {
         <section>
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-slate-900">Available integrations</h2>
-            <button onClick={() => window.location.reload()} className="rounded-lg border border-[#DDE5EF] px-3 py-2 text-xs font-semibold text-[#003B95] hover:bg-[#EAF3FF]">Refresh</button>
+            <button onClick={() => window.location.reload()} className="rounded-lg border border-ink-200 px-3 py-2 text-xs font-semibold text-brand-600 hover:bg-brand-100 transition duration-150">Refresh</button>
           </div>
 
           {loading ? (
-            <div className="rounded-xl border border-[#DDE5EF] bg-white p-8 text-sm text-slate-500">Loading active integrations…</div>
+            <LoadingBlock label="Loading active integrations…" className="rounded-xl border border-ink-200 p-8" />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
               {cards.map((integration) => (
                 <Link key={integration.key} href={integration.href}
-                  className="group rounded-xl border border-[#DDE5EF] bg-white p-6 transition hover:border-[#0078E8] hover:bg-[#EAF3FF]">
+                  className="group rounded-xl border border-ink-200 bg-white p-6 transition hover:border-brand-700 hover:bg-brand-100">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF3FF] text-[#003B95]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
                       {integration.kind === "shopify" ? (
                         <svg viewBox="0 0 48 48" className="h-9 w-9" role="img" aria-label="Shopify">
                           <path fill="#95BF47" d="M37.6 9.4c-.1-.6-.6-.9-1-.9-.4 0-4.8-.3-4.8-.3s-3-3-3.3-3.3c-.3-.3-.9-.2-1.1-.1-.1 0-.7.2-1.7.5-1-2.9-2.8-5.6-6-5.6-5.6 0-9.4 4.3-10.8 10.7l-4.8 1.5L2.8 44.1l27.6 4.8 13.5-3.3L37.6 9.4Z"/>
@@ -120,7 +121,7 @@ export default function SellerIntegrationsPage() {
                   </div>
                   <h3 className="mt-5 text-lg font-semibold text-slate-900">{integration.name}</h3>
                   <p className="mt-2 min-h-12 text-sm leading-6 text-slate-600">{integration.description}</p>
-                  <div className="mt-6 text-sm font-semibold text-[#006CE5] group-hover:text-[#003B95]">{integration.label} →</div>
+                  <div className="mt-6 text-sm font-semibold text-brand-600 group-hover:text-brand-700 transition duration-150">{integration.label} →</div>
                 </Link>
               ))}
             </div>

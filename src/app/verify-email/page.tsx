@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import { Mail } from "lucide-react";
 import { FormEvent, Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -86,17 +88,17 @@ function VerifyEmailForm() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-white px-5 py-10">
       <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-blue-100 bg-white p-8 text-center shadow-[0_20px_60px_rgba(37,99,235,0.08)]">
+        <div className="rounded-xl border border-ink-200 bg-white p-8 text-center shadow-lg">
 
           <div className="mb-7 flex justify-center border-b border-slate-100 pb-7">
             <NewvelionBrand size="md" />
           </div>
 
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-600">
-            ✉
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+            <Mail aria-hidden className="h-7 w-7" strokeWidth={1.75} />
           </div>
 
-          <h1 className="mt-6 text-2xl font-bold text-[#0A0440]">
+          <h1 className="mt-6 text-2xl font-bold text-ink-900">
             Verify your email
           </h1>
 
@@ -104,7 +106,7 @@ function VerifyEmailForm() {
             We sent a 6-digit verification code to:
           </p>
 
-          <p className="mt-3 break-all font-semibold text-blue-600">
+          <p className="mt-3 break-all font-semibold text-brand-600">
             {email || "your email address"}
           </p>
 
@@ -112,7 +114,7 @@ function VerifyEmailForm() {
 
             <label
               htmlFor="verification-code"
-              className="mb-2 block text-left text-sm font-semibold text-[#0A0440]"
+              className="mb-2 block text-left text-sm font-semibold text-ink-900"
             >
               Verification code
             </label>
@@ -128,7 +130,7 @@ function VerifyEmailForm() {
                 setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
               }
               placeholder="000000"
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-4 text-center text-2xl font-bold tracking-[0.45em] text-[#0A0440] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-4 text-center text-2xl font-bold tracking-wide text-ink-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-50"
             />
 
             {error && (
@@ -138,7 +140,7 @@ function VerifyEmailForm() {
             )}
 
             {success && (
-              <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-700">
+              <div className="mt-5 rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm leading-6 text-brand-700">
                 {success}
               </div>
             )}
@@ -146,7 +148,7 @@ function VerifyEmailForm() {
             <button
               type="submit"
               disabled={loading || code.length !== 6}
-              className="mt-5 w-full rounded-xl bg-blue-600 py-3.5 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-5 w-full rounded-xl bg-brand-600 py-3.5 font-bold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Verifying..." : "Verify email"}
             </button>
@@ -156,14 +158,14 @@ function VerifyEmailForm() {
             type="button"
             onClick={resend}
             disabled={resending}
-            className="mt-4 w-full rounded-xl border border-blue-200 bg-white px-6 py-3 font-semibold text-blue-600 transition hover:bg-blue-50 disabled:opacity-60"
+            className="mt-4 w-full rounded-xl border border-brand-200 bg-white px-6 py-3 font-semibold text-brand-600 transition hover:bg-brand-50 disabled:opacity-60"
           >
             {resending ? "Sending code..." : "Resend verification code"}
           </button>
 
           <Link
             href={"/register/customer?next=" + encodeURIComponent(nextPath)}
-            className="mt-5 inline-block text-sm font-semibold text-slate-500 hover:text-blue-600"
+            className="mt-5 inline-block text-sm font-semibold text-slate-500 hover:text-brand-600 transition duration-150"
           >
             Back to registration
           </Link>
@@ -180,9 +182,7 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <main className="flex min-h-screen items-center justify-center bg-white">
-          <div className="text-sm font-semibold text-[#0A0440]">
-            Loading...
-          </div>
+          <LoadingBlock label="Loading..." className="font-semibold" />
         </main>
       }
     >

@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import AnnouncementBar from "@/components/produto/AnnouncementBar";
@@ -71,8 +72,8 @@ export default function ProdutoPage() {
     return () => { cancelled = true; };
   }, [slug, affiliateRef]);
 
-  if (loading) return <main className="flex min-h-screen items-center justify-center bg-white"><div className="text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#E5E7EB] border-t-[#003B95]" /><p className="mt-4 text-sm text-slate-500">Loading product...</p></div></main>;
-  if (error || !data?.product) return <main className="flex min-h-screen items-center justify-center bg-white px-6"><div className="max-w-md text-center"><h1 className="text-2xl font-extrabold text-[#003B95]">Product unavailable</h1><p className="mt-2 text-sm text-slate-500">{error || "This product could not be found."}</p></div></main>;
+  if (loading) return <LoadingBlock page label="Loading product…" />;
+  if (error || !data?.product) return <main className="flex min-h-screen items-center justify-center bg-white px-6"><div className="max-w-md text-center"><h1 className="text-2xl font-extrabold text-brand-600">Product unavailable</h1><p className="mt-2 text-sm text-slate-500">{error || "This product could not be found."}</p></div></main>;
 
   const raw = data.product;
   const product: Product = {
@@ -98,8 +99,8 @@ export default function ProdutoPage() {
     <AnnouncementBar />
     <Header />
     <ProductInfo product={product} affiliateLink={affiliateRef} priceOverride={data.affiliatePrice ?? null} />
-    {raw.supplier && <section className="border-b border-[#E7EDF5] bg-white"><div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-5 lg:px-8"><div><p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#0078E8]">Supplier</p><p className="mt-1 font-bold text-[#003B95]">{raw.supplier.name}</p><p className="text-sm text-slate-500">{raw.supplier.countryName}{raw.supplier.city ? " · " + raw.supplier.city : ""}</p></div><a href={"/fornecedor/" + encodeURIComponent(raw.supplier.slug)} className="shrink-0 rounded-lg border border-[#E5E7EB] px-4 py-2.5 text-sm font-bold text-[#003B95] hover:bg-[#F7FAFF]">View supplier</a></div></section>}
-    <section className="border-b border-[#E7EDF5] bg-[#F7FAFF]"><div className="mx-auto grid max-w-7xl grid-cols-1 sm:grid-cols-3"><div className="border-b border-[#E5E7EB] px-6 py-7 text-center sm:border-b-0 sm:border-r"><p className="text-lg font-extrabold text-[#003B95]">Free nationwide delivery</p><p className="mt-1 text-sm text-slate-500">Delivery across South Africa in an estimated 1–5 days</p></div><div className="border-b border-[#E5E7EB] px-6 py-7 text-center sm:border-b-0 sm:border-r"><p className="text-lg font-extrabold text-[#003B95]">Product guarantee</p><p className="mt-1 text-sm text-slate-500">{product.garantia_texto || "Guarantee details are shown below"}</p></div><div className="px-6 py-7 text-center"><p className="text-lg font-extrabold text-[#003B95]">Customer support</p><p className="mt-1 text-sm text-slate-500">Help throughout your purchase</p></div></div></section>
+    {raw.supplier && <section className="border-b border-ink-200 bg-white"><div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-5 lg:px-8"><div><p className="text-xs font-bold uppercase tracking-wide text-brand-600">Supplier</p><p className="mt-1 font-bold text-brand-600">{raw.supplier.name}</p><p className="text-sm text-slate-500">{raw.supplier.countryName}{raw.supplier.city ? " · " + raw.supplier.city : ""}</p></div><a href={"/fornecedor/" + encodeURIComponent(raw.supplier.slug)} className="shrink-0 rounded-lg border border-ink-200 px-4 py-2.5 text-sm font-bold text-brand-600 hover:bg-brand-100 transition duration-150">View supplier</a></div></section>}
+    <section className="border-b border-ink-200 bg-brand-50"><div className="mx-auto grid max-w-7xl grid-cols-1 sm:grid-cols-3"><div className="border-b border-ink-200 px-6 py-7 text-center sm:border-b-0 sm:border-r"><p className="text-lg font-extrabold text-brand-600">Free nationwide delivery</p><p className="mt-1 text-sm text-slate-500">Delivery across South Africa in an estimated 1–5 days</p></div><div className="border-b border-ink-200 px-6 py-7 text-center sm:border-b-0 sm:border-r"><p className="text-lg font-extrabold text-brand-600">Product guarantee</p><p className="mt-1 text-sm text-slate-500">{product.garantia_texto || "Guarantee details are shown below"}</p></div><div className="px-6 py-7 text-center"><p className="text-lg font-extrabold text-brand-600">Customer support</p><p className="mt-1 text-sm text-slate-500">Help throughout your purchase</p></div></div></section>
     <WhyChooseSection product={product} />
     <ProductDetails product={product} />
     <StoreFeatures />

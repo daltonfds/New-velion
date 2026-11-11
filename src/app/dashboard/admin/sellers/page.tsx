@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -233,7 +234,7 @@ export default function AdminSellersPage() {
             <select
               value={kycFilter}
               onChange={(event) => setKycFilter(event.target.value)}
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               <option value="all">All KYC statuses</option>
               <option value="approved">Approved</option>
@@ -247,7 +248,7 @@ export default function AdminSellersPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               <option value="all">All sales activation states</option>
               <option value="active">Active — first sale made</option>
@@ -264,9 +265,7 @@ export default function AdminSellersPage() {
 
         <Card>
           {loading ? (
-            <div className="py-12 text-center text-sm text-slate-500">
-              Loading sellers...
-            </div>
+            <LoadingBlock label="Loading sellers..." className="py-12" />
           ) : filteredSellers.length === 0 ? (
             <div className="py-12 text-center">
               <p className="font-medium text-slate-900">
@@ -330,7 +329,7 @@ export default function AdminSellersPage() {
                     return (
                       <tr
                         key={seller.id}
-                        className="hover:bg-slate-50"
+                        className="hover:bg-slate-50 transition duration-150"
                       >
                         <td className="px-6 py-4">
                           <div className="font-medium text-slate-900">

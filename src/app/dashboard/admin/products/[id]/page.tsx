@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -50,6 +52,7 @@ interface Category {
 }
 
 export default function AdminProductPage() {
+  const confirmAction = useConfirm();
   const params = useParams();
   const router = useRouter();
   const productId = params.id as string;
@@ -262,7 +265,7 @@ export default function AdminProductPage() {
   }
 
   async function handleDelete() {
-    if (!window.confirm("Delete this product? This action cannot be undone.")) {
+    if (!(await confirmAction({ title: "Delete product?", message: "Delete this product? This action cannot be undone.", confirmLabel: "Delete", tone: "danger" }))) {
       return;
     }
 
@@ -293,9 +296,7 @@ export default function AdminProductPage() {
   if (loading) {
     return (
       <AppShell area="admin">
-        <div className="flex min-h-[400px] items-center justify-center text-sm text-slate-500">
-          Loading product...
-        </div>
+        <LoadingBlock label="Loading product..." className="min-h-[400px]" />
       </AppShell>
     );
   }
@@ -330,7 +331,7 @@ export default function AdminProductPage() {
         <div>
           <Link
             href="/dashboard/admin/products"
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition duration-150"
           >
             ← Back to Products
           </Link>

@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import SmartImage from "@/components/ui/SmartImage";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -54,7 +56,7 @@ export default function ExternalOfferPage() {
   }, [params.token]);
 
   if (loading) {
-    return <main className="min-h-screen bg-slate-50 px-4 py-16 text-center text-slate-500">Loading offer...</main>;
+    return <LoadingBlock label="Loading offer..." page className="px-4 py-16" />;
   }
 
   if (error || !offer) {
@@ -75,7 +77,7 @@ export default function ExternalOfferPage() {
       <div className="mx-auto grid max-w-5xl overflow-hidden rounded-3xl bg-white shadow-sm md:grid-cols-2">
         <div className="min-h-[320px] bg-slate-100">
           {image ? (
-            <img src={image} alt={offer.product.nome} className="h-full min-h-[320px] w-full object-cover" />
+            <SmartImage src={image} alt={offer.product.nome} className="h-full min-h-[320px] w-full object-cover" />
           ) : null}
         </div>
 
@@ -96,7 +98,7 @@ export default function ExternalOfferPage() {
 
           <Link
             href={`/produto/${encodeURIComponent(offer.product.slug)}?offer=${encodeURIComponent(offer.offer_token)}`}
-            className="mt-6 flex w-full items-center justify-center rounded-xl bg-indigo-600 px-5 py-3.5 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="mt-6 flex w-full items-center justify-center rounded-xl bg-indigo-600 px-5 py-3.5 text-sm font-semibold text-white hover:bg-indigo-700 transition duration-150"
           >
             Continue to product
           </Link>

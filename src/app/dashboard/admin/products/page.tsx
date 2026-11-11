@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import SmartImage from "@/components/ui/SmartImage";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
@@ -123,7 +125,7 @@ export default function AdminProductsPage() {
                 id="product-category"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                className="rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               >
                 <option value="all">All Categories</option>
                 {categories.map(([id, name]) => (
@@ -133,7 +135,7 @@ export default function AdminProductsPage() {
                 ))}
               </select>
 
-              <div className="flex items-center rounded-lg border border-[#E5E7EB] bg-[#F7F8FA] p-1">
+              <div className="flex items-center rounded-lg border border-ink-200 bg-ink-50 p-1">
                 <button
                   type="button"
                   onClick={() => changeView("list")}
@@ -178,9 +180,7 @@ export default function AdminProductsPage() {
           </div>
 
           {loading ? (
-            <div className="px-6 py-12 text-center text-sm text-slate-500">
-              Loading products...
-            </div>
+            <LoadingBlock label="Loading products..." className="px-6 py-12" />
           ) : filteredProducts.length === 0 ? (
             <div className="px-6 py-16 text-center">
               <h3 className="font-semibold text-slate-900">
@@ -212,11 +212,11 @@ export default function AdminProductsPage() {
 
                 <tbody className="divide-y divide-slate-100">
                   {filteredProducts.map((product) => (
-                    <tr key={product.id} className="hover:bg-[#F7F8FA]">
+                    <tr key={product.id} className="hover:bg-ink-100 transition duration-150">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           {product.fotos?.[0] ? (
-                            <img
+                            <SmartImage
                               src={product.fotos[0]}
                               alt={product.nome}
                               className="h-12 w-12 rounded-lg object-cover"
@@ -272,7 +272,7 @@ export default function AdminProductsPage() {
                       <td className="px-6 py-4">
                         <Link
                           href={`/dashboard/admin/products/${product.id}`}
-                          className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                          className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition duration-150"
                         >
                           Manage
                         </Link>
@@ -287,11 +287,11 @@ export default function AdminProductsPage() {
               {filteredProducts.map((product) => (
                 <Card
                   key={product.id}
-                  className="overflow-hidden border-[#E5E7EB] bg-white p-0 shadow-none transition hover:border-slate-300"
+                  className="overflow-hidden border-ink-200 bg-white p-0 shadow-none transition hover:border-slate-300"
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-slate-100">
                     {product.fotos?.[0] ? (
-                      <img
+                      <SmartImage
                         src={product.fotos[0]}
                         alt={product.nome}
                         className="h-full w-full object-cover"
@@ -323,7 +323,7 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-lg bg-[#F7F8FA] p-3">
+                      <div className="rounded-lg bg-ink-50 p-3">
                         <p className="text-xs text-slate-500">Selling Price</p>
                         <p className="mt-1 font-semibold text-slate-900">
                           {product.moeda}{" "}
@@ -333,7 +333,7 @@ export default function AdminProductsPage() {
                         </p>
                       </div>
 
-                      <div className="rounded-lg bg-[#F7F8FA] p-3">
+                      <div className="rounded-lg bg-ink-50 p-3">
                         <p className="text-xs text-slate-500">Supplier Cost</p>
                         <p className="mt-1 font-semibold text-slate-900">
                           {product.supplier_cost_amount != null || product.preco_custo != null
@@ -342,7 +342,7 @@ export default function AdminProductsPage() {
                         </p>
                       </div>
 
-                      <div className="rounded-lg bg-[#F7F8FA] p-3">
+                      <div className="rounded-lg bg-ink-50 p-3">
                         <p className="text-xs text-slate-500">Commission</p>
                         <p className="mt-1 font-semibold text-slate-900">
                           {product.comissao_tipo === "percentual"
@@ -361,7 +361,7 @@ export default function AdminProductsPage() {
 
                       <Link
                         href={`/dashboard/admin/products/${product.id}`}
-                        className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                        className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition duration-150"
                       >
                         Manage
                       </Link>
