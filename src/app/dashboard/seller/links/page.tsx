@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import SmartImage from "@/components/ui/SmartImage";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -236,7 +238,7 @@ export default function SellerLinksPage() {
                 setSearch(event.target.value)
               }
               placeholder="Search products or links..."
-              className="h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 md:w-80"
+              className="h-10 w-full rounded-lg border border-ink-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 md:w-80 focus-visible:ring-2 focus-visible:ring-brand-600"
             />
           </div>
         </Card>
@@ -249,9 +251,7 @@ export default function SellerLinksPage() {
 
         {loading ? (
           <Card>
-            <div className="py-12 text-center text-sm text-slate-500">
-              Loading affiliate links...
-            </div>
+            <LoadingBlock label="Loading affiliate links..." className="py-12" />
           </Card>
         ) : filteredLinks.length === 0 ? (
           <Card>
@@ -265,7 +265,7 @@ export default function SellerLinksPage() {
 
               <a
                 href="/dashboard/seller/marketplace"
-                className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white hover:bg-indigo-700"
+                className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white hover:bg-indigo-700 transition duration-150"
               >
                 Go to Marketplace
               </a>
@@ -311,7 +311,7 @@ export default function SellerLinksPage() {
                   <div className="flex gap-4">
                     <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                       {image ? (
-                        <img
+                        <SmartImage
                           src={image}
                           alt={productName}
                           className="h-full w-full object-cover"
@@ -352,8 +352,8 @@ export default function SellerLinksPage() {
                       </div>
 
                       <div className="mt-4 grid grid-cols-2 gap-2">
-                        <div className="rounded-lg border border-[#E5E7EB] bg-[#F7F8FA] px-3 py-2">
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                        <div className="rounded-lg border border-ink-200 bg-ink-50 px-3 py-2">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
                             Commission
                           </p>
                           <p className="mt-1 text-sm font-semibold text-slate-900">
@@ -369,8 +369,8 @@ export default function SellerLinksPage() {
                           </p>
                         </div>
 
-                        <div className="rounded-lg border border-[#E5E7EB] bg-[#F7F8FA] px-3 py-2">
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                        <div className="rounded-lg border border-ink-200 bg-ink-50 px-3 py-2">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
                             Attribution
                           </p>
                           <p className="mt-1 text-sm font-semibold text-slate-900">
@@ -383,28 +383,28 @@ export default function SellerLinksPage() {
                       </div>
 
                       <div className="mt-3 grid grid-cols-3 gap-2">
-                        <div className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2">
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Clicks</p>
+                        <div className="rounded-lg border border-ink-200 bg-white px-3 py-2">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Clicks</p>
                           <p className="mt-1 text-lg font-semibold text-slate-900">
                             {stats[item.id]?.clicks ?? 0}
                           </p>
                         </div>
-                        <div className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2">
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Leads</p>
+                        <div className="rounded-lg border border-ink-200 bg-white px-3 py-2">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Leads</p>
                           <p className="mt-1 text-lg font-semibold text-slate-900">
                             {stats[item.id]?.sessions ?? 0}
                           </p>
                         </div>
-                        <div className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2">
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Sales</p>
+                        <div className="rounded-lg border border-ink-200 bg-white px-3 py-2">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Sales</p>
                           <p className="mt-1 text-lg font-semibold text-slate-900">
                             {stats[item.id]?.approved ?? 0}
                           </p>
                         </div>
                       </div>
 
-                      <div className="mt-3 rounded-lg border border-[#E5E7EB] bg-[#F7F8FA] px-3 py-2">
-                        <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                      <div className="mt-3 rounded-lg border border-ink-200 bg-ink-50 px-3 py-2">
+                        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">
                           Sales page link
                         </p>
                         <p className="break-all text-xs text-slate-600">
@@ -415,8 +415,8 @@ export default function SellerLinksPage() {
                         </p>
                       </div>
 
-                      <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50/60 px-3 py-2">
-                        <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#003B95]">
+                      <div className="mt-3 rounded-lg border border-brand-200 bg-brand-50/60 px-3 py-2">
+                        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-brand-600">
                           Direct checkout link
                         </p>
                         <p className="break-all text-xs text-slate-700">
@@ -440,7 +440,7 @@ export default function SellerLinksPage() {
                               item.id,
                             )
                           }
-                          className="inline-flex h-9 items-center justify-center rounded-lg bg-indigo-600 px-3 text-sm font-medium text-white hover:bg-indigo-700"
+                          className="inline-flex h-9 items-center justify-center rounded-lg bg-indigo-600 px-3 text-sm font-medium text-white hover:bg-indigo-700 transition duration-150"
                         >
                           {copied === item.id
                             ? "Copied"
@@ -455,7 +455,7 @@ export default function SellerLinksPage() {
                               productName,
                             )
                           }
-                          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm font-medium text-slate-700 hover:bg-[#F7F8FA]"
+                          className="inline-flex h-9 items-center justify-center rounded-lg border border-ink-200 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-ink-100 transition duration-150"
                         >
                           Share
                         </button>
@@ -468,7 +468,7 @@ export default function SellerLinksPage() {
                             const directCheckoutUrl = `${siteUrl}/entrega?ref=${encodeURIComponent(affiliateRef)}`;
                             void copyLink(directCheckoutUrl, `${item.id}-checkout`);
                           }}
-                          className="inline-flex h-9 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm font-medium text-[#003B95] hover:bg-blue-100"
+                          className="inline-flex h-9 items-center justify-center rounded-lg border border-brand-200 bg-brand-50 px-3 text-sm font-medium text-brand-600 hover:bg-brand-100 transition duration-150"
                         >
                           {copied === `${item.id}-checkout`
                             ? "Checkout Link Copied"
@@ -479,7 +479,7 @@ export default function SellerLinksPage() {
                           href={item.affiliateUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm font-medium text-slate-700 hover:bg-[#F7F8FA]"
+                          className="inline-flex h-9 items-center justify-center rounded-lg border border-ink-200 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-ink-100 transition duration-150"
                         >
                           Open Sales Page
                         </a>

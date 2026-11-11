@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { FormEvent, useEffect, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -18,6 +20,7 @@ interface Category {
 }
 
 export default function AdminCategoriesPage() {
+  const confirmAction = useConfirm();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -107,9 +110,12 @@ export default function AdminCategoriesPage() {
 
   async function handleDelete(category: Category) {
     if (
-      !window.confirm(
-        `Delete "${category.nome}"? Products using this category may prevent deletion.`,
-      )
+      !(await confirmAction({
+        title: "Delete category?",
+        message: `Delete "${category.nome}"? Products using this category may prevent deletion.`,
+        confirmLabel: "Delete",
+        tone: "danger",
+      }))
     ) {
       return;
     }
@@ -234,9 +240,7 @@ export default function AdminCategoriesPage() {
             </div>
 
             {loading ? (
-              <div className="px-6 py-12 text-center text-sm text-slate-500">
-                Loading categories...
-              </div>
+              <LoadingBlock label="Loading categories..." className="px-6 py-12" />
             ) : categories.length === 0 ? (
               <div className="px-6 py-12 text-center text-sm text-slate-500">
                 No categories found.
@@ -258,7 +262,7 @@ export default function AdminCategoriesPage() {
                     {categories.map((category) => (
                       <tr
                         key={category.id}
-                        className="hover:bg-[#F6F9FC]"
+                        className="hover:bg-ink-100 transition duration-150"
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -290,7 +294,7 @@ export default function AdminCategoriesPage() {
                           <button
                             type="button"
                             onClick={() => void handleDelete(category)}
-                            className="text-sm font-medium text-red-600 hover:text-red-700"
+                            className="text-sm font-medium text-red-600 hover:text-red-700 transition duration-150"
                           >
                             Delete
                           </button>

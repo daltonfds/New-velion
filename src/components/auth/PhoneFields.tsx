@@ -30,7 +30,7 @@ export default function PhoneFields({
   return (
     <div className="space-y-5">
       <div>
-        <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+        <label className="mb-2 block text-sm font-semibold text-ink-800">
           Country
         </label>
 
@@ -45,7 +45,7 @@ export default function PhoneFields({
               selected?.callingCode || "",
             );
           }}
-          className="w-full rounded-xl border border-[#16294F]/15 bg-white px-4 py-3.5 outline-none focus:border-[#16294F]"
+          className="w-full rounded-xl border border-ink-800/15 bg-white px-4 py-3.5 outline-none focus:border-ink-800 focus-visible:ring-2 focus-visible:ring-brand-600"
         >
           <option value="">Select your country</option>
 
@@ -58,7 +58,7 @@ export default function PhoneFields({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+        <label className="mb-2 block text-sm font-semibold text-ink-800">
           Mobile number
         </label>
 
@@ -73,7 +73,7 @@ export default function PhoneFields({
             onChange={(event) => onPhoneChange(event.target.value)}
             inputMode="tel"
             placeholder="72 295 8915"
-            className="min-w-0 flex-1 rounded-xl border border-[#16294F]/15 bg-white px-4 py-3.5 outline-none focus:border-[#16294F]"
+            className="min-w-0 flex-1 rounded-xl border border-ink-800/15 bg-white px-4 py-3.5 outline-none focus:border-ink-800 focus-visible:ring-2 focus-visible:ring-brand-600"
           />
         </div>
 
@@ -83,7 +83,7 @@ export default function PhoneFields({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+        <label className="mb-2 block text-sm font-semibold text-ink-800">
           WhatsApp{" "}
           <span className="font-normal text-slate-400">(optional)</span>
         </label>
@@ -98,13 +98,13 @@ export default function PhoneFields({
             onChange={(event) => onWhatsappChange(event.target.value)}
             inputMode="tel"
             placeholder="Optional WhatsApp number"
-            className="min-w-0 flex-1 rounded-xl border border-[#16294F]/15 bg-white px-4 py-3.5 outline-none focus:border-[#16294F]"
+            className="min-w-0 flex-1 rounded-xl border border-ink-800/15 bg-white px-4 py-3.5 outline-none focus:border-ink-800 focus-visible:ring-2 focus-visible:ring-brand-600"
           />
         </div>
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-[#16294F]">
+        <label className="mb-2 block text-sm font-semibold text-ink-800">
           Preferred language
         </label>
 
@@ -116,8 +116,8 @@ export default function PhoneFields({
               onClick={() => onLanguageChange(value)}
               className={
                 language === value
-                  ? "rounded-xl border border-[#16294F] bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
-                  : "rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#16294F]"
+                  ? "rounded-xl border border-ink-800 bg-brand-600 px-4 py-3 text-sm font-semibold text-white"
+                  : "rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-ink-800"
               }
             >
               {value === "en" ? "English" : "Português"}

@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -40,7 +41,7 @@ export default function ProfilePage() {
   if (isAdmin === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 px-6">
-        <p className="text-sm font-medium text-slate-600">Loading account settings…</p>
+        <LoadingBlock label="Loading account settings…" className="font-medium" />
       </div>
     );
   }
@@ -53,7 +54,7 @@ export default function ProfilePage() {
     >
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#16294F]">
+          <h2 className="text-2xl font-bold tracking-tight text-ink-800">
             Account
           </h2>
           <p className="mt-1 text-sm text-slate-500">
@@ -67,13 +68,13 @@ export default function ProfilePage() {
             className="group rounded-xl border border-slate-200 bg-white p-6 transition-colors hover:border-slate-300 hover:bg-slate-50"
           >
             <div className="flex items-start justify-between">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#eef4fb] text-[#16294F]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-ink-800">
                 <Icon>
                   <circle cx="12" cy="8" r="3.5" />
                   <path d="M5 20a7 7 0 0 1 14 0" />
                 </Icon>
               </div>
-              <span className="text-slate-400 group-hover:text-blue-600">→</span>
+              <span className="text-slate-400 group-hover:text-brand-600 transition duration-150">→</span>
             </div>
             <h3 className="mt-5 text-base font-semibold text-slate-900">
               Personal profile
@@ -88,7 +89,7 @@ export default function ProfilePage() {
             className="group rounded-xl border border-slate-200 bg-white p-6 transition-colors hover:border-slate-300 hover:bg-slate-50"
           >
             <div className="flex items-start justify-between">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#eef4fb] text-[#16294F]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-ink-800">
                 <Icon>
                   <path d="M12 3v3" />
                   <path d="M12 18v3" />
@@ -101,7 +102,7 @@ export default function ProfilePage() {
                   <path d="m7.7 16.3-2.1 2.1" />
                 </Icon>
               </div>
-              <span className="text-slate-400 group-hover:text-blue-600">→</span>
+              <span className="text-slate-400 group-hover:text-brand-600 transition duration-150">→</span>
             </div>
             <h3 className="mt-5 text-base font-semibold text-slate-900">
               {isAdmin ? "Administrator settings" : "Settings"}
@@ -123,7 +124,7 @@ export default function ProfilePage() {
           <div className="divide-y divide-slate-100">
             <Link
               href="/dashboard/profile/personal"
-              className="flex items-center justify-between px-6 py-5 hover:bg-slate-50"
+              className="flex items-center justify-between px-6 py-5 hover:bg-slate-50 transition duration-150"
             >
               <div>
                 <p className="text-sm font-medium text-slate-900">
@@ -138,7 +139,7 @@ export default function ProfilePage() {
 
             <Link
               href={isAdmin ? "/dashboard/admin/platform-settings" : "/dashboard/seller/settings"}
-              className="flex items-center justify-between px-6 py-5 hover:bg-slate-50"
+              className="flex items-center justify-between px-6 py-5 hover:bg-slate-50 transition duration-150"
             >
               <div>
                 <p className="text-sm font-medium text-slate-900">
@@ -153,7 +154,7 @@ export default function ProfilePage() {
 
             <Link
               href={isAdmin ? "/dashboard/admin/users" : "/dashboard/seller/settings"}
-              className="flex items-center justify-between px-6 py-5 hover:bg-slate-50"
+              className="flex items-center justify-between px-6 py-5 hover:bg-slate-50 transition duration-150"
             >
               <div>
                 <p className="text-sm font-medium text-slate-900">

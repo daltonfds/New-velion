@@ -202,7 +202,7 @@ export default function NewProductPage() {
         <div>
           <Link
             href="/dashboard/admin/products"
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition duration-150"
           >
             ← Back to Products
           </Link>
@@ -414,7 +414,7 @@ ${item.answer}`,
                 <select
                   value={form.pricing_mode}
                   onChange={(event) => updateField("pricing_mode", event.target.value)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                 >
                   <option value="fixed">Fixed Offer — Admin/Supplier controls price</option>
                   <option value="custom">Custom Pricing — Seller/Platform controls price</option>

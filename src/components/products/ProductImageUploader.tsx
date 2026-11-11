@@ -1,5 +1,6 @@
 "use client";
 
+import SmartImage from "@/components/ui/SmartImage";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -175,14 +176,14 @@ export default function ProductImageUploader({
                 key={`${image}-${index}`}
                 className="group relative overflow-hidden rounded-lg border border-slate-200 bg-white"
               >
-                <img
+                <SmartImage
                   src={image}
                   alt={`Product image ${index + 1}`}
                   className="aspect-square w-full object-cover"
                 />
 
                 {index === 0 && (
-                  <span className="absolute left-2 top-2 rounded-full bg-indigo-600 px-2 py-1 text-[10px] font-semibold text-white">
+                  <span className="absolute left-2 top-2 rounded-full bg-indigo-600 px-2 py-1 text-xs font-semibold text-white">
                     Main
                   </span>
                 )}

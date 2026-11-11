@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -170,9 +171,7 @@ export default function AdminUsersPage() {
           </div>
 
           {loading ? (
-            <div className="px-6 py-16 text-center text-sm text-slate-500">
-              Loading users...
-            </div>
+            <LoadingBlock label="Loading users..." className="px-6 py-16" />
           ) : filteredUsers.length === 0 ? (
             <div className="px-6 py-16 text-center">
               <h3 className="font-semibold text-slate-900">
@@ -220,7 +219,7 @@ export default function AdminUsersPage() {
                     return (
                       <tr
                         key={user.id}
-                        className="hover:bg-slate-50"
+                        className="hover:bg-slate-50 transition duration-150"
                       >
                         <td className="px-6 py-4">
                           <div>

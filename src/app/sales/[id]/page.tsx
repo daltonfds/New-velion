@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import SmartImage from "@/components/ui/SmartImage";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -295,7 +297,7 @@ export default function SalesPage() {
     return (
       <main className="sales-page loading-page">
         <div className="loader" />
-        <p>Loading offer...</p>
+        <LoadingBlock label="Loading offer..." />
         <style jsx>{`
           .sales-page {
             min-height: 100vh;
@@ -1124,7 +1126,7 @@ export default function SalesPage() {
       `}</style>
 
       <div className="announcement">
-        Secure checkout • Fast support • Shop with confidence
+        Secure checkout • Order tracking
       </div>
 
       <header className="header">
@@ -1152,7 +1154,7 @@ export default function SalesPage() {
           <div className="gallery">
             <div className="gallery-main">
               {images[0] ? (
-                <img src={images[0]} alt={title} />
+                <SmartImage src={images[0]} alt={title} />
               ) : (
                 <div className="gallery-placeholder">Product image</div>
               )}
@@ -1162,7 +1164,7 @@ export default function SalesPage() {
               <div className="thumbs">
                 {images.map((image, index) => (
                   <button className={`thumb ${index === 0 ? "active" : ""}`} key={image}>
-                    <img src={image} alt={`${title} ${index + 1}`} />
+                    <SmartImage src={image} alt={`${title} ${index + 1}`} />
                   </button>
                 ))}
               </div>
@@ -1297,8 +1299,7 @@ export default function SalesPage() {
         <div className="container">
           <h2 className="section-title">Why choose this product?</h2>
           <p className="section-subtitle">
-            Everything you need to make an informed purchase decision, presented
-            clearly and simply.
+            Price, options and delivery details for this product.
           </p>
 
           <div className="feature-grid">
@@ -1306,8 +1307,7 @@ export default function SalesPage() {
               <Icon name="check" size={24} />
               <h3>Clear product information</h3>
               <p>
-                Product details, pricing and available options are presented in
-                one place.
+                Details, price and options are listed on this page.
               </p>
             </article>
 
@@ -1359,7 +1359,7 @@ export default function SalesPage() {
 
       <section className="section soft">
         <div className="container">
-          <h2 className="section-title">Shop with confidence</h2>
+          <h2 className="section-title">From product page to delivery</h2>
 
           <div className="trust">
             <div className="trust-item">
@@ -1475,7 +1475,7 @@ export default function SalesPage() {
                   <article className="related-card" key={related.id}>
                     <div className="related-image">
                       {relatedImages[0] && (
-                        <img src={relatedImages[0]} alt={relatedTitle} />
+                        <SmartImage src={relatedImages[0]} alt={relatedTitle} />
                       )}
                     </div>
 

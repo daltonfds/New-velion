@@ -16,10 +16,10 @@ export default function Newsletter() {
   }
 
   return (
-    <section className="border-t border-[#E7EDF5] bg-white">
+    <section className="border-t border-ink-200 bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-        <div className="mx-auto max-w-3xl border border-[#E5E7EB] bg-[#F7F8FA] px-6 py-10 text-center sm:px-10">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0A0440]">
+        <div className="mx-auto max-w-3xl border border-ink-200 bg-ink-50 px-6 py-10 text-center sm:px-10">
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-900">
             Stay connected
           </p>
 
@@ -47,19 +47,19 @@ export default function Newsletter() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="Your email address"
-                className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-[#0A0440]"
+                className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-brand-800 focus-visible:ring-2 focus-visible:ring-brand-600"
               />
 
               <button
                 type="submit"
-                className="rounded-lg bg-[#0A0440] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0e1d38]"
+                className="rounded-lg bg-brand-900 px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0e1d38]"
               >
                 Subscribe
               </button>
             </form>
           )}
 
-          <p className="mt-4 text-[11px] text-slate-400">
+          <p className="mt-4 text-xs text-slate-400">
             You can unsubscribe at any time.
           </p>
         </div>

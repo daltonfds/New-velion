@@ -12,17 +12,17 @@ const sizes = {
   sm: {
     icon: 38,
     name: "text-xl",
-    tagline: "text-[8px]",
+    tagline: "text-xs",
   },
   md: {
     icon: 52,
     name: "text-3xl",
-    tagline: "text-[9px]",
+    tagline: "text-xs",
   },
   lg: {
     icon: 68,
     name: "text-4xl sm:text-5xl",
-    tagline: "text-[10px] sm:text-[11px]",
+    tagline: "text-xs sm:text-xs",
   },
 };
 
@@ -84,14 +84,14 @@ export default function NewvelionBrand({
 
       <div className="flex flex-col">
         <span
-          className={`${config.name} font-bold leading-none tracking-[-0.055em] text-[#001B44]`}
+          className={`${config.name} font-bold leading-none tracking-[-0.055em] text-ink-900`}
         >
           Newvelion
         </span>
 
         {showTagline && (
           <span
-            className={`${config.tagline} mt-1 font-medium uppercase tracking-[0.2em] text-[#6B7280]`}
+            className={`${config.tagline} mt-1 font-medium uppercase tracking-wide text-ink-500`}
           >
             Commerce infrastructure
           </span>

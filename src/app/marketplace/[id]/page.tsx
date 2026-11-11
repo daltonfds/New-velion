@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -65,7 +66,7 @@ export default function MarketplaceProductRedirect() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-white">
-      <p className="text-sm text-slate-500">Loading product...</p>
+      <LoadingBlock label="Loading product..." />
     </main>
   );
 }

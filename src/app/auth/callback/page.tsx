@@ -1,5 +1,6 @@
 "use client";
 
+import Skeleton from "@/components/ui/Skeleton";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -83,5 +84,5 @@ export default function AuthCallbackPage() {
     return () => { active = false; };
   }, [router]);
 
-  return <main className="flex min-h-screen items-center justify-center bg-[#f6f9fc] px-5"><div className="w-full max-w-md rounded-xl border border-[#dde5ef] bg-white p-8 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#003B95]" /><p role="status" className="mt-5 text-sm font-semibold text-[#003B95]">{message}</p></div></main>;
+  return <main className="flex min-h-screen items-center justify-center bg-ink-50 px-5"><div className="w-full max-w-md rounded-xl border border-ink-200 bg-white p-8 text-center"><Skeleton className="mx-auto h-6 w-32" /><p role="status" className="mt-5 text-sm font-semibold text-brand-600">{message}</p></div></main>;
 }

@@ -18,20 +18,19 @@ export default function StoreFeatures() {
   ];
 
   return (
-    <section className="border-b border-[#E7EDF5] bg-white">
+    <section className="border-b border-ink-200 bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0A0440]">
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-900">
             The Newvelion experience
           </p>
 
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-            Shop with confidence
+            From product page to delivery
           </h2>
 
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Everything you need for a simple and reliable product purchase,
-            from product information to checkout.
+            Price, delivery details and order tracking stay visible from the product page to payment.
           </p>
         </div>
 
@@ -39,9 +38,9 @@ export default function StoreFeatures() {
           {features.map((feature) => (
             <div
               key={feature.number}
-              className="border border-[#E5E7EB] bg-white p-7"
+              className="border border-ink-200 bg-white p-7"
             >
-              <span className="text-sm font-bold text-[#10069F]">
+              <span className="text-sm font-bold text-brand-600">
                 {feature.number}
               </span>
 

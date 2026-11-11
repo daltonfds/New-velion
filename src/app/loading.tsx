@@ -8,7 +8,7 @@ export default function Loading() {
           {Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-28 rounded-xl border border-slate-100 bg-slate-50" />)}
         </div>
         <div className="mt-6 h-64 rounded-xl border border-slate-100 bg-slate-50" />
-        <p className="mt-4 text-sm text-slate-500">Loading Newvelion…</p>
+        <span role="status" className="sr-only">Loading Newvelion…</span>
       </div>
     </main>
   );

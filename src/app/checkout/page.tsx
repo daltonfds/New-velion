@@ -1,4 +1,6 @@
 "use client";
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import SmartImage from "@/components/ui/SmartImage";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import CustomerNav from "@/components/customer/CustomerNav";
@@ -56,7 +58,7 @@ function CheckoutContent() {
     } catch { setError("Unable to start checkout. Please try again."); setPaying(false); }
   }
 
-  if (loading) return <main className="min-h-screen grid place-items-center">Loading checkout...</main>;
+  if (loading) return <LoadingBlock label="Loading checkout..." page />;
   const price = Number(product?.preco_promocional || product?.preco || 0);
   const total = price * quantity;
   const fields: { key: keyof DeliveryForm; label: string; type?: string; required?: boolean; autoComplete?: string }[] = [
@@ -69,21 +71,21 @@ function CheckoutContent() {
     { key: "address", label: "Delivery address", required: true, autoComplete: "street-address" },
     { key: "address_reference", label: "Address reference (optional)" },
   ];
-  return <main className="min-h-screen bg-[#f6f9fc]">
+  return <main className="min-h-screen bg-ink-50">
     <CustomerNav />
     <div className="mx-auto max-w-6xl px-5 py-10">
-      <h1 className="text-3xl font-extrabold text-[#0e1f3d]">Secure checkout</h1>
+      <h1 className="text-3xl font-extrabold text-ink-900">Secure checkout</h1>
       <div className="mt-8 grid gap-7 lg:grid-cols-[1fr_360px]">
         <form onSubmit={pay} className="space-y-4 rounded-[12px] border border-slate-200 bg-white p-6">
-          <h2 className="text-xl font-bold text-[#0e1f3d]">Delivery details</h2>
+          <h2 className="text-xl font-bold text-ink-900">Delivery details</h2>
           <p className="text-sm text-slate-500">Guest checkout is available. We create or link your customer account only after an administrator approves the sale.</p>
           {fields.map((field) => <input key={field.key} name={field.key} type={field.type || "text"} autoComplete={field.autoComplete || "off"} required={field.required} placeholder={field.label} aria-label={field.label} value={form[field.key]} onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.target.value }))} className="w-full rounded-[7px] border border-slate-200 px-4 py-3" />)}
           {error && <div role="alert" className="rounded-[7px] bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
-          <button disabled={paying} className="w-full rounded-[7px] bg-[#0078e8] py-4 font-extrabold text-white disabled:opacity-60">{paying ? "Redirecting to payment..." : "Continue to secure payment"}</button>
+          <button disabled={paying} className="w-full rounded-[7px] bg-brand-600 py-4 font-extrabold text-white disabled:opacity-60">{paying ? "Redirecting to payment..." : "Continue to secure payment"}</button>
         </form>
         <aside className="h-fit rounded-[12px] border border-slate-200 bg-white p-6">
-          {product?.fotos?.[0] && <img src={product.fotos[0]} alt={product?.nome || "Product"} className="aspect-square w-full rounded-[7px] object-cover" />}
-          <h2 className="mt-4 font-extrabold text-[#0e1f3d]">{product?.nome}</h2>
+          {product?.fotos?.[0] && <SmartImage src={product.fotos[0]} alt={product?.nome || "Product"} className="aspect-square w-full rounded-[7px] object-cover" />}
+          <h2 className="mt-4 font-extrabold text-ink-900">{product?.nome}</h2>
           <p className="mt-2 text-sm text-slate-500">Quantity: {quantity}</p>
           <div className="mt-5 flex justify-between border-t pt-4 font-extrabold"><span>Total</span><span>R {total.toFixed(2)}</span></div>
           <p className="mt-3 text-xs text-slate-400">Delivery is calculated from the supplier's South African shipping rules.</p>
@@ -92,4 +94,4 @@ function CheckoutContent() {
     </div>
   </main>;
 }
-export default function CheckoutPage() { return <Suspense fallback={<main className="min-h-screen grid place-items-center">Loading checkout...</main>}><CheckoutContent /></Suspense>; }
+export default function CheckoutPage() { return <Suspense fallback={<LoadingBlock label="Loading checkout..." page />}><CheckoutContent /></Suspense>; }

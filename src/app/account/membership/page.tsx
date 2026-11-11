@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import { Check, ExternalLink } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import CustomerNav from "@/components/customer/CustomerNav";
@@ -77,32 +79,32 @@ export default function MembershipPage() {
   const openRequest = memberships.find(m => ["pending_payment","pending_review"].includes(m.status));
   const active = memberships.find(m => m.status === "active" && (!m.expires_at || new Date(m.expires_at) > new Date()));
 
-  if (loading) return <main className="grid min-h-screen place-items-center text-sm text-slate-500">Loading membership…</main>;
+  if (loading) return <LoadingBlock label="Loading membership…" page />;
 
-  return <main className="min-h-screen bg-[#F5F8FC] text-[#001B44]">
+  return <main className="min-h-screen bg-ink-50 text-ink-900">
     <CustomerNav name={name}/>
     <div className="mx-auto max-w-6xl px-5 py-8 lg:px-8">
-      <Link href="/account" className="text-sm font-semibold text-[#0078E8]">← My account</Link>
-      <section className="mt-5 rounded-3xl bg-[#003B95] p-7 text-white sm:p-10">
-        <p className="text-sm font-bold text-blue-100">NEWVELION CLUB</p>
+      <Link href="/account" className="text-sm font-semibold text-brand-600">← My account</Link>
+      <section className="mt-5 rounded-3xl bg-brand-600 p-7 text-white sm:p-10">
+        <p className="text-sm font-bold text-brand-100">NEWVELION CLUB</p>
         <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">More value in every order.</h1>
-        <p className="mt-3 max-w-2xl text-blue-100">Join for member discounts, free delivery on eligible orders and exclusive promotions. Membership is paid quarterly and activated after payment verification.</p>
+        <p className="mt-3 max-w-2xl text-brand-100">Join for member discounts, free delivery on eligible orders and exclusive promotions. Membership is paid quarterly and activated after payment verification.</p>
         <div className="mt-5 flex flex-wrap gap-3">{benefits.map(b => <span key={b} className="rounded-full border border-white/30 px-3 py-2 text-sm">{b}</span>)}</div>
       </section>
       {error && <p role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>}
-      {message && <p role="status" className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{message}</p>}
+      {message && <p role="status" className="mt-5 rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm text-brand-900">{message}</p>}
       {active && <section className="mt-6 rounded-2xl border border-emerald-200 bg-white p-6"><p className="font-bold text-emerald-700">Your membership is active</p><h2 className="mt-1 text-2xl font-extrabold">{active.plan_code.replace("club_","Club ")}</h2><p className="mt-2 text-sm text-slate-600">Valid until {active.expires_at ? new Date(active.expires_at).toLocaleDateString("en-ZA") : "further notice"}.</p></section>}
       <div className="mt-7 grid gap-5 md:grid-cols-3">
-        {plans.map((plan,i) => <article key={plan.code} className={"flex flex-col rounded-2xl border bg-white p-6 shadow-sm "+(i===1?"border-[#0078E8] ring-1 ring-[#0078E8]":"border-slate-200")}>
-          <p className="text-sm font-bold text-[#0078E8]">{plan.name}</p><h2 className="mt-2 text-3xl font-extrabold">{money(plan.amount)}<span className="text-sm font-medium text-slate-500"> / 3 months</span></h2>
-          <ul className="mt-5 flex-1 space-y-3 text-sm text-slate-600">{benefits.map(b=><li key={b} className="flex gap-2"><span className="font-bold text-emerald-600">✓</span>{b}</li>)}</ul>
+        {plans.map((plan,i) => <article key={plan.code} className={"flex flex-col rounded-2xl border bg-white p-6 shadow-sm "+(i===1?"border-brand-600 ring-1 ring-brand-600":"border-slate-200")}>
+          <p className="text-sm font-bold text-brand-600">{plan.name}</p><h2 className="mt-2 text-3xl font-extrabold">{money(plan.amount)}<span className="text-sm font-medium text-slate-500"> / 3 months</span></h2>
+          <ul className="mt-5 flex-1 space-y-3 text-sm text-slate-600">{benefits.map(b=><li key={b} className="flex gap-2"><Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2.5} />{b}</li>)}</ul>
           {!plan.paymentUrl && <p className="mt-5 text-xs text-amber-700">Payment link is being configured.</p>}
-          <button disabled={busy || !plan.paymentUrl || Boolean(openRequest) || Boolean(active)} onClick={()=>void requestPlan(plan)} className="mt-6 rounded-xl bg-[#003B95] px-4 py-3 text-sm font-bold text-white hover:bg-[#0078E8] disabled:cursor-not-allowed disabled:opacity-50">{active?"Membership active":openRequest?"Request already in progress":"Choose plan & pay"}</button>
+          <button disabled={busy || !plan.paymentUrl || Boolean(openRequest) || Boolean(active)} onClick={()=>void requestPlan(plan)} className="mt-6 rounded-xl bg-brand-600 px-4 py-3 text-sm font-bold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50 transition duration-150">{active?"Membership active":openRequest?"Request already in progress":"Choose plan & pay"}</button>
         </article>)}
       </div>
       {openRequest && <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Your current request</p><h2 className="mt-1 text-xl font-extrabold">{money(Number(openRequest.amount_zar))} · Quarterly</h2></div><span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">{statusLabel[openRequest.status] || openRequest.status}</span></div>
-        {openRequest.status==="pending_payment" && <div className="mt-5"><p className="text-sm text-slate-600">Complete payment using the link for your request. Once paid, submit the payment reference below.</p>{openRequest.payment_url && <a href={openRequest.payment_url} target="_blank" rel="noreferrer" className="mt-3 inline-flex rounded-xl border border-[#0078E8] px-4 py-2 text-sm font-bold text-[#0078E8]">Open payment link ↗</a>}<label className="mt-4 block text-sm font-semibold">Payment reference (optional)<input value={reference} onChange={e=>setReference(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-normal" placeholder="Reference or transaction ID"/></label><label className="mt-3 block text-sm font-semibold">Note for the team (optional)<textarea value={note} onChange={e=>setNote(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-normal" rows={2} placeholder="Any payment details"/></label><button disabled={busy} onClick={()=>void confirmPaid(openRequest)} className="mt-4 rounded-xl bg-[#0078E8] px-5 py-3 text-sm font-bold text-white disabled:opacity-50">I have paid — submit for review</button></div>}
+        {openRequest.status==="pending_payment" && <div className="mt-5"><p className="text-sm text-slate-600">Complete payment using the link for your request. Once paid, submit the payment reference below.</p>{openRequest.payment_url && <a href={openRequest.payment_url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-brand-600 px-4 py-2 text-sm font-bold text-brand-600 transition-colors duration-150 hover:bg-brand-50">Open payment link<ExternalLink aria-hidden className="h-4 w-4" /></a>}<label className="mt-4 block text-sm font-semibold">Payment reference (optional)<input value={reference} onChange={e=>setReference(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-normal" placeholder="Reference or transaction ID"/></label><label className="mt-3 block text-sm font-semibold">Note for the team (optional)<textarea value={note} onChange={e=>setNote(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-normal" rows={2} placeholder="Any payment details"/></label><button disabled={busy} onClick={()=>void confirmPaid(openRequest)} className="mt-4 rounded-xl bg-brand-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">I have paid — submit for review</button></div>}
         {openRequest.status==="pending_review" && <p className="mt-4 text-sm text-slate-600">Your payment confirmation is awaiting manual verification. Your benefits are not active yet.</p>}
       </section>}
       <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-lg font-extrabold">Membership history</h2>{memberships.length===0?<p className="mt-3 text-sm text-slate-500">No membership requests yet.</p>:<div className="mt-4 divide-y divide-slate-100">{memberships.map(m=><div key={m.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm"><div><p className="font-bold">{money(Number(m.amount_zar))} · {m.plan_code.replace("club_","Club ")}</p><p className="mt-1 text-slate-500">{new Date(m.created_at).toLocaleDateString("en-ZA")}</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{statusLabel[m.status]||m.status}</span></div>)}</div>}</section>

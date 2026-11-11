@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AppShell from "@/components/layout/AppShell";
@@ -112,7 +113,7 @@ export default function ShopifyIntegrationPage() {
     <AppShell area="seller" title="Shopify" subtitle="Connect and manage your Shopify store integration.">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-[#003B95]">
+          <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">
             Seller · Integrations
           </p>
 
@@ -132,7 +133,7 @@ export default function ShopifyIntegrationPage() {
           </div>
         )}
 
-        <section className="rounded-[12px] border border-[#E5E7EB] bg-white p-6">
+        <section className="rounded-[12px] border border-ink-200 bg-white p-6">
           <div className="flex flex-col gap-6">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
@@ -150,14 +151,14 @@ export default function ShopifyIntegrationPage() {
                 onChange={(event) => setShop(event.target.value)}
                 placeholder="minha-loja.myshopify.com"
                 disabled={connecting}
-                className="h-11 flex-1 rounded-[10px] border border-slate-300 px-4 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="h-11 flex-1 rounded-[10px] border border-slate-300 px-4 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               />
 
               <button
                 type="button"
                 onClick={connectShopify}
                 disabled={connecting}
-                className="h-11 rounded-[10px] bg-[#003B95] px-6 text-sm font-semibold text-white transition hover:bg-[#001B44] disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-11 rounded-[10px] bg-brand-600 px-6 text-sm font-semibold text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {connecting ? "Connecting..." : "Connect Shopify"}
               </button>
@@ -165,7 +166,7 @@ export default function ShopifyIntegrationPage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-[12px] border border-[#E5E7EB] bg-white p-6">
+        <section className="mt-6 rounded-[12px] border border-ink-200 bg-white p-6">
           <div className="mb-5">
             <h2 className="text-lg font-semibold text-slate-900">
               Connected stores
@@ -177,9 +178,7 @@ export default function ShopifyIntegrationPage() {
           </div>
 
           {loading ? (
-            <div className="py-8 text-center text-sm text-slate-500">
-              Loading integrations...
-            </div>
+            <LoadingBlock label="Loading integrations..." className="py-8" />
           ) : stores.length === 0 ? (
             <div className="rounded-[10px] border border-dashed border-slate-300 px-5 py-10 text-center">
               <p className="text-sm font-medium text-slate-700">
@@ -194,7 +193,7 @@ export default function ShopifyIntegrationPage() {
               {stores.map((store) => (
                 <div
                   key={store.id}
-                  className="flex flex-col gap-3 rounded-[10px] border border-[#E5E7EB] p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 rounded-[10px] border border-ink-200 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="font-semibold text-slate-900">

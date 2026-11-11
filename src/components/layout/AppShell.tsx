@@ -6,29 +6,26 @@ import Link from "next/link";
 import NewvelionBrand from "@/components/ui/NewvelionBrand";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
 import { supabase } from "@/lib/supabase";
+import Button from "@/components/ui/Button";
+import Dialog from "@/components/ui/Dialog";
+import {
+  ArrowDownToLine, ArrowLeftRight, Award, BadgeCheck, BarChart3, Bell, ClipboardCheck, Gift, Globe,
+  LayoutDashboard, LayoutGrid, Link2, LogOut, Menu, Package, Percent, Plug, ReceiptText, Scale,
+  Settings, Star, Store, TrendingUp, Trophy, Truck, UserRound, Users, Wallet, Warehouse, type LucideIcon,
+} from "lucide-react";
 
 export type AppArea = "seller" | "supplier" | "affiliate" | "admin";
 
 type IconName =
-  | "home"
-  | "grid"
-  | "box"
-  | "sales"
-  | "wallet"
-  | "chart"
-  | "trophy"
-  | "link"
-  | "download"
-  | "users"
-  | "bell"
-  | "globe"
-  | "menu"
-  | "logout";
+  | "home" | "grid" | "box" | "sales" | "wallet" | "chart" | "trophy" | "link" | "download" | "users"
+  | "bell" | "globe" | "menu" | "logout" | "percent" | "plug" | "trending" | "truck" | "settings" | "user"
+  | "gift" | "review" | "star" | "transfer" | "scale" | "idcard" | "award" | "store" | "warehouse";
 
 interface NavItem {
   label: string;
   href: string;
   icon: IconName;
+  group?: string;
 }
 
 function countryFlag(code: string) {
@@ -37,123 +34,51 @@ function countryFlag(code: string) {
   return String.fromCodePoint(...normalized.split("").map((letter) => 127397 + letter.charCodeAt(0)));
 }
 
+const iconMap: Record<IconName, LucideIcon> = {
+  home: LayoutDashboard, grid: LayoutGrid, box: Package, sales: ReceiptText, wallet: Wallet, chart: BarChart3,
+  trophy: Trophy, link: Link2, download: ArrowDownToLine, users: Users, bell: Bell, globe: Globe, menu: Menu,
+  logout: LogOut, percent: Percent, plug: Plug, trending: TrendingUp, truck: Truck, settings: Settings,
+  user: UserRound, gift: Gift, review: ClipboardCheck, star: Star, transfer: ArrowLeftRight, scale: Scale,
+  idcard: BadgeCheck, award: Award, store: Store, warehouse: Warehouse,
+};
+
 function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
-  const props = {
-    width: size,
-    height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    "aria-hidden": true,
-  };
-
-  const icons: Record<IconName, React.ReactNode> = {
-    home: <>
-      <path d="m3 10 9-7 9 7" />
-      <path d="M5 9v12h14V9" />
-      <path d="M9 21v-7h6v7" />
-    </>,
-    grid: <>
-      <rect x="4" y="4" width="6" height="6" rx="1" />
-      <rect x="14" y="4" width="6" height="6" rx="1" />
-      <rect x="4" y="14" width="6" height="6" rx="1" />
-      <rect x="14" y="14" width="6" height="6" rx="1" />
-    </>,
-    box: <>
-      <path d="m4 7 8-4 8 4-8 4-8-4Z" />
-      <path d="M4 7v10l8 4 8-4V7" />
-      <path d="M12 11v10" />
-    </>,
-    sales: <>
-      <path d="M4 19V5" />
-      <path d="M4 19h16" />
-      <path d="m7 15 4-5 3 2 5-7" />
-    </>,
-    wallet: <>
-      <path d="M4 7a3 3 0 0 1 3-3h13v16H7a3 3 0 0 1-3-3V7Z" />
-      <path d="M4 8h16" />
-      <path d="M16 13h4" />
-      <circle cx="16" cy="13" r=".7" fill="currentColor" />
-    </>,
-    chart: <>
-      <path d="M4 19V5" />
-      <path d="M4 19h16" />
-      <rect x="7" y="11" width="2.5" height="5" rx=".5" />
-      <rect x="11" y="8" width="2.5" height="8" rx=".5" />
-      <rect x="15" y="5" width="2.5" height="11" rx=".5" />
-    </>,
-    trophy: <>
-      <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z" />
-      <path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4" />
-    </>,
-    link: <>
-      <path d="M10 13.5 8.5 15a3.5 3.5 0 0 1-5-5l2-2a3.5 3.5 0 0 1 5 0" />
-      <path d="M14 10.5 15.5 9a3.5 3.5 0 0 1 5 5l-2 2a3.5 3.5 0 0 1-5 0" />
-      <path d="m8 12 8-4" />
-    </>,
-    download: <>
-      <path d="M12 3v12" />
-      <path d="m7 10 5 5 5-5" />
-      <path d="M5 21h14" />
-    </>,
-    users: <>
-      <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
-      <circle cx="9.5" cy="7" r="3" />
-      <path d="M17 11a3 3 0 0 0 0-6" />
-      <path d="M21 21v-2a4 4 0 0 0-3-3.87" />
-    </>,
-    bell: <>
-      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-      <path d="M10 21h4" />
-    </>,
-    globe: <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
-    </>,
-    menu: <>
-      <path d="M4 6h16" />
-      <path d="M4 12h16" />
-      <path d="M4 18h16" />
-    </>,
-    logout: <>
-      <path d="M10 5H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5" />
-      <path d="M14 8l4 4-4 4" />
-      <path d="M18 12H9" />
-    </>,
-  };
-
-  return <svg {...props}>{icons[name]}</svg>;
+  const Cmp = iconMap[name];
+  return <Cmp width={size} height={size} strokeWidth={1.75} aria-hidden />;
 }
+
+const groupLabels: Record<string, string> = {
+  Platform: "Plataforma", Overview: "Visão geral", Sell: "Vender", Finance: "Finanças", Grow: "Crescer",
+  Operations: "Operação", Account: "Conta", People: "Pessoas", Catalog: "Catálogo",
+  "Orders & money": "Pedidos e dinheiro", Business: "Negócio",
+};
 
 const navigation: Record<AppArea, NavItem[]> = {
   seller: [
-    { label: "Dashboard", href: "/dashboard/seller", icon: "home" },
-    { label: "Marketplace", href: "/dashboard/seller/marketplace", icon: "grid" },
-    { label: "My Products", href: "/dashboard/seller/products", icon: "box" },
-    { label: "Orders & Sales", href: "/dashboard/seller/sales", icon: "sales" },
-    { label: "Commissions", href: "/dashboard/seller/commissions", icon: "wallet" },
-    { label: "Wallet", href: "/dashboard/seller/wallet", icon: "wallet" },
-    { label: "Analytics", href: "/dashboard/seller/performance", icon: "chart" },
-    { label: "Top Scale", href: "/top-scale", icon: "chart" },
-    { label: "Ranking", href: "/dashboard/seller/ranking", icon: "trophy" },
-    { label: "Integrations", href: "/dashboard/seller/integrations", icon: "link" },
-    { label: "Links", href: "/dashboard/seller/links", icon: "sales" },
-    { label: "Withdrawals", href: "/dashboard/seller/withdrawals", icon: "download" },
-    { label: "Become affiliate", href: "/dashboard/affiliate", icon: "link" },
+    { label: "Dashboard", href: "/dashboard/seller", icon: "home", group: "Overview" },
+    { label: "Marketplace", href: "/dashboard/seller/marketplace", icon: "grid", group: "Sell" },
+    { label: "My Products", href: "/dashboard/seller/products", icon: "box", group: "Sell" },
+    { label: "Orders & Sales", href: "/dashboard/seller/sales", icon: "sales", group: "Sell" },
+    { label: "Links", href: "/dashboard/seller/links", icon: "link", group: "Sell" },
+    { label: "Commissions", href: "/dashboard/seller/commissions", icon: "percent", group: "Finance" },
+    { label: "Wallet", href: "/dashboard/seller/wallet", icon: "wallet", group: "Finance" },
+    { label: "Withdrawals", href: "/dashboard/seller/withdrawals", icon: "download", group: "Finance" },
+    { label: "Analytics", href: "/dashboard/seller/performance", icon: "chart", group: "Grow" },
+    { label: "Top Scale", href: "/top-scale", icon: "trending", group: "Grow" },
+    { label: "Ranking", href: "/dashboard/seller/ranking", icon: "trophy", group: "Grow" },
+    { label: "Integrations", href: "/dashboard/seller/integrations", icon: "plug", group: "Grow" },
+    { label: "Become affiliate", href: "/dashboard/affiliate", icon: "gift", group: "Grow" },
   ],
 
   supplier: [
-    { label: "Dashboard", href: "/dashboard/supplier", icon: "home" },
-    { label: "Products", href: "/dashboard/supplier/products", icon: "box" },
-    { label: "Orders & Fulfillment", href: "/dashboard/supplier/orders", icon: "sales" },
-    { label: "Shipping", href: "/dashboard/supplier/shipping", icon: "box" },
-    { label: "Withdrawals", href: "/dashboard/supplier/withdrawals", icon: "download" },
-    { label: "Settings", href: "/dashboard/supplier/settings", icon: "chart" },
-    { label: "Profile", href: "/dashboard/supplier/profile", icon: "users" },
-    { label: "Become affiliate", href: "/dashboard/affiliate", icon: "link" },
+    { label: "Dashboard", href: "/dashboard/supplier", icon: "home", group: "Operations" },
+    { label: "Products", href: "/dashboard/supplier/products", icon: "box", group: "Operations" },
+    { label: "Orders & Fulfillment", href: "/dashboard/supplier/orders", icon: "sales", group: "Operations" },
+    { label: "Shipping", href: "/dashboard/supplier/shipping", icon: "truck", group: "Operations" },
+    { label: "Withdrawals", href: "/dashboard/supplier/withdrawals", icon: "download", group: "Finance" },
+    { label: "Settings", href: "/dashboard/supplier/settings", icon: "settings", group: "Account" },
+    { label: "Profile", href: "/dashboard/supplier/profile", icon: "user", group: "Account" },
+    { label: "Become affiliate", href: "/dashboard/affiliate", icon: "gift", group: "Account" },
   ],
 
   affiliate: [
@@ -163,25 +88,25 @@ const navigation: Record<AppArea, NavItem[]> = {
   ],
 
   admin: [
-    { label: "Dashboard", href: "/dashboard/admin", icon: "home" },
-    { label: "Users", href: "/dashboard/admin/users", icon: "users" },
-    { label: "Sellers", href: "/dashboard/admin/sellers", icon: "users" },
-    { label: "Suppliers", href: "/dashboard/admin/suppliers", icon: "users" },
-    { label: "Business Settings", href: "/dashboard/admin/platform-settings", icon: "chart" },
-    { label: "Products", href: "/dashboard/admin/products", icon: "box" },
-    { label: "Product Review", href: "/dashboard/admin/products/review", icon: "box" },
-    { label: "Customer Reviews", href: "/dashboard/admin/product-reviews", icon: "box" },
-    { label: "Categories", href: "/dashboard/admin/categories", icon: "grid" },
-    { label: "Orders", href: "/dashboard/admin/checkout-sessions", icon: "box" },
-    { label: "Transactions", href: "/dashboard/admin/transactions", icon: "sales" },
-    { label: "Commissions", href: "/dashboard/admin/commissions", icon: "wallet" },
-    { label: "Withdrawals", href: "/dashboard/admin/withdrawals", icon: "download" },
-    { label: "Club memberships", href: "/dashboard/admin/club-memberships", icon: "users" },
-    { label: "Disputes", href: "/dashboard/admin/disputes", icon: "download" },
-    { label: "KYC", href: "/dashboard/admin/kyc", icon: "users" },
-    { label: "Analytics", href: "/dashboard/admin/analytics", icon: "chart" },
-
+    { label: "Dashboard", href: "/dashboard/admin", icon: "home", group: "Overview" },
+    { label: "Analytics", href: "/dashboard/admin/analytics", icon: "chart", group: "Overview" },
+    { label: "Users", href: "/dashboard/admin/users", icon: "users", group: "People" },
+    { label: "Sellers", href: "/dashboard/admin/sellers", icon: "store", group: "People" },
+    { label: "Suppliers", href: "/dashboard/admin/suppliers", icon: "warehouse", group: "People" },
+    { label: "KYC", href: "/dashboard/admin/kyc", icon: "idcard", group: "People" },
+    { label: "Products", href: "/dashboard/admin/products", icon: "box", group: "Catalog" },
+    { label: "Product Review", href: "/dashboard/admin/products/review", icon: "review", group: "Catalog" },
+    { label: "Customer Reviews", href: "/dashboard/admin/product-reviews", icon: "star", group: "Catalog" },
+    { label: "Categories", href: "/dashboard/admin/categories", icon: "grid", group: "Catalog" },
+    { label: "Orders", href: "/dashboard/admin/checkout-sessions", icon: "sales", group: "Orders & money" },
+    { label: "Transactions", href: "/dashboard/admin/transactions", icon: "transfer", group: "Orders & money" },
+    { label: "Commissions", href: "/dashboard/admin/commissions", icon: "percent", group: "Orders & money" },
+    { label: "Withdrawals", href: "/dashboard/admin/withdrawals", icon: "download", group: "Orders & money" },
+    { label: "Disputes", href: "/dashboard/admin/disputes", icon: "scale", group: "Orders & money" },
+    { label: "Business Settings", href: "/dashboard/admin/platform-settings", icon: "settings", group: "Business" },
+    { label: "Club memberships", href: "/dashboard/admin/club-memberships", icon: "award", group: "Business" },
   ],
+
 };
 
 interface AppShellProps {
@@ -224,8 +149,9 @@ export default function AppShell({
     let active = true;
     supabase.auth.getSession().then(({ data: { session } }) => {
       const user = session?.user;
-      if (!active || !user || sessionStorage.getItem("newvelion-referral-popup-shown") === "1") return;
-      sessionStorage.setItem("newvelion-referral-popup-shown", "1");
+      const seenKey = user ? `newvelion-referral-popup-seen:${user.id}` : "";
+      if (!active || !user || localStorage.getItem(seenKey) === "1") return;
+      localStorage.setItem(seenKey, "1");
       setReferralPopupOpen(true);
     }).catch((error) => console.error("Referral popup:", error));
     return () => { active = false; };
@@ -253,6 +179,14 @@ export default function AppShell({
     : area === "affiliate" && accountRole === "supplier"
       ? [...navigation.affiliate, { label: "Supplier dashboard", href: "/dashboard/supplier", icon: "home" as IconName }]
       : navigation[area];
+
+  const groups = items.reduce<{ key: string; items: NavItem[] }[]>((acc, item) => {
+    const key = item.group ?? "Platform";
+    const found = acc.find((group) => group.key === key);
+    if (found) found.items.push(item);
+    else acc.push({ key, items: [item] });
+    return acc;
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -295,11 +229,18 @@ export default function AppShell({
   }, []);
 
   return (
-    <div className="nv-app-shell min-h-screen bg-[#F7F8FA] text-[#1F2937]">
+    <div className="nv-app-shell min-h-screen bg-ink-50 text-ink-900">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-600 focus:shadow-lg"
+      >
+        {t("Skip to content", "Saltar para o conteúdo")}
+      </a>
+
       {mobileOpen && (
         <button
           aria-label="Close menu"
-          className="fixed inset-0 z-40 bg-black/30 lg:hidden"
+          className="fixed inset-0 z-40 bg-ink-900/40 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -307,175 +248,151 @@ export default function AppShell({
       <aside
         className={[
           "fixed inset-y-0 left-0 z-50 flex w-[248px] flex-col",
-          "border-r border-[#E5E7EB] bg-white",
+          "border-r border-ink-200 bg-white",
           "transition-transform duration-200",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         ].join(" ")}
       >
-        <div className="flex h-[72px] items-center border-b border-[#E5E7EB] px-6">
+        <div className="flex h-[72px] items-center border-b border-ink-200 px-6">
           <NewvelionBrand size="md" />
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-5">
-          <p className="px-3 pb-3 text-[11px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
-            Platform
-          </p>
+        <nav aria-label={t("Main navigation", "Navegação principal")} className="flex-1 overflow-y-auto px-3 pb-5">
+          {groups.map((group, index) => (
+            <div key={group.key} className={index === 0 ? "pt-4" : "pt-6"}>
+              <p className="px-3 pb-2 text-xs font-semibold text-ink-500">
+                {t(group.key, groupLabels[group.key] ?? group.key)}
+              </p>
 
-          <div className="space-y-1">
-            {items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className={[
-                  "group relative flex items-center gap-3 rounded-[7px] px-3 py-2.5 text-sm font-medium transition-colors",
-                  pathname === item.href
-                    ? "bg-[#EAF3FF] text-[#003B95]"
-                    : "text-[#6B7280] hover:bg-[#F7F8FA] hover:text-[#003B95]",
-                ].join(" ")}
-              >
-                {pathname === item.href && (
-                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-[#006CE5]" />
-                )}
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const active = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.label + item.href}
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => setMobileOpen(false)}
+                      className={[
+                        "group flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600",
+                        active
+                          ? "bg-brand-50 font-semibold text-brand-600"
+                          : "text-ink-600 hover:bg-ink-50 hover:text-ink-900",
+                      ].join(" ")}
+                    >
+                      <span
+                        className={[
+                          "flex h-5 w-5 shrink-0 items-center justify-center transition-colors duration-150",
+                          active ? "text-brand-600" : "text-ink-400 group-hover:text-ink-700",
+                        ].join(" ")}
+                      >
+                        <Icon name={item.icon} />
+                      </span>
 
-                <span
-                  className={[
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
-                    pathname === item.href
-                      ? "text-[#003B95]"
-                      : "text-[#9CA3AF] group-hover:text-[#003B95]",
-                  ].join(" ")}
-                >
-                  <Icon name={item.icon} />
-                </span>
-
-                <span>{t(item.label, ({Dashboard:"Painel",Marketplace:"Mercado", "My Products":"Meus produtos","Orders & Sales":"Pedidos e vendas",Commissions:"Comissões",Wallet:"Carteira",Analytics:"Análises","Top Scale":"Top Scale",Ranking:"Classificação",Integrations:"Integrações",Links:"Links",Withdrawals:"Levantamentos",Products:"Produtos","Orders & Fulfillment":"Pedidos e logística",Shipping:"Envio",Settings:"Definições",Profile:"Perfil",Users:"Utilizadores",Sellers:"Vendedores",Suppliers:"Fornecedores","Business Settings":"Definições da plataforma","Product Review":"Revisão de produtos","Customer Reviews":"Avaliações de clientes",Categories:"Categorias",Orders:"Pedidos",Transactions:"Transações",Disputes:"Disputas",KYC:"KYC","Become affiliate":"Tornar-se afiliado","Club memberships":"Adesões ao clube","Seller dashboard":"Painel do vendedor","Supplier dashboard":"Painel do fornecedor"} as Record<string,string>)[item.label] || item.label)}</span>
-              </Link>
-            ))}
-          </div>
+                      <span>{t(item.label, ({Dashboard:"Painel",Marketplace:"Mercado", "My Products":"Meus produtos","Orders & Sales":"Pedidos e vendas",Commissions:"Comissões",Wallet:"Carteira",Analytics:"Análises","Top Scale":"Top Scale",Ranking:"Classificação",Integrations:"Integrações",Links:"Links",Withdrawals:"Levantamentos",Products:"Produtos","Orders & Fulfillment":"Pedidos e logística",Shipping:"Envio",Settings:"Definições",Profile:"Perfil",Users:"Utilizadores",Sellers:"Vendedores",Suppliers:"Fornecedores","Business Settings":"Definições da plataforma","Product Review":"Revisão de produtos","Customer Reviews":"Avaliações de clientes",Categories:"Categorias",Orders:"Pedidos",Transactions:"Transações",Disputes:"Disputas",KYC:"KYC","Become affiliate":"Tornar-se afiliado","Club memberships":"Adesões ao clube","Seller dashboard":"Painel do vendedor","Supplier dashboard":"Painel do fornecedor"} as Record<string,string>)[item.label] || item.label)}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
-        <div className="border-t border-[#E5E7EB] p-3">
+        <div className="border-t border-ink-200 p-3">
           <Link
             href="/dashboard/profile"
-            className="flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#F7F8FA]"
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-150 hover:bg-ink-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#003B95]">
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-600">
               {profileInitial}
-              {countryFlag(countryCode) && <span title={countryCode} className="absolute -bottom-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-white text-[10px] leading-none">{countryFlag(countryCode)}</span>}
+              {countryFlag(countryCode) && <span title={countryCode} className="absolute -bottom-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-white text-xs leading-none">{countryFlag(countryCode)}</span>}
             </div>
 
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-gray-900">
-                {t("Account","Conta")}
-              </p>
-              <p className="truncate text-xs text-gray-500">
-                {t("Profile & settings","Perfil e definições")}
-              </p>
+              <p className="truncate text-sm font-semibold text-ink-900">{t("Account", "Conta")}</p>
+              <p className="truncate text-xs text-ink-500">{t("Profile & settings", "Perfil e definições")}</p>
             </div>
           </Link>
 
           <button
             type="button"
             onClick={() => setLogoutOpen(true)}
-            className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-[#6B7280] transition-colors hover:bg-red-50 hover:text-red-600"
+            className="mt-0.5 flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-medium text-ink-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center">
               <Icon name="logout" size={18} />
             </span>
-            <span>{t("Log out","Sair")}</span>
+            <span>{t("Log out", "Sair")}</span>
           </button>
         </div>
       </aside>
 
-      {logoutOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-4">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="logout-title"
-            className="w-full max-w-sm rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-xl"
-          >
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
-              <Icon name="logout" size={20} />
-            </div>
+      <Dialog
+        open={logoutOpen}
+        onClose={() => { if (!loggingOut) setLogoutOpen(false); }}
+        title={t("Log out?", "Sair?")}
+        description={t("Are you sure you want to log out of your Newvelion account?", "Tem a certeza de que pretende sair da sua conta Newvelion?")}
+        className="sm:max-w-sm"
+        footer={
+          <>
+            <Button variant="secondary" disabled={loggingOut} onClick={() => setLogoutOpen(false)}>
+              {t("Cancel", "Cancelar")}
+            </Button>
+            <Button loading={loggingOut} onClick={handleLogout}>
+              {loggingOut ? t("Logging out...", "A sair...") : t("Log out", "Sair")}
+            </Button>
+          </>
+        }
+      />
 
-            <h2
-              id="logout-title"
-              className="mt-4 text-lg font-bold text-[#1F2937]"
+      <Dialog
+        open={referralPopupOpen}
+        onClose={() => setReferralPopupOpen(false)}
+        title="R50 for each seller or supplier you refer"
+        description="Newvelion Partner Program"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setReferralPopupOpen(false)}>Maybe later</Button>
+            <Link
+              href="/dashboard/affiliate"
+              onClick={() => setReferralPopupOpen(false)}
+              className="inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white transition-colors duration-150 hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
             >
-              {t("Log out?","Sair?")}
-            </h2>
-
-            <p className="mt-2 text-sm leading-6 text-[#6B7280]">
-              {t("Are you sure you want to log out of your Newvelion account?","Tem a certeza de que pretende sair da sua conta Newvelion?")}
-            </p>
-
-            <div className="mt-6 flex gap-3">
-              <button
-                type="button"
-                disabled={loggingOut}
-                onClick={() => setLogoutOpen(false)}
-                className="flex-1 rounded-lg border border-[#E5E7EB] px-4 py-2.5 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#F7F8FA] disabled:opacity-50"
-              >
-                {t("Cancel","Cancelar")}
-              </button>
-
-              <button
-                type="button"
-                disabled={loggingOut}
-                onClick={handleLogout}
-                className="flex-1 rounded-lg bg-[#003B95] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#001B44] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loggingOut ? t("Logging out...","A sair...") : t("Log out","Sair")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {referralPopupOpen && (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-[#001B44]/55 px-4 py-6" role="presentation">
-          <section role="dialog" aria-modal="true" aria-labelledby="referral-popup-title" className="w-full max-w-md rounded-2xl border border-[#DCE3EE] bg-white p-6 shadow-2xl sm:p-8">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#EAF3FF] text-[#003B95]"><Icon name="link" size={22} /></div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0078E8]">Newvelion Partner Program</p>
-            <h2 id="referral-popup-title" className="mt-2 text-2xl font-bold text-[#001B44]">Earn R50 for every successful referral</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">Invite a seller or supplier. When their first sale is confirmed, you earn R50. Unlock mystery prizes at 5, 10 and 25 active referrals. Your affiliate rewards stay separate from your sales or supplier balance.</p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Link href="/dashboard/affiliate" onClick={() => setReferralPopupOpen(false)} className="flex-1 rounded-lg bg-[#003B95] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#0078E8]">Become affiliate</Link>
-              <button type="button" onClick={() => setReferralPopupOpen(false)} className="rounded-lg border border-[#DCE3EE] px-4 py-3 text-sm font-semibold text-[#003B95] hover:bg-[#F7FAFF]">Maybe later</button>
-            </div>
-          </section>
-        </div>
-      )}
+              Become affiliate
+            </Link>
+          </>
+        }
+      >
+        <p className="leading-6">You earn R50 when a business you referred confirms its first sale. At 5, 10 and 25 active referrals you also receive a prize. Affiliate rewards stay separate from your sales and supplier balances.</p>
+      </Dialog>
 
       <div className="lg:pl-[248px]">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[#E5E7EB] bg-white px-4 lg:px-8">
+        <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-ink-200 bg-white px-4 lg:px-8">
           <div className="flex items-center gap-3">
             <button
               type="button"
               aria-label="Open menu"
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-ink-200 text-ink-600 transition-colors duration-150 hover:bg-ink-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 lg:hidden"
               onClick={() => setMobileOpen(true)}
             >
               <Icon name="menu" size={19} />
             </button>
 
             <div>
-              {title && (
-                <h1 className="text-lg font-bold text-[#1F2937]">{title}</h1>
-              )}
+              {title && <h1 className="text-lg font-semibold text-ink-900">{title}</h1>}
 
               {subtitle && (
-                <p className="hidden text-sm text-[#6B7280] sm:block">
-                  {subtitle}
-                </p>
+                <p className="hidden text-sm text-ink-500 sm:block">{subtitle}</p>
               )}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="relative flex h-10 items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-2 text-sm text-[#374151] transition hover:bg-[#F7F8FA]" title={t("Choose language", "Escolher idioma")}>
+            <label
+              className="relative flex h-10 items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-2.5 text-sm text-ink-700 transition-colors duration-150 hover:bg-ink-50 focus-within:ring-2 focus-within:ring-brand-600"
+              title={t("Choose language", "Escolher idioma")}
+            >
               <Icon name="globe" size={17} />
               <span className="sr-only">{t("Language", "Idioma")}</span>
               <select
@@ -488,7 +405,7 @@ export default function AppShell({
                   document.documentElement.lang = language;
                   window.dispatchEvent(new Event("newvelion-language-change"));
                 }}
-                className="max-w-[92px] cursor-pointer appearance-none border-0 bg-transparent py-1 pr-1 text-xs font-semibold outline-none"
+                className="max-w-[92px] cursor-pointer appearance-none border-0 bg-transparent py-1 pr-1 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
               >
                 <option value="en">English</option>
                 <option value="pt">Português</option>
@@ -499,15 +416,15 @@ export default function AppShell({
             <Link
               href="/dashboard/profile"
               aria-label="Account profile"
-              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF3FF] text-sm font-bold text-[#001B44]"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-600 transition-colors duration-150 hover:bg-brand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               {profileInitial}
-              {countryFlag(countryCode) && <span title={countryCode} className="absolute -bottom-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-white text-[10px] leading-none">{countryFlag(countryCode)}</span>}
+              {countryFlag(countryCode) && <span title={countryCode} className="absolute -bottom-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full border border-white bg-white text-xs leading-none">{countryFlag(countryCode)}</span>}
             </Link>
           </div>
         </header>
 
-        <main className="nv-dashboard min-h-[calc(100vh-4.5rem)] bg-[#F7F8FA] p-4 lg:p-7">
+        <main id="main-content" className="nv-dashboard min-h-[calc(100vh-4.5rem)] bg-ink-50 p-4 lg:p-7">
           {children}
         </main>
       </div>

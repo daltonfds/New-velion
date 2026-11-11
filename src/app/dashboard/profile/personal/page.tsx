@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
@@ -89,26 +90,26 @@ export default function PersonalProfilePage() {
 
   return <AppShell area="seller" title="Personal Profile" subtitle="Manage your personal information.">
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-blue-600">← Account</Link>
-      <div><h2 className="mt-3 text-2xl font-bold text-[#16294F]">Personal information</h2><p className="mt-1 text-sm text-slate-500">Changes are saved directly to your Newvelion account.</p></div>
+      <Link href="/dashboard/profile" className="text-sm text-slate-500 hover:text-brand-600 transition duration-150">← Account</Link>
+      <div><h2 className="mt-3 text-2xl font-bold text-ink-800">Personal information</h2><p className="mt-1 text-sm text-slate-500">Changes are saved directly to your Newvelion account.</p></div>
       {error&&<div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
       {message&&<div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</div>}
       <form onSubmit={save} className="rounded-xl border border-slate-200 bg-white">
         <div className="border-b border-slate-100 px-6 py-5"><h3 className="font-semibold text-slate-900">Profile details</h3></div>
-        {loading?<div className="p-6 text-sm text-slate-500">Loading profile...</div>:<>
+        {loading?<LoadingBlock label="Loading profile..." className="p-6" />:<>
           <div className="grid gap-5 p-6 md:grid-cols-2">
-            <label className="text-sm font-medium text-slate-700">First name<input value={firstName} onChange={e=>setFirstName(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-[#16294F]"/></label>
-            <label className="text-sm font-medium text-slate-700">Last name<input value={lastName} onChange={e=>setLastName(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-[#16294F]"/></label>
-            <label className="text-sm font-medium text-slate-700">Email<input type="email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-[#16294F]"/></label>
-            <label className="text-sm font-medium text-slate-700">Phone<input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-[#16294F]"/></label>
+            <label className="text-sm font-medium text-slate-700">First name<input value={firstName} onChange={e=>setFirstName(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-ink-800 focus-visible:ring-2 focus-visible:ring-brand-600"/></label>
+            <label className="text-sm font-medium text-slate-700">Last name<input value={lastName} onChange={e=>setLastName(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-ink-800 focus-visible:ring-2 focus-visible:ring-brand-600"/></label>
+            <label className="text-sm font-medium text-slate-700">Email<input type="email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-ink-800 focus-visible:ring-2 focus-visible:ring-brand-600"/></label>
+            <label className="text-sm font-medium text-slate-700">Phone<input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-ink-800 focus-visible:ring-2 focus-visible:ring-brand-600"/></label>
             <label className="text-sm font-medium text-slate-700 md:col-span-2">Country
-              <select value={country} onChange={e=>setCountry(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-[#16294F]">
+              <select value={country} onChange={e=>setCountry(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-ink-800 focus-visible:ring-2 focus-visible:ring-brand-600">
                 <option value="">Select country</option><option value="ZA">South Africa</option><option value="AO">Angola</option><option value="MZ">Mozambique</option><option value="FR">France</option><option value="PT">Portugal</option>
               </select>
             </label>
           </div>
           <div className="flex justify-end border-t border-slate-100 px-6 py-4">
-            <button disabled={saving} className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving?"Saving...":"Save changes"}</button>
+            <button disabled={saving} className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving?"Saving...":"Save changes"}</button>
           </div>
         </>}
       </form>

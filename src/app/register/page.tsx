@@ -118,14 +118,23 @@ export default function RegisterPage() {
 
 
   return (
-    <main className="min-h-screen bg-white px-5 py-10">
-      <div className="mx-auto w-full max-w-xl">
-        <div className="rounded-3xl border border-blue-100 bg-white p-6 shadow-[0_20px_60px_rgba(37,99,235,0.08)] sm:p-8">
-          <div className="mb-8 flex justify-center border-b border-slate-100 pb-7">
+    <main className="min-h-screen bg-white lg:grid lg:grid-cols-[5fr_7fr]">
+      <aside className="hidden flex-col justify-between bg-brand-600 p-12 text-white lg:flex">
+        <span className="text-xl font-bold">newvelion</span>
+        <div>
+          <h2 className="max-w-sm text-3xl font-semibold leading-tight text-white">Orders, commissions and payouts in one ledger.</h2>
+          <p className="mt-4 max-w-sm text-sm leading-6 text-brand-100">Sellers and suppliers work from separate dashboards. Referral rewards are tracked on their own ledger.</p>
+        </div>
+        <p className="text-xs text-brand-200">Suppliers in South Africa and China</p>
+      </aside>
+      <div className="flex items-center justify-center px-5 py-10 sm:px-10">
+      <div className="w-full max-w-md">
+        <div className="rounded-xl border border-ink-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="mb-8">
             <NewvelionBrand size="md" />
           </div>
 
-          <h1 className="text-3xl font-bold text-[#0A0440]">
+          <h1 className="text-3xl font-bold text-ink-900">
             {affiliateInviteMode ? "Create your Newvelion account" : "Create your seller account"}
           </h1>
 
@@ -135,7 +144,7 @@ export default function RegisterPage() {
 
           <form onSubmit={submit} className="mt-8 space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
+              <label className="mb-2 block text-sm font-semibold text-ink-900">
                 Full name
               </label>
 
@@ -145,7 +154,7 @@ export default function RegisterPage() {
                 onChange={(event) =>
                   setForm({ ...form, fullName: event.target.value })
                 }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-50"
                 autoComplete="name"
               />
             </div>
@@ -172,7 +181,7 @@ export default function RegisterPage() {
             />
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
+              <label className="mb-2 block text-sm font-semibold text-ink-900">
                 Email
               </label>
 
@@ -183,14 +192,14 @@ export default function RegisterPage() {
                 onChange={(event) =>
                   setForm({ ...form, email: event.target.value })
                 }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-50"
                 autoComplete="email"
               />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
+                <label className="mb-2 block text-sm font-semibold text-ink-900">
                   Password
                 </label>
 
@@ -202,13 +211,13 @@ export default function RegisterPage() {
                   onChange={(event) =>
                     setForm({ ...form, password: event.target.value })
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-50"
                   autoComplete="new-password"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-[#0A0440]">
+                <label className="mb-2 block text-sm font-semibold text-ink-900">
                   Confirm password
                 </label>
 
@@ -220,7 +229,7 @@ export default function RegisterPage() {
                   onChange={(event) =>
                     setForm({ ...form, confirm: event.target.value })
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-50"
                   autoComplete="new-password"
                 />
               </div>
@@ -232,13 +241,13 @@ export default function RegisterPage() {
                 required
                 checked={acceptedTerms}
                 onChange={(event) => setAcceptedTerms(event.target.checked)}
-                className="mt-1 h-4 w-4 shrink-0 accent-[#006CE5]"
+                className="mt-1 h-4 w-4 shrink-0 accent-brand-600"
               />
               <span>
                 I have read and agree to the{" "}
-                <Link href="/terms" target="_blank" className="font-semibold text-[#003B95] underline underline-offset-2">Terms of Service</Link>
+                <Link href="/terms" target="_blank" className="font-semibold text-brand-600 underline underline-offset-2">Terms of Service</Link>
                 {" "}and acknowledge the{" "}
-                <Link href="/privacy" target="_blank" className="font-semibold text-[#003B95] underline underline-offset-2">Privacy Policy</Link>.
+                <Link href="/privacy" target="_blank" className="font-semibold text-brand-600 underline underline-offset-2">Privacy Policy</Link>.
               </span>
             </label>
 
@@ -251,25 +260,26 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-blue-600 py-3.5 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-brand-600 py-3.5 font-bold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Creating account..." : "Create seller account"}
             </button>
           </form>
 
-          <p className="mt-3 text-center text-sm text-slate-500">Are you a supplier or producer?{" "}<Link href="/register/supplier" className="font-semibold text-[#003B95] underline">Create a supplier / producer account</Link></p>
+          <p className="mt-3 text-center text-sm text-slate-500">Are you a supplier or producer?{" "}<Link href="/register/supplier" className="font-semibold text-brand-600 underline">Create a supplier / producer account</Link></p>
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-semibold text-blue-600 hover:text-blue-700"
+              className="font-semibold text-brand-600 hover:text-brand-700 transition duration-150"
             >
               Sign in
             </Link>
           </p>
 
         </div>
+      </div>
       </div>
     </main>
   );

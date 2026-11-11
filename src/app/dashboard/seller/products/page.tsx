@@ -1,5 +1,7 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import SmartImage from "@/components/ui/SmartImage";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
@@ -233,7 +235,7 @@ export default function SellerProductsPage() {
                   setCategoryId(event.target.value);
                   setSubcategoryId("all");
                 }}
-                className="w-full rounded-lg border border-[#DDE5EF] bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600"
+                className="w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600"
               >
                 <option value="all">All categories</option>
                 {parentCategories.map((category) => (
@@ -252,7 +254,7 @@ export default function SellerProductsPage() {
                 value={subcategoryId}
                 onChange={(event) => setSubcategoryId(event.target.value)}
                 disabled={categoryId === "all" || visibleSubcategories.length === 0}
-                className="w-full rounded-lg border border-[#DDE5EF] bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-600 disabled:bg-[#F6F9FC] disabled:text-slate-400"
+                className="w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-600 disabled:bg-ink-50 disabled:text-slate-400 focus-visible:ring-2 focus-visible:ring-brand-600"
               >
                 <option value="all">
                   {categoryId === "all"
@@ -279,9 +281,7 @@ export default function SellerProductsPage() {
 
         {loading ? (
           <Card>
-            <div className="py-12 text-center text-sm text-slate-500">
-              Loading your products...
-            </div>
+            <LoadingBlock label="Loading your products..." className="py-12" />
           </Card>
         ) : filteredAffiliations.length === 0 ? (
           <Card>
@@ -300,7 +300,7 @@ export default function SellerProductsPage() {
 
               <Link
                 href="/dashboard/seller/marketplace"
-                className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-5 text-sm font-medium text-white hover:bg-indigo-700"
+                className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-indigo-600 px-5 text-sm font-medium text-white hover:bg-indigo-700 transition duration-150"
               >
                 Browse Marketplace
               </Link>
@@ -335,7 +335,7 @@ export default function SellerProductsPage() {
                 >
                   <div className="aspect-[16/9] overflow-hidden bg-slate-100">
                     {product.fotos?.[0] ? (
-                      <img
+                      <SmartImage
                         src={product.fotos[0]}
                         alt={product.nome}
                         className="h-full w-full object-cover"
@@ -361,12 +361,12 @@ export default function SellerProductsPage() {
                       </div>
 
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="rounded-md border border-[#DDE5EF] bg-white px-2.5 py-1 text-xs font-medium text-slate-600">
+                        <span className="rounded-md border border-ink-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600">
                           {getCategoryName(product.categoria_id)}
                         </span>
 
                         {product.subcategoria_id && (
-                          <span className="rounded-md border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#0E4AAB]">
+                          <span className="rounded-md border border-brand-100 bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-600">
                             {getSubcategoryName(product.subcategoria_id)}
                           </span>
                         )}
@@ -380,7 +380,7 @@ export default function SellerProductsPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-lg bg-[#F6F9FC] p-3">
+                      <div className="rounded-lg bg-ink-50 p-3">
                         <p className="text-xs text-slate-500">
                           Price
                         </p>
@@ -392,7 +392,7 @@ export default function SellerProductsPage() {
                         </p>
                       </div>
 
-                      <div className="rounded-lg bg-[#F6F9FC] p-3">
+                      <div className="rounded-lg bg-ink-50 p-3">
                         <p className="text-xs text-slate-500">
                           Commission
                         </p>
@@ -415,7 +415,7 @@ export default function SellerProductsPage() {
                         <input
                           readOnly
                           value={affiliateUrl}
-                          className="min-w-0 flex-1 rounded-lg border border-[#DDE5EF] bg-[#F6F9FC] px-3 py-2 text-xs text-slate-600 outline-none"
+                          className="min-w-0 flex-1 rounded-lg border border-ink-200 bg-ink-50 px-3 py-2 text-xs text-slate-600 outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                         />
 
                         <button
@@ -426,7 +426,7 @@ export default function SellerProductsPage() {
                               affiliation.id,
                             )
                           }
-                          className="shrink-0 rounded-lg border border-[#DDE5EF] bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-[#F6F9FC]"
+                          className="shrink-0 rounded-lg border border-ink-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-ink-100 transition duration-150"
                         >
                           {copied === affiliation.id
                             ? "Copied"
@@ -437,7 +437,7 @@ export default function SellerProductsPage() {
 
                     <Link
                       href={`/marketplace/${product.id}`}
-                      className="block text-center text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                      className="block text-center text-sm font-medium text-indigo-600 hover:text-indigo-700 transition duration-150"
                     >
                       View Product
                     </Link>

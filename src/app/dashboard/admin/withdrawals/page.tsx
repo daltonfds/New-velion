@@ -1,5 +1,8 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import Dialog from "@/components/ui/Dialog";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -42,6 +45,7 @@ interface Profile {
 }
 
 export default function AdminWithdrawalsPage() {
+  const confirmAction = useConfirm();
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [search, setSearch] = useState("");
@@ -65,11 +69,15 @@ export default function AdminWithdrawalsPage() {
   ) => {
     if (actionLoading) return;
 
-    const confirmed = window.confirm(
-      action === "approve"
-        ? "Approve this withdrawal?"
-        : "Reject this withdrawal? The amount will be returned to the seller's available balance.",
-    );
+    const confirmed = await confirmAction({
+      title: action === "approve" ? "Approve withdrawal?" : "Reject withdrawal?",
+      message:
+        action === "approve"
+          ? "Approve this withdrawal?"
+          : "Reject this withdrawal? The amount will be returned to the seller's available balance.",
+      confirmLabel: action === "approve" ? "Approve" : "Reject",
+      tone: action === "approve" ? "default" : "danger",
+    });
 
     if (!confirmed) return;
 
@@ -97,7 +105,7 @@ export default function AdminWithdrawalsPage() {
       await load();
     } catch (error) {
       console.error(error);
-      window.alert(
+      notify.error(
         error instanceof Error ? error.message : "Failed to update withdrawal.",
       );
     } finally {
@@ -576,7 +584,7 @@ export default function AdminWithdrawalsPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               <option value="all">All statuses</option>
               <option value="solicitado">Requested</option>
@@ -592,7 +600,7 @@ export default function AdminWithdrawalsPage() {
               onChange={(event) =>
                 setCountryFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none"
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               <option value="all">All countries</option>
               {Array.from(
@@ -613,7 +621,7 @@ export default function AdminWithdrawalsPage() {
               onChange={(event) =>
                 setMethodFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               <option value="all">All payment methods</option>
               <option value="bank_transfer">
@@ -636,9 +644,7 @@ export default function AdminWithdrawalsPage() {
 
         <Card>
           {loading ? (
-            <div className="py-12 text-center text-sm text-slate-500">
-              Loading withdrawals...
-            </div>
+            <LoadingBlock label="Loading withdrawals..." className="py-12" />
           ) : filteredWithdrawals.length === 0 ? (
             <div className="py-12 text-center">
               <p className="font-medium text-slate-900">
@@ -713,7 +719,7 @@ export default function AdminWithdrawalsPage() {
                       return (
                         <tr
                           key={withdrawal.id}
-                          className="hover:bg-slate-50"
+                          className="hover:bg-slate-50 transition duration-150"
                         >
                           <td className="px-6 py-4">
                             <div className="max-w-[180px] truncate text-sm font-medium text-slate-900">
@@ -776,7 +782,7 @@ export default function AdminWithdrawalsPage() {
                           <td className="px-6 py-4">
                             <button
                               onClick={() => openDetails(withdrawal)}
-                              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition duration-150"
                             >
                               View details
                             </button>
@@ -794,36 +800,10 @@ export default function AdminWithdrawalsPage() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 p-4 md:p-8">
-          <div className="mx-auto max-w-6xl rounded-2xl bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                  Withdrawal
-                </p>
-                <h2 className="mt-1 text-lg font-semibold text-slate-900">
-                  {selected.id}
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  {current?.status}
-                </p>
-              </div>
-
-              <button
-                onClick={() => {
-                  setSelected(null);
-                  setDetail(null);
-                }}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600"
-              >
-                Close
-              </button>
-            </div>
+<Dialog open onClose={() => setSelected(null)} title={selected.id} description={`Withdrawal · ${current?.status ?? ""}`} padded={false} className="sm:max-w-6xl">
 
             {detailLoading ? (
-              <div className="px-6 py-16 text-center text-sm text-slate-500">
-                Loading withdrawal details...
-              </div>
+              <LoadingBlock label="Loading withdrawal details..." className="px-6 py-16" />
             ) : (
               <div className="space-y-6 p-6">
                 {actionError && (
@@ -1208,8 +1188,7 @@ export default function AdminWithdrawalsPage() {
                 </Card>
               </div>
             )}
-          </div>
-        </div>
+</Dialog>
       )}
 
     </AppShell>

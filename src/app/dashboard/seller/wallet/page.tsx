@@ -215,9 +215,9 @@ export default function SellerWalletPage() {
       return "border-amber-100 bg-amber-50 text-amber-700";
 
     if (state === "sacado")
-      return "border-[#DCE3EE] bg-[#EEF3F9] text-[#60708A]";
+      return "border-ink-200 bg-[#EEF3F9] text-ink-500";
 
-    return "border-blue-100 bg-[#EDF4FF] text-[#245EA8]";
+    return "border-brand-100 bg-brand-50 text-brand-600";
   };
 
   return (
@@ -229,31 +229,30 @@ export default function SellerWalletPage() {
       <div className="space-y-6">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Finance
             </p>
 
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0A0440]">
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink-900">
               Wallet
             </h1>
 
-            <p className="mt-1 text-sm text-[#7C8798]">
-              Manage earnings, available funds and every balance movement in
-              one place.
+            <p className="mt-1 text-sm text-ink-500">
+              Earnings, available funds and every balance movement.
             </p>
           </div>
 
           <div className="flex gap-2">
             <Link
               href="/dashboard/seller/withdrawals"
-              className="inline-flex h-10 items-center rounded-lg border border-[#DCE3EE] bg-white px-4 text-sm font-semibold text-[#405579] hover:bg-[#F5F8FC]"
+              className="inline-flex h-10 items-center rounded-lg border border-ink-200 bg-white px-4 text-sm font-semibold text-ink-600 hover:bg-ink-100 transition duration-150"
             >
               Withdrawal history
             </Link>
 
             <Link
               href="/dashboard/seller/withdrawals"
-              className="inline-flex h-10 items-center rounded-lg bg-[#10069F] px-4 text-sm font-semibold text-white hover:bg-[#0B3D8F]"
+              className="inline-flex h-10 items-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-800 transition duration-150"
             >
               Withdraw funds
             </Link>
@@ -273,7 +272,7 @@ export default function SellerWalletPage() {
             {[1, 2, 3, 4].map((item) => (
               <Card
                 key={item}
-                className="h-32 animate-pulse bg-[#F5F8FC]"
+                className="h-32 animate-pulse bg-ink-50"
               />
             ))}
           </div>
@@ -309,13 +308,13 @@ export default function SellerWalletPage() {
                         {label}
                       </p>
 
-                      <p className="mt-2 text-2xl font-semibold tracking-tight text-[#0A0440]">
+                      <p className="mt-2 text-2xl font-semibold tracking-tight text-ink-900">
                         {money(Number(value))}
                       </p>
                       {localCurrency !== "ZAR" && <p className="mt-1 text-xs font-medium text-slate-500">≈ {localMoney(Number(value))}</p>}
                     </div>
 
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#DCE3EE] bg-[#F5F8FC] text-[#60708A]">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-ink-200 bg-ink-50 text-ink-500">
                       <Icon />
                     </span>
                   </div>
@@ -329,13 +328,13 @@ export default function SellerWalletPage() {
 
             <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
               <Card className="overflow-hidden">
-                <div className="flex items-center justify-between border-b border-[#DCE3EE] px-5 py-5">
+                <div className="flex items-center justify-between border-b border-ink-200 px-5 py-5">
                   <div>
-                    <h2 className="font-semibold text-[#0A0440]">
+                    <h2 className="font-semibold text-ink-900">
                       Wallet performance
                     </h2>
 
-                    <p className="mt-1 text-sm text-[#7C8798]">
+                    <p className="mt-1 text-sm text-ink-500">
                       Actual ledger movements across the last six months.
                     </p>
                   </div>
@@ -361,12 +360,12 @@ export default function SellerWalletPage() {
                           className="flex h-full flex-1 flex-col justify-end"
                         >
                           <div className="group relative flex h-full items-end">
-                            <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-[#10069F] px-2 py-1 text-[10px] font-semibold text-white group-hover:block">
+                            <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-brand-600 px-2 py-1 text-xs font-semibold text-white group-hover:block transition duration-150">
                               {money(month.value)}{localCurrency !== "ZAR" ? ` · ${localMoney(month.value)}` : ""}
                             </span>
 
                             <div
-                              className="w-full rounded-t-md bg-[#10069F] transition hover:bg-[#0B3D8F]"
+                              className="w-full rounded-t-md bg-brand-600 transition hover:bg-brand-800"
                               style={{ height: `${height}%` }}
                             />
                           </div>
@@ -384,27 +383,27 @@ export default function SellerWalletPage() {
               <Card className="p-5">
                 <div className="flex justify-between">
                   <div>
-                    <h2 className="font-semibold text-[#0A0440]">
+                    <h2 className="font-semibold text-ink-900">
                       Balance position
                     </h2>
 
-                    <p className="mt-1 text-sm text-[#7C8798]">
+                    <p className="mt-1 text-sm text-ink-500">
                       How your current funds are allocated.
                     </p>
                   </div>
 
-                  <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#DCE3EE] bg-[#F5F8FC] text-[#60708A]">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-ink-200 bg-ink-50 text-ink-500">
                     <Icon />
                   </span>
                 </div>
 
                 <div className="mt-7">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#7C8798]">
+                    <span className="text-ink-500">
                       Available balance
                     </span>
 
-                    <span className="font-semibold text-[#0A0440]">
+                    <span className="font-semibold text-ink-900">
                       {wallet.saldo_total
                         ? Math.round(
                             (wallet.disponivel / wallet.saldo_total) * 100,
@@ -434,22 +433,22 @@ export default function SellerWalletPage() {
 
                   <div className="mt-6 space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-[#7C8798]">Available</span>
+                      <span className="text-ink-500">Available</span>
                       <b>{money(wallet.disponivel)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(wallet.disponivel)}</small>}</b>
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-[#7C8798]">On hold</span>
+                      <span className="text-ink-500">On hold</span>
                       <b>{money(wallet.retido)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(wallet.retido)}</small>}</b>
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-[#7C8798]">Reserved</span>
+                      <span className="text-ink-500">Reserved</span>
                       <b>{money(wallet.reservado)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(wallet.reservado)}</small>}</b>
                     </div>
 
-                    <div className="flex justify-between border-t border-[#E9EEF5] pt-3">
-                      <span className="font-medium text-[#405579]">
+                    <div className="flex justify-between border-t border-ink-200 pt-3">
+                      <span className="font-medium text-ink-600">
                         Total
                       </span>
                       <b>{money(wallet.saldo_total)}{localCurrency !== "ZAR" && <small className="ml-2 block font-normal text-slate-500">≈ {localMoney(wallet.saldo_total)}</small>}</b>
@@ -479,7 +478,7 @@ export default function SellerWalletPage() {
                   Total outflow
                 </p>
 
-                <p className="mt-2 text-xl font-semibold text-[#0A0440]">
+                <p className="mt-2 text-xl font-semibold text-ink-900">
                   {money(chart.outflow)}{localCurrency !== "ZAR" && <p className="mt-1 text-sm text-slate-500">≈ {localMoney(chart.outflow)}</p>}
                 </p>
 
@@ -490,18 +489,18 @@ export default function SellerWalletPage() {
             </div>
 
             <Card className="overflow-hidden">
-              <div className="flex flex-col justify-between gap-4 border-b border-[#DCE3EE] px-5 py-5 sm:flex-row sm:items-center">
+              <div className="flex flex-col justify-between gap-4 border-b border-ink-200 px-5 py-5 sm:flex-row sm:items-center">
                 <div>
-                  <h2 className="font-semibold text-[#0A0440]">
+                  <h2 className="font-semibold text-ink-900">
                     Wallet history
                   </h2>
 
-                  <p className="mt-1 text-sm text-[#7C8798]">
+                  <p className="mt-1 text-sm text-ink-500">
                     Every ledger movement recorded for your account.
                   </p>
                 </div>
 
-                <div className="flex rounded-lg border border-[#DCE3EE] bg-[#F5F8FC] p-1">
+                <div className="flex rounded-lg border border-ink-200 bg-ink-50 p-1">
                   {(
                     [
                       ["30", "30 days"],
@@ -514,8 +513,8 @@ export default function SellerWalletPage() {
                       onClick={() => setPeriod(value)}
                       className={`rounded-md px-3 py-1.5 text-xs font-semibold ${
                         period === value
-                          ? "bg-white text-[#0A0440] shadow-sm"
-                          : "text-[#7C8798]"
+                          ? "bg-white text-ink-900 shadow-sm"
+                          : "text-ink-500"
                       }`}
                     >
                       {label}
@@ -526,7 +525,7 @@ export default function SellerWalletPage() {
 
               {filtered.length === 0 ? (
                 <div className="px-5 py-14 text-center">
-                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[10px] border border-[#DCE3EE] bg-[#F5F8FC] text-[#7C8798]">
+                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[10px] border border-ink-200 bg-ink-50 text-ink-500">
                     <Icon />
                   </span>
 
@@ -534,7 +533,7 @@ export default function SellerWalletPage() {
                     No wallet activity yet
                   </p>
 
-                  <p className="mt-1 text-sm text-[#7C8798]">
+                  <p className="mt-1 text-sm text-ink-500">
                     Your commissions, withdrawals and balance movements will
                     appear here.
                   </p>
@@ -542,8 +541,8 @@ export default function SellerWalletPage() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[760px] text-left">
-                    <thead className="border-b border-[#DCE3EE] bg-[#F5F8FC]">
-                      <tr className="text-[11px] uppercase tracking-wider text-[#7C8798]">
+                    <thead className="border-b border-ink-200 bg-ink-50">
+                      <tr className="text-xs uppercase tracking-wide text-ink-500">
                         <th className="px-5 py-3">Activity</th>
                         <th className="px-5 py-3">Amount</th>
                         <th className="px-5 py-3">Status</th>
@@ -556,15 +555,15 @@ export default function SellerWalletPage() {
                       {filtered.map((entry) => (
                         <tr
                           key={entry.id}
-                          className="hover:bg-[#F5F8FC]"
+                          className="hover:bg-ink-100 transition duration-150"
                         >
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-3">
-                              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#DCE3EE] bg-white text-[#60708A]">
+                              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-ink-200 bg-white text-ink-500">
                                 <Icon type={entry.tipo} />
                               </span>
 
-                              <span className="font-medium text-[#0A0440]">
+                              <span className="font-medium text-ink-900">
                                 {labels[entry.tipo]}
                               </span>
                             </div>
@@ -574,7 +573,7 @@ export default function SellerWalletPage() {
                             className={`px-5 py-4 text-sm font-semibold ${
                               entry.valor >= 0
                                 ? "text-[#18794E]"
-                                : "text-[#0A0440]"
+                                : "text-ink-900"
                             }`}
                           >
                             {entry.valor > 0 ? "+" : ""}
@@ -591,13 +590,13 @@ export default function SellerWalletPage() {
                             </span>
                           </td>
 
-                          <td className="px-5 py-4 text-xs text-[#7C8798]">
+                          <td className="px-5 py-4 text-xs text-ink-500">
                             {entry.sale_id
                               ? `Sale #${entry.sale_id.slice(0, 8)}`
                               : "Wallet ledger"}
                           </td>
 
-                          <td className="px-5 py-4 text-sm text-[#7C8798]">
+                          <td className="px-5 py-4 text-sm text-ink-500">
                             {date(entry.created_at)}
                           </td>
                         </tr>

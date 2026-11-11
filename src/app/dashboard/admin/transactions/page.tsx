@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingBlock } from "@/components/ui/Skeleton";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
@@ -276,7 +277,7 @@ export default function AdminTransactionsPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value)
               }
-              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500"
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-brand-600"
             >
               <option value="all">All statuses</option>
               <option value="paga">Paid</option>
@@ -295,9 +296,7 @@ export default function AdminTransactionsPage() {
 
         <Card>
           {loading ? (
-            <div className="py-12 text-center text-sm text-slate-500">
-              Loading transactions...
-            </div>
+            <LoadingBlock label="Loading transactions..." className="py-12" />
           ) : filteredTransactions.length === 0 ? (
             <div className="py-12 text-center">
               <p className="font-medium text-slate-900">
@@ -347,7 +346,7 @@ export default function AdminTransactionsPage() {
                   {filteredTransactions.map((transaction) => (
                     <tr
                       key={transaction.id}
-                      className="hover:bg-slate-50"
+                      className="hover:bg-slate-50 transition duration-150"
                     >
                       <td className="px-6 py-4">
                         <div className="max-w-[180px] truncate text-sm font-medium text-slate-900">
