@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import AppShell from "@/components/layout/AppShell";
 import {
   SupplierOrdersScreen,
   SUPPLIER_NAV,
@@ -119,7 +118,7 @@ export default function SupplierOrdersPage() {
   });
 
   return (
-    <AppShell area="supplier" title="Orders & fulfillment">
+    <>
       <div className="mb-4 flex items-center justify-between gap-3">
         {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
         <button
