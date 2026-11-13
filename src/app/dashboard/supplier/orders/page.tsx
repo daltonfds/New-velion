@@ -144,6 +144,6 @@ export default function SupplierOrdersPage() {
         loading={loading}
         emptyText="No orders are waiting for fulfillment."
       />
-    </AppShell>
+    </>
   );
 }
