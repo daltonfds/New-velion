@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
@@ -68,20 +68,6 @@ const navigation: Record<AppArea, NavItem[]> = {
     { label: "Business Settings", href: "/dashboard/admin/platform-settings", group: "Business" },
     { label: "Club memberships", href: "/dashboard/admin/club-memberships", group: "Business" },
   ],
-};
-
-const groupLabels: Record<string, string> = {
-  Platform: "Platform",
-  Overview: "Overview",
-  Sell: "Sell",
-  Finance: "Finance",
-  Grow: "Grow",
-  Operations: "Operations",
-  Account: "Account",
-  People: "People",
-  Catalog: "Catalog",
-  "Orders & money": "Orders & money",
-  Business: "Business",
 };
 
 const ptLabels: Record<string, string> = {
@@ -184,28 +170,25 @@ export default function AppShell({ area, children, title, subtitle }: AppShellPr
       ? [...navigation.affiliate, { label: "Supplier dashboard", href: "/dashboard/supplier", group: "Account" }]
       : navigation[area];
 
-  const nav = useMemo<NavGroup[]>(() => {
-    const grouped = items.reduce<{ key: string; items: NavItem[] }[]>((acc, item) => {
-      const key = item.group ?? "Platform";
-      const existing = acc.find((group) => group.key === key);
-      if (existing) existing.items.push(item);
-      else acc.push({ key, items: [item] });
-      return acc;
-    }, []);
-    const groups: NavGroup[] = grouped.map((group) => ({
-      label: t(group.key),
-      items: group.items.map((item) => ({
-        label: t(item.label),
-        href: item.href,
-        active: pathname === item.href || (item.href !== "/dashboard/seller" && item.href !== "/dashboard/supplier" && pathname.startsWith(item.href + "/")),
-      })),
-    }));
-    groups.push({
-      label: t("Account"),
-      items: [{ label: t("Profile"), href: "/dashboard/profile", active: pathname === "/dashboard/profile" }],
-    });
-    return groups;
-  }, [items, pathname, pt]);
+  const grouped = items.reduce<{ key: string; items: NavItem[] }[]>((acc, item) => {
+    const key = item.group ?? "Platform";
+    const existing = acc.find((group) => group.key === key);
+    if (existing) existing.items.push(item);
+    else acc.push({ key, items: [item] });
+    return acc;
+  }, []);
+  const nav: NavGroup[] = grouped.map((group) => ({
+    label: t(group.key),
+    items: group.items.map((item) => ({
+      label: t(item.label),
+      href: item.href,
+      active: pathname === item.href || (item.href !== "/dashboard/seller" && item.href !== "/dashboard/supplier" && pathname.startsWith(item.href + "/")),
+    })),
+  }));
+  nav.push({
+    label: t("Account"),
+    items: [{ label: t("Profile"), href: "/dashboard/profile", active: pathname === "/dashboard/profile" }],
+  });
 
   const bottomNavLabels: Record<string, string> = {
     "Painel": "Dashboard",
