@@ -110,7 +110,7 @@ export default function SupplierOrdersPage() {
     return {
       id: order.id,
       ref: "#" + order.id.slice(0, 8).toUpperCase(),
-      product: "—",
+      product: `${Number(order.total).toLocaleString()} ${order.currency}`,
       destination: destination || String(customer.name || customer.full_name || "Customer"),
       status: { tone: statusTone(order.status), label: order.status.replaceAll("_", " ") },
       action: <div className="flex flex-wrap gap-2">{actions}</div>,
@@ -139,7 +139,7 @@ export default function SupplierOrdersPage() {
           { label: "In progress", value: counts.active, note: "Orders requiring fulfillment" },
           { label: "In transit", value: counts.shipped, note: "Orders handed to a carrier" },
         ]}
-        head={["Order", "Product", "Destination", "Status", "Next action"]}
+        head={["Order", "Order value", "Destination", "Status", "Next action"]}
         orders={rows}
         loading={loading}
         emptyText="No orders are waiting for fulfillment."
