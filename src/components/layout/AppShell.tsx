@@ -207,9 +207,16 @@ export default function AppShell({ area, children, title, subtitle }: AppShellPr
     return groups;
   }, [items, pathname, pt]);
 
+  const bottomNavLabels: Record<string, string> = {
+    "Painel": "Dashboard",
+    "Mercado": "Marketplace",
+    "Vendas": "Sales",
+    "Carteira": "Wallet",
+    "Mais": "More",
+  };
   const bottomNav = area === "seller" ? SELLER_BOTTOM_NAV.map((item) => ({
     ...item,
-    label: t(item.label),
+    label: pt ? item.label : (bottomNavLabels[item.label] || item.label),
     active: pathname === item.href || (item.href !== "/dashboard/seller" && pathname.startsWith(item.href + "/")),
   })) : undefined;
 
