@@ -665,9 +665,10 @@ export interface TrackingScreenProps extends ShellProps {
   headline: string;
   steps: { label: string; done: boolean }[];
   events: { when: string; text: string }[];
+  trackingAction?: ReactNode;
 }
 
-export function TrackingScreen({ shellNav, shellRight, reference, headline, steps, events }: TrackingScreenProps) {
+export function TrackingScreen({ shellNav, shellRight, reference, headline, steps, events, trackingAction }: TrackingScreenProps) {
   return (
     <PublicShell nav={shellNav} right={shellRight}>
       <main className="mx-auto max-w-[760px] px-5 py-12 lg:px-8 lg:py-14">
@@ -690,6 +691,7 @@ export function TrackingScreen({ shellNav, shellRight, reference, headline, step
               </li>
             ))}
           </ul>
+          {trackingAction ? <div className="mt-6 border-t border-ink-100 pt-5">{trackingAction}</div> : null}
         </Surface>
       </main>
     </PublicShell>
